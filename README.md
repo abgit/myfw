@@ -470,18 +470,52 @@ $valueA = $app->session()->get( array( 'admin', 'x' ) );
 $valueB = $app->session()->get( array( 'admin', 'y' ) );
 ```
 
-
 cache
 ----
-content..
+This is a simple library to handle apc or redis operations. Before access, set or delete a key make sure to setup enviroment with `$app->config()`.
+
+```php
+// default apc ti to leave
+$app->config( 'apc.ttl', 600 );
+
+// default redis time to leave
+$app->config( 'redis.ttl', 600 );
+
+// cache set using apc
+$app->cache()->set( APP_CACHEAPC, $key, $value );
+or
+$app->cache()->apcset( $key, $value );
+
+// cache set using redis
+$app->cache()->set( APP_CACHEREDIS, $key, $value );
+or
+$app->cache()->redisset( $key, $value );
+
+// cache apc delete
+$app->cache()->delete( APP_CACHEAPC, $key );
+
+// cache redis delete
+$app->cache()->delete( APP_CACHEREDIS, $key );
+```
 
 cart
 ----
-content..
+Cart library handles simple cart functions based on session library. There are some methods available like `getItems`, `getTotalItems`, `getTotal`, `addItem`, `isItem`, `isItemValue`, `addExtra`, `getExtra`, `removeItem`, `updateItemProperty`, `getItemPropertyValue`, `checkItemProperty` and `clear`.
 
 logging
 ----
-content..
+Logging is useful when we need to check internal app behavior. Setup logging level in your config and just log.
+
+```php
+$app->config( 'log.init', true );
+$app->config( 'log.level', \Slim\Log::DEBUG );
+
+$app->cron( 'somecron', function() use ($app){
+    $app->log()->debug( 'my log line' );
+});
+```
+
+Currently, log uses an internal php `print` ouput, useful when using in a cron environment.
 
 mailer
 ----
