@@ -511,7 +511,10 @@ $app->config( 'log.init', true );
 $app->config( 'log.level', \Slim\Log::DEBUG );
 
 $app->cron( 'somecron', function() use ($app){
-    $app->log()->debug( 'my log line' );
+    ...
+    $app->log()->debug( 'my critical log line' );
+    ...
+    $app->log()->warning( 'my warning log line' );
 });
 ```
 
@@ -519,16 +522,89 @@ Currently, log uses an internal php `print` ouput, useful when using in a cron e
 
 mailer
 ----
-content..
+Mail engine is a very simple library to send emails. This library is integrated with rackspace mailgun api for delivery so need some additional `config()` params.
 
-transloadit
-----
-content..
+```php
+// default params
+$app->config( 'email.from', $from );
+$app->config( 'email.to', $to );
+$app->config( 'email.subject', $subject );
+
+// mailgun specific
+$app->config( 'email.mailgunkey', $key );
+$app->config( 'email.mailgundomain', $domain );
+
+// send email
+$app->mailer()->send( $from, $to, $subject, $text );
+
+// send simple email with default email.from config
+$app->mailer()->sendsystem( $to, $subject, $text );
+
+// send simple email with default email.from, email.to and email.subject config
+$app->mailer()->sendinternal( $text );
+```
 
 virustotal
 ----
-content..
+Virus total is a google webservice to check files and websites based on some antivirus categorization. To use this lib we must set virustotal api key and use getInfo method to assign a website info.
+
+```php
+// setup virustotal key
+$app->config( 'vtotal.api', $key );
+
+if( $app->vtotal()->getInfo( $info, "domain.com" ) ){
+   // read $info
+   ... 
+}
+```
+
+transloadit
+----
+This library is the tranloadit webservice integration. All we need is to setup credentials and create an assembly using `createAssembly()` and/or request an assembly status info using `request()`.
+
+```php
+// setup key and secret
+$app->config( 'transloadit.k', $key );
+$app->config( 'transloadit.s', $secret );
+
+// compute transloadit assembly
+$assembly = array(
+    'params' => array(
+        'template_id' => 'abababababababababababababa',
+            'steps' => array(
+                'mystep' => array( 
+                     'param' => $paramvar,
+                      ),
+                'otherstep' => array( 
+                     'otherparam' => $otherparamvar
+                      )
+                ),
+             )
+     );
+
+// transloadit assembly webservice call
+if( $app->transloadit()->createAssembly( $result, $assembly ) ){
+ ...
+}
+```
+
+Transloadit `createAssembly()` just initialize the assembly. Then, transloadit webservice will process it and we need to retrieve results after some time. To do so, we need to use `request()` with our assembly url that we retrive in `createAssembly` `$result`.
+
+```php
+if( $app->transloadit()->request( $returninfo, $assemblyUrl ) ){
+    // do something with $resultinfo
+}
+```
 
 brightcloud
 ----
-content..
+Brightcloud is a webservice to categorize domains. Currently library retrieves a domain info. We need to setup credentials and infor `getInfo()` method.
+
+```php
+$app->config( 'bcloud.k', $key );
+$app->config( 'bcloud.s', $secret );
+
+if( $app->bcloud()->getInfo( $result, "domain.com" ) ){
+    // do something with $result
+}
+```
