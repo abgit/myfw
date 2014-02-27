@@ -54,7 +54,7 @@ require 'myfw.php';
 
 // init and set templates directory
 $app = new myfw();
-$app->config( 'templates.path', \__DIR__ . '/templates' );
+$app->config( 'templates.path', __DIR__ . '/templates' );
 
 // on root
 $app->get( '/', function() use ($app){
@@ -75,7 +75,7 @@ require 'myfw.php';
 
 // init and set template directory
 $app = new myfw();
-$app->config( 'templates.path', \__DIR__ . '/templates' );
+$app->config( 'templates.path', __DIR__ . '/templates' );
 
 $app->get( '/news/:id', function($id) use ($app){
     $app->render( 'mytemplate', array( 'str' => 'My news id is ' . $id ) );
@@ -169,6 +169,10 @@ $app->group('/backend', function() use ($app){
           ...
         });
 });
+
+...
+
+$app->run();
 ```
 
 form
@@ -261,7 +265,7 @@ $app->map( '/item/:id', function($id) use ($app){
             return $result;        
 
         $app->form()->setErrorMessage( 'News item not available' )->hide();
-});
+  });
 
   $app->form()->onSubmittedAndValid( function() use ($app,$id){
 
@@ -346,15 +350,126 @@ In previous example we are changing language to `en_US`, use session value if av
 
 rules
 ----
-content..
+myfw has a built-in library to check patterns. These are just simple boolean methods that check an argument string and return true/false. These methods are integrated with form object when adding a form element so that we can check its value but we can use them alone too.
 
+**form integration**
+
+```php
+$app->map( '/contact', function() use ($app){
+  
+  $app->form()->addText( 'myelement', 'Label', array( 'required' => 'element is required' ) );
+              ...
+              ->addSubmit();
+  ...
+)->via( 'GET', 'POST' );
+
+$app->run();
+```
+
+When adding a form element we can assign an array of rules as 3rd element. This is an array where each key is the rule name (rules method name) and value is the error message on an array with message and additional options.
+
+```php
+$app->map( '/contact', function() use ($app){
+  
+  $app->form()->addText( 'myelement', 'Label', array( 'required' => 'element is required' ) );
+              ->addText( 'mydescription', 'Description', array( 'required' => 'Descrition is required', maxlen => array( 'Description is too big', 200 ) ) );
+              ...
+              ->addSubmit();
+  ...
+)->via( 'GET', 'POST' );
+
+$app->run();
+```
+
+**stand alone**
+
+
+```php
+if( $app->rules()->maxlen( $x, 250 ) ){
+  ...
+}
+```
+
+myfw **rules available**:
+
+* required
+* numeric
+* maxlen
+* regex
+* email
+* not_email
+* money
+* ip
+* md5
+* tag
+* lettersonly
+* character
+* maxhyperlinks
+* value
+* maxlength
+* minlength
+* nopunctuation
+* alphanumeric
+* alphanumericstrict
+* captcha
+* selectvalid
+* matchfield
+* dontmatchfield
+* fieldrequired
+* httpurl
+* domain
+* subdomain
+* hexcolor
+	
 filters
 ----
-content..
+Like the rules library, filters library can be used when adding form elements. If form is submitted and valid, element values will be filtered before we retrieve values with `$arr = $app->form()->getValues()`.
+
+```php
+$app->form()->addText( 'myelement', 'Label', array(..), array( 'trim' ) );
+```
+myfw **rules available**:
+
+* trim
+* sha1
+* fintval
+* shortify
+* hexcolor
+* host
+* domain
+* markdown
+* xss
+		
 
 session
 ----
-content..
+Session library contains simple methods to handle php `$_SESSION`. Instead of direct access we should use this simple library to store, delete, get session information.
+
+```php
+// set $key 
+$app->session()->set( $key, $label );
+
+// set $key if not exists only
+$app->session()->setcheck( $key, $label ); 
+
+// get $key value
+$k = $app->session()->get( $key );
+
+// check if $key exists
+if( $app->session()->exists( $key ) ){ .. }
+
+// delete $key
+if( $app->session()->delete( $key ) ){ .. }
+
+// set pluralkey 'admin - x' ( same as $_SESSION[ 'admin' ][ 'x' ] )
+$app->session()->set( array( 'admin', 'x' ), $valueA );
+$app->session()->set( array( 'admin', 'y' ), $valueB );
+
+// get pluralkey 'admin - x'
+$valueA = $app->session()->get( array( 'admin', 'x' ) );
+$valueB = $app->session()->get( array( 'admin', 'y' ) );
+```
+
 
 cache
 ----
