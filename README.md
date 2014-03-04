@@ -571,14 +571,14 @@ $app->config( 'transloadit.s', $secret );
 $assembly = array(
     'params' => array(
         'template_id' => 'abababababababababababababa',
-            'steps' => array(
+        'steps'       => array(
                 'mystep' => array( 
                      'param' => $paramvar,
                       ),
                 'otherstep' => array( 
                      'otherparam' => $otherparamvar
                       )
-                ),
+                )
              )
      );
 
