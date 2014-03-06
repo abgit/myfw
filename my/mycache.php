@@ -66,11 +66,11 @@
         }
 
         public function redisdelete( $k ){
-            return $this->redisrw->delete( $k );
+            return $this->redisrwinit() ? $this->redisrw->delete( $k ) : null;
         }
 
         public function & redissettimeout( $k, $ttl ){
-            $this->redisrw->setTimeout( $k, $ttl );
+            $this->redisrwinit() ? $this->redisrw->setTimeout( $k, $ttl ) : null;
             return $this;
         }
 
