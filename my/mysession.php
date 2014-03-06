@@ -15,7 +15,7 @@
 
             // start custom session handler
             if( ( $mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
-                $handler = new mysessionhandler( $mode );
+                $handler = new mysessionhandler( $mode, $this->app );
 
                 if( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID > 50399 ){
                     session_set_save_handler($handler);
@@ -117,10 +117,10 @@
 
     class mysessionhandler implements SessionHandlerInterface{
 
-        public function __construct( $mode ){
-            $this->app    = \Slim\Slim::getInstance();
-            $this->ttl    = $this->app->config( 'session.ttl' ) || ini_get( 'session.gc_maxlifetime' ) || 360;
+        public function __construct( $mode, $app ){
+            $this->app    = $app;
             $this->mode   = $mode;
+            $this->ttl    = $this->app->config( 'session.ttl' ) || ini_get( 'session.gc_maxlifetime' ) || 360;
             $this->prefix = 'PHPSESSID:';
         }
 

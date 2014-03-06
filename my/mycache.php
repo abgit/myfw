@@ -11,7 +11,7 @@
             return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcexists( $id ) : $this->redisexists( $id );
         }
 
-        public function set( $mode, $id, $content, $ttl ){
+        public function set( $mode, $id, $content, $ttl = false ){
             return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcset( $id, $content, $ttl ) : $this->redisset( $id, $content, $ttl );
         }
 
@@ -34,8 +34,8 @@
             return function_exists( 'apc_exists' ) ? apc_exists( $id ) : false;
         }
 
-        public function apcset( $id, $content, $ttl ){
-            return function_exists( 'apc_store' ) ? apc_store( $id, $content, is_null( $ttl ) ? $this->app->config( 'apc.ttl' ) : intval( $ttl ) ) : false;
+        public function apcset( $id, $content, $ttl = false ){
+            return function_exists( 'apc_store' ) ? apc_store( $id, $content, $ttl || $this->app->config( 'apc.ttl' ) ) : false;
         }
 
         public function apcget( $id ){
@@ -57,8 +57,8 @@
             return $this->redisroinit() ? $this->redisro->exists( $id ) : false;
         }
 
-        public function redisset( $id, $content, $ttl ){
-            return $this->redisrwinit() ? ($this->redisrw->setex( $id, is_null( $ttl ) ? $this->app->config( 'redis.ttl' ) : intval( $ttl ), $content )) : false;
+        public function redisset( $id, $content, $ttl = false ){
+            return $this->redisrwinit() ? ($this->redisrw->setex( $id, $ttl || $this->app->config( 'redis.ttl' ), $content )) : false;
         }
 
         public function redisget( $id ){
