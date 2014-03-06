@@ -19,6 +19,16 @@
             return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcget( $id ) : $this->redisget( $id );
         }
 
+        public function delete( $mode, $k ){
+            return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcdelete( $k ) : $this->redisdelete( $k );
+        }
+
+        public function & settimeout( $mode, $k, $ttl ){
+            ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcsettimeout( $k, $ttl ) : $this->redissettimeout( $k, $ttl );
+            return $this;
+        }
+
+
         // apc
         public function apcexists( $id ){
             return function_exists( 'apc_exists' ) ? apc_exists( $id ) : false;
@@ -32,6 +42,16 @@
             return function_exists( 'apc_fetch' ) ? apc_fetch( $id ) : null;
         }
 
+        public function apcdelete( $k ){
+            return apc_delete( $k );
+        }
+
+        public function & apcsettimeout( $k, $ttl ){
+            apc_exists( $k ) ? apc_store( $k, apc_get( $k ), $ttl ) : false;
+            return $this;
+        }
+
+
         // redis
         public function redisexists( $id ){
             return $this->redisroinit() ? $this->redisro->exists( $id ) : false;
@@ -43,6 +63,15 @@
 
         public function redisget( $id ){
             return $this->redisroinit() ? $this->redisro->get( $id ) : null;
+        }
+
+        public function redisdelete( $k ){
+            return $this->redisrw->delete( $k );
+        }
+
+        public function & redissettimeout( $k, $ttl ){
+            $this->redisrw->setTimeout( $k, $ttl );
+            return $this;
         }
 
         private function redisroinit(){

@@ -5,7 +5,26 @@
         private $sessionactive = false;
 
         public function __construct(){
-            $this->sessionactive = ( session_id() !== '' ) || ( ( APP_WEBMODE && ( function_exists( 'session_status' ) ? session_status() != PHP_SESSION_ACTIVE : session_id() === "" ) ) ? ( session_start() && session_regenerate_id() ) : false );
+            $this->app           = \Slim\Slim::getInstance();
+            $this->sessionactive = ( session_id() !== '' ) || ( ( APP_WEBMODE && ( function_exists( 'session_status' ) ? session_status() != PHP_SESSION_ACTIVE : session_id() === "" ) ) ? $this->sessionstart() : false );
+        }
+
+        private function sessionstart(){
+
+            $mode = $this->app->config( 'session.mode' );
+
+            // start custom session handler
+            if( ( $mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
+                $handler = new mysessionhandler( $mode );
+
+                if( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID > 50399 ){
+                    session_set_save_handler($handler);
+                }else{
+                    session_set_save_handler( array($handler, 'open'), array($handler, 'close'), array($handler, 'read'), array($handler, 'write'), array($handler, 'destroy'), array($handler, 'gc') );
+                }
+            }
+  
+            return ( session_start() && session_regenerate_id() );
         }
 
         public function exists( $key ){
@@ -95,3 +114,34 @@
         }
     }
 
+
+    class mysessionhandler implements SessionHandlerInterface{
+
+        public function __construct( $mode ){
+            $this->app    = \Slim\Slim::getInstance();
+            $this->ttl    = $this->app->config( 'session.ttl' ) || ini_get( 'session.gc_maxlifetime' ) || 360;
+            $this->mode   = $mode;
+            $this->prefix = 'PHPSESSID:';
+        }
+
+        public function read( $id ){
+            return $this->app->cache()->settimeout( $this->mode, $this->prefix . $id, $this->ttl )->get( $this->mode, $this->prefix . $id );
+        }
+
+        public function write( $id, $data ){
+            return $this->app->cache()->set( $this->mode, $this->prefix . $id, $data, $this->ttl );
+        }
+
+        public function destroy( $id ){
+            return $this->app->cache()->delete( $this->mode, $this->prefix . $id );
+        }
+
+        public function open( $savePath, $sessionName ){
+        }
+
+        public function close(){
+        }
+
+        public function gc( $maxLifetime ){
+        }
+    }
