@@ -2,7 +2,7 @@
 
     class mycache{
 
-        public function __contruct(){
+        public function __construct(){
             $this->app = \Slim\Slim::getInstance();
         }
 
