@@ -2,6 +2,9 @@
 
     class mycache{
 
+        private $redisrw = null;
+        private $redisro = null;
+
         public function __construct(){
             $this->app = \Slim\Slim::getInstance();
         }
