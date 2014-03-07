@@ -82,7 +82,7 @@
             return ( !is_null( $this->redisro ) && $this->redisro->IsConnected() );
         }
 
-        private function rediswrinit(){
+        private function redisrwinit(){
             if( is_null( $this->redisrw ) && class_exists( 'Redis' ) ){
                 $this->redisrw = new Redis();
                 $this->redisrw->connect( $this->app->config( 'redis.hostrw' ), $this->app->config( 'redis.hostrwport' ) || 6379 );
