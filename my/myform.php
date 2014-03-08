@@ -628,8 +628,8 @@ class myform{
 
             if( $applyFilters && is_array( $el[ 'filters' ] ) )
                 foreach( $el[ 'filters' ] as $f )
-                    if( is_callable( array( 'myrules', 'f' . $f ) ) )
-                        $values[ $n ] = call_user_func( array( 'myrules', 'f' . $f ), $values[ $n ] );
+                    if( is_callable( array( 'myfilters', $f ) ) )
+                        $values[ $n ] = call_user_func( array( 'myfilters', $f ), $values[ $n ] );
         }
 
         return $values;

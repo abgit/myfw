@@ -1,8 +1,5 @@
 <?php
 
-    use \Michelf\Markdown;
-    use \Michelf\MarkdownExtra;
-
 class myrules{
 
     public static function required( $value = '', $options = '', $input = array(), $el = array() ){
@@ -151,85 +148,4 @@ class myrules{
     public static function hexcolor( $val ){
         return myrules::regex( $val, '/^#?([a-fA-F0-9]){3}(([a-fA-F0-9]){3})?$/' );
     }
-
-    // FILTERS
-    public static function ftrim( $value ){
-        return trim( $value );
-    }
-
-    public static function fsha1( $value ){
-        return sha1( $value );
-    }
-
-    public static function fintval( $value ){
-        return intval( $value );
-    }
-
-    public static function fshortify( $value ){
-        return preg_replace( "/[^a-zA-Z0-9_-]/", "-", $value );
-    }
-
-    public static function fhexcolor( $val ){
-        return ( strlen( $val ) > 2 && substr( $val, 0, 1 ) != '#' ) ? '#' . $val : $val;
-    }
-
-    public static function fhost( $value ){
-        if( ! empty( $value ) )
-            return ( substr( $value, 0, 7 ) != 'http://' && substr( $value, 0, 8 ) != 'https://' ) ? 'http://' . $value : $value;
-    }
-
-    public static function fdomain( $value ){
-        return parse_url( ( substr( $value, 0, 7 ) != 'http://' && substr( $value, 0, 8 ) != 'https://' ) ? 'http://' . $value : $value, PHP_URL_HOST );
-    }
-
-    public static function fmarkdown( $data ){
-        $parser = new MarkdownExtra();
-        $parser->no_markup = true;
-        $parser->no_entities = true;
-        return $parser->transform($data);
-    }
-
-    public static function fxss( $data ){
-
-        // remove email before markdown
-        $data = preg_replace("/[^@\s]*@[^@\s]*\.[^@\s]*/", "[email]", $data);
-
-        // markdown
-        $data = myrules::fmarkdown( $data );
-
-        // xss
-        // Fix &entity\n;
-        $data = str_replace(array('&amp;','&lt;','&gt;'), array('&amp;amp;','&amp;lt;','&amp;gt;'), $data);
-        $data = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $data);
-        $data = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $data);
-        $data = html_entity_decode($data, ENT_COMPAT, 'UTF-8');
- 
-        // Remove any attribute starting with "on" or xmlns
-        $data = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $data);
- 
-        // Remove javascript: and vbscript: protocols
-        $data = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $data);
-        $data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $data);
-        $data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $data);
- 
-        // Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
-        $data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
-        $data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
-        $data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $data);
- 
-        // Remove namespaced elements (we do not need them)
-        $data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
- 
-        do{
-            // Remove really unwanted tags
-            $old_data = $data;
-            $data = preg_replace('#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $data);
-        }while ($old_data !== $data);
-
-        // remove email after markdown
-        $data = preg_replace("/[^@\s]*@[^@\s]*\.[^@\s]*/", "[email]", $data);
- 
-        return $data;	
-    }
 }
-

@@ -159,24 +159,9 @@
 
             if( !$this->renderinit ){
                 $env->getExtension('core')->setDateFormat( 'F j, Y' );
-                $env->addFilter( new Twig_SimpleFilter( 'm', function($string,$showSymbol=true){ return ( ( $showSymbol ? '&euro; ' : '' ) . round($string, 2) ); }, array('is_safe' => array('html') ) ) );
-                $env->addFilter( new Twig_SimpleFilter( 'url', function($string){ return myrules::fhost( $string); } ) );
-                $env->addFilter( new Twig_SimpleFilter( 'order', function($string){ switch( intval( $string ) ){case 1: return '1st'; case 2: return '2nd'; case 3: return '3rd'; default: return $string . 'th'; } } ) );
-                $env->addFilter( new Twig_SimpleFilter( 't', function($string,$chars=10,$rep='...'){ return $chars > strlen($string) ? $string : substr($string, 0, $chars) . $rep; } ) );
-                $env->addFilter( new Twig_SimpleFilter( 'rnumber', function($string){$string=(0+str_replace(",","",$string));if(!is_numeric($string))return false;if($string>1000000000000)return round(($string/1000000000000),1).' trillion';elseif($string>1000000000)return round(($string/1000000000),1).' billion';elseif($string>1000000)return round(($string/1000000),1).' million';elseif($string>1000)return round(($string/1000),1).' thousand';return number_format($string);}));
-                $env->addFilter( new Twig_SimpleFilter( 'bcloudname', function($string){ $b = new mybcloud(); $b = $b->getCategoriesList(); return isset( $b[$string] ) ? $b[$string][0] : 'unknown'; } ) );
-                $env->addFilter( new Twig_SimpleFilter( 'gravatar', function( $email, $s = 80, $d = 'mm', $r = 'g' ){ return '//www.gravatar.com/avatar/' . md5( strtolower( trim( $email ) ) ) . "?s=$s&d=$d&r=$r"; } ) );
-                $env->addFilter( new Twig_SimpleFilter( 'md5', function($string){return md5( $string );}));
-                $env->addFilter( new Twig_SimpleFilter( 'alphaindex', function($string){return md5( $string );}));
-                $env->addFilter( new Twig_SimpleFilter( 'floatval', function($string){return is_array($string) ? array_map( 'floatval', $string ) : floatval( $string );}));
-                $env->addFilter( new Twig_SimpleFilter( 'intval', function($string){return is_array($string) ? array_map( 'intval', $string ) : intval( $string );}));
-                $env->addFilter( new Twig_SimpleFilter( 'statecolor', function($string){if ( intval( $string) > 0 ){return '#090';}if( intval( $string) < 0 ){return '#F00';}return '#960';}));
-                $env->addFilter( new Twig_SimpleFilter( 'extension', function($string){return strtolower(pathinfo($string, PATHINFO_EXTENSION));}));
-                $env->addFilter( new Twig_SimpleFilter( 'domain', function($string){$url=parse_url($string); return isset($url['host'])?$url['host']:'';}));
-                $env->addFilter( new Twig_SimpleFilter( 'xss', function($string){$obj = new myrules(); return $obj->xss( $string );}, array( 'is_safe' => array( 'html' ) ) ) );
-                $env->addFilter( new Twig_SimpleFilter( 'ago', function($datetime, $full = 0){$now = new DateTime;$ago = new DateTime($datetime);$diff = $now->diff($ago);$diff->w = floor($diff->d / 7);$diff->d -= $diff->w * 7;$string = array( 'y' => 'year', 'm' => 'month', 'w' => 'week', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second' );foreach ($string as $k => &$v) {if ($diff->$k) {$v = $diff->$k . ' ' . $v . ($diff->$k > 1 ? 's' : '');} else {unset($string[$k]);}}if (!$full) $string = array_slice($string, 0, 1);return $string ? implode(', ', $string) . ' ago' : 'just now';}));
                 $env->addFunction( new Twig_SimpleFunction( '_', function($s,$v=array("")){if(!is_array($v))$v=array($v);array_unshift($v,gettext($s));return call_user_func_array('sprintf', $v );}));
                 $env->addFunction( new Twig_SimpleFunction( '_n', '_n' ) );  
+                $env->addFilter( new Twig_SimpleFilter( '*', function( $f, $args ){ return is_callable( array( 'myfilters', $f ) ) ? call_user_func( array( 'myfilters', $f ), $args ) : ''; }, array('is_safe' => array('html') ) ) );
 
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
@@ -194,7 +179,7 @@
             $output = $env->render( $tpl . '.tpl', $vars );
 
             if( $this->config( 'templates.srcpreg' ) )
-                $output = preg_replace( '~(href|src)=(["\'])(?!#)(/)?(?!http(s)?://)([^ ]+)(' . $this->config( 'templates.srcpregext' ). ')(["\'])~i', '$1="' . $this->config( 'templates.srcpregdomain' ) . '$5$6"', $output);
+                $output = preg_replace( '~(href|src)=(["\'])(?!#)(/)?(?!http(s)?://)([^"\']+)(' . $this->config( 'templates.srcpregext' ). ')(["\'])~i', '$1="' . $this->config( 'templates.srcpregdomain' ) . '$5$6"', $output);
 
             // optionally add to cache
             if( !is_null( $cacheid ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
@@ -253,7 +238,10 @@
 
 			return ( is_array( $argv ) && isset( $argv[1] ) && is_string( $argv[1] ) && is_string( $match ) && $argv[1] === $match ) ? call_user_func( $callback ) : false;
 		}
-        
+
+        public function run(){
+            return APP_WEBMODE ? parent::run() : false;
+        }
 	}
 	
 	// debug function alias
