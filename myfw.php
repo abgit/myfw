@@ -37,6 +37,7 @@
         private $redisro     = null;
         private $redisrw     = null;
         private $rules       = null;
+        private $filters     = null;
         private $vtotal      = null;
         private $session     = null;
         private $bcloud      = null;
@@ -68,6 +69,12 @@
             if( is_null( $this->rules ) )
 				$this->rules = new myrules();
 			return $this->rules;
+		}
+
+        public function filters(){
+            if( is_null( $this->filters ) )
+				$this->filters = new myfilters();
+			return $this->filters;
 		}
 
 		// get form object
