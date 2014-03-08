@@ -186,7 +186,7 @@ class myform{
         ), JSON_UNESCAPED_SLASHES );
 
         $this->imageuploadorder = isset( $this->imageuploadorder ) ? 1+$this->imageuploadorder : 1;
-        $this->elements[ $name ] = array( 'type' => 'imageupload', 'valuetype' => $options['type'], 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => array( 'order' => $this->imageuploadorder, 'params' => $params, 'signature' => hash_hmac('sha1', $params, APP_TL_S ), 'width' => $options['width'], 'height' => $options['height'] ) );
+        $this->elements[ $name ] = array( 'type' => 'imageupload', 'valuetype' => $options['type'], 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => array( 'order' => $this->imageuploadorder, 'params' => $params, 'signature' => hash_hmac('sha1', $params, $app->config('transloadit.s') ), 'width' => $options['width'], 'height' => $options['height'] ) );
         return $this;
     }
 
