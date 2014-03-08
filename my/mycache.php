@@ -61,7 +61,7 @@
         }
 
         public function redisset( $id, $content, $ttl = false ){
-            return $this->redisrwinit() ? ($this->redisrw->setex( $id, $ttl || $this->app->config( 'redis.ttl' ), $content )) : false;
+            return $this->redisrwinit() ? ($this->redisrw->set( $id, $content, $ttl || $this->app->config( 'redis.ttl' ) )) : false;
         }
 
         public function redisget( $id ){
