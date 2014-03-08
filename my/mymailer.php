@@ -6,8 +6,8 @@
 
         public function __construct(){
 
-            $this->app = \Slim\Slim::getInstance();
-            $this->mg = new Mailgun( $this->app->config( 'email.mailgunkey' ) );
+            $this->app    = \Slim\Slim::getInstance();
+            $this->mg     = new Mailgun( $this->app->config( 'email.mailgunkey' ) );
             $this->domain = $this->app->config( 'email.mailgundomain' );
         }
 
@@ -16,23 +16,29 @@
         }
 
         public function sendsystem( $to, $subject, $message ){
-            return $this->send( APP_EMAIL, $to, $subject, $message );
+            return $this->send( $this->app->config( 'email.from' ), $to, $subject, $message );
         }
 
-        public function send( $from, $to, $subject, $text ){
+        public function send( $from, $to, $subject, $text, $templatevars = array() ){
 
-            $this->app = \Slim\Slim::getInstance();
+            // log
             $this->app->log()->debug( "mymailer::send,to:" . $to . ',subject:' . $subject );
 
-            $html = file_get_contents( dirname( __FILE__ ) . '/mymailer.tpl' );
-            $html = str_replace( '#msgheader#',  date("j / M"), $html );
-            $html = str_replace( '#msgtitle#',   $subject, $html );
-            $html = str_replace( '#msgcontent#', nl2br( preg_replace( '@((http://|https://)(www.)?([^ ]{4,300}))@', '<a href="\0" target="_blank">\4</a>', $text ) ), $html );
+            // if we use a template file, assign text and optional vars to template and get render result
+            if( $template = $this->app->config( 'email.template' ) ){
+                $html = $this->app->render( $template, $templatevars + array( 'content' => $text ), null, null, APP_CACHEAPC, false, false );    
+            }else{
+                $html = $text;
+            }
 
-            return $this->mg->sendMessage( $this->domain, array(    'from'          => $from, 
-                                                                    'to'            => $to,
-                                                                    'subject'       => $subject, 
-                                                                    'text'          => $text,
-                                                                    'html'          => $html ) );
+            // comput mailgun email header
+            $email = array( 'from' => $from, 'to' => $to, 'subject' => $subject, 'text' => $text, 'html' => $html );
+
+            // check if we have custom additional header variables
+            if( ( $headers = $this->app->config( 'email.headers' ) ) && is_array( $headers ) )
+                $email = $headers + $email;
+
+            // send
+            return $this->mg->sendMessage( $this->domain, $email );
         }
     }

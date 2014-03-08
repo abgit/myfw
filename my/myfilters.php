@@ -18,6 +18,10 @@ class myfilters{
         return md5( $string );
     }
 
+    public static function nl2br( $string ){
+        return nl2br( $string );
+    }
+
     public static function floatval( $string ){
         return is_array($string) ? array_map( 'floatval', $string ) : floatval( $string );
     }
