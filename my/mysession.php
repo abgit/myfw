@@ -13,7 +13,7 @@
             if( ! $this->sessionactive ){
 
                 // start custom session handler
-                if( ( $mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
+                if( ( $this->mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $this->mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
 
                     if( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID > 50399 ){
                         session_set_save_handler($this);
