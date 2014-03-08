@@ -5,26 +5,25 @@
         private $sessionactive = false;
 
         public function __construct(){
-            $this->app           = \Slim\Slim::getInstance();
-            $this->sessionactive = ( session_id() !== '' ) || ( ( APP_WEBMODE && ( function_exists( 'session_status' ) ? session_status() != PHP_SESSION_ACTIVE : session_id() === "" ) ) ? $this->sessionstart() : false );
-        }
+            $this->app    = \Slim\Slim::getInstance();
+            $this->ttl    = $this->app->config( 'session.ttl' ) || ini_get( 'session.gc_maxlifetime' ) || 360;
+            $this->mode   = $this->app->config( 'session.mode' ) || 9;
+            $this->prefix = 'PHPSESSID:';
 
-        private function sessionstart(){
+            if( ! $this->sessionactive ){
 
-            $mode = $this->app->config( 'session.mode' );
+                // start custom session handler
+                if( ( $mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
 
-            // start custom session handler
-            if( ( $mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
-                $handler = new mysessionhandler( $mode, $this->app );
-
-                if( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID > 50399 ){
-                    session_set_save_handler($handler);
-                }else{
-                    session_set_save_handler( array($handler, 'open'), array($handler, 'close'), array($handler, 'read'), array($handler, 'write'), array($handler, 'destroy'), array($handler, 'gc') );
+                    if( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID > 50399 ){
+                        session_set_save_handler($this);
+                    }else{
+                        session_set_save_handler( array($this, 'open'), array($this, 'close'), array($this, 'read'), array($this, 'write'), array($this, 'destroy'), array($this, 'gc') );
+                    }
                 }
+
+                $this->sessionactive = ( session_id() !== '' ) || ( ( APP_WEBMODE && ( function_exists( 'session_status' ) ? session_status() != PHP_SESSION_ACTIVE : session_id() === "" ) ) ? ( session_start() && session_regenerate_id() ) : false );
             }
-  
-            return ( session_start() && session_regenerate_id() );
         }
 
         public function exists( $key ){
@@ -112,18 +111,9 @@
 
             return false;
         }
-    }
 
 
-    class mysessionhandler implements SessionHandlerInterface{
-
-        public function __construct( $mode, $app ){
-            $this->app    = $app;
-            $this->mode   = $mode;
-            $this->ttl    = $this->app->config( 'session.ttl' ) || ini_get( 'session.gc_maxlifetime' ) || 360;
-            $this->prefix = 'PHPSESSID:';
-        }
-
+        // php session interface methods
         public function read( $id ){
             return $this->app->cache()->settimeout( $this->mode, $this->prefix . $id, $this->ttl )->get( $this->mode, $this->prefix . $id );
         }
@@ -144,4 +134,5 @@
 
         public function gc( $maxLifetime ){
         }
+
     }
