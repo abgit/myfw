@@ -166,9 +166,27 @@
 
             if( !$this->renderinit ){
                 $env->getExtension('core')->setDateFormat( 'F j, Y' );
-                $env->addFunction( new Twig_SimpleFunction( '_', function($s,$v=array("")){if(!is_array($v))$v=array($v);array_unshift($v,gettext($s));return call_user_func_array('sprintf', $v );}));
+
+                $env->addFunction( new Twig_SimpleFunction( '_',
+                    function( $s, $v = array( "" ) ){
+                        if( !is_array( $v ))
+                            $v = array( $v );
+                            array_unshift( $v, gettext( $s ) );
+                            return call_user_func_array( 'sprintf', $v );
+                        }));
+
                 $env->addFunction( new Twig_SimpleFunction( '_n', '_n' ) );  
-                $env->addFilter( new Twig_SimpleFilter( '*', function( $f, $args ){ return is_callable( array( 'myfilters', $f ) ) ? call_user_func( array( 'myfilters', $f ), $args ) : ''; }, array('is_safe' => array('html') ) ) );
+
+                $env->addFilter( new Twig_SimpleFilter( '*',
+                    function( $f, $args = '' ){
+                        if( is_callable( array( 'myfilters', $f ) ) ){
+                            $args = func_get_args();
+                            array_shift( $args );
+                            return call_user_func_array( array( 'myfilters', $f ), $args );
+                        }
+                        return '';
+                    }
+                , array('is_safe' => array('html') ) ));
 
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
