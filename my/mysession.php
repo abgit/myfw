@@ -115,11 +115,11 @@
 
         // php session interface methods
         public function read( $id ){
-            return $this->app->cache()->settimeout( $this->mode, $this->prefix . $id, $this->ttl )->get( $this->mode, $this->prefix . $id );
+            return (string) $this->app->cache()->settimeout( $this->mode, $this->prefix . $id, $this->ttl )->get( $this->mode, $this->prefix . $id );
         }
 
         public function write( $id, $data ){
-            return $this->app->cache()->set( $this->mode, $this->prefix . $id, $data, $this->ttl );
+            return (bool) $this->app->cache()->set( $this->mode, $this->prefix . $id, $data, $this->ttl );
         }
 
         public function destroy( $id ){
