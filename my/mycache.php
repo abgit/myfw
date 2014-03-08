@@ -38,7 +38,7 @@
         }
 
         public function apcset( $id, $content, $ttl = false ){
-            return function_exists( 'apc_store' ) ? apc_store( $id, $content, $ttl || $this->app->config( 'apc.ttl' ) ) : false;
+            return function_exists( 'apc_store' ) ? apc_store( $id, $content, intval( $ttl ) || $this->app->config( 'apc.ttl' ) ) : false;
         }
 
         public function apcget( $id ){
@@ -61,7 +61,7 @@
         }
 
         public function redisset( $id, $content, $ttl = false ){
-            return $this->redisrwinit() ? ($this->redisrw->set( $id, $content, $ttl || $this->app->config( 'redis.ttl' ) )) : false;
+            return $this->redisrwinit() ? ($this->redisrw->set( $id, $content, intval( $ttl ) || $this->app->config( 'redis.ttl' ) )) : false;
         }
 
         public function redisget( $id ){
