@@ -188,6 +188,11 @@
                     }
                 , array('is_safe' => array('html') ) ));
 
+                $env->addFunction( new Twig_SimpleFunction( 'urlFor',
+                    function( $action, $params = array() ){
+                        return \Slim\Slim::getInstance()->urlFor( $action, is_array( $params ) ? $params : array( $params ) );
+                        }));
+
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
 
