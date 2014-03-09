@@ -1,6 +1,10 @@
 start
 ----
-To use myfw all we need is to include myfw.php file and init myfw object.
+To use myfw all we need is to:
+
+* download latest stable version [here](https://github.com/abgit/myfw/archive/v0.1.zip).
+
+*  include myfw.php and just init myfw object.
 
 ```php
 require 'myfw.php';
