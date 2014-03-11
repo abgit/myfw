@@ -2,7 +2,7 @@ start
 ----
 To use myfw all we need is to:
 
-* download latest stable version [here](https://github.com/abgit/myfw/archive/v0.1.zip).
+* download latest stable version [here](https://github.com/abgit/myfw/releases/latest).
 
 * add a htaccess file to our root directory
 
