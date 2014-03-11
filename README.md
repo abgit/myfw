@@ -4,7 +4,15 @@ To use myfw all we need is to:
 
 * download latest stable version [here](https://github.com/abgit/myfw/archive/v0.1.zip).
 
-*  include myfw.php and just init myfw object.
+* add a htaccess file to our root directory
+
+```
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
+```
+
+*  include myfw.php, init and run.
 
 ```php
 require 'myfw.php';
@@ -46,7 +54,7 @@ $app->cron( 'somearg2', function(){
 });
 ```
 
-To execute previous 'somearg' cron, we only need to load file and specify 'somearg' in command line:
+To execute previous `somearg` cron, we only need to load file and specify `somearg` in command line:
 `/bin/usr/php file.php somearg`.
 
 hello world
@@ -134,7 +142,7 @@ require 'myfw.php';
 
 $app = new myfw();
 
-// choose mode or just create a php.ini SLIM_MODE variable
+// choose mode
 $app->config( 'mode', 'production' );
 
 $app->configureMode( 'production', function () use ($app) {
@@ -155,6 +163,12 @@ $app->configureMode( 'development', function () use ($app) {
 
 $app->run();
 ```
+
+There are at least 3 different ways to define mode to use:
+
+* hardcoded: this is the previous example where we hard code mode: `$app->config( 'mode', 'production' );`;
+* by apache env variable: we need to customize our `apache configuration` and add a special variable `SLIM_MODE` and assign mode value; This method don't require an additional `$app->config()` call;
+* by a php env variable: we need to customize our php.ini fom our `php configuration` and add a variable. Can have any name, eg: `app.mode = "development"` and add it to our code: `$app->config( 'mode', get_cfg_var( 'app.mode' ) );`;
 
 group
 ----
@@ -472,7 +486,7 @@ myfw md5 filter
 Filters library can be invoked directly in php and used as standalone too:
 
 ```php
-$app->filters()->gravatar( 'someemail' );
+$filteredvalue = $app->filters()->gravatar( 'someemail' );
 ```
 
 myfw **filters available**:
@@ -576,7 +590,7 @@ In previous example, if a `/news/:id` exists, all html will be displayed and no 
 
 * apc engine is detected in server;
 * is a http request;
-* was not computed any `form()` inside action;
+* was not created any `$app->form()` inside action;
 
 cart
 ----
@@ -630,7 +644,7 @@ Mailer engine supports templates. This means that we can assign a template to ma
 
 We need to create a template file in our templates directory, add a `content` tag that will be used by mailer engine to inject message and inform mailer about the template filename:
 
-mymail.tpl file:
+`mymail.tpl` file:
 ```
 some header
   {{content}}
@@ -669,7 +683,7 @@ $url = $app->urlFor( "newsitem", array( "name" => $someitem ) );
 
 **template environment** example:
 
-```
+```html
 <a href="{{ urlFor( 'newsitem', {'name':someitem} ) }}">
 ```
 
@@ -740,3 +754,5 @@ if( $app->bcloud()->getInfo( $result, "domain.com" ) ){
     // do something with $result
 }
 ```
+
+--
