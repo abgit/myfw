@@ -45,9 +45,15 @@
         private $loginit     = null;
         private $i18n        = null;
         private $cache       = null;
+        private $cacheable   = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
+            $app = &$this;
+            $this->hook( 'slim.before.dispatch', function () use ($app) {
+                $app->clearcacheable();
+            });
+            
         }
 
         public function setConditions( $cond ){
@@ -63,6 +69,18 @@
             }
 
             return $this->log;
+        }
+
+        public function setcacheable(){
+            $this->cacheable = true;
+        }
+
+        public function iscacheable(){
+            return $this->cacheable === true;
+        }
+
+        public function clearcacheable(){
+            $this->cacheable = null;
         }
 
         public function rules(){
@@ -212,7 +230,7 @@
                 $output = preg_replace( '~(href|src)=(["\'])(?!#)(/)?(?!http(s)?://)([^"\']+)(' . $this->config( 'templates.srcpregext' ). ')(["\'])~i', '$1="' . $this->config( 'templates.srcpregdomain' ) . '$5$6"', $output);
 
             // optionally add to cache
-            if( !is_null( $cacheid ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
+            if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
                 $this->cache()->set( $cachetype, $this->request()->getScheme() . 'tpl' . $cacheid, $output, $cachettl );
             }
 
@@ -226,7 +244,7 @@
 		}
 
 		// try to render cache if available
-		public function renderCached( $cacheid, $cachetype = APP_CACHEAPC, $printFooter = true ){
+		public function renderCached( $cacheid = null, $cachetype = APP_CACHEAPC, $printFooter = true ){
 
 			$cacheid = $this->request()->getScheme() . 'tpl' . $cacheid;
 
@@ -303,30 +321,41 @@
         return call_user_func_array( 'sprintf', $arr );
     }        
 
-	// set session authentication
-	function islogged() {
-		$app = \Slim\Slim::getInstance();
-		if ( ! $app->client()->isLogged() )
-			$app->redirect( '/login' . $app->request()->getResourceUri() );
-	}
+    // set session authentication
+    function islogged() {
+        $app = \Slim\Slim::getInstance();
+        if ( ! $app->client()->isLogged() )
+        $app->redirect( '/login' . $app->request()->getResourceUri() );
+    }
 
-	// check https protocol
-	function ishttps(){
-		$app = \Slim\Slim::getInstance();
-		if( $app->config( 'ishttps.enable' ) !== false && ! $app->ishttps() )
-			$app->redirect( "https://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
-	}
+    // check https protocol
+    function ishttps(){
+        $app = \Slim\Slim::getInstance();
+        if( $app->config( 'ishttps.enable' ) !== false && ! $app->ishttps() )
+            $app->redirect( "https://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
+    }
 
-	// check http protocol
-	function ishttp(){
-		$app = \Slim\Slim::getInstance();
-		if( $app->config( 'ishttp.enable' ) !== false && $app->ishttps() )
-			$app->redirect( "http://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
-	}
+    // check http protocol
+    function ishttp(){
+        $app = \Slim\Slim::getInstance();
+        if( $app->config( 'ishttp.enable' ) !== false && $app->ishttps() )
+            $app->redirect( "http://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
+    }
 
     // check ajax post
     function isajax(){
-		$app = \Slim\Slim::getInstance();
+        $app = \Slim\Slim::getInstance();
         if( $app->config( 'isajax.enable' ) !== false && $app->request->isAjax() )
             $app->pass();
+    }
+
+    function iscache(){
+		$app = \Slim\Slim::getInstance();
+        if( $app->config( 'iscache.enable' ) !== false ){
+            if( $app->renderCached() ){
+                $app->stop();
+            }else{
+                $app->setcacheable();
+            }
+        }
     }

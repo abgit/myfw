@@ -127,7 +127,7 @@ $app->get( '/news/:id', function($id) use ($app){
 
 mode
 ----
-Most of times we have at least two environments: development (when our app is executed locally and some debugging is enabled) and production (when our app is executed on a remote server). This means that we need to assign distinct configuration options depending of our mode. To do this we only need to predefine config options using `configureMode()` for each mode and assign mode previously. Let's predefine 'development' and 'production' modes with different config settings:
+Most of times we have at least two environments: **development** (when our app is executed locally and some debugging is enabled) and **production** (when our app is executed on a remote server). This means that we need to assign distinct configuration options depending of our mode. To do this we only need to predefine config options using `configureMode()` for each mode and assign mode previously. Let's predefine **development** and **production** modes with different config settings:
 
 ```php
 require 'myfw.php';
@@ -174,8 +174,6 @@ $app->group('/backend', function() use ($app){
         });
 });
 
-...
-
 $app->run();
 ```
 
@@ -194,18 +192,19 @@ require 'myfw.php';
 $app = new myfw();
 $app->map( '/contact', function() use ($app){
   
-  $app->form()->addText( ... )
-              ->addSelect( ... )
+  $app->form()->addText( 'name', ... )
+              ->addSelect( 'chooser', ... )
               ...
               ->addSubmit();
   
 
   $app->form()->setDefault( function(){
-     return array( ... );
+     return array( 'name' => ..., 'chooser' => ... );
   });
 
   $app->form()->onSubmittedAndValid( function() use ($app){
-     ...
+     $formvalues = $app->form()->getValues();
+     // do something with $formvalues
   });
   
   $app->render( 'mytplfile', array( 'form' => $app->form() ) );
@@ -214,7 +213,7 @@ $app->map( '/contact', function() use ($app){
 $app->run();
 ```
 
-Note that, we don't need to create a new variable to handle form object, all internal myfw features are handle dynamically (lazzy-loading). Form object has lots of features to explore.
+Note that, we don't need to create a new variable to handle form object, all internal myfw features are handle dynamically. Form object has lots of features to explore.
 
 db
 ----
@@ -283,7 +282,12 @@ $app->map( '/item/:id', function($id) use ($app){
 
 i18n
 ----
-Internationalization support is handle on php logic and template side. myfw uses php built-in gettext to handle translation with two functions `_` and `_n` both on php and tpl side. The main goal is to have a standard way in both sides compatible with PoEdit strings extration.
+Internationalization support is handle on php logic and template side. myfw uses php built-in gettext to handle translation with two functions `_` and `_n` both on php and template side.
+
+The main goal is to:
+
+* have a standard way in both php and template environments;
+* be compatible with PoEdit strings extration.
 
 **php examples**
 
@@ -308,7 +312,7 @@ _n( "1 orange", "%s oranges", $counter, $counter );
 _n( "1 orange in %s tree ", "%s oranges in %s trees", $counter, array( 'big' ), array( $counter, 'small' ) );
 ```
 
-**tpl examples**
+**template examples**
 
 * simple
 ```python
@@ -351,7 +355,14 @@ $app->i18n()->setLang( 'en_US', true, true );
 ```
 In previous example we are changing language to `en_US`, use session value if available (instead of `en_US`) and save `en_US` in session for future use.
 
+**PoEdit settings**
 
+PoEdit is the best opensource software to handle all transation stuff. One of the most useful feature is to be able to extract strings to compute *.po files. All we need is to:
+
+1. add `*.tpl` extension in python settings. Go to `File` > `Preferences` > select `Python` > `Edit` > change `List of extensions separated by semicolons` to: `*.py;*.tpl`
+* create a new file: `File` > `New`; or open an existing: `File` > `Open`;
+* create keywords: `Catalog` > `Properties...` > click tab `Sourced keywords` > add `_n:1,2` and add `_n:1`
+ 
 rules
 ----
 myfw has a built-in library to check patterns. These are just simple boolean methods that check an argument string and return true/false. These methods are integrated with form object when adding a form element so that we can check its value but we can use them alone too.
@@ -361,7 +372,7 @@ myfw has a built-in library to check patterns. These are just simple boolean met
 ```php
 $app->map( '/contact', function() use ($app){
   
-  $app->form()->addText( 'myelement', 'Label', array( 'required' => 'element is required' ) );
+  $app->form()->addText( 'myelement', 'Label', array( 'required' => 'element is required' ) )
               ...
               ->addSubmit();
   ...
@@ -375,8 +386,8 @@ When adding a form element we can assign an array of rules as 3rd element. This 
 ```php
 $app->map( '/contact', function() use ($app){
   
-  $app->form()->addText( 'myelement', 'Label', array( 'required' => 'element is required' ) );
-              ->addText( 'mydescription', 'Description', array( 'required' => 'Descrition is required', maxlen => array( 'Description is too big', 200 ) ) );
+  $app->form()->addText( 'myelement', 'Label', array( 'required' => 'element is required' ) )
+              ->addText( 'mydescription', 'Description', array( 'required' => 'Descrition is required', maxlen => array( 'Description is too big', 200 ) ) )
               ...
               ->addSubmit();
   ...
@@ -427,23 +438,67 @@ myfw **rules available**:
 	
 filters
 ----
-Like the rules library, filters library can be used when adding form elements. If form is submitted and valid, element values will be filtered before we retrieve values with `$arr = $app->form()->getValues()`.
+Like the rules library, filters library can be used in three environments: form, template and standalone.
+
+**Form filters**
+
+when adding form elements. If form is submitted and valid, element values will be filtered when retrieving values.
 
 ```php
+// add form elements
 $app->form()->addText( 'myelement', 'Label', array(..), array( 'trim' ) );
+
+$app->form()->onSubmittedAndValid( function() use ($app){
+
+  // get values (filtered)
+  $arr = $app->form()->getValues();
+});
 ```
-myfw **rules available**:
+
+**Template filters**
+
+All filters can be used in a template. Template engine supports [native filters](http://twig.sensiolabs.org/doc/filters/index.html) and myfw filters transparently.
+
+```
+native upper filter
+{{ 'welcome'|upper }}
+
+myfw md5 filter
+{{ 'welcome'|md5 }}
+```
+
+**Standalone filters**
+
+Filters library can be invoked directly in php and used as standalone too:
+
+```php
+$app->filters()->gravatar( 'someemail' );
+```
+
+myfw **filters available**:
 
 * trim
 * sha1
-* fintval
+* md5
+* nl2br
+* floatval
+* intval
 * shortify
 * hexcolor
-* host
+* statecolor
+* extension
+* order
+* t
+* m
+* rnumber
+* bcloudname
+* gravatar
+* url
 * domain
 * markdown
+* ago
 * xss
-		
+
 
 session
 ----
@@ -502,6 +557,27 @@ $app->cache()->delete( APP_CACHEAPC, $key );
 $app->cache()->delete( APP_CACHEREDIS, $key );
 ```
 
+Cache engine has a built-in middleware architecture to cache actions. If we have action that is static almost the time, we can active `iscache` so that the cached version is displayed:
+
+```php
+require 'myfw.php';
+
+$app = new myfw();
+...
+
+$app->get( '/news/:id', 'iscache', function($id) use ($app){
+    ...
+    $app->render( 'sometemplate', array( .. ) );
+});
+...
+```
+
+In previous example, if a `/news/:id` exists, all html will be displayed and no additional processing is done. If cache is empty or is first time, `render()` will automatically render template and store in cache so that next time `/news/:id` is invoked the cache version is displayed. Note that, `iscache` will work if:
+
+* apc engine is detected in server;
+* is a http request;
+* was not computed any `form()` inside action;
+
 cart
 ----
 Cart library handles simple cart functions based on session library. There are some methods available like `getItems`, `getTotalItems`, `getTotal`, `addItem`, `isItem`, `isItemValue`, `addExtra`, `getExtra`, `removeItem`, `updateItemProperty`, `getItemPropertyValue`, `checkItemProperty` and `clear`.
@@ -547,6 +623,58 @@ $app->mailer()->sendsystem( $to, $subject, $text );
 // send simple email with default email.from, email.to and email.subject config
 $app->mailer()->sendinternal( $text );
 ```
+
+**html support**
+
+Mailer engine supports templates. This means that we can assign a template to mailer library so that when we send an email will be computed an email based on that html template.
+
+We need to create a template file in our templates directory, add a `content` tag that will be used by mailer engine to inject message and inform mailer about the template filename:
+
+mymail.tpl file:
+```
+some header
+  {{content}}
+some footer
+```
+
+```php
+$app->config( 'email.template', 'mymail' );
+```
+
+**mail headers**
+
+If we need to specify additional mail headers we have a configuration parameter for that. Useful if we need to add a 'bcc' header:
+
+```php
+$app->config( 'email.headers', array( 'bcc' => 'someemail' ) );
+```
+
+urlFor
+----
+`urlFor()` is the method to create application URLs so that you can freely change route patterns without breaking your application. This method ca be used in php environment (this is the native slim method) or on template environment:
+
+Just add a name to each action:
+```php
+$app = new myfw();
+$app->get('/new/:name/go', function ($name) {
+    echo "Some news item $name!";
+})->name('newitem');
+```
+
+**php environment** example:
+
+```php
+$url = $app->urlFor( "newsitem", array( "name" => $someitem ) );
+```
+
+**template environment** example:
+
+```
+<a href="{{ urlFor( 'newsitem', {'name':someitem} ) }}">
+```
+
+eg, if `someitem` variable containg `xpto`, both environments will compute `/new/xpto/go` url.
+
 
 virustotal
 ----
