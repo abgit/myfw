@@ -309,44 +309,53 @@ The main goal is to:
 ```php
  _( "hello world" );
 ```
+eg: outputs translated `"hello world"`;
+
 * variables
 ```php
  _n( "welcome %s to %s", array( $name, $portal ) );
 ```
+eg: if `$name` is `david` and `$portal` is `domain.com`, outputs translated `"welcome david to domain.com"`.
+
 * singular/plural
 ```php
  _n( "1 orange", "lots of oranges", $counter );
 ```
+eg: if `$counter` is `1` outputs `"1 orange"`, if `$counter` is `5` outputs `"lots of oranges"`;
+
 * singular/plural translated with variables
 ```php
 _n( "1 orange", "%s oranges", $counter, $counter );
 ```
+eg: if `$counter` is `1` outputs `"1 orange"`, if `$counter` is `5` outputs `"5 oranges"`;
+
 * singular/plural translated with variables per context:
 ```php
-_n( "1 orange in %s tree ", "%s oranges in %s trees", $counter, array( 'big' ), array( $counter, 'small' ) );
+_n( "1 orange in %s tree", "%s oranges in %s trees", $counter, array( 'big' ), array( $counter, 'small' ) );
 ```
+eg: if `$counter` is `1` outputs `"1 orange in big tree"`, if `$counter` is `5` outputs `"5 oranges in small trees"`;
 
 **template examples**
 
 * simple
 ```python
- _( "hello world" );
+_( "hello world" )
 ```
 * simples with variables
 ```python
- _n( "welcome %s to %s", [name, portal] );
+_n( "welcome %s to %s", [name, portal] )
 ```
 * singular/plural
 ```python
- _n( "1 orange", "lots of oranges", counter );
+_n( "1 orange", "lots of oranges", counter )
 ```
 * singular/plural translated with variables
 ```python
-_n( "1 orange", "%s oranges", counter, counter );
+_n( "1 orange", "%s oranges", counter, counter )
 ```
 * singular/plural translated with variables per context:
 ```python
-_n( "1 orange in %s tree ", "%s oranges in %s trees", counter, ['big'], [counter, 'small'] );
+_n( "1 orange in %s tree ", "%s oranges in %s trees", counter, ['big'], [counter, 'small'] )
 ```
 
 **Configuration**
