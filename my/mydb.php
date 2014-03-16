@@ -51,6 +51,7 @@
                         case 'double' :     $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? strval( round( floatval( str_replace( ',', '.', $values[ $column_name] ) ), 2 ) ) : 0;
                                             break;
+                        case 'uuid' :       $column_len   = 40;
                         case 'str' :
                         case 'varchar' :
                         default :           $column_type  = PDO::PARAM_STR;

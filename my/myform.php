@@ -548,7 +548,7 @@ class myform{
 
         // get values
         if( ! is_array( $values ) )
-            $values = $this->getValues( false );
+            $values = $this->getValues( false, false );
 
         foreach( $this->elements as $n => $el ){
 
@@ -598,7 +598,7 @@ class myform{
         return ( $this->wasValid = empty( $this->errors ) );
     }
 
-    public function getValues( $applyFilters = true ){
+    public function getValues( $applyFilters = true, $includeDisabled = false ){
 
         // check if form is submitted
         if( !$this->wasSubmitted )
@@ -608,7 +608,7 @@ class myform{
         foreach( $this->elements as $n => $el ){
 
             // get values only from some element types and if not disabled
-            if( !isset( $el[ 'valuetype' ] ) || ( isset( $el['disabled'] ) && $el['disabled'] == true ) )
+            if( !isset( $el[ 'valuetype' ] ) || ( $includeDisabled == false && isset( $el['disabled'] ) && $el['disabled'] == true ) )
                 continue;
 
             // get value for this element
@@ -643,7 +643,7 @@ class myform{
     public function obj(){
 
         // get values
-        $values = $this->getValues( false );
+        $values = $this->getValues( false, true );
 
         foreach( $this->elements as $n => $el ){		
             $this->elements[$n][ 'value' ] = isset( $values[ $n ] ) ? $values[ $n ] : '';

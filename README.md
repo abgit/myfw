@@ -6,7 +6,7 @@ To use myfw all we need is to:
 
 * add a htaccess file to our root directory
 
-```
+```apache
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [QSA,L]
@@ -480,7 +480,7 @@ $app->form()->onSubmittedAndValid( function() use ($app){
 
 **Template filters**
 
-All filters can be used in a template. Template engine supports [native filters](http://twig.sensiolabs.org/doc/filters/index.html) and myfw filters transparently.
+All filters available in myfilters library and [native twig filters](http://twig.sensiolabs.org/doc/filters/index.html) can be used in a template.
 
 ```
 native upper filter
@@ -498,7 +498,39 @@ Filters library can be invoked directly in php and used as standalone too:
 $filteredvalue = $app->filters()->gravatar( 'someemail' );
 ```
 
-myfw **filters available**:
+**filters available**:
+
+* abs
+* batch
+* capitalize
+* convert_encoding
+* date
+* date_modify
+* default
+* escape
+* first
+* format
+* join
+* json_encode
+* keys
+* last
+* length
+* lower
+* nl2br
+* number_format
+* merge
+* upper
+* raw
+* replace
+* reverse
+* round
+* slice
+* sort
+* split
+* striptags
+* title
+* trim
+* url_encode
 
 * trim
 * sha1

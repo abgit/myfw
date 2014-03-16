@@ -46,6 +46,10 @@
         private $i18n        = null;
         private $cache       = null;
         private $cacheable   = null;
+        private $loginradius = null;
+        private $objusercall = null;
+        private $objuserredir= null;
+
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -121,6 +125,24 @@
 			return $this->pdodb;
 		}
 
+        public function setObjUser( $callback ){
+            $this->objusercall = $callback;
+        }
+        
+        public function setLogin( $redirect, $callback ){
+            $this->objuserredir = $redirect;
+            $this->objusercall  = $callback;
+        }
+        
+        public function isLogged(){
+            $func = $this->objusercall;
+            return ( call_user_func( $func ) === true );
+        }
+        
+        public function getuserredir(){
+            return $this->objuserredir;
+        }
+
 		public function client(){
 			if( is_null( $this->client ) && ( $client = $this->config( 'client.global' ) ) )
 				$this->client = new $client();
@@ -169,6 +191,12 @@
             return $this->transloadit;
         }
 
+        public function loginradius(){
+            if( is_null( $this->loginradius ) )
+                $this->loginradius = new myloginradius();
+            return $this->loginradius;
+        }
+
         // show template
         public function render( $tpl, $vars = array(), $cacheid = null, $cachettl = null, $cachetype = APP_CACHEAPC, $display = true, $printFooter = true ){
 
@@ -208,8 +236,12 @@
 
                 $env->addFunction( new Twig_SimpleFunction( 'urlFor',
                     function( $action, $params = array() ){
-                        return \Slim\Slim::getInstance()->urlFor( $action, is_array( $params ) ? $params : array( $params ) );
-                        }));
+                        try{
+                            return \Slim\Slim::getInstance()->urlFor( $action, is_array( $params ) ? $params : array( $params ) );
+                        }catch( RuntimeException $e ){
+                            return '';
+                        };
+                }));
 
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
@@ -324,8 +356,9 @@
     // set session authentication
     function islogged() {
         $app = \Slim\Slim::getInstance();
-        if ( ! $app->client()->isLogged() )
-        $app->redirect( '/login' . $app->request()->getResourceUri() );
+        if( !$app->isLogged() && $app->config( 'islogged.enable' ) !== false ){
+            $app->redirect( $app->getuserredir() );
+        }
     }
 
     // check https protocol
