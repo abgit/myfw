@@ -26,7 +26,10 @@
 
             // if we use a template file, assign text and optional vars to template and get render result
             if( $template = $this->app->config( 'email.template' ) ){
-                $html = $this->app->render( $template, $templatevars + array( 'content' => $text ), null, null, APP_CACHEAPC, false, false );    
+                if( !($tag = $this->app->config( 'email.templatetag' ) ) ){
+                    $tag = 'content';
+                }
+                $html = $this->app->render( $template, $templatevars + array( $tag => $text ), null, null, APP_CACHEAPC, false, false );    
             }else{
                 $html = $text;
             }

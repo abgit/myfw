@@ -364,7 +364,7 @@
     // check https protocol
     function ishttps(){
         $app = \Slim\Slim::getInstance();
-        if( $app->config( 'ishttps.enable' ) !== false && ! $app->ishttps() )
+        if( $app->config( 'ishttps.enable' ) !== false && !$app->ishttps() )
             $app->redirect( "https://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
     }
 
@@ -378,17 +378,13 @@
     // check ajax post
     function isajax(){
         $app = \Slim\Slim::getInstance();
-        if( $app->config( 'isajax.enable' ) !== false && $app->request->isAjax() )
+        if( $app->config( 'isajax.enable' ) !== false && !$app->request->isAjax() )
             $app->pass();
     }
 
     function iscache(){
 		$app = \Slim\Slim::getInstance();
         if( $app->config( 'iscache.enable' ) !== false ){
-            if( $app->renderCached() ){
-                $app->stop();
-            }else{
-                $app->setcacheable();
-            }
+            $app->renderCached() ? $app->stop() : $app->setcacheable();
         }
     }
