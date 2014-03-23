@@ -171,7 +171,7 @@ class myform{
 
         $params = json_encode(array(
             'auth' => array(
-                'key'       => $app->config( 'transloadit.s' ),
+                'key'       => $app->config( 'transloadit.k' ),
                 'expires'   => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour'))
                 ),
                 'steps' => array(

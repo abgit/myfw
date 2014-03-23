@@ -30,8 +30,8 @@ class myfilters{
         return is_array( $string ) ? array_map( 'intval', $string ) : intval( $string );
     }
 
-    public static function shortify( $value ){
-        return preg_replace( "/[^a-zA-Z0-9_-]/", "-", $value );
+    public static function shortify( $value, $onlyalpha = false ){
+        return $onlyalpha ? preg_replace( "/[^a-zA-Z0-9]/", '', $value ) : preg_replace( "/[^a-zA-Z0-9_-]/", "-", $value );
     }
 
     public static function hexcolor( $val ){
@@ -167,5 +167,79 @@ class myfilters{
         $data = preg_replace("/[^@\s]*@[^@\s]*\.[^@\s]*/", "[email]", $data);
  
         return $data;	
+    }
+
+    // js design helper: worldmap
+    public static function worldmap( $value, $options ){
+
+        // id
+        if( !isset( $options[ 'id' ] ) )
+            return;
+        
+        $id = myfilters::shortify( $options[ 'id' ], true );
+
+        $html = '';
+        if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
+            $html .= '<script type="text/javascript">';
+        }
+
+        $html .= 'var ' . $id . 'gdpData=' . json_encode( $value ) . ';
+                $(function(){$("#' . $options[ 'id' ] . '").vectorMap({map:"world_mill_en",backgroundColor:false,
+                onRegionLabelShow:function(event,label,code){if(' . $id . 'gdpData[code]!=undefined){label.text(label.html()+"  "+' . $id . 'gdpData[code]+"%");}else{label.text(label.html()+"  0%");}},
+                series:{regions:[{values:' . $id . 'gdpData,scale:["#8FDFFC","#0B62A4"],normalizeFunction:"polynomial"}]},
+                regionStyle:{initial:{fill:"#8FDFFC","fill-opacity":1,stroke:"none","stroke-width":0,"stroke-opacity":1},
+                hover:{"fill-opacity": 0.8},selected:{fill:"yellow"},selectedHover:{}}});});';
+
+        if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
+            $html .= '</script>';
+        }
+
+        return $html;
+    }
+    
+    // js design helper: morris line
+    public static function morrisline( $value, $options ){
+
+        // id
+        if( !isset( $options[ 'id' ] ) )
+            return;
+        
+        $id = myfilters::shortify( $options[ 'id' ], true );
+
+        $html = '';
+        if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
+            $html .= '<script type="text/javascript">';
+        }
+
+        $html .= 'Morris.Line({element:"' . $id . '",data:' . json_encode( $value ) . ',grid:false,xkey:"' . ( isset( $options['xkey'] ) ? $options['xkey'] : '' ) . '",ykeys:["' . ( isset( $options['ykeys'] ) ? $options['ykeys'] : '' ) . '"],pointSize:false,yLabelFormat:function(y){if(parseInt(y.toString())==0){return "";}else{return numeral(y.toString()).format("0.0 a");}},labels:["' . ( isset( $options['labels'] ) ? $options['labels'] : '' ) . '"]});';
+
+        if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
+            $html .= '</script>';
+        }
+
+        return $html;
+    }
+
+    // js design helper: morris donut
+    public static function morrisdonut( $value, $options ){
+
+        // id
+        if( !isset( $options[ 'id' ] ) )
+            return;
+
+        $id = myfilters::shortify( $options[ 'id' ], true );
+
+        $html = '';
+        if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
+            $html .= '<script type="text/javascript">';
+        }
+
+        $html .= 'Morris.Donut({element:"' . $id . '",data:' . json_encode( $value ) . ',formatter:function(x){return x+"%"}});';
+
+        if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
+            $html .= '</script>';
+        }
+
+        return $html;
     }
 }

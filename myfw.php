@@ -47,6 +47,7 @@
         private $cache       = null;
         private $cacheable   = null;
         private $loginradius = null;
+        private $oneall      = null;
         private $objusercall = null;
         private $objuserredir= null;
 
@@ -197,6 +198,12 @@
             return $this->loginradius;
         }
 
+        public function oneall(){
+            if( is_null( $this->oneall ) )
+                $this->oneall = new myoneall();
+            return $this->oneall;
+        }
+
         // show template
         public function render( $tpl, $vars = array(), $cacheid = null, $cachettl = null, $cachetype = APP_CACHEAPC, $display = true, $printFooter = true ){
 
@@ -263,7 +270,7 @@
 
             // optionally add to cache
             if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
-                $this->cache()->set( $cachetype, $this->request()->getScheme() . 'tpl' . $cacheid, $output, $cachettl );
+                $this->cache()->set( $cachetype, 'tpl' . $this->request()->getPath() . $cacheid, $output, $cachettl );
             }
 
             if( $display == false ){
@@ -278,7 +285,7 @@
 		// try to render cache if available
 		public function renderCached( $cacheid = null, $cachetype = APP_CACHEAPC, $printFooter = true ){
 
-			$cacheid = $this->request()->getScheme() . 'tpl' . $cacheid;
+			$cacheid = 'tpl' . $this->request()->getPath() . $cacheid;
 
 			// check if cache is supported and cache timer is active for this specific page
 			if( $this->request()->isGet() && !$this->ishttps() && $this->cache()->exists( $cachetype, $cacheid ) ){

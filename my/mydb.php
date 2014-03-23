@@ -46,7 +46,7 @@
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 3000 ) : null;
                                             break;
                         case 'float' :      $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? printf( '%0.0f', str_replace( ',', '.', $values[ $column_name] ) ) : 0;
+                                            $column_value = isset( $values[ $column_name ] ) ? str_replace( ',', '.', $values[ $column_name] ) : 0;
                                             break;
                         case 'double' :     $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? strval( round( floatval( str_replace( ',', '.', $values[ $column_name] ) ), 2 ) ) : 0;
@@ -82,7 +82,6 @@
         }
 
         public function findOne( & $result, $procedure, $args = array(), $returnobject = false ){
-
             $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
             return ( ! empty( $result ) );
         }
@@ -97,12 +96,7 @@
 
             $this->app->log()->debug( "mydb::apply,procedure:" . $procedure . ',args:' . json_encode( $args ) );
 
-            $result = $this->query( $procedure, $args )->fetchAll();
-            if ( is_array( $result ) && count($result) == 1 && isset( $result[0] ) && is_array( $result[0] ) ){
-                $result = array_values( $result[0] );
-                return intval( $result[0] );
-            }
-            return false;
+            return $this->query( $procedure, $args );
         }
 
     }
