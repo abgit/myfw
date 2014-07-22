@@ -3,27 +3,17 @@
     class mysession{
 
         private $sessionactive = false;
+        private $memcached     = null;
 
         public function __construct(){
             $this->app    = \Slim\Slim::getInstance();
-            $this->ttl    = $this->app->config( 'session.ttl' ) || ini_get( 'session.gc_maxlifetime' ) || 360;
-            $this->mode   = $this->app->config( 'session.mode' ) || 9;
-            $this->prefix = 'PHPSESSID:';
 
-            if( ! $this->sessionactive ){
+            if( ! $this->sessionactive )
+                $this->sessionactive = ( session_id() !== '' ) || ( ( APP_WEBMODE && ( function_exists( 'session_status' ) ? session_status() != PHP_SESSION_ACTIVE : session_id() === "" ) ) ? ( session_start() ) : false );
+        }
 
-                // start custom session handler
-                if( ( $this->mode === APP_CACHEAPC && function_exists( 'apc_exists' ) ) || ( $this->mode === APP_CACHEREDIS && class_exists( 'Redis' ) ) ){
-
-                    if( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID > 50399 ){
-                        session_set_save_handler($this);
-                    }else{
-                        session_set_save_handler( array($this, 'open'), array($this, 'close'), array($this, 'read'), array($this, 'write'), array($this, 'destroy'), array($this, 'gc') );
-                    }
-                }
-
-                $this->sessionactive = ( session_id() !== '' ) || ( ( APP_WEBMODE && ( function_exists( 'session_status' ) ? session_status() != PHP_SESSION_ACTIVE : session_id() === "" ) ) ? ( session_start() && session_regenerate_id(true) ) : false );
-            }
+        public function isActive(){
+            return $this->sessionactive;
         }
 
         public function exists( $key ){
@@ -61,7 +51,8 @@
                     case 2: $_SESSION[ $key[0] ][ $key[1] ] = $value; return isset( $_SESSION[ $key[0] ][ $key[1] ] );
                     case 3: $_SESSION[ $key[0] ][ $key[1] ][ $key[2] ] = $value; return isset( $_SESSION[ $key[0] ][ $key[1] ][ $key[2] ] );
                     case 4: $_SESSION[ $key[0] ][ $key[1] ][ $key[2] ][ $key[3] ] = $value; return isset( $_SESSION[ $key[0] ][ $key[1] ][ $key[2] ][ $key[3] ] );
-                }		
+                }
+
             }
 
             return false;
@@ -112,27 +103,54 @@
             return false;
         }
 
-
-        // php session interface methods
-        public function read( $id ){
-            return (string) $this->app->cache()->settimeout( $this->mode, $this->prefix . $id, $this->ttl )->get( $this->mode, $this->prefix . $id );
+        public function deleteAll(){
+            $_SESSION = array();
+            return is_array( $_SESSION ) && empty( $_SESSION );
         }
 
-        public function write( $id, $data ){
-            return (bool) $this->app->cache()->set( $this->mode, $this->prefix . $id, $data, $this->ttl );
+        public function getHash( $sid = null ){
+            return is_null( $sid ) ? $this->get( array( 'session', 'hash' ), null ) : md5( $sid . $_SERVER["REMOTE_ADDR"] . $_SERVER["HTTP_USER_AGENT"] );
         }
 
-        public function destroy( $id ){
-            return $this->app->cache()->delete( $this->mode, $this->prefix . $id );
+        public function setHash( $sid ){
+            return $this->set( array( 'session', 'hash' ), md5( $sid . $_SERVER["REMOTE_ADDR"] . $_SERVER["HTTP_USER_AGENT"] ) );
+        }
+        
+        public function memSet( $key, $value, $expiration = 0 ){
+            if( !$this->memInit() )
+                return false;
+            return $this->memcached->set( $key, $value, $expiration );
         }
 
-        public function open( $savePath, $sessionName ){
+        public function memGet( $key, $default = false ){
+            if( !$this->memInit() )
+                return false;
+            $res = $this->memcached->get( $key );
+            return ( $res === false ) ? $default : $res;
         }
 
-        public function close(){
+        public function & memDelete( $key ){
+            if( !$this->memInit() )
+                return false;
+            $this->memcached->delete( $key );
+            return $this;
         }
+        
+        private function memInit(){
 
-        public function gc( $maxLifetime ){
+            if( !is_null( $this->memcached ) )
+                return true;
+        
+            if( !class_exists( 'Memcached' ) )
+                return false;
+
+            $this->memcached = new \Memcached();
+
+            foreach( explode( ',', ini_get( 'session.save_path' ) ) as $server ){
+                list( $host, $port ) = explode( ':', $server );
+                $this->memcached->addServer( $host, intval( $port ) );
+            }
+
+            return true;
         }
-
     }

@@ -28,6 +28,8 @@
     class myfw extends \Slim\Slim{
 
         private $forms       = array();
+        private $modals      = array();
+        private $ajax        = null;
         private $mailer      = null;
         private $client      = null;
         private $cart        = null;
@@ -46,10 +48,12 @@
         private $i18n        = null;
         private $cache       = null;
         private $cacheable   = null;
-        private $loginradius = null;
-        private $oneall      = null;
+        private $isajaxmode  = null;
+        private $auth        = null;
         private $objusercall = null;
         private $objuserredir= null;
+        private $otp         = null;
+        private $grids       = null;
 
 
         public function __construct( $arr = array() ){
@@ -58,7 +62,11 @@
             $this->hook( 'slim.before.dispatch', function () use ($app) {
                 $app->clearcacheable();
             });
-            
+            $this->hook( 'slim.after.dispatch', function () use ($app) {
+                if( $app->getajaxmode() )
+                    $app->ajax()->render();
+                $app->clearajaxmode();
+            });
         }
 
         public function setConditions( $cond ){
@@ -78,6 +86,19 @@
 
         public function setcacheable(){
             $this->cacheable = true;
+        }
+
+        public function setajaxmode(){
+            $this->isajaxmode = true;
+        }
+
+        public function & clearajaxmode(){
+            $this->isajaxmode = null;
+            return $this;
+        }
+
+        public function getajaxmode(){
+            return $this->isajaxmode === true;
         }
 
         public function iscacheable(){
@@ -107,6 +128,24 @@
 			return $this->forms[ $formname ];
 		}
 
+		public function grid( $name = 'l' ){
+			if( ! isset( $this->grids[ $name ] ) )
+				$this->grids[ $name ] = new mygrid( $name );
+			return $this->grids[ $name ];
+		}
+
+		public function modal( $id ){
+			if( ! isset( $this->modals[ $id ] ) )
+				$this->modals[ $id ] = new mymodal( $id );
+			return $this->modals[ $id ];
+		}
+
+		public function ajax(){
+			if( ! isset( $this->ajax ) )
+				$this->ajax = new myajax();
+			return $this->ajax;
+		}
+
 		public function mailer(){
 			if( is_null( $this->mailer ) )
 				$this->mailer = new mymailer();
@@ -126,18 +165,18 @@
 			return $this->pdodb;
 		}
 
-        public function setObjUser( $callback ){
-            $this->objusercall = $callback;
-        }
-        
-        public function setLogin( $redirect, $callback ){
-            $this->objuserredir = $redirect;
+        public function setIsLogged( $callback ){
             $this->objusercall  = $callback;
         }
         
         public function isLogged(){
             $func = $this->objusercall;
-            return ( call_user_func( $func ) === true );
+            $func = call_user_func( $func );
+
+            if( is_string( $func ) && strlen( $func ) )
+                $this->objuserredir = $func;
+
+            return ( $func === true );
         }
         
         public function getuserredir(){
@@ -192,16 +231,16 @@
             return $this->transloadit;
         }
 
-        public function loginradius(){
-            if( is_null( $this->loginradius ) )
-                $this->loginradius = new myloginradius();
-            return $this->loginradius;
+        public function auth(){
+            if( is_null( $this->auth ) )
+                $this->auth = new myauth();
+            return $this->auth;
         }
-
-        public function oneall(){
-            if( is_null( $this->oneall ) )
-                $this->oneall = new myoneall();
-            return $this->oneall;
+        
+        public function otp(){
+            if( is_null( $this->otp ) )
+                $this->otp = new myotp();
+            return $this->otp;
         }
 
         // show template
@@ -239,7 +278,7 @@
                         }
                         return '';
                     }
-                , array('is_safe' => array('html') ) ));
+                /*, array( 'pre_escape' => 'html', 'is_safe' => array( 'html' ) )*/ ) );
 
                 $env->addFunction( new Twig_SimpleFunction( 'urlFor',
                     function( $action, $params = array() ){
@@ -266,7 +305,7 @@
             $output = $env->render( $tpl . '.tpl', $vars );
 
             if( $this->config( 'templates.srcpreg' ) )
-                $output = preg_replace( '~(href|src)=(["\'])(?!#)(/)?(?!http(s)?://)([^"\']+)(' . $this->config( 'templates.srcpregext' ). ')(["\'])~i', '$1="' . $this->config( 'templates.srcpregdomain' ) . '$5$6"', $output);
+                $output = preg_replace( '~(href|src|url)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $this->config( 'templates.srcpregext' ). ')(["\'])~i', '$1$2"' . $this->config( 'templates.srcpregdomain' ) . '$5$6"', $output);
 
             // optionally add to cache
             if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
@@ -294,13 +333,9 @@
 			}
 			return false;
 		}
-
-        public function renderAjax( $arr = array() ){
-            if( $this->request->isAjax() ){
-                print( json_encode( $arr ) );
-                return true;
-            }
-            return false;
+        
+        public function urlForAjax( $action, $options = array() ){
+            return "myfwsubmit('" . $this->urlFor( $action, $options ) . "')";
         }
 
 		private function printFooter( $print = true, $appendString = '' ){
@@ -328,6 +363,11 @@
 
         public function run(){
             return APP_WEBMODE ? parent::run() : false;
+        }
+        
+        public function redirectjs( $url, $close = false ){
+            $this->render( '@my/jsredir', array( 'url' => $url, 'winclose' => $close ) );
+            $this->stop();
         }
 	}
 	
@@ -363,8 +403,13 @@
     // set session authentication
     function islogged() {
         $app = \Slim\Slim::getInstance();
+
         if( !$app->isLogged() && $app->config( 'islogged.enable' ) !== false ){
-            $app->redirect( $app->getuserredir() );
+            $url = $app->getuserredir();
+            if( is_string( $url ) && strlen( $url ) ){
+                $app->request->isAjax() ? $app->ajax()->setCommand( 'redir', array( 'u' => $url ) )->render() : $app->redirect( $url );
+            }
+                $app->stop();
         }
     }
 
@@ -387,6 +432,8 @@
         $app = \Slim\Slim::getInstance();
         if( $app->config( 'isajax.enable' ) !== false && !$app->request->isAjax() )
             $app->pass();
+        else
+            $app->setajaxmode();            
     }
 
     function iscache(){
@@ -394,4 +441,11 @@
         if( $app->config( 'iscache.enable' ) !== false ){
             $app->renderCached() ? $app->stop() : $app->setcacheable();
         }
+    }
+
+    // check developmentmode
+    function isdevelopment(){
+        $app = \Slim\Slim::getInstance();
+        if( $app->config( 'mode' ) !== 'development' )
+            $app->pass();
     }

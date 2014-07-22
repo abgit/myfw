@@ -1,206 +1,382 @@
-<div class="block_leave_comment">
-<div class="form">
 
 {%if submitted or (errors|length > 0) %}
 	{%if valid is null %}
-	    <blockquote class="full" style="border-left-color:#F90; background-color:#FFFAB7">Form submitted but not validated</blockquote>
+        <div class="callout callout-info fade in">
+				<button data-dismiss="alert" class="close" type="button">×</button>
+				<h5>Form submitted but not validated</h5>
+        </div>
     {% elseif warningmsg %}
-	    <blockquote class="full" style="border-left-color:#F90; background-color:#FEECC2"><h6>Warning</h6>{{ warningmsg|raw }}</blockquote>
-
+        <div class="callout callout-warning fade in">
+				<button data-dismiss="alert" class="close" type="button">×</button>
+				<h5>Warning</h5>
+				<p>{{ warningmsg|raw }}</p>
+        </div>
 	{% elseif valid %}
-	    <blockquote class="full" style="border-left-color:#090; background-color:#ECFFEC">{{ validmsg|raw }}</blockquote>
+        <div class="callout callout-success fade in">
+				<button data-dismiss="alert" class="close" type="button">×</button>
+				<h5>Success</h5>
+				<p>{{ validmsg|raw }}</p>
+        </div>
 	{% else %}
-	    <blockquote class="full"><h6>Some errors found</h6><ul class="list_3"><li>{{ errors|join('</li><li>')|raw }}</li></ul></blockquote>
+        <div class="callout callout-danger fade in">
+				<button data-dismiss="alert" class="close" type="button">×</button>
+				<h5>Some errors found</h5>
+				<p><ul><li>{{ errors|join('</li><li>')|raw }}</li></ul></p>
+        </div>
     {% endif %}
-
 {% endif %}
 
 {% if hide == false %}
 
 	{% if renderaction %}
-		<form action="{{ action }}" method="post" name="{{ name }}" id="{{ name }}">
+		<form action="{{ action }}" method="post" name="{{ name }}" id="{{ name }}" role="form">
 	{% endif %}
 
-		{% for el in elements %}
-        
-        	{% if el.type == 'text' %}
-            	<div class="one_third">
-                	<p class="label">{{ el.label }} {{el.rules.required ? '<span>(required)</span>'}} </p>
-                    <div class="field">
-                    	<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" type="text" value="{{el.value}}" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-					</div>
-				</div>
+	{% if ismodal %}
+            <div id="{{ modal.id }}" class="modal" tabindex="-1" role="dialog"{{ modal.static ? ' data-keyboard="false" data-backdrop="static"'}}>
+				<div class="modal-dialog{{ modal.class ? ' ' ~ modal.class }}"{% if modal.width %} style="max-width:{{modal.width}}px"{% endif %}>
+					<div class="modal-content">
+						<div class="modal-header" style="background-color:#3B5998">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title"><i class="{{ modal.icon }}"></i> {{ modal.title }}</h4>
+						</div>
+    					<div class="modal-body with-padding" style="padding:30px;">
+	{% endif %}
 
+
+        {% set formsubmitvalue = "Submit" %}
+        {% set formtransloadit = 0 %}
+        {% set formgroup = -1 %}
+
+
+		{% for el in elements %}
+    
+
+        	{% if el.type == 'formgroup' %}
+                <div class="form-group">
+                    <div class="row">
+
+                    {% set formgroup    = el.total %}
+                    {% set formgroupcss = el.css %}
+
+            {% elseif formgroup > 0 %}
+                <div class="{{formgroupcss}}">
+
+            {% else %}
+                <div class="form-group">
+            {% endif %}
+        
+
+        	{% if el.type == 'text' %}
+
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    {% if el.prevent %}
+                        <p class="form-control-static">{{ el.value|default( preventmsg ) }}</p>
+                    {% else %}
+
+                        <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                        {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help}}</span>{% endif %}
+
+                    {% endif %}
+    
         	{% elseif el.type == 'password' %}
-            	<div class="one_third">
-                	<p class="label">{{ el.label }} {{el.rules.required ? '<span>(required)</span>'}} </p>
-                    <div class="field">
-                    	<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" type="password" value="" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-					</div>
-				</div>
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" type="password" value=""{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
 
 			{% elseif el.type == 'textarea' %}
-        		<p class="label">{{ el.label }} {{el.rules.required ? '<span>(required)</span>'}} </p>
-                <div class="textarea">
-                	<textarea {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" cols="1" rows="1" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.value}}</textarea>
-				</div>
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="1"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.value}}</textarea>
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
 
 			{% elseif el.type == 'select' %}
-	            <div class="one_third">
-                	<p class="label">{{ el.label }} {{el.rules.required ? '<span>(required)</span>'}} </p>
-                    <select {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+
+                    {% if el.prevent %}
+                        <p class="form-control-static">{{ el.options[ el.value ]|default( preventmsg ) }}</p>
+                    {% else %}
+
+                        <select class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+    					{% for opv, opl in el.options %}
+                            <option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
+    					{% endfor %}
+                        </select>
+
+                        {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+
+                    {% endif %}
+
+			{% elseif el.type == 'multiple' %}
+
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    <div>
+                    <select data-role="multiselect" multiple="multiple" style="display:none" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}[]"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 					{% for opv, opl in el.options %}
                         <option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
 					{% endfor %}
                     </select>
-				</div>                    
-
-			{% elseif el.type == 'multiple' %}
-				<div class="one_half">
-                	<p class="label">{{ el.label }} {{el.rules.required ? '<span>(required)</span>'}} </p>
-                    <table border="0">
-                    	<tr>
-                        	<td>
-								<select {{el.disabled ? 'disabled="disabled" '}}style="height:auto;width:200px" size="10" multiple="multiple" id="{{name ~ el.name}}" name="{{name ~ el.name}}" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-            			        {% for opv, opl in el.options %}
-                        			<option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
-			                    {% endfor %}
-            			        </select>
-							</td>
-							<td align="left" style="vertical-align:top">
-								<a class="general_button big type_5" onclick="$('#{{name ~ el.name}} option').prop('selected',true);return false;" /><span>select all</span><a /><br/>
-								<a class="general_button big type_5" onclick="$('#{{name ~ el.name}} option').prop('selected',false);return false;" /><span>clear</span><a /><br/>
-							</td>
-						</tr>
-					</table>
-				</div>
+                    </div>
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
 
 			{% elseif el.type == 'checkbox' %}
-				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" {{el.value == 'on' ? 'checked '}}type="checkbox" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.label|raw}}
+				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" {{el.value == 'on' ? 'checked '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.label|raw}}
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
 
 			{% elseif el.type == 'hidden' %}
-            	<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}"  type="hidden" value="{{el.value}}" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+            	<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}"  type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
                 
 			{% elseif el.type == 'checkboxgroup' %}
-				<p class="label">{{ el.label }} {{el.rules.required ? '<span>(required)</span>'}} </p>                
-		        {% for opv, opl in el.options %}
-					<input {{el.disabled ? 'disabled="disabled" '}}id="{{name ~ el.name ~ opv}}" name="{{name ~ el.name ~ opv}}" {{opv in el.value|split(';') ? 'checked '}}type="checkbox" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}><label for="{{name ~ el.name ~ opv}}">{{opl}}</label>
-					{{ (el.settings.separator and loop.revindex0) ? el.settings.separator|raw }}
-				{% endfor %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+
+                {% if el.prevent %}
+                    <p class="form-control-static">{{ el.options|intersect(el.value)|values|default( preventmsg ) }}</p>
+                {% else %}
+
+                    {% if el.settings.cols == 1 %}
+                        {% set chkgseparate = true %}
+                        {% set chkgcss      = "col-md-12" %}
+                    {% elseif el.settings.cols == 2 %}
+                        {% set chkgseparate = true %}
+                        {% set chkgcss      = "col-md-6" %}
+                    {% elseif el.settings.cols == 3 %}
+                        {% set chkgseparate = true %}
+                        {% set chkgcss      = "col-md-4" %}
+                    {% elseif el.settings.cols == 4 %}
+                        {% set chkgseparate = true %}
+                        {% set chkgcss      = "col-md-3" %}
+                    {% else %}
+                        {% set chkgseparate = false %}
+                    {% endif %}
+
+                    <div class="block-inner">
+                       {% if chkgseparate %}
+                           <div class="row">
+                       {% endif %}
+
+    		        {% for opv, opl in el.options %}
+
+                       {% if chkgseparate %}
+                            <div class="{{ chkgcss }}">
+                       {% endif %}
+                        
+                        <label class="checkbox-inline">
+                            <input style="position:relative;margin-right:1px;" {{el.disabled ? 'disabled="disabled" '}}id="{{name ~ el.name ~ opv}}" name="{{name ~ el.name ~ opv}}" {{opv in el.value|split(';') ? 'checked '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}> {{opl}}
+                        </label>
+
+                       {% if chkgseparate %}
+                            </div>
+                       {% endif %}
+                    {% endfor %}
+
+                    {% if chkgseparate %}
+                         </div>
+                    {% endif %}
+
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+    				</div>
+
+                {% endif %}
 
 			{% elseif el.type == 'separator' %}
 				<div class="clearboth"></div>
 
+			{% elseif el.type == 'grid' %}
+                {{ el.obj|raw }}
+
+			{% elseif el.type == 'custom' %}
+                {{ el.obj|raw }}
+
+			{% elseif el.type == 'formheader' %}
+                <div class="block-inner">
+                    <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}" style="margin-top:{% if not loop.first %}45px{% else %}15px{% endif %};">
+                        <i class="{{el.icon}}"></i>{{el.title}}{% if el.description %}<small class="display-block">{{el.description|nl2br}}</small>{% endif %} 
+                    </h6>
+                </div>
+
+			{% elseif el.type == 'message' %}
+                <div class="callout callout-info fade in">
+				    <h5>{{el.title}}</h5>
+				    {% if el.description %}<p>{{el.description|nl2br}}</p>{% endif %}
+                </div>
+
+			{% elseif el.type == 'static' %}
+            
+                {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
+                {% if el.showvalue %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value|default( 'unknown' ) }}</p>{% endif %}
+                {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help}}</span>{% endif %}
+
+			{% elseif el.type == 'button' %}
+            
+                {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
+                <div>
+                <input type="button" class="btn btn-default" onClick="{{el.onclick|raw}}" value="{{ el.labelbutton }}"/>
+                </div>
+                {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+
+        	{% elseif el.type == 'staticimage' %}
+
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    <div>
+                    <img id="{{name ~ el.name}}" {% if not el.options.html.width and not el.options.html.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
+                    </div>
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+
+        	{% elseif el.type == 'staticmovie' %}
+
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    <div>
+                    <video width="100%" controls poster="{{ el.value|transloadit( 'upvideo', 'url' ) }}" style="width:100%;height:auto;" id="{{name ~ el.name}}" class="video-js vjs-default-skin">
+                        <source src="{{ el.value|transloadit( 'upvideomp4', 'url' ) }}" type="video/mp4">
+                        <source src="{{ el.value|transloadit( 'upvideowebm', 'url' ) }}" type="video/webm">
+                        <source src="{{ el.value|transloadit( 'upvideoflash', 'url' ) }}" type="video/flv">
+                    </video>
+                    </div>
+                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+
+
+        	{% elseif el.type == 'staticmessage' %}
+            <div class="block">
+                                    <ul class="media-list">
+										<li class="media">
+										    <img class="pull-left media-object" src="{{el.icon|gravatar}}" alt="">
+											<div class="media-body">
+												<div class="clearfix">
+													<span class="media-heading">{{ el.title }}</span>
+													<span class="media-notice">{{ el.date|ago(0,1) }}</span>
+												</div>
+                                                {{ el.message|nl2br }}
+											</div>
+										</li>
+									</ul>
+</div>
+			{% elseif el.type == 'stats' %}
+                <ul class="statistics">
+                {% for stat in el.stats %}
+						    			<li>
+						    				<div class="statistics-info">
+							    				<a class="bg-{{stat.type|default('info')}}"><i class="{{stat.icon}}"></i></a>
+							    				<strong>{{stat.value}}</strong>
+							    			</div>
+											<div class="progress progress-micro">
+												<div style="width:{{ stat.percentage|default(100) }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{stat.percentage|default(100)}}" role="progressbar" class="progress-bar progress-bar-{{stat.type|default('info')}}">
+													<span class="sr-only">{{stat.percentage|default(100)}}%</span>
+												</div>
+											</div>
+											<span>{{stat.title}}</span>
+						    			</li>
+                {% endfor %}
+                </ul>
+
 			{% elseif el.type == 'separatorline' %}
-				<div class="line_2" style="margin:10px 0px 15px;"></div>
+				<div class="line_2" style="margin:10px 0px 15px"></div>
 
 			{% elseif el.type == 'captcha' %}
-				<div class="one_half">
-	                <p class="label">Security code <span>(required)<br />Please confirm 5 character code (letters only)<br />Click on image to see a different code</span></p>
-                	<script type="text/javascript">document.write('<a href="#" onclick="$(\'#cap{{name ~ el.name}}\').attr(\'src\', \'/captcha/\'+Math.floor(89999999*Math.random()+10000000));return false;"><img id="cap{{name ~ el.name}}" width="200" height="100" src="/captcha/'+Math.floor(89999999*Math.random()+10000000)+'" alt="c" /></a>');</script>
-                	<div class="field">
-                		<input name="{{name ~ el.name}}" type="text" size="20" maxlength="20">
-					</div>
-                </div>
+                <label>Security code</label>
+                <script type="text/javascript">document.write('<a href="#" onclick="$(\'#cap{{name ~ el.name}}\').attr(\'src\', \'/captcha/\'+Math.floor(89999999*Math.random()+10000000));return false;"><img id="cap{{name ~ el.name}}" width="200" height="100" src="/captcha/'+Math.floor(89999999*Math.random()+10000000)+'" alt="c" /></a>');</script>
+                <input name="{{name ~ el.name}}" type="text" size="20" maxlength="20">
+                <span class="help-block">Please confirm 5 character code (letters only) and click on image if you want to see a different code</span>
 
-			{% elseif el.type == 'submit' and rendersubmit %}
-				<div class="button" style="{% if el.position == 'left' %}float:left;{% elseif el.position == 'right' %}float:right;margin-left:10px{% endif %}">
-	                <input {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" class="general_button" value="{{el.label}}" {%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-					<input type="hidden" name="{{csrfname}}" value="{{csrf}}"/>
-                </div>
+			{% elseif el.type == 'transloadit' %}
 
-			{% elseif el.type == 'imageupload' %}
+                {% if formtransloadit == 0 %}
+                	<input type="hidden" id="{{ name }}transloaditid" />
 
-            	{% if el.options.order == 1 %}
-                	<input type="hidden" id="transloaditid" /><input type="hidden" id="transloaditidw" /><input type="hidden" id="transloaditidh" />
-					<script type="text/javascript">
-					    $(function() {
-					      $('form#{{name}}').transloadit({
-					        wait: true,
-							autoSubmit: false,
-							processZeroFiles: false,
-					        triggerUploadOnFileSelection: true,
-							onStart: function(assembly){
-								$('#' + $('#transloaditid').val() ).val('');
-							},
-						    onSuccess: function(assembly) {
-								
-								var cbutton = '#' + $('#transloaditid').val();
-								var cfcontainer = cbutton + 'FC';
-								var cfhvalue    = cbutton + 'V';
-					
-								if( 'results' in assembly && 'upflash' in assembly.results ){
-									$( cfcontainer ).html('<div id="' + assembly.assembly_id + '"><p><table><tr><td><div id="d' + assembly.assembly_id + '"></div></td><td style="vertical-align:middle">&nbsp;<input type="button" class="general_button type_5" value="remove file" onClick="$(\'#' + assembly.assembly_id + '\').remove();$(\'' + cfhvalue + '\').val(\'\');$(\'' + cbutton + '\').show();"></td></tr></table></p></div>');
-									$( cfhvalue ).val( '{{tpl.clientGetTag}}/'+assembly.results.upflash[0].id + '-' + assembly.results.upflash[0].name );
-									swfobject.embedSWF(assembly.results.upflash[0].ssl_url, 'd' + assembly.assembly_id, $('#transloaditidw').val(), $('#transloaditidh').val(), "9.0.0", false, {}, { scale: "exactfit" });
-								}else if( 'results' in assembly && 'upimage' in assembly.results ){
-									$( cfcontainer ).html('<div id="' + assembly.assembly_id + '"><p><table><tr><td><img src="' + assembly.results.upimage[0].ssl_url + '" width="' + assembly.results.upimage[0].meta.width + '" height="' + assembly.results.upimage[0].meta.height +'" /></td><td style="vertical-align:middle">&nbsp;<input type="button" class="general_button type_5" value="remove file" onClick="$(\'#' + assembly.assembly_id + '\').remove();$(\'' + cfhvalue + '\').val(\'\');$(\'' + cbutton + '\').show();"></td></tr></table></p></div>');
-									$( cfhvalue ).val( '{{tpl.clientGetTag}}/'+assembly.results.upimage[0].id + '-' + assembly.results.upimage[0].name );
-								}else if( 'results' in assembly && 'upvideo' in assembly.results ){
-									$( cfcontainer ).html('<div id="' + assembly.assembly_id + '"><p><table><tr><td><video id="v' + assembly.assembly_id + '" class="video-js vjs-default-skin"></video></td><td style="vertical-align:middle">&nbsp;<input type="button" class="general_button type_5" value="remove file" onClick="$(\'#' + assembly.assembly_id + '\').remove();$(\'' + cfhvalue + '\').val(\'\');$(\'' + cbutton + '\').show();"></td></tr></table></p></div>');
-									$( cfhvalue ).val( '{{tpl.clientGetTag}}/'+assembly.results.upvideo[0].id + '-' + assembly.results.upvideo[0].name + ';' + '{{tpl.clientGetTag}}/'+assembly.results.upvideomp4[0].id + '-' + assembly.results.upvideomp4[0].name + ';' + '{{tpl.clientGetTag}}/'+assembly.results.upvideowebm[0].id + '-' + assembly.results.upvideowebm[0].name + ';' + '{{tpl.clientGetTag}}/'+assembly.results.upvideoflash[0].id + '-' + assembly.results.upvideoflash[0].name );
-									var mplayer = videojs("v"+assembly.assembly_id, {"controls": true, "autoplay": false, "poster": assembly.results.upvideo[0].ssl_url, "width": assembly.results.upvideo[0].meta.width, "height": assembly.results.upvideo[0].meta.height }, function(){});
-									mplayer.src([{ type: "video/mp4", src: assembly.results.upvideomp4[0].ssl_url },{ type: "video/webm", src: assembly.results.upvideowebm[0].ssl_url },{ type: "video/flv", src: assembly.results.upvideoflash[0].ssl_url }]);
-								}
-								$('#' + $('#transloaditid').val() ).hide();
-		  					}
-					       });
-   						 });
-					</script>                
-                {% endif %}
-				
-                <div id="{{ name ~ el.name }}FC">
-                
-                	{% if el.value %}
-
-								<div id="{{ el.name }}PID">
-								<p>
-
-                                    {% if el.value|split(';')|length > 1 %}
-                                    
-                                    	{% set upvideo = el.value|split(';') %}
-                                        <table><tr><td>
-                                    	<video id="v{{ (name ~ el.name)|md5 }}" class="video-js vjs-default-skin"
-                                        controls width="{{ el.options.width }}" height="{{ el.options.height }}" poster="//{{ tpl.cdnuser ~ '/' ~ upvideo[0] }}">
-											<source src="//{{ tpl.cdnuser ~ '/' ~ upvideo[1] }}" type='video/mp4' />
-											<source src="//{{ tpl.cdnuser ~ '/' ~ upvideo[2] }}" type='video/webm' />
-											<source src="//{{ tpl.cdnuser ~ '/' ~ upvideo[3] }}" type='video/flv' />
-                                        </video>
-										<script type="text/javascript">videojs("v{{ (name ~ el.name)|md5 }}");</script>
-										</td><td style="vertical-align:middle">&nbsp;
-										<input {{el.disabled ? 'disabled="disabled" '}}type="button" class="general_button type_5" value="remove file" onClick="$('#{{ el.name }}PID').remove();$('#{{name ~ el.name}}V').val('');$('#{{name ~ el.name}}').show();">
-                                        </td></tr></table>
-                                    {% elseif el.value|extension == 'jpg' or el.value|extension == 'jpeg' or el.value|extension == 'png' or el.value|extension == 'gif'%}
-                                        <table><tr><td>
-										<img src="//{{ tpl.cdnuser ~ '/' ~ el.value }}" width="{{ el.options.width }}" height="{{ el.options.height }}" />
-										</td><td style="vertical-align:middle">&nbsp;
-										<input {{el.disabled ? 'disabled="disabled" '}}type="button" class="general_button type_5" value="remove file" onClick="$('#{{ el.name }}PID').remove();$('#{{name ~ el.name}}V').val('');$('#{{name ~ el.name}}').show();">
-                                        </td></tr></table>
-                                    {% elseif el.value|extension == 'swf' %}
-                                        <table><tr><td>
-                                    	<div id="{{ el.name }}" style="width:{{ el.options.width }};height:{{ el.options.height }}"></div>
-										<script type="text/javascript">swfobject.embedSWF("//{{ tpl.cdnuser ~ '/' ~ el.value }}", "{{ el.name }}", {{ el.options.width }}, {{ el.options.height }}, "9.0.0", false, {}, { scale: "exactfit" });</script>
-										</td><td style="vertical-align:middle">&nbsp;
-										<input {{el.disabled ? 'disabled="disabled" '}}type="button" class="general_button type_5" value="remove file" onClick="$('#{{ el.name }}PID').remove();$('#{{name ~ el.name}}V').val('');$('#{{name ~ el.name}}').show();">
-                                        </td></tr></table>
-                                    {% endif %}
-
-								</p>
-                                </div>
-
+                    {% if isajax == false %}
+    					<script type="text/javascript">myfwtransloadit('{{ name }}'); </script>
                     {% endif %}
-				</div>
-				<input type="hidden" name="{{ name ~ el.name }}" value="{{ el.value }}" id="{{name ~ el.name}}V"/>
-				<input {% if el.value %} style="display:none;" {% endif %} {{el.disabled ? 'disabled="disabled" '}}type="file" name="{{name ~ el.name}}N" id="{{name ~ el.name}}" onChange="$('#transloaditid').val($(this).attr('id'));$('#transloaditidw').val('{{el.options.width}}');$('#transloaditidh').val('{{el.options.height}}');$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" />            	
-            {% endif %}        
+
+                    {% set formtransloadit = 1 %}
+                {% endif %}
+
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+
+                {% set tvalue = el.value|transloadit( '', 'assembly_id' ) %}
+
+                {% if not el.prevent %}
+    				<input type="hidden" name="{{ name ~ el.name }}" value="{{ tvalue }}" id="{{name ~ el.name}}V" class="{{ name }}transloaditV"/>
+                    <div class="uploader {{ name }}transloaditU" {{ tvalue is not empty ? 'style="display:none"' }} id="{{ name ~ el.name }}U"><input name="{{ name ~ el.name }}N" class="transloaditN" onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
+
+                {% elseif tvalue is empty %}
+                    <p class="form-control-static">{{ preventmsg }}</p>
+
+                {% endif %}
+
+            <div class="row {{ name }}transloaditC" {{ tvalue is empty ? 'style="display:none"' }} id="{{name ~ el.name}}C">
+                <div class="col-xs-10" id="{{name ~ el.name}}P">
+
+                {% if tvalue is not empty %}
+                    {% if el.options.mode == 'image' %}
+                        {% set imgssl_url = el.value|transloadit( 'upimage', 'ssl_url' ) %}
+                        {% set imgwidth   = el.value|transloadit( 'upimage', 'meta', 'width' ) %}
+                        {% set imgheight  = el.value|transloadit( 'upimage', 'meta', 'height' ) %}
+                        <img style="height:auto;width:100%" src="{{ imgssl_url }}" width="{{ imgwidth }}" height="{{ imgheight }}" />
+                    {% elseif el.options.mode == 'video' %}
+                        {% set vposter    = el.value|transloadit( 'upvideo',      'ssl_url' ) %}
+                        {% set vmp4       = el.value|transloadit( 'upvideomp4',   'ssl_url' ) %}
+                        {% set vwebm      = el.value|transloadit( 'upvideowebm',  'ssl_url' ) %}
+                        {% set vflash     = el.value|transloadit( 'upvideoflash', 'ssl_url' ) %}
+                        <video controls id="v{{ tvalue }}" class="video-js vjs-default-skin" width="100%" style="width:100%;height:auto;" poster="{{ vposter }}"><source src="{{ vmp4 }}" type="video/mp4"><source src="{{ vwebm }}" type="video/webm"><source src="{{ vflash }}" type="video/flv"></video>
+                    {% endif %}
+                {% endif %}
+                </div>
+                <div class="col-xs-2">
+                    {% if not el.prevent %}
+                        <button onClick="$('#{{name ~ el.name}}C').hide();$('#{{name ~ el.name}}U').show();$('#{{name ~ el.name}}S').text('No file selected');$('#{{name ~ el.name}}V').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                    {% endif %}
+                </div>
+            </div>
+
+                {% if el.help and not el.prevent %}<span class="help-block">{{el.help}}</span>{% endif %}
+            {% endif %}
+
+        	{% if el.type != 'formgroup' %}
+                {% if formgroup > 1 or formgroup < 1 %}
+                        </div>
+                {% elseif formgroup == 1 %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% set formgroup = formgroup-1 %}
+            {% endif %}
 
     {% endfor %}
+
+
+	{% if ismodal %}
+                        </div>
+                        <div class="modal-footer" style="margin-bottom:40px">
+								
+	{% endif %}
+            
+            {% for el in elements %}
+    			{% if el.type == 'submit' and rendersubmit %}
+
+                    <div class="form-actions {% if el.position == 'left' %}text-left{% else %}text-right{% endif %}">
+                        <input {%if formtransloadit%} onClick="$('form#{{name}}').unbind('submit.transloadit');" {% endif %} {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" id="{{name}}submit" class="btn btn-success" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                    </div>
+
+	    		{% elseif el.type == 'ajax' and el.label is not null %}
+                    <input style="margin-top:3px;" onClick="myfwformsubmit('{{name}}','{{name ~ el.name}}ajax','{{el.label}}','{{name ~ el.name}}');" {{el.disabled ? 'disabled="disabled" '}}type="button" id="{{name ~ el.name}}ajax" class="btn {{el.css}}" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+
+                {% endif %}
+            {% endfor %}
+            <input type="hidden" name="{{csrfname}}" id="{{csrfname}}" value="{{csrf}}"/>
+
+	{% if ismodal %}                                
+                            {% if isajax %}
+                                <button data-dismiss="modal" class="btn btn-default" style="margin-left:5px;margin-top:3px;">Close</button>
+                            {% endif %}
+						</div>
+                    </div>                            
+                </div>
+            </div>
+	{% endif %}
+
 
 	{% if renderaction %}
 		</form>
 	{% endif %}
 
+
 {% endif %}
-<div class="clearboth"></div>
-</div>
-</div>

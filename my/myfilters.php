@@ -38,6 +38,36 @@ class myfilters{
         return ( strlen( $val ) > 2 && substr( $val, 0, 1 ) != '#' ) ? '#' . $val : $val;
     }
 
+    public static function intersect( $array, $optarray ){
+
+        if( !is_array( $optarray ) )
+            $optarray = explode( ';', $optarray );
+
+        $res = array();
+
+        foreach( $optarray as $k ){
+            if( isset( $array[ $k ] ) )
+                $res[ $k ] = $array[ $k ];
+        }
+
+        return $res;
+    }
+
+    public static function values( $array ){
+        return is_array( $array ) ? implode( ', ', array_values( $array ) ) : $array;
+    }
+
+    public static function inarray( $string, $array, $default = 'unknown' ){
+
+        $string = strval( $string );
+        if( is_array( $array ) )
+            foreach( $array as $k => $v )
+                if( strval( $k ) === $string )
+                    return $v;
+
+        return $default;
+    }
+
     public static function statecolor($string){
         if( intval( $string ) > 0 ){ return '#090'; }
         if( intval( $string ) < 0 ){ return '#F00'; }
@@ -86,8 +116,38 @@ class myfilters{
         return isset( $b[$string] ) ? $b[$string][0] : 'unknown';
     }
 
-    public static function gravatar( $email, $s = 80, $d = 'mm', $r = 'g' ){
-        return '//www.gravatar.com/avatar/' . md5( strtolower( trim( $email ) ) ) . "?s=$s&d=$d&r=$r";
+    public static function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){
+        if( strpos( $hash, '@' ) )
+            $hash = md5( strtolower( trim( $hash ) ) );
+
+        return ( \Slim\Slim::getInstance()->request->isAjax() ? 'http://www.gravatar.com/avatar/' : 'https://secure.gravatar.com/avatar/' ) . $hash . "?s=$s&d=$d&r=$r";
+    }
+
+    public static function transloadit( $json, $step, $property = null, $property2 = null ){
+    
+        $arr = json_decode( $json );
+
+        if( is_null( $property ) )
+            return ( isset( $arr->ok ) && $arr->ok == 'ASSEMBLY_COMPLETED' && isset( $arr->results->$step ) );
+
+        if( isset( $arr->results->$step ) ){
+            $s = & $arr->results->$step;
+
+            if( isset( $s[0]->$property ) ){
+             
+                $p = & $s[0]->$property;
+
+                if( is_null( $property2 ) )
+                    return $p;
+
+                if( isset( $p->$property2 ) )
+                    return $p->$property2;
+            }
+        }elseif( isset( $arr->$property ) ){
+            return $arr->$property;
+        }
+
+        return null;
     }
 
     public static function url( $value ){
@@ -105,8 +165,12 @@ class myfilters{
         $parser->no_entities = true;
         return $parser->transform($data);
     }
+    
+    public static function ago( $datetime, $full = 0 , $includeoriginal = 0 ){
 
-    public static function ago( $datetime, $full = 0 ){
+        if( strtotime( $datetime ) < 1 )
+            return '';
+
         $now = new DateTime;
         $ago = new DateTime( $datetime );
         $diff = $now->diff( $ago );
@@ -123,7 +187,7 @@ class myfilters{
         if( !$full )
             $string = array_slice( $string, 0, 1 );
         
-        return $string ? implode( ', ', $string ) . ' ago' : 'just now';
+        return ( $string ? implode( ', ', $string ) . ' ago' : 'just now' ) . ( $includeoriginal ? ( ', ' . $datetime ) : '' );
     }
 
     public static function xss( $data ){

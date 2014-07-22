@@ -30,6 +30,10 @@ class myrules{
         return myrules::regex( strval( $value ), '/^([0-9]{1,5}([\.\,][0-9]{1,2})?)$/' );
     }
 
+    public static function unsigned( $value, $opts='', $formelement = null){
+        return myrules::regex( strval( $value ), '/^([1-9]*[0-9]{1,20}(\.[0-9]{1,2}){0,1})$/' );
+    }
+
     public static function ip( $value, $options = '', $input = array() ){
         return myrules::regex( $value, '/\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/' );
     }
@@ -64,6 +68,42 @@ class myrules{
 
     public static function minlength( $value, $opts, $formelement = null ) {
         return ( strlen( $value ) >= intval( $opts ) );
+    }
+
+    public static function maxvalue( $value, $opts, $formelement = null ) {
+        return ( intval( $value ) <= intval( $opts ) );
+    }
+
+    public static function minvalue( $value, $opts, $formelement = null ) {
+        return ( intval( $value ) >= intval( $opts ) );
+    }
+
+    public static function minoptions( $value, $options = '', $input = array() ){
+
+        $options = intval( $options );
+        $counter = 0;
+        $exp = explode( ';', $value );
+        foreach( $exp as &$el ){
+            if( strlen( trim( $el ) ) )
+                $counter++;
+            if( $counter >= $options )
+                return true;
+        }
+        return false;
+    }
+
+    public static function maxoptions( $value, $options = '', $input = array() ){
+
+        $options = intval( $options );
+        $counter = 0;
+        $exp = explode( ';', $value );
+        foreach( $exp as &$el ){
+            if( strlen( trim( $el ) ) )
+                $counter++;
+            if( $counter > $options )
+                return false;
+        }
+        return true;
     }
 
     public static function maximagesize( $value, $opts, $formelement = null ) {

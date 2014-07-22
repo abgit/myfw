@@ -12,12 +12,14 @@ class myform{
     private $warningMessage;
     private $hide;
     private $action;
-    private $wasSubmitted;
     private $wasValid;
     private $renderaction;
     private $rendersubmit;
     private $customRules;
     private $disabled;
+    private $preventmsg;
+    private $isajax = false;
+    private $modal = array();
 
     private $csrfname;
     private $csrfinit = false;
@@ -45,14 +47,14 @@ class myform{
         $this->submitMessage    = '';
         $this->warningMessage   = '';
         $this->hide             = false;
-        $this->action           = '';
-        $this->wasSubmitted     = false;
+        $this->action           = $_SERVER['REQUEST_URI'];
         $this->wasValid         = null;
         $this->renderaction     = true;
         $this->rendersubmit     = true;
         $this->customRules      = array();
         $this->disabled         = array();
         $this->csrfname         = $name . 'csrf';
+        $this->preventmsg       = 'undefined';
 
         // captcha
         $this->font             = dirname( __FILE__ ) . '/myform.ttf';	
@@ -65,6 +67,7 @@ class myform{
         $this->ncols            = 20;  // foreground or background cols
 
         $this->app = \Slim\Slim::getInstance();
+        $this->isajax = $this->app->request->isAjax();
     }
 
     public function & clear(){
@@ -81,8 +84,13 @@ class myform{
         return $this->formname;
     }
 
-    public function & addText( $name, $label = '', $rules = array(), $filters = array(), $options = array() ){
-        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options );
+    public function & setModal( $title, $class = 'modal-lg', $icon = 'icon-paragraph-justify2', $static = true, $width = '' ){
+        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width );
+        return $this;
+    }
+
+    public function & addText( $name, $label = '', $rules = array(), $filters = array(), $options = array(), $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
 
@@ -96,8 +104,8 @@ class myform{
         return $this;
     }
 
-    public function & addTextarea( $name, $label, $rules = array(), $filters = array(), $options = array() ){
-        $this->elements[ $name ] = array( 'type' => 'textarea', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options );
+    public function & addTextarea( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'textarea', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
 
@@ -105,6 +113,74 @@ class myform{
         $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options );
         return $this;
     }
+
+    public function & addStaticImage( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        return $this;
+    }
+
+    public function & addStaticMovie( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'staticmovie', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        return $this;
+    }
+
+    public function & focus( $element ){
+        $this->app->ajax()->focus( '#' . $this->formname . $element );
+        return $this;
+    }
+
+    public function & addGroup( $size = 2, $total = null ){
+        
+        switch( $size ){
+            case 4: $css = 'col-md-3'; break;
+            case 3: $css = 'col-md-4'; break;
+            default:$css = 'col-md-6'; break;
+        }
+
+        if( is_null( $total ) )
+            $total = $size;
+
+        $this->elements[ 'grp' . $this->counter++ ] = array( 'type' => 'formgroup', 'total' => $total, 'css' => $css, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }
+
+    public function & addHeader( $title, $description = '', $icon = 'icon-books' ){
+        $this->elements[ 'hdr' . $this->counter++ ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'icon' => $icon, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }
+
+    public function & addMessage( $title, $description = '' ){
+        $this->elements[ 'mss' . $this->counter++ ] = array( 'type' => 'message', 'title' => $title, 'description' => $description, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }    
+
+    public function & addStatic( $name, $label = '', $help = '', $showvalue = true ){
+        $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue );
+        return $this;
+    }    
+
+    public function & addStaticMessage( $message = '', $title = '', $icon = '', $date = '' ){
+        $this->elements[ 'smm' . $this->counter++ ] = array( 'type' => 'staticmessage', 'message' => $message, 'title' => $title, 'icon' => $icon, 'date' => $date, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }    
+
+    public function & addGrid( & $obj ){
+        $this->elements[ 'gri' . $this->counter++ ] = array( 'type' => 'grid', 'obj' => $obj );
+        return $this;
+    }    
+
+    public function & addCustom( $obj ){
+        $this->elements[ 'ctm' . $this->counter++ ] = array( 'type' => 'custom', 'obj' => $obj );
+        return $this;
+    }    
+
+    public function & addStats( $stats ){
+
+        // array( 'title' => , 'value' => 12476, 'percentage' => 50, 'icon' => 'icon-user-plus|icon-point-up', 'type' => 'success|info')
+        $this->elements[ 'sts' . $this->counter++ ] = array( 'type' => 'stats', 'stats' => $stats, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }    
+
 
     // special elements
     public function & addEmail( $name, $label = 'Email', $rules = array(), $filters = array() ){
@@ -129,64 +205,71 @@ class myform{
         return $this->addSelect( $name, $label, $rules, $filters, $options );
     }
 
-    public function & addSelect( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null ){
 
-        // filter types
-        if( isset( $optionsFilter['type'] ) ){
-            switch( $optionsFilter['type'] ){
+    private function & filterOptions( & $options, $optionsFilter = array() ){
+
+        // options filter types
+        if( isset( $optionsFilter[ 'type' ] ) ){
+            $res = array();
+            switch( $optionsFilter[ 'type' ] ){
                 case 'implode': foreach( $options as $o => $arr )
-                                    $options[ $o ] = implode( ' ', $arr );
+                                    $res[ $o ] = implode( ' ', $arr );
                                 break;
-                case 'explode': $options = explode( $optionsFilter['delimiter'], $options );
+                case 'explode': $res = isset( $optionsFilter[ 'delimiter' ] ) ? explode( $optionsFilter[ 'delimiter' ], $options ) : array();
                                 break;
-                case 'for':     $options = array();
-                                for( $i = $optionsFilter['min']; $i<=$optionsFilter['max']; $i += $optionsFilter['step'] )
-                                    $options[ $i ] = $i;
+                case 'list' :   foreach( explode( ';', $options ) as $el ){
+                                    $pat = explode( ',', $el );
+                                    if( isset( $pat[ 0 ] ) && isset( $pat[ 1 ] ) )
+                                        $res[ $pat[ 0 ] ] = $pat[ 1 ];
+                                }
+                                break;
+                case 'for':     if( isset( $optionsFilter[ 'min' ] ) && isset( $optionsFilter[ 'max' ] ) && isset( $optionsFilter[ 'step' ] ) )
+                                    for( $i = $optionsFilter[ 'min' ]; $i<=$optionsFilter[ 'max' ]; $i += $optionsFilter[ 'step' ] )
+                                        $res[ $i ] = $i;
                                 break;
             }
+            return $res;
         }
 
+        return $options;
+    }
+
+    public function & addSelect( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $help = '' ){
+        $options = $this->filterOptions( $options, $optionsFilter );
         $rules[ 'selectvalid' ] = array( $label . ' is not valid', $options );
-        $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
+        $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
 
-    public function & addMultiple( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null ){
-        $this->elements[ $name ] = array( 'type' => 'multiple', 'valuetype' => 'multiple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
+    public function & addMultiple( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $help = '' ){
+        $options = $this->filterOptions( $options, $optionsFilter );
+        $this->elements[ $name ] = array( 'type' => 'multiple', 'valuetype' => 'multiple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
 
-    public function & addCheckboxgroup( $name, $label, $rules = array(), $filters = array(), $options = array(), $settings = array() ){
-//		$rules[ 'checkboxgroupvalid' ] = array( $label . ' is not valid', $options );
-        $this->elements[ $name ] = array( 'type' => 'checkboxgroup', 'valuetype' => 'group', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'settings' => $settings );		
+    public function & addCheckboxgroup( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $settings = array(), $help = '' ){
+        $options = $this->filterOptions( $options, $optionsFilter );
+        $this->elements[ $name ] = array( 'type' => 'checkboxgroup', 'valuetype' => 'group', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'settings' => $settings, 'help' => $help );
         return $this;
     }
 
-    public function & addImageupload( $name, $label, $rules = array(), $filters = array(), $options = array() ){
+    public function & addTransloadit( $name, $label, $rules = array(), $filters = array(), $options = array(), $settings = array(), $help = '' ){
 
         // default options
-        $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'type' => 'simple', 'steps' => array() );
+        $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array(), 'mode' => 'image' );
 
-        $app = \Slim\Slim::getInstance();
+        $params = array( 'auth' => array( 'key'     => $this->app->config( 'transloadit.k' ),
+                                          'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
 
-        $params = json_encode(array(
-            'auth' => array(
-                'key'       => $app->config( 'transloadit.k' ),
-                'expires'   => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour'))
-                ),
-                'steps' => array(
-                    'cfiles' => array( 
-                        'path' => $app->client()->getTag() . '/${file.id}-${file.url_name}'
-                    ),
-                    'ofile' => array( 
-                        'path' => $app->client()->getTag() . '/${file.id}-${file.url_name}'
-                    )
-                ) + $options[ 'steps' ],
-                'template_id' => $options['template_id']
-        ), JSON_UNESCAPED_SLASHES );
+        if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ))
+            $params[ 'template_id' ] = $options[ 'template_id' ];
 
-        $this->imageuploadorder = isset( $this->imageuploadorder ) ? 1+$this->imageuploadorder : 1;
-        $this->elements[ $name ] = array( 'type' => 'imageupload', 'valuetype' => $options['type'], 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => array( 'order' => $this->imageuploadorder, 'params' => $params, 'signature' => hash_hmac('sha1', $params, $app->config('transloadit.s') ), 'width' => $options['width'], 'height' => $options['height'] ) );
+        if( isset( $options[ 'steps' ] ) && !empty( $options[ 'steps' ] ))
+            $params[ 'steps' ] = $options[ 'steps' ];
+
+        $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
+
+        $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->app->config('transloadit.s') ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
         return $this;
     }
 
@@ -208,6 +291,19 @@ class myform{
     public function & disable( $name ){
         if( isset( $this->elements[ $name ] ) )
             $this->elements[ $name ][ 'disabled' ] = true;
+        return $this;
+    }
+
+    public function & prevent( $name ){
+        if( isset( $this->elements[ $name ] ) )
+            $this->elements[ $name ][ 'prevent' ] = true;
+        return $this;
+    }
+
+    public function & preventAll( $except = array() ){
+        foreach( $this->elements as $name => $el )
+            if( ! in_array( $name, $except ) )
+                $this->prevent( $name );
         return $this;
     }
 
@@ -252,7 +348,7 @@ class myform{
         $rand = $this->getRandom( 5 );
 
         // save random value in session
-        \Slim\Slim::getInstance()->session()->set( 'captcha_string', $rand );
+        $this->app->session()->set( 'captcha_string', $rand );
 
         return $rand;
     }
@@ -375,16 +471,6 @@ class myform{
         }
     }
 
-    // add grid for debugging purposes
-    private function addgrid($tmpimg, $width2, $height2, $iscale, $color) {
-        $lwid = floor($iscale*3/2);
-        imagesetthickness($tmpimg, $lwid);
-        for ($x = 4; $x < $width2-$lwid; $x+=$lwid*2)
-            imageline($tmpimg, $x, 0, $x, $height2-1, $color);
-        for ($y = 4; $y < $height2-$lwid; $y+=$lwid*2)
-            imageline($tmpimg, 0, $y, $width2-1, $y, $color);
-    }
-
     private function warped_text_image($width, $height, $string){
 
         // internal variablesinternal scale factor for antialias
@@ -411,7 +497,6 @@ class myform{
         $y = round($height2/2 - $ty/2 - $bb[1]);
         imagettftext($tmpimg, $fsize, 0, $x, $y, -$col, $this->font, $string);
 
-        // $this->addgrid($tmpimg, $width2, $height2, $iscale, $col); // debug
         // warp text from $tmpimg into $img
         $this->distorted_copy($tmpimg, $img, $width, $height, $iscale);
 
@@ -444,59 +529,133 @@ class myform{
         imagestring($img, 5, 10, imagesy($img)-20, $string, $cmtcol);
     }
 
+    public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $options = array() ){
+
+        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'onclick' => $onclick, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'options' => $options );
+        return $this;
+    }
+
     public function & addSubmit( $label = null, $name = null, $position = '', $options = array() ){
 
         if( empty( $name ) )  $name = 'save';
         if( empty( $label ) ) $label = 'Save';
         $this->elements[ $name ] = array( 'type' => 'submit', 'name' => $name, 'position' => $position, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
+        $this->applyCsrf();
+
+        return $this;
+    }
+
+    public function & addAjax( $label = null, $name = null, $css = 'btn-success', $position = '', $options = array() ){
+
+        if( empty( $name ) )  $name = 'save';
+        $this->elements[ $name ] = array( 'type' => 'ajax', 'name' => $name, 'position' => $position, 'css' => $css, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
+        $this->applyCsrf();
+
+        return $this;
+    }
+
+    private function applyCsrf(){
 
         // csrf protection
         if( !$this->csrfinit ){
 
-            $csrf = $this->app->session()->get( $this->csrfname, '' );
+            $csrfname = $this->csrfname;
+            $csrf     = $this->app->session()->get( $csrfname, '' );
+            $csrfnew  = $this->getRandom( 8 );
 
-            $this->addRule( function() use( $csrf ){
-                return ( is_string( $csrf ) && !empty( $csrf ) && isset( $_POST[ $this->csrfname ] ) && $csrf === $_POST[ $this->csrfname ] ) ? true : 'csrf protection';
+            $this->addRule( function() use( $csrf, $csrfname ){
+                return ( is_string( $csrf ) && !empty( $csrf ) && isset( $_POST[ $csrfname ] ) && $csrf === $_POST[ $csrfname ] ) ? true : 'csrf protection';
             });
 
-            $this->app->session()->set( $this->csrfname, $this->getRandom( 8 ) );
-            $this->csrfinit = true;
-		}
 
-        return $this;
+            $this->app->session()->set( $csrfname, $csrfnew );
+            $this->csrfinit = true;
+		
+            // add csrf to ajax
+            $this->app->ajax()->addFormCsrf( $csrfname, $csrfnew );
+        }
+
     }
 
-    public function & setSubmitMessage( $msg ){
+
+    public function & setSubmitMessage( $msg, $title = 'Sucess' ){
+
+        if( $this->isajax )
+            $this->app->ajax()->setMessageOk( $msg, $title );
+
         $this->submitMessage = $msg;
         return $this;
     }
 
-    public function & setWarningMessage( $msg ){
+    public function & setWarningMessage( $msg, $title = 'Warning' ){
+
+        if( $this->isajax )
+            $this->app->ajax()->setMessageWarning( $msg, $title );
+
         $this->warningMessage = $msg;
         return $this;
     }
 
-    public function & setErrorMessage( $msg ){
+    public function & setErrorMessage( $msg, $title = 'Errors found' ){
+
+        if( $this->isajax )
+            $this->app->ajax()->setMessageError( $msg, $title );
+
         $this->errors[] = $msg;
         $this->wasValid = false;
+        return $this;
+    }
+    
+    public function & setHelp( $element, $message ){
+        if( isset( $this->elements[ $element ] ) )
+            $this->elements[ $element ][ 'help' ] = $message;
         return $this;
     }
 
     public function isSubmitted( $button = '' ){
 
         foreach( $this->elements as $n => $el ){
-            if( $el[ 'type' ] == 'submit' && isset( $_POST[ $this->formname . $n ] ) && ( empty( $button ) || $n == $button ) )
-                return ($this->wasSubmitted = true );
+            if( ( $el[ 'type' ] == 'submit' || $el[ 'type' ] == 'ajax' ) && isset( $_POST[ $this->formname . $n ] ) && ( empty( $button ) || $n == $button ) )
+                return true;
         }
-        return ($this->wasSubmitted=false);
+        return false;
     }
 
     public function & hide(){
+
+        if( $this->isajax ){
+            $this->app->ajax()->setFormReset( $this->formname );
+
+            if( !empty( $this->modal ) ){
+                $modal = $this->modal;
+                $this->app->ajax()->modalHide( $modal[ 'id' ] );
+            }
+        }
+
         $this->hide = true;
         return $this;
     }
 
-    public function & setDefaultValues( $values ){
+    public function & show(){
+
+        // check special form element: transloadit
+        $transloadit = 0;
+        foreach( $this->elements as $n => $el ){
+            if( $el[ 'type' ] == 'transloadit' ){
+                $transloadit = 1;
+                break;
+            }
+        }
+
+        // if modal undefined, create one
+        if( ! isset( $this->modal['id'] ) )
+            $this->setModal( 'Form' );
+
+        $this->app->ajax()->setCommand( 'fs', array( 'f' => $this->formname, 'h' => $this->app->ajax()->filter( $this->__toString() ), 's' => $this->modal['id'], 't' => $transloadit ) );
+        return $this;
+    }
+
+    public function & setDefaultValues( $values, $append = false ){
 
         // check if values is object
         if( is_object( $values ) ){
@@ -505,9 +664,9 @@ class myform{
                 if( isset( $values->$n ) )
                     $val[ $n ] = $values->$n;
 
-            $this->valuesdefault = $val;
+            $this->valuesdefault = $append ? ( $this->valuesdefault + $val ) : $val;
         }else{
-            $this->valuesdefault = $values;
+            $this->valuesdefault = $append ? ( $this->valuesdefault + $values ) : $values;
         }
         return $this;
     }
@@ -525,17 +684,18 @@ class myform{
         return $this;
     }
 
-    public function addRule(){
+    public function & addRule(){
 	
         // add validation if form is submitted only
-        if( ! $this->isSubmitted() )
-            return false;
+        if( $this->isSubmitted() ){
+            $this->customRules[] = func_get_args();
+        }
 
-        $this->customRules[] = func_get_args();
+        return $this;
     }
 
-    public function isSubmittedAndValid(){
-        return ( $this->isSubmitted() && $this->isValid() );
+    public function isSubmittedAndValid( $button = '' ){
+        return ( $this->isSubmitted( $button ) && $this->isValid() );
     }
 
     public function onSubmittedAndValid( $callback ){
@@ -595,13 +755,22 @@ class myform{
             }
         }
 
-        return ( $this->wasValid = empty( $this->errors ) );
+        $isvalid = ( $this->wasValid = empty( $this->errors ) );
+
+        if( !$isvalid && $this->isajax )
+            $this->app->ajax()->setMessageError( $this->getErrors() );
+
+        return $isvalid;
+    }
+
+    public function getErrors(){
+        return $this->errors;
     }
 
     public function getValues( $applyFilters = true, $includeDisabled = false ){
 
         // check if form is submitted
-        if( !$this->wasSubmitted )
+        if( ! $this->isSubmitted() )
             return $this->valuesdefault;
 
         $values = array();
@@ -613,17 +782,22 @@ class myform{
 
             // get value for this element
             switch( $el[ 'valuetype' ] ){
-                case 'simple':  $values[ $n ] = isset( $_POST[ $this->formname . $n ] ) ? $_POST[ $this->formname . $n ] : '';
-                                break;
-                case 'multiple':$values[ $n ] = ( isset( $_POST[ $this->formname . $n ] ) && is_array( $_POST[ $this->formname . $n ] ) ) ? implode( ';', $_POST[ $this->formname . $n ] ) : ''; 
-                                break;
-                case 'group':   $v = array();
-                                foreach( $el['options'] as $o => $val )
-                                    if( isset( $_POST[ $this->formname . $n . $o ] ) && $_POST[ $this->formname . $n . $o ] == 'on' )
-                                        $v[] = $o;
-                                $values[ $n ] = implode( ';', $v );
-                                break;
-                default:        continue;
+                case 'simple':      $values[ $n ] = isset( $_POST[ $this->formname . $n ] ) ? $_POST[ $this->formname . $n ] : '';
+                                    break;
+                case 'multiple':    $values[ $n ] = ( isset( $_POST[ $this->formname . $n ] ) && is_array( $_POST[ $this->formname . $n ] ) ) ? implode( ';', $_POST[ $this->formname . $n ] ) : ''; 
+                                    break;
+                case 'group':       $v = array();
+                                    foreach( $el['options'] as $o => $val )
+                                        if( isset( $_POST[ $this->formname . $n . $o ] ) && $_POST[ $this->formname . $n . $o ] == 'on' )
+                                            $v[] = $o;
+                                    $values[ $n ] = implode( ';', $v );
+                                    break;
+                case 'transloadit': if( isset( $_POST[ $this->formname . $n ] ) ){
+                                        $this->app->transloadit()->requestAssembly( $res, $_POST[ $this->formname . $n ] );
+                                        $values[ $n ] = $res;
+                                    }
+                                    break;
+                default:            continue;
             }
 
             if( $applyFilters && is_array( $el[ 'filters' ] ) )
@@ -651,10 +825,11 @@ class myform{
         }
 
         return array(   'hide'          => $this->hide,
-                        'submitted'     => $this->wasSubmitted,
+                        'submitted'     => $this->isSubmitted(),
                         'valid'         => $this->wasValid,
                         'validmsg'      => ( empty( $this->submitMessage ) ? 'Form submitted' : $this->submitMessage ),
                         'warningmsg'    => $this->warningMessage,
+                        'preventmsg'    => $this->preventmsg,
                         'errors'        => $this->errors,
                         'name'          => $this->formname,
                         'action'        => $this->action,
@@ -662,11 +837,14 @@ class myform{
                         'renderaction'  => $this->renderaction,
                         'rendersubmit'  => $this->rendersubmit,
                         'csrfname'      => $this->csrfname,
-                        'csrf'          => $this->app->session()->get( $this->csrfname, '' )
+                        'csrf'          => $this->app->session()->get( $this->csrfname, '' ),
+                        'isajax'        => $this->isajax,
+                        'ismodal'       => !empty( $this->modal ),
+                        'modal'         => $this->modal
                         );
     }
 
     public function __toString(){
-        return \Slim\Slim::getInstance()->render( '@my/myform', $this->obj(), null, null, APP_CACHEAPC, false, false );
+        return $this->app->render( '@my/myform', $this->obj(), null, null, APP_CACHEAPC, false, false );
     }
 }
