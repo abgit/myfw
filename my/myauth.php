@@ -1,7 +1,7 @@
 <?php
 
-    require_once( __DIR__  . "/3rdparty/hybridauth/Hybrid/Auth.php" );
-    require_once( __DIR__  . "/3rdparty/hybridauth/Hybrid/Endpoint.php" ); 
+    require_once( __DIR__  . "/3rdparty/Hybrid/Auth.php" );
+    require_once( __DIR__  . "/3rdparty/Hybrid/Endpoint.php" ); 
 
     class myauth{
 
@@ -59,24 +59,10 @@
             return false;
         }
 
-        public function postTwitterWall( &$id, &$post, $message, $title, $description, $image = false ){
+        public function postTwitterWall( $msg, $image = '' ){
 
             $twitter = $this->hybridauth->authenticate( "Twitter" );
-
-            if( !$image )
-    	    	$post = $twitter->api()->post( 'statuses/update.json', array( 'status' => $message . "\n" . $title . "\n" . $description ) ); 
-            else{
-                $post = $twitter->api()->post( 'statuses/update_with_media.json', array( 'status' => $message, 'media[]' => file_get_contents( $image ) ) );                 
-    
-            }
-    		// check the last HTTP status code returned
-    		if ( $twitter->api()->http_code == 200 && isset( $post->id ) ){
-                $id = $post->id;
-
-	    		return true;
-		    }
-
-            return false;
+            $twitter->setUserStatus( empty( $image ) ? $msg : array( 'message' => $msg, 'picture' => $image ) );
         }
 
         public function getTwitterPost( &$info, $postid ){
@@ -97,13 +83,13 @@
         public function getFacebookPost( $postid ){
         
             $facebook = $this->hybridauth->authenticate( "Facebook" );
-            return $facebook->api()->api("/" . $postid);
+            return $facebook->api()->api( "/" . $postid );
         }
         
         public function destroySession(){
             $facebook = $this->hybridauth->authenticate( "Facebook" );
             return $facebook->api()->destroySession();
-            }
+        }
 
         public function getFacebookPostInfo( $postid ){
 

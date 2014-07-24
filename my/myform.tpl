@@ -196,7 +196,9 @@
 			{% elseif el.type == 'message' %}
                 <div class="callout callout-info fade in">
 				    <h5>{{el.title}}</h5>
-				    {% if el.description %}<p>{{el.description|nl2br}}</p>{% endif %}
+				    {% if el.description %}
+                        <p>{{el.description|nl2br}}</p>
+                    {% endif %} 
                 </div>
 
 			{% elseif el.type == 'static' %}
@@ -294,14 +296,14 @@
 
                 {% if not el.prevent %}
     				<input type="hidden" name="{{ name ~ el.name }}" value="{{ tvalue }}" id="{{name ~ el.name}}V" class="{{ name }}transloaditV"/>
-                    <div class="uploader {{ name }}transloaditU" {{ tvalue is not empty ? 'style="display:none"' }} id="{{ name ~ el.name }}U"><input name="{{ name ~ el.name }}N" class="transloaditN" onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
+                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN" onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
 
                 {% elseif tvalue is empty %}
                     <p class="form-control-static">{{ preventmsg }}</p>
 
                 {% endif %}
 
-            <div class="row {{ name }}transloaditC" {{ tvalue is empty ? 'style="display:none"' }} id="{{name ~ el.name}}C">
+            <div class="row {{ name }}transloaditC" id="{{name ~ el.name}}C"{{ tvalue is empty ? ' style="display:none"' }}>
                 <div class="col-xs-10" id="{{name ~ el.name}}P">
 
                 {% if tvalue is not empty %}
