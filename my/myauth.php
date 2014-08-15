@@ -28,16 +28,11 @@
             return $this->hybridauth->logoutAllProviders();
         }
 
-        public function onLogout( $callback ){
-
-            if( is_callable( array( $this->hybridauth, 'logoutAllProviders' ) ) && $this->hybridauth->logoutAllProviders() )
-                call_user_func( $callback );
-        }
-
         public function process(){
             Hybrid_Endpoint::process();
         }
-        
+
+        // posts
         public function postFacebookWall( &$id, &$post, $message, $picture = "", $link = "", $name = "", $caption = "", $description = "", $privacy = "" ){
 
             $values = array();
@@ -50,8 +45,7 @@
             if( is_string( $description ) && strlen( trim( $description ) ) ) $values[ 'description' ] = $description;
             if( is_string( $privacy ) && strlen( trim( $privacy ) ) )         $values[ 'privacy' ] = $privacy;
         
-            $facebook = $this->hybridauth->authenticate( "Facebook" );
-            $post = $facebook->api()->api("/me/feed", "post", $values );
+            $post = $this->hybridauth->authenticate( "Facebook" )->setUserStatus( $values );
             if( isset( $post[ 'id' ] ) ){
                 $id = $post[ 'id' ];
                 return true;
@@ -59,62 +53,35 @@
             return false;
         }
 
-        public function postTwitterWall( $msg, $image = '' ){
-
-            $twitter = $this->hybridauth->authenticate( "Twitter" );
-            $twitter->setUserStatus( empty( $image ) ? $msg : array( 'message' => $msg, 'picture' => $image ) );
+        public function postTwitterWall( $status ){
+            return $this->hybridauth->authenticate( "Twitter" )->setUserStatus( $status );
         }
 
-        public function getTwitterPost( &$info, $postid ){
-
-            $twitter = $this->hybridauth->authenticate( "Twitter" );
-	    	$info = $twitter->api()->get( 'statuses/show.json?id=' . $postid . '&include_entities=true' ); 
-
-    		// check the last HTTP status code returned
-    		if ( $twitter->api()->http_code == 200 && isset( $info->id ) ){
-                $info = array( 'favorites' => $info->favorite_count,
-                               'retweets'  => $info->retweet_count );
-	    		return true;
-		    }
-
-            return false;
+        // contacts
+        public function getFacebookContacts(){
+            return $this->hybridauth->authenticate( "Facebook" )->getUserContacts();
         }
 
+        public function getTwitterContacts(){
+            return $this->hybridauth->authenticate( "Twitter" )->getUserContacts();
+        }
+
+        // posts
         public function getFacebookPost( $postid ){
-        
-            $facebook = $this->hybridauth->authenticate( "Facebook" );
-            return $facebook->api()->api( "/" . $postid );
-        }
-        
-        public function destroySession(){
-            $facebook = $this->hybridauth->authenticate( "Facebook" );
-            return $facebook->api()->destroySession();
+            return $this->hybridauth->authenticate( "Facebook" )->getUserStatus( $postid );
         }
 
-        public function getFacebookPostInfo( $postid ){
-
-            $facebook = $this->hybridauth->authenticate( "Facebook" );
-            $info = $facebook->api()->api( array( 'method' => 'fql.query', 'query' => 'SELECT like_info.like_count, comment_info.comment_count, share_count FROM stream WHERE post_id = "' . $postid . '"' ) );        
-        
-            if( isset( $info[0] ) && is_array( $info[0] ) ){
-            
-                $info = array( 'likes'    => intval( $info[0]['like_info']['like_count'] ),
-                               'comments' => intval( $info[0]['comment_info']['comment_count'] ),
-                               'shares'   => intval( $info[0]['share_count'] ) );
-                return $info;
-            }
-            return false;
+        public function getTwitterPost( $postid ){
+            return $this->hybridauth->authenticate( "Twitter" )->getUserStatus( $postid );
         }
 
-
-        public function postFacebookPage( $pageid, $pageaccesstoken, $message ){
-            $facebook = $this->hybridauth->authenticate( "Facebook" );
-            return $facebook->api()->api( "/" . $pageid . "/feed", 'POST', array( 'access_token' => $pageaccesstoken, "message" => $message ) );
+        // pages
+        public function postFacebookPage( $message, $pageid ){
+            return $this->hybridauth->authenticate( "Facebook" )->setUserStatus( $message, $pageid );
         }
 
         public function getFacebookPages(){
-             $facebook = $this->hybridauth->authenticate( "Facebook" );
-             return $facebook->api()->api('/me/accounts');
+            return $this->hybridauth->authenticate( "Facebook" )->getUserPages(true);
         }
 
     }

@@ -69,7 +69,7 @@ class Hybrid_Providers_Twitter extends Hybrid_Provider_Model_OAuth1
  		$this->token( "request_token_secret", $tokens["oauth_token_secret"] );
  	
 		// redirect the user to the provider authentication url with force_login
- 		if ( isset( $this->config['force_login'] ) && $this->config['force_login'] ){
+ 		if ( ( isset( $this->config['force_login'] ) && $this->config['force_login'] ) || ( isset( $this->config[ 'force' ] ) && $this->config[ 'force' ] === true ) ){
  			Hybrid_Auth::redirect( $this->api->authorizeUrl( $tokens, array( 'force_login' => true ) ) );
  		}
 
@@ -129,7 +129,7 @@ class Hybrid_Providers_Twitter extends Hybrid_Provider_Model_OAuth1
 		$this->user->profile->displayName = (property_exists($response,'screen_name'))?$response->screen_name:"";
 		$this->user->profile->description = (property_exists($response,'description'))?$response->description:"";
 		$this->user->profile->firstName   = (property_exists($response,'name'))?$response->name:""; 
-		$this->user->profile->photoURL    = (property_exists($response,'profile_image_url'))?$response->profile_image_url:"";
+		$this->user->profile->photoURL    = (property_exists($response,'profile_image_url'))?(str_replace('_normal', '', $response->profile_image_url)):"";
 		$this->user->profile->profileURL  = (property_exists($response,'screen_name'))?("http://twitter.com/".$response->screen_name):"";
 		$this->user->profile->webSiteURL  = (property_exists($response,'url'))?$response->url:""; 
 		$this->user->profile->region      = (property_exists($response,'location'))?$response->location:"";
@@ -202,7 +202,26 @@ class Hybrid_Providers_Twitter extends Hybrid_Provider_Model_OAuth1
         if ( $this->api->http_code != 200 ){
             throw new Exception( "Update user status failed! {$this->providerId} returned an error. " . $this->errorMessageByStatus( $this->api->http_code ) );
         }
+
+        return $response;
     }
+
+
+	/**
+	* get user status
+	*/
+    function getUserStatus( $tweetid )
+    {
+        $info = $this->api->get( 'statuses/show.json?id=' . $tweetid . '&include_entities=true' );
+
+        // check the last HTTP status code returned
+        if ( $this->api->http_code != 200 || !isset( $info->id ) ){
+			throw new Exception( "Cannot retrieve user status! {$this->providerId} returned an error. " . $this->errorMessageByStatus( $this->api->http_code ) );
+        }
+
+        return $info;
+    }
+
 
 	/**
 	* load the user latest activity  

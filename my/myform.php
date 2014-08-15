@@ -12,6 +12,7 @@ class myform{
     private $warningMessage;
     private $hide;
     private $action;
+    private $target;
     private $wasValid;
     private $renderaction;
     private $rendersubmit;
@@ -48,6 +49,7 @@ class myform{
         $this->warningMessage   = '';
         $this->hide             = false;
         $this->action           = $_SERVER['REQUEST_URI'];
+        $this->target           = false;
         $this->wasValid         = null;
         $this->renderaction     = true;
         $this->rendersubmit     = true;
@@ -95,6 +97,7 @@ class myform{
     }
 
     public function & addHidden( $name, $rules = array(), $filters = array(), $options = array() ){
+        $name = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $this->elements[ $name ] = array( 'type' => 'hidden', 'valuetype' => 'simple', 'name' => $name, 'label' => '', 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
         return $this;
     }
@@ -115,6 +118,7 @@ class myform{
     }
 
     public function & addStaticImage( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
+        $name = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
@@ -237,6 +241,8 @@ class myform{
     public function & addSelect( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $help = '' ){
         $options = $this->filterOptions( $options, $optionsFilter );
         $rules[ 'selectvalid' ] = array( $label . ' is not valid', $options );
+
+        $name = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
@@ -315,6 +321,11 @@ class myform{
 
     public function & setAction( $action ){
         $this->action = $action;
+        return $this;
+    }
+
+    public function & setTarget( $target ){
+        $this->target = $target;
         return $this;
     }
 
@@ -833,6 +844,7 @@ class myform{
                         'errors'        => $this->errors,
                         'name'          => $this->formname,
                         'action'        => $this->action,
+                        'target'        => $this->target,
                         'elements'      => $this->elements,
                         'renderaction'  => $this->renderaction,
                         'rendersubmit'  => $this->rendersubmit,

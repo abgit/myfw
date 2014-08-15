@@ -29,7 +29,7 @@
 {% if hide == false %}
 
 	{% if renderaction %}
-		<form action="{{ action }}" method="post" name="{{ name }}" id="{{ name }}" role="form">
+		<form action="{{ action }}" method="post" name="{{ name }}" id="{{ name }}" role="form"{% if target %} target="{{ target }}"{% endif %}>
 	{% endif %}
 
 	{% if ismodal %}
@@ -96,7 +96,7 @@
                         <p class="form-control-static">{{ el.options[ el.value ]|default( preventmsg ) }}</p>
                     {% else %}
 
-                        <select class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                        <select class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
     					{% for opv, opl in el.options %}
                             <option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
     					{% endfor %}
@@ -123,7 +123,7 @@
                     {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
 
 			{% elseif el.type == 'hidden' %}
-            	<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}"  type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+            	<input {{el.disabled ? 'disabled="disabled" '}}name="{{ el.name}}" type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
                 
 			{% elseif el.type == 'checkboxgroup' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
@@ -217,9 +217,9 @@
 
         	{% elseif el.type == 'staticimage' %}
 
-                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    {%if label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
                     <div>
-                    <img id="{{name ~ el.name}}" {% if not el.options.html.width and not el.options.html.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
+                    <img id="{{el.name}}" {% if not el.options.html.width and not el.options.html.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
                     </div>
                     {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
 
@@ -353,10 +353,7 @@
             
             {% for el in elements %}
     			{% if el.type == 'submit' and rendersubmit %}
-
-                    <div class="form-actions {% if el.position == 'left' %}text-left{% else %}text-right{% endif %}">
-                        <input {%if formtransloadit%} onClick="$('form#{{name}}').unbind('submit.transloadit');" {% endif %} {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" id="{{name}}submit" class="btn btn-success" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-                    </div>
+                    <input style="margin-top:3px;" {%if formtransloadit%} onClick="$('form#{{name}}').unbind('submit.transloadit');" {% endif %} {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" id="{{name}}submit" class="btn btn-success" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 
 	    		{% elseif el.type == 'ajax' and el.label is not null %}
                     <input style="margin-top:3px;" onClick="myfwformsubmit('{{name}}','{{name ~ el.name}}ajax','{{el.label}}','{{name ~ el.name}}');" {{el.disabled ? 'disabled="disabled" '}}type="button" id="{{name ~ el.name}}ajax" class="btn {{el.css}}" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
