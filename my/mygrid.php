@@ -6,17 +6,25 @@ class mygrid{
     private $key      = null;
     private $cols     = null;
     private $labels   = null;
-    private $more     = null;
+    private $more     = false;
     private $values   = null;
     private $keyhtml  = null;
     private $menu     = 0;
     private $title    = null;
-    private $emptymsg = null;
+    private $emptymsg = 'No elements to display';
     private $buttons  = array();
+    private $classes  = array();
+    private $actions  = array();
+    private $modal    = null;
     
-    public function __construct( $name ){
+    public function __construct( $name = 'g' ){
         $this->name = $name;
         $this->app = \Slim\Slim::getInstance();
+    }
+
+    public function & setName( $name ){
+        $this->name = $name;
+        return $this;
     }
     
     public function & setKey( $key, $keyhtml = 'KEY' ){
@@ -24,7 +32,7 @@ class mygrid{
         $this->keyhtml = $keyhtml;
         return $this;
     }
-    
+
     public function & setTitle( $label, $icon = 'icon-stack' ){
         $this->title = array( 'label' => $label, 'icon' => $icon );
         return $this;
@@ -46,64 +54,143 @@ class mygrid{
         }
         return $this;
     }
+
+    public function addAction( $name, $call ){
+        $this->actions[ $name ] = $call;
+    }
+
+    public function __call( $name, $arguments ){
+
+        if( isset( $this->actions[ $name ] ) ){
+            return call_user_func_array( $this->actions[ $name ], $arguments );
+        }
+    }
     
     public function & addToolbarButton( $label, $icon, $onclick, $class = 'info' ){
         $this->buttons[] = array( 'label' => $label, 'icon' => $icon, 'onclick' => $onclick, 'class' => $class );
         return $this;
     }
     
-    public function & addSimple( $key, $kval, $label, $align = '' ){
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+    public function & addSimple( $key, $kval, $label = '', $align = '' ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'simple');
         return $this;
     }
 
     public function & addH4( $key, $kval, $label, $align = '' ){
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'h4');
         return $this;
     }
 
-    public function & addSpan( $key, $kval, $label, $align = '' ){
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+    public function & addSpan( $key, $kval, $label = '', $align = '' ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'span' );
         return $this;
     }
 
     public function & addAgo( $key, $kval, $label, $align = '' ){
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'ago' );
         return $this;
     }
 
-    public function & addUrl( $key, $kval, $label, $onclick, $align = 'text-left'){
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'url', 'onclick' => $onclick );
+    public function & addUrl( $key, $kval, $label, $onclick, $bold = false, $align = 'text-left' ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'url', 'onclick' => $onclick, 'bold' => $bold );
         return $this;
     }
 
     public function & addFixed( $key, $kval, $label, $options, $default = array(), $align = 'text-center' ){
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'fixed', 'options' => $options, 'default' => $default );
         return $this;
     }
 
-    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $classtype = 'primary', $align = 'text-center' ){
+    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'text-center' ){
         $key = 'm' . $this->menu++;
-        $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
-        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'classtype' => $classtype, 'options' => $options );
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'options' => $options );
         return $this;
     }
 
     public function & setValues( $values ){
-        $this->values = $values;
+        if( is_array( $values ) )
+            $this->values = $values;
+
         return $this;
+    }
+
+    public function & setClass( $el, $class ){
+
+        if( !is_array( $el ) )
+            $el = array( $el );
+
+        foreach( $el as $e ){
+            if( isset( $this->labels[ $e ] ) ){
+                $this->labels[ $e ][ 'class' ] = $class;
+            }
+        }
+        return $this;
+    }
+
+
+
+    public function & setRowClass( $key, $kval, $class, $dependkey = false ){
+
+        foreach( $this->cols[ $key ] as $index => $subrow ){
+            if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey );
+        }
+        return $this;
+    }
+
+
+    public function & setRowReplace( $key, $kval, $replace ){
+        foreach( $this->cols[ $key ] as $index => $subrow ){
+            if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                $this->cols[ $key ][ $index ][ 'replace' ] = $replace;
+        }
+        return $this;
+    }
+
+    public function & addAddon( $key, $kval, $value, $prefix = true ){
+
+        if( $prefix )
+            foreach( $this->cols[ $key ] as $index => $subrow )
+                if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                    $this->cols[ $key ][ $index ][ 'addonpre' ] = $value;
+        else
+            foreach( $this->cols[ $key ] as $index => $subrow )
+                if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                    $this->cols[ $key ][ $index ][ 'addonpos' ] = $value;
+
+        return $this;
+    }
+
+
+    public function & refreshAjaxValue( $value ){
+        return $this->refreshAjaxValues( array( $value ) );
     }
 
     public function & refreshAjaxValues( $values ){
 
-        if( !is_array( $values ) || !isset( $values[0] ) )
-            $values = array( $values );
+        if( !is_array( $values ) )
+            return $this;
 
         foreach( $values as $row ){
             if( isset( $row[ $this->key ] ) )
@@ -113,34 +200,78 @@ class mygrid{
         return $this;
     }
 
-    public function & addAjaxValue( $values ){
+    public function & deleteAjaxValue( $key ){
+        $this->app->ajax()->hideTableRow( '#' . $key, '#' . $this->name . 'table', '#' . $this->name . 'empty' );
+        return $this;
+    }
 
-        if( !is_array( $values ) || !isset( $values[0] ) )
-            $values = array( $values );
+    public function & addAjaxValue( $value ){
+        return $this->addAjaxValues( array( $value ), false );
+    }
 
-        $values = array_reverse( $values );
+    public function & addAjaxValues( $values, $append = true ){
 
-        $counter = false;
-        foreach( $values as $row ){
-            if( isset( $row[ $this->key ] ) ){
-                $this->app->ajax()->prepend( '#' . $this->name, $this->render( $values ) );
-                $counter = true;
-            }
+        if( !is_array( $values ) )
+            return $this;
+
+        $counter = count( $values );
+
+        if( $counter ){
+            $append ? $this->app->ajax()->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax()->prepend( '#' . $this->name, $this->render( $values ) );
         }
 
         if( $counter )
-            $this->app->ajax()->remove( '#' . $this->name . 'empty' );
+            $this->app->ajax()->hide( '#' . $this->name . 'empty' );
+
+        if( $this->getPerPage() > $counter )
+            $this->app->ajax()->remove( '#' . $this->name . 'more' );
 
         return $this;
     }
 
-    public function & setMore( $onclick, $label = 'load more' ){
+    public function & setMore( $onclick, $perpage = 10, $offset = 0, $label = 'more' ){
+        
+        // reset counter
+        $this->app->session()->set( $this->name . 'perpage', $perpage );
+        $this->app->session()->set( $this->name . 'offset',  $offset );
+        
         $this->more = array( 'onclick' => $onclick, 'label' => $label );
+
         return $this;
     }
-    
+
+    public function getPerPage(){
+        return intval( $this->app->session()->get( $this->name . 'perpage', 10 ) );
+    }
+
+    public function getOffset( $increase = false ){
+
+        $newoffset = intval( $this->app->session()->get( $this->name . 'offset', 0 ) ) + $this->getPerPage();
+
+        $this->app->session()->set( $this->name . 'offset', $newoffset );
+
+        return $newoffset;
+    }
+
     public function __toString(){
         return $this->render();
+    }
+
+    public function & setModal( $title, $class = 'modal-lg', $icon = 'icon-paragraph-justify2', $static = true, $width = '' ){
+        $this->modal = array( 'formid' => 'mygf' . $this->name, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width );
+        return $this;
+    }
+
+    public function show( $htmlid = null ){
+
+        if( is_null( $htmlid ) ){
+            return $this->app->form( $this->modal[ 'formid' ] )
+                             ->addAjax()
+                             ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
+                             ->addGrid( $this )
+                             ->show();
+        }
+        $this->app->ajax()->html( $htmlid, $this->render() );
     }
 
     private function render( $values = null ){
@@ -154,6 +285,7 @@ class mygrid{
                                                         'title'    => $this->title,
                                                         'emptymsg' => $this->emptymsg,
                                                         'buttons'  => $this->buttons,
+                                                        'perpage'  => $this->getPerPage(),
                                                         'cols'     => $this->cols ), null, null, APP_CACHEAPC, false, false );        
     }
 }

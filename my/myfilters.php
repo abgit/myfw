@@ -22,6 +22,10 @@ class myfilters{
         return nl2br( $string );
     }
 
+    public static function nl2space( $string ){
+        return preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", " ", $string );
+    }
+
     public static function floatval( $string ){
         return is_array($string) ? array_map( 'floatval', $string ) : floatval( $string );
     }
@@ -36,6 +40,11 @@ class myfilters{
 
     public static function hexcolor( $val ){
         return ( strlen( $val ) > 2 && substr( $val, 0, 1 ) != '#' ) ? '#' . $val : $val;
+    }
+
+    public static function cdn( $html ){
+        $app  = \Slim\Slim::getInstance();
+        return preg_replace( '~(href|src|url)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $app->config( 'filter.cdn.ext' ). ')(["\'])~i', '$1$2"' . $app->config( 'filter.cdn.domain' ) . '$5$6"', $html  );
     }
 
     public static function intersect( $array, $optarray ){
@@ -88,26 +97,26 @@ class myfilters{
     }
 
     public static function t( $string, $chars=10, $rep='...' ){
-        return $chars > strlen($string) ? $string : substr( $string, 0, $chars ) . $rep;
+        return $chars < strlen($string) ? substr( $string, 0, $chars ) . $rep : $string;
     }
 
     public static function m( $string, $showSymbol = true ){
         return ( $showSymbol ? '&euro; ' : '' ) . round( $string, 2 );
     }
 
-    public static function rnumber( $string ){
+    public static function rnumber( $string, $mini = false ){
         $string = ( 0 + str_replace( ",", "", $string ) );
         if( !is_numeric( $string ) )
             return false;
         if( $string > 1000000000000 )
-            return round( ( $string / 1000000000000 ), 1 ) . ' trillion';
+            return round( ( $string / 1000000000000 ), 1 ) . ( $mini ? 'T' : ' trillion' );
         elseif( $string > 1000000000 )
-            return round( ( $string / 1000000000 ), 1 ) . ' billion';
+            return round( ( $string / 1000000000 ), 1 ) . ( $mini ? 'B' : ' billion' );
         elseif( $string > 1000000)
-            return round( ( $string / 1000000 ), 1 ) . ' million';
+            return round( ( $string / 1000000 ), 1 ) . ( $mini ? 'M' : ' million' );
         elseif( $string > 1000 )
-            return round( ( $string / 1000 ), 1 ) . ' thousand';
-        return number_format( $string );
+            return round( ( $string / 1000 ), 1 ) . ( $mini ? 'K' : ' thousand' );
+        return ( $mini ? '<1K' : number_format( $string ) );
     }
 
     public static function bcloudname( $string ){

@@ -1,17 +1,17 @@
 <?php
 
-    define( "APP_START",         round( microtime( true ) * 1000 ) );
-    define( "APP_WEBMODE",       !isset( $_SERVER['argc'] ) );
-    define( "APP_CACHEAPC",      0 );
-    define( "APP_CACHEREDIS",    1 );
+    define( "APP_START",      round( microtime( true ) * 1000 ) );
+    define( "APP_WEBMODE",    !isset( $_SERVER['argc'] ) );
+    define( "APP_CACHEAPC",   0 );
+    define( "APP_CACHEREDIS", 1 );
 
     // slim warnings on cron
     if( ! APP_WEBMODE ){
         if( ! isset( $_SERVER['REQUEST_METHOD'] ) ) $_SERVER['REQUEST_METHOD'] = '';
-        if( ! isset( $_SERVER['REMOTE_ADDR'] ) )    $_SERVER['REMOTE_ADDR'] = '';
-        if( ! isset( $_SERVER['REQUEST_URI'] ) )    $_SERVER['REQUEST_URI'] = '';
-        if( ! isset( $_SERVER['SERVER_NAME'] ) )    $_SERVER['SERVER_NAME'] = '';
-        if( ! isset( $_SERVER['SERVER_PORT'] ) )    $_SERVER['SERVER_PORT'] = '';
+        if( ! isset( $_SERVER['REMOTE_ADDR'] ) )    $_SERVER['REMOTE_ADDR']    = '';
+        if( ! isset( $_SERVER['REQUEST_URI'] ) )    $_SERVER['REQUEST_URI']    = '';
+        if( ! isset( $_SERVER['SERVER_NAME'] ) )    $_SERVER['SERVER_NAME']    = '';
+        if( ! isset( $_SERVER['SERVER_PORT'] ) )    $_SERVER['SERVER_PORT']    = '';
     }
 
     // init slim
@@ -52,21 +52,40 @@
         private $auth        = null;
         private $objusercall = null;
         private $objuserredir= null;
+        private $objuserlogg = null;
         private $otp         = null;
         private $grids       = null;
-
+        private $ipn         = null;
+        private $panel       = null;
+        private $notify      = null;
+        private $stats       = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
-            $app = &$this;
-            $this->hook( 'slim.before.dispatch', function () use ($app) {
-                $app->clearcacheable();
+            $this->hook( 'slim.before.dispatch', function(){
+                $this->cacheable = null;
             });
-            $this->hook( 'slim.after.dispatch', function () use ($app) {
-                if( $app->getajaxmode() )
-                    $app->ajax()->render();
-                $app->clearajaxmode();
+            $this->hook( 'slim.after.dispatch', function(){
+                if( $this->isajaxmode === true )
+                    $this->ajax()->render();
+                $this->isajaxmode = null;
             });
+            $this->post( '/myfwconfirm/:h', function( $h ){
+
+                $obj = $this->session()->get( $h, false );
+
+                if( isset( $obj[ 'uri' ] ) && isset( $obj[ 'method' ] ) ){
+
+                    $route = $this->router->getMatchedRoutes( $obj[ 'method' ], $obj[ 'uri' ], true );
+
+                    if( isset( $route[0] ) ){
+                        $this->session()->set( $h . 'confirm', 1 );
+                        return $route[0]->dispatch();
+                    }
+                }
+                $this->notFound();
+
+            })->name( 'myfwconfirm' )->conditions( array( 'h' => 'cf[a-f0-9]{32}' ) );
         }
 
         public function setConditions( $cond ){
@@ -92,21 +111,8 @@
             $this->isajaxmode = true;
         }
 
-        public function & clearajaxmode(){
-            $this->isajaxmode = null;
-            return $this;
-        }
-
-        public function getajaxmode(){
-            return $this->isajaxmode === true;
-        }
-
         public function iscacheable(){
             return $this->cacheable === true;
-        }
-
-        public function clearcacheable(){
-            $this->cacheable = null;
         }
 
         public function rules(){
@@ -134,10 +140,28 @@
 			return $this->grids[ $name ];
 		}
 
+		public function notify( $name = 'n' ){
+			if( ! isset( $this->notify[ $name ] ) )
+				$this->notify[ $name ] = new mynotify( $name );
+			return $this->notify[ $name ];
+		}
+
+		public function stats( $name = 'n' ){
+			if( ! isset( $this->stats[ $name ] ) )
+				$this->stats[ $name ] = new mystats( $name );
+			return $this->stats[ $name ];
+		}
+
 		public function modal( $id ){
 			if( ! isset( $this->modals[ $id ] ) )
 				$this->modals[ $id ] = new mymodal( $id );
 			return $this->modals[ $id ];
+		}
+
+		public function panel( $id = 'p' ){
+			if( ! isset( $this->panel[ $id ] ) )
+				$this->panel[ $id ] = new mypanel( $id );
+			return $this->panel[ $id ];
 		}
 
 		public function ajax(){
@@ -150,6 +174,12 @@
 			if( is_null( $this->mailer ) )
 				$this->mailer = new mymailer();
 			return $this->mailer;
+		}
+
+		public function ipn(){
+			if( is_null( $this->ipn ) )
+				$this->ipn = new myipn();
+			return $this->ipn;
 		}
 
 		public function tpl(){
@@ -170,13 +200,20 @@
         }
         
         public function isLogged(){
+
+            if( $this->objuserlogg === true )
+                return true;
+
             $func = $this->objusercall;
             $func = call_user_func( $func );
 
-            if( is_string( $func ) && strlen( $func ) )
+            if( is_string( $func ) && strlen( $func ) ){
                 $this->objuserredir = $func;
+                return false;
+            }
 
-            return ( $func === true );
+            $this->objuserlogg = true;
+            return true;
         }
         
         public function getuserredir(){
@@ -243,6 +280,25 @@
             return $this->otp;
         }
 
+        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $mode = 1 ){
+
+            $route = $this->router->getCurrentRoute();
+            $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) ) );
+
+            if( $this->session()->get( $hash . 'confirm', false ) ){
+                $this->session()->delete( $hash . 'confirm' );
+                $this->session()->delete( $hash );
+                return true;
+            }
+
+            $uri    = $this->request->getResourceUri();
+            $method = $this->request->getMethod();
+
+            $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method ) );
+            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $help, $mode )->render();
+            $this->stop();
+        }
+
         // show template
         public function render( $tpl, $vars = array(), $cacheid = null, $cachettl = null, $cachetype = APP_CACHEAPC, $display = true, $printFooter = true ){
 
@@ -269,8 +325,11 @@
 
                 $env->addFunction( new Twig_SimpleFunction( '_n', '_n' ) );  
 
+                $env->addFilter( new Twig_SimpleFilter( 'cdn', array( 'myfilters', 'cdn' )
+                , array( 'is_safe' => array( 'html' ) ) ) );
+                
                 $env->addFilter( new Twig_SimpleFilter( '*',
-                    function( $f, $args = '' ){
+                    function( $f  ){
                         if( is_callable( array( 'myfilters', $f ) ) ){
                             $args = func_get_args();
                             array_shift( $args );
@@ -278,7 +337,7 @@
                         }
                         return '';
                     }
-                /*, array( 'pre_escape' => 'html', 'is_safe' => array( 'html' ) )*/ ) );
+                ) );
 
                 $env->addFunction( new Twig_SimpleFunction( 'urlFor',
                     function( $action, $params = array() ){
@@ -303,9 +362,6 @@
             }
 
             $output = $env->render( $tpl . '.tpl', $vars );
-
-            if( $this->config( 'templates.srcpreg' ) )
-                $output = preg_replace( '~(href|src|url)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $this->config( 'templates.srcpregext' ). ')(["\'])~i', '$1$2"' . $this->config( 'templates.srcpregdomain' ) . '$5$6"', $output);
 
             // optionally add to cache
             if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
@@ -334,8 +390,12 @@
 			return false;
 		}
         
-        public function urlForAjax( $action, $options = array() ){
-            return "myfwsubmit('" . $this->urlFor( $action, $options ) . "')";
+        public function urlForAjax( $action, $options = array(), $msg = false ){
+            return "myfwsubmit('" . $this->urlFor( $action, $options ) . "'" . ( is_string( $msg ) ? ( ",'" . $msg . "'" ) : '' ) . ")";
+        }
+
+        public function urlForWindow( $action, $options = array() ){
+            return "myfwopen('http://" . $this->config( 'app.hostname' ) . $this->urlFor( $action, $options ) . "')";
         }
 
 		private function printFooter( $print = true, $appendString = '' ){
@@ -407,9 +467,9 @@
         if( !$app->isLogged() && $app->config( 'islogged.enable' ) !== false ){
             $url = $app->getuserredir();
             if( is_string( $url ) && strlen( $url ) ){
-                $app->request->isAjax() ? $app->ajax()->setCommand( 'redir', array( 'u' => $url ) )->render() : $app->redirect( $url );
+                $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render() : $app->redirect( $url );
             }
-                $app->stop();
+            $app->stop();
         }
     }
 

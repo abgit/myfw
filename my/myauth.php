@@ -6,17 +6,23 @@
     class myauth{
 
         public function __construct(){
-            $this->app        = \Slim\Slim::getInstance();
+            $this->app = \Slim\Slim::getInstance();
+            $this->init();
+        }
+
+        public function & init(){
             $this->hybridauth = new Hybrid_Auth( array( "base_url"  => $this->app->request->getScheme() . '://' . $this->app->request->getHost() . $this->app->urlFor( $this->app->config( 'auth.callname' ) ),
                                                         "providers" => $this->app->config( 'auth.providers' ) ) );
   
             if( $sessiondata = $this->app->session()->get( 'auth', false ) && !empty( $sessiondata ) )
                 $this->hybridauth->restoreSessionData( $sessiondata );
+
+            return $this;
         }
 
-        public function onLogged( $prov, $callback ){
+        public function onLogged( $prov, $callback, $force = false ){
 
-            $adapter = $this->hybridauth->authenticate( $prov );
+            $adapter = $this->hybridauth->authenticate( $prov, null, $force );
 
             $this->app->session()->set( 'auth', $this->hybridauth->getSessionData() );
 

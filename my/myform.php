@@ -97,8 +97,9 @@ class myform{
     }
 
     public function & addHidden( $name, $rules = array(), $filters = array(), $options = array() ){
-        $name = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
-        $this->elements[ $name ] = array( 'type' => 'hidden', 'valuetype' => 'simple', 'name' => $name, 'label' => '', 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
+        $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
+        $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+        $this->elements[ $name ] = array( 'type' => 'hidden', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => '', 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
         return $this;
     }
 
@@ -118,8 +119,9 @@ class myform{
     }
 
     public function & addStaticImage( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
-        $name = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
-        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
+        $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
 
@@ -153,8 +155,8 @@ class myform{
         return $this;
     }
 
-    public function & addMessage( $title, $description = '' ){
-        $this->elements[ 'mss' . $this->counter++ ] = array( 'type' => 'message', 'title' => $title, 'description' => $description, 'rules' => array(), 'filters' => array() );
+    public function & addMessage( $title, $description = '', $css = 'info', $buttonlabel = '', $buttononclick = '', $buttonhref = '', $buttonicon = '', $buttoncss = '' ){
+        $this->elements[ 'mss' . $this->counter++ ] = array( 'type' => 'message', 'title' => $title, 'description' => $description, 'rules' => array(), 'filters' => array(), 'css' => $css, 'buttonlabel' => $buttonlabel, 'buttononclick' => $buttononclick, 'buttonhref' => $buttonhref, 'buttonicon' => $buttonicon, 'buttoncss' => $buttoncss );
         return $this;
     }    
 
@@ -168,10 +170,23 @@ class myform{
         return $this;
     }    
 
-    public function & addGrid( & $obj ){
-        $this->elements[ 'gri' . $this->counter++ ] = array( 'type' => 'grid', 'obj' => $obj );
+    public function & addGrid( $obj ){
+        $name = is_string( $obj ) ? $obj : ( 'gri' . $this->counter++ );
+        $this->elements[ $name ] = array( 'type' => 'grid', 'obj' => $obj );
         return $this;
     }    
+
+    public function & addStatistics( $obj ){
+        $name = is_string( $obj ) ? $obj : ( 'sts' . $this->counter++ );
+        $this->elements[ $name ] = array( 'type' => 'statistics', 'obj' => $obj );
+        return $this;
+    }    
+
+    public function & setGrid( $name, $obj ){
+        if( isset( $this->elements[ $name ] ) )
+            $this->elements[ $name ] = $obj;
+        return $this;
+    }
 
     public function & addCustom( $obj ){
         $this->elements[ 'ctm' . $this->counter++ ] = array( 'type' => 'custom', 'obj' => $obj );
@@ -242,8 +257,9 @@ class myform{
         $options = $this->filterOptions( $options, $optionsFilter );
         $rules[ 'selectvalid' ] = array( $label . ' is not valid', $options );
 
-        $name = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
-        $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
+        $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+        $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
         return $this;
     }
 
@@ -297,6 +313,23 @@ class myform{
     public function & disable( $name ){
         if( isset( $this->elements[ $name ] ) )
             $this->elements[ $name ][ 'disabled' ] = true;
+        return $this;
+    }
+
+    public function & disableAll(){
+        foreach( $this->elements as $name => $el )
+            $this->elements[ $name ][ 'disabled' ] = true;
+        return $this;
+    }
+
+    public function & addAddon( $name, $value, $prefix = true ){
+        if( isset( $this->elements[ $name ] ) ){
+            if( $prefix ){
+                $this->elements[ $name ][ 'addonpre' ] = $value;
+            }else{
+                $this->elements[ $name ][ 'addonpos' ] = $value;            
+            }
+        }
         return $this;
     }
 
@@ -540,11 +573,18 @@ class myform{
         imagestring($img, 5, 10, imagesy($img)-20, $string, $cmtcol);
     }
 
-    public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $options = array() ){
+    public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $href = '' ){
 
-        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'onclick' => $onclick, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'options' => $options );
+        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'onclick' => $onclick, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href );
         return $this;
     }
+
+    public function & addAjaxButton( $name, $labelbutton = null, $onclick = '', $href = '', $css = '' ){
+
+        $this->elements[ $name ] = array( 'type' => 'ajaxbutton', 'name' => $name, 'onclick' => $onclick, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'css' => $css );
+        return $this;
+    }
+
 
     public function & addSubmit( $label = null, $name = null, $position = '', $options = array() ){
 
@@ -592,7 +632,7 @@ class myform{
     public function & setSubmitMessage( $msg, $title = 'Sucess' ){
 
         if( $this->isajax )
-            $this->app->ajax()->setMessageOk( $msg, $title );
+            $this->app->ajax()->msgOk( $msg, $title );
 
         $this->submitMessage = $msg;
         return $this;
@@ -601,7 +641,7 @@ class myform{
     public function & setWarningMessage( $msg, $title = 'Warning' ){
 
         if( $this->isajax )
-            $this->app->ajax()->setMessageWarning( $msg, $title );
+            $this->app->ajax()->msgWarning( $msg, $title );
 
         $this->warningMessage = $msg;
         return $this;
@@ -610,7 +650,7 @@ class myform{
     public function & setErrorMessage( $msg, $title = 'Errors found' ){
 
         if( $this->isajax )
-            $this->app->ajax()->setMessageError( $msg, $title );
+            $this->app->ajax()->msgError( $msg, $title );
 
         $this->errors[] = $msg;
         $this->wasValid = false;
@@ -662,7 +702,7 @@ class myform{
         if( ! isset( $this->modal['id'] ) )
             $this->setModal( 'Form' );
 
-        $this->app->ajax()->setCommand( 'fs', array( 'f' => $this->formname, 'h' => $this->app->ajax()->filter( $this->__toString() ), 's' => $this->modal['id'], 't' => $transloadit ) );
+        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit );
         return $this;
     }
 
@@ -769,7 +809,7 @@ class myform{
         $isvalid = ( $this->wasValid = empty( $this->errors ) );
 
         if( !$isvalid && $this->isajax )
-            $this->app->ajax()->setMessageError( $this->getErrors() );
+            $this->app->ajax()->msgError( $this->getErrors() );
 
         return $isvalid;
     }
@@ -778,7 +818,7 @@ class myform{
         return $this->errors;
     }
 
-    public function getValues( $applyFilters = true, $includeDisabled = false ){
+    public function getValues( $applyFilters = true, $includeDisabled = false, $ungroup = false ){
 
         // check if form is submitted
         if( ! $this->isSubmitted() )
@@ -797,11 +837,17 @@ class myform{
                                     break;
                 case 'multiple':    $values[ $n ] = ( isset( $_POST[ $this->formname . $n ] ) && is_array( $_POST[ $this->formname . $n ] ) ) ? implode( ';', $_POST[ $this->formname . $n ] ) : ''; 
                                     break;
-                case 'group':       $v = array();
-                                    foreach( $el['options'] as $o => $val )
-                                        if( isset( $_POST[ $this->formname . $n . $o ] ) && $_POST[ $this->formname . $n . $o ] == 'on' )
-                                            $v[] = $o;
-                                    $values[ $n ] = implode( ';', $v );
+                case 'group':       if( $ungroup ){
+                                        foreach( $el['options'] as $o => $val )
+                                            if( isset( $_POST[ $this->formname . $n . $o ] ) && $_POST[ $this->formname . $n . $o ] == 'on' )
+                                                $values[ $o ] = 1;
+                                    }else{
+                                        $v = array();
+                                        foreach( $el['options'] as $o => $val )
+                                            if( isset( $_POST[ $this->formname . $n . $o ] ) && $_POST[ $this->formname . $n . $o ] == 'on' )
+                                                $v[] = $o;
+                                        $values[ $n ] = implode( ';', $v );
+                                    }
                                     break;
                 case 'transloadit': if( isset( $_POST[ $this->formname . $n ] ) ){
                                         $this->app->transloadit()->requestAssembly( $res, $_POST[ $this->formname . $n ] );

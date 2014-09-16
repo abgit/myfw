@@ -88,11 +88,18 @@
             try{
                 $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );		
             }catch( ErrorException $e ){
-                $result = is_null( $this->stmt ) ? 0 : intval( $this->stmt->errorCode() );
+                $result = is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
                 return false;
             }
-
             return ( count( $result ) > 0 );
+        }
+
+        public function findAllReturn( $procedure, $args = array(), $returnobject = false ){
+            return $this->findAll( $result, $procedure, $args, $returnobject ) ? $result : array();
+        }
+
+        public function findOneReturn( $procedure, $args = array(), $returnobject = false ){
+            return $this->findOne( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
 
         public function findOne( & $result, $procedure, $args = array(), $returnobject = false ){
@@ -100,11 +107,20 @@
             try{
                 $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
             }catch( ErrorException $e ){
-                $result = is_null( $this->stmt ) ? 0 : intval( $this->stmt->errorCode() );
+                $result = is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
                 return false;
             }
 
             return ( ! empty( $result ) );
+        }
+
+        public function errorCode(){
+            return intval( $this->stmt->errorCode() );
+        }
+
+        public function errorInfo(){
+            $arr = $this->stmt->errorInfo();
+            return isset( $arr[2] ) ? $arr[2] : 'unknown error';
         }
 
         public function findResult( & $result, $procedure, $args = array() ){

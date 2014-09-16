@@ -40,7 +40,7 @@
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 							<h4 class="modal-title"><i class="{{ modal.icon }}"></i> {{ modal.title }}</h4>
 						</div>
-    					<div class="modal-body with-padding" style="padding:30px;">
+    					<div class="modal-body with-padding" style="padding:20px 21px 0px 21px">
 	{% endif %}
 
 
@@ -74,23 +74,28 @@
                         <p class="form-control-static">{{ el.value|default( preventmsg ) }}</p>
                     {% else %}
 
+                        {% if el.addonpre or el.addonpos %}<div class="input-group">{% endif %}
+                        {% if el.addonpre %}<span class="input-group-addon">{{ el.addonpre }}</span> {% endif %}
                         <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-                        {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help}}</span>{% endif %}
+                        {% if el.addonpos %}<span class="input-group-addon">{{ el.addonpos }}</span>{% endif %}
+                        {% if el.addonpre or el.addonpos %}</div>{% endif %}
+                                                
+                        {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
                     {% endif %}
     
         	{% elseif el.type == 'password' %}
                     <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                     <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" type="password" value=""{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'textarea' %}
                     <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                 	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="1"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.value}}</textarea>
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'select' %}
-                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 
                     {% if el.prevent %}
                         <p class="form-control-static">{{ el.options[ el.value ]|default( preventmsg ) }}</p>
@@ -102,7 +107,7 @@
     					{% endfor %}
                         </select>
 
-                        {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                        {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
                     {% endif %}
 
@@ -116,17 +121,17 @@
 					{% endfor %}
                     </select>
                     </div>
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'checkbox' %}
 				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" {{el.value == 'on' ? 'checked '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.label|raw}}
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'hidden' %}
             	<input {{el.disabled ? 'disabled="disabled" '}}name="{{ el.name}}" type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
                 
 			{% elseif el.type == 'checkboxgroup' %}
-                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 
                 {% if el.prevent %}
                     <p class="form-control-static">{{ el.options|intersect(el.value)|values|default( preventmsg ) }}</p>
@@ -137,13 +142,13 @@
                         {% set chkgcss      = "col-md-12" %}
                     {% elseif el.settings.cols == 2 %}
                         {% set chkgseparate = true %}
-                        {% set chkgcss      = "col-md-6" %}
+                        {% set chkgcss      = "col-md-6 col-xs-6" %}
                     {% elseif el.settings.cols == 3 %}
                         {% set chkgseparate = true %}
-                        {% set chkgcss      = "col-md-4" %}
+                        {% set chkgcss      = "col-md-4 col-xs-6" %}
                     {% elseif el.settings.cols == 4 %}
                         {% set chkgseparate = true %}
-                        {% set chkgcss      = "col-md-3" %}
+                        {% set chkgcss      = "col-md-3 col-xs-6" %}
                     {% else %}
                         {% set chkgseparate = false %}
                     {% endif %}
@@ -172,7 +177,7 @@
                          </div>
                     {% endif %}
 
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
     				</div>
 
                 {% endif %}
@@ -188,32 +193,38 @@
 
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
-                    <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}" style="margin-top:{% if not loop.first %}45px{% else %}15px{% endif %};">
+                    <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}" style="margin-top:{% if not loop.first %}45px{% else %}10px{% endif %};">
                         <i class="{{el.icon}}"></i>{{el.title}}{% if el.description %}<small class="display-block">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>
 
 			{% elseif el.type == 'message' %}
-                <div class="callout callout-info fade in">
+                <div class="callout callout-{{ el.css }} fade in">
 				    <h5>{{el.title}}</h5>
 				    {% if el.description %}
                         <p>{{el.description|nl2br}}</p>
-                    {% endif %} 
+                    {% endif %}
+                    {% if el.buttonlabel %}
+                        <a type="button" class="btn btn-{{el.buttoncss|default(el.css)}}" style="margin-top:4px;"{% if el.buttononclick %} onclick="{{el.buttononclick}}"{% endif %}{% if el.buttonhref %} href="{{el.buttonhref}}"{% endif %}>
+                            {% if el.buttonicon %}<i class="{{ el.buttonicon }}"> </i>{% endif %}
+                            {{el.buttonlabel}}
+                        </a>
+                    {% endif %}            
                 </div>
 
 			{% elseif el.type == 'static' %}
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
                 {% if el.showvalue %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value|default( 'unknown' ) }}</p>{% endif %}
-                {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help}}</span>{% endif %}
+                {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'button' %}
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
                 <div>
-                <input type="button" class="btn btn-default" onClick="{{el.onclick|raw}}" value="{{ el.labelbutton }}"/>
+                <input type="button" class="btn btn-default" {% if el.onclick %}onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
                 </div>
-                {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
         	{% elseif el.type == 'staticimage' %}
 
@@ -221,7 +232,7 @@
                     <div>
                     <img id="{{el.name}}" {% if not el.options.html.width and not el.options.html.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
                     </div>
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
         	{% elseif el.type == 'staticmovie' %}
 
@@ -233,7 +244,7 @@
                         <source src="{{ el.value|transloadit( 'upvideoflash', 'url' ) }}" type="video/flv">
                     </video>
                     </div>
-                    {% if el.help %}<span class="help-block">{{el.help}}</span>{% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 
         	{% elseif el.type == 'staticmessage' %}
@@ -251,23 +262,8 @@
 										</li>
 									</ul>
 </div>
-			{% elseif el.type == 'stats' %}
-                <ul class="statistics">
-                {% for stat in el.stats %}
-						    			<li>
-						    				<div class="statistics-info">
-							    				<a class="bg-{{stat.type|default('info')}}"><i class="{{stat.icon}}"></i></a>
-							    				<strong>{{stat.value}}</strong>
-							    			</div>
-											<div class="progress progress-micro">
-												<div style="width:{{ stat.percentage|default(100) }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{stat.percentage|default(100)}}" role="progressbar" class="progress-bar progress-bar-{{stat.type|default('info')}}">
-													<span class="sr-only">{{stat.percentage|default(100)}}%</span>
-												</div>
-											</div>
-											<span>{{stat.title}}</span>
-						    			</li>
-                {% endfor %}
-                </ul>
+			{% elseif el.type == 'statistics' %}
+                {{ el.obj|raw }}
 
 			{% elseif el.type == 'separatorline' %}
 				<div class="line_2" style="margin:10px 0px 15px"></div>
@@ -296,7 +292,7 @@
 
                 {% if not el.prevent %}
     				<input type="hidden" name="{{ name ~ el.name }}" value="{{ tvalue }}" id="{{name ~ el.name}}V" class="{{ name }}transloaditV"/>
-                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN" onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
+                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input{{ el.disabled ? ' disabled="disabled"' }} name="{{ name ~ el.name }}N" class="transloaditN" onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
 
                 {% elseif tvalue is empty %}
                     <p class="form-control-static">{{ preventmsg }}</p>
@@ -321,14 +317,14 @@
                     {% endif %}
                 {% endif %}
                 </div>
-                <div class="col-xs-2">
+                <div class="col-xs-2" style="padding:0px;">
                     {% if not el.prevent %}
                         <button onClick="$('#{{name ~ el.name}}C').hide();$('#{{name ~ el.name}}U').show();$('#{{name ~ el.name}}S').text('No file selected');$('#{{name ~ el.name}}V').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     {% endif %}
                 </div>
             </div>
 
-                {% if el.help and not el.prevent %}<span class="help-block">{{el.help}}</span>{% endif %}
+                {% if el.help and not el.prevent %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
             {% endif %}
 
         	{% if el.type != 'formgroup' %}
@@ -353,10 +349,13 @@
             
             {% for el in elements %}
     			{% if el.type == 'submit' and rendersubmit %}
-                    <input style="margin-top:3px;" {%if formtransloadit%} onClick="$('form#{{name}}').unbind('submit.transloadit');" {% endif %} {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" id="{{name}}submit" class="btn btn-success" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                    <input style="margin-top:3px;" onClick="{%if formtransloadit%}$('form#{{name}}').unbind('submit.transloadit');{% endif %}this.disabled=true;this.value='please wait';this.form.submit();" {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" id="{{name}}submit" class="btn btn-success" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 
 	    		{% elseif el.type == 'ajax' and el.label is not null %}
                     <input style="margin-top:3px;" onClick="myfwformsubmit('{{name}}','{{name ~ el.name}}ajax','{{el.label}}','{{name ~ el.name}}');" {{el.disabled ? 'disabled="disabled" '}}type="button" id="{{name ~ el.name}}ajax" class="btn {{el.css}}" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+
+	    		{% elseif el.type == 'ajaxbutton' %}
+                <input type="button" class="btn {{el.css}}" style="margin-left:5px;margin-top:3px;" {% if el.onclick %}onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
 
                 {% endif %}
             {% endfor %}

@@ -4,97 +4,88 @@ class myajax{
     
     private $out = array();
     
-    public function & addComand( $name, $obj ){
-        $this->out[ $name ][] = $obj;
-        return $this;
-    }
-    
-    public function & setCommand( $name, $obj ){
-        $this->out[ $name ] = $obj;    
-        return $this;
-    }
-    
-    public function delCommand( $name ){
-        if( isset( $this->out[ $name ] ) ){
-            unset( $this->out[ $name ] );
-            return true;
+    public function & msg( $msg, $header = null, $args = array() ){
+
+        if( !is_null( $header ) ){
+            $args[ 'header' ] = $header;
         }
-        return false;
-    }
 
-    public function setMessageInfo( $msg, $header = 'Information', $life = 6000 ){
+        if( !isset( $args[ 'life' ] ) ){
+            $args[ 'life' ] = 6000;
+        }
 
-        if( is_array( $msg ) )
-            $msg = '<ul><li>' . implode( '</li><li>', $msg ) . '</li></ul>';
-
-        $this->out[ 'msg' ] = array( 'h' => $header, 'd' => $msg, 'l' => $life, 't' => 'growl-info' );
-    }
-
-    public function & setMessageOk( $msg, $header = null, $life = 6000 ){
-
-        if( is_null( $header ) )
-            $header = 'Success';
-
-        if( is_array( $msg ) )
-            $msg = '<ul><li>' . implode( '</li><li>', $msg ) . '</li></ul>';
-
-        $this->out[ 'msg' ] = array( 'h' => $header, 'd' => $msg, 'l' => $life, 't' => 'growl-success' );
+        $this->out[ 'mg' ][] = array( 'd' => is_array( $msg ) ? ( count( $msg ) > 1 ? ( '<ul><li>' . implode( '</li><li>', $msg ) . '</li></ul>' ) : implode( '', $msg ) ) : $msg, 'a' => $args );
         return $this;
     }
 
-    public function & setMessageWarning( $msg, $header = null, $life = 6000 ){
-
-        if( is_null( $header ) )
-            $header = ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Warnings' : 'Warning';
-
-        if( is_array( $msg ) )
-            $msg = '<ul><li>' . implode( '</li><li>', $msg ) . '</li></ul>';
-
-        $this->out[ 'msg' ] = array( 'h' => $header, 'd' => $msg, 'l' => $life, 't' => 'growl-warning' );
-        return $this;
+    public function & msgInfo( $msg, $header = 'Information', $args = array() ){
+        return $this->msg( $msg, $header, array( 'theme' => 'growl-info' ) + $args );
     }
 
-    public function & setMessageError( $msg, $header = null, $life = 6000 ){
-
-        if( is_null( $header ) )
-            $header = ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Errors found' : 'Error found';
-
-        $msg = is_array( $msg ) ? ( count( $msg ) > 1 ?  ( '<ul><li>' . implode( '</li><li>', $msg ) . '</li></ul>' ) : implode( '', $msg ) ) : $msg;
-
-        $this->out[ 'msg' ] = array( 'h' => $header, 'd' => $msg, 'l' => $life, 't' => 'growl-error' );
-        return $this;
+    public function & msgOk( $msg, $header = 'Success', $args = array() ){
+        return $this->msg( $msg, $header, array( 'theme' => 'growl-success' ) + $args );
     }
 
-    public function addFormCsrf( $element, $csrf ){
+    public function & msgWarning( $msg, $header = null, $args = array() ){
+        return $this->msg( $msg, is_null( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Warnings' : 'Warning' ) : $header, array( 'theme' => 'growl-warning' ) + $args );
+    }
+
+    public function & msgError( $msg, $header = null, $args = array() ){
+        return $this->msg( $msg, is_null( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Errors found' : 'Error found' ) : $header, array( 'theme' => 'growl-error' ) + $args );
+    }
+
+    public function & addFormCsrf( $element, $csrf ){
         $this->out[ 'cs' ][] = array( 'e' => $element, 'v' => $csrf );
+        return $this;
     }
 
-    public function setFormReset( $name ){
+    public function & setFormReset( $name ){
         $this->out[ 'fr' ] = array( 'f' => $name );
+        return $this;
     }
     
-    public function modalHide( $id ){
+    public function & showForm( $formname, $html, $modal, $transloadit = 0 ){
+        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit );
+        return $this;
+    }
+    
+    public function & modalHide( $id ){
         $this->out[ 'mh' ] = array( 'i' => $id );
+        return $this;
     }
     
-    public function callAction( $action ){
-        $this->out[ 'ca' ] = array( 'a' => $action );
+    public function & callAction( $action ){
+        $this->out[ 'ca' ][] = array( 'a' => $action );
+        return $this;
     }
 
-    public function focus( $element ){
+    public function & focus( $element ){
         $this->out[ 'fu' ] = array( 'e' => $element );
+        return $this;
     }
 
-    public function append( $el, $html ){
-        $this->out[ 'ap' ] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+    public function & confirm( $url, $msg, $title, $help, $mode ){
+        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 't' => $title, 'h' => $help, 'o' => $mode );
+        return $this;
     }
 
-    public function prepend( $el, $html ){
-        $this->out[ 'pp' ] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+    public function & redirect( $url, $ms = 1000 ){
+        $this->out[ 'rd' ] =  array( 'u' => $url, 'm' => $ms );
+        return $this;
+    }
+
+    public function & append( $el, $html ){
+        $this->out[ 'ap' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        return $this;
+    }
+
+    public function & prepend( $el, $html ){
+        $this->out[ 'pp' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        return $this;
     }
 
     public function & replacewith( $el, $html ){
-        $this->out[ 'repw' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        $this->out[ 'rp' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
         return $this;
     }
 
@@ -108,23 +99,47 @@ class myajax{
         return $this;
     }
 
+    public function visibility( $el, $mode ){
+        $this->out[ 'vi' ][] = array( 'e' => $el, 'm' => $mode ? 'visible' : 'hidden' );
+    }
+
     public function & text( $el, $html ){
         $this->out[ 'tx' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
         return $this;
     }
 
+    public function & val( $el, $html ){
+        $this->out[ 'va' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        return $this;
+    }
+
     public function & remove( $el ){
-        $this->out[ 'rem' ][] = array( 'e' => $el );
+        $this->out[ 'rm' ][] = array( 'e' => $el );
+        return $this;
+    }
+
+    public function & hide( $el ){
+        $this->out[ 'hi' ][] = array( 'e' => $el );
+        return $this;
+    }
+
+    public function & hideTableRow( $el, $table, $emptymsg ){
+        $this->out[ 'hr' ][] = array( 'e' => $el, 't' => $table, 'm' => $emptymsg );
+        return $this;
+    }
+
+    public function & show( $el ){
+        $this->out[ 'sh' ][] = array( 'e' => $el );
         return $this;
     }
 
     public function & fadeOut( $el ){
-        $this->out[ 'fo' ] = array( 'e' => $el );
+        $this->out[ 'fo' ][] = array( 'e' => $el );
         return $this;
     }
 
     public function & fadeIn( $el ){
-        $this->out[ 'fi' ] = array( 'e' => $el );
+        $this->out[ 'fi' ][] = array( 'e' => $el );
         return $this;
     }
 

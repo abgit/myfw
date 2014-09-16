@@ -11,8 +11,8 @@
             $this->domain = $this->app->config( 'email.mailgundomain' );
         }
 
-        public function sendinternal( $message ){
-            return $this->send( $this->app->config( 'email.from' ), $this->app->config( 'email.to' ), $this->app->config( 'email.subject' ), $message );
+        public function sendinternal( $message, $subject = null ){
+            return $this->send( $this->app->config( 'email.from' ), $this->app->config( 'email.to' ), is_null( $subject ) ? $this->app->config( 'email.subject' ) : $subject, $message );
         }
 
         public function sendsystem( $to, $subject, $message ){
