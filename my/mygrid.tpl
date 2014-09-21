@@ -30,10 +30,11 @@
 {% endif %}
 
                                 		{% for val in values %}
-                                        <tr class="{{loop.index|odd ? 'odd' : 'even' }}" id="{{ val[ key ] }}">
+                                        <tr id="{{ val[ key ] }}">
 
                                     		{% for col in labels %}
-				                            <td{% if col.align or col.class %} class="{{ col.align }} {{col.class}}"{% endif %}>
+                                            
+				                            <td{% if col.align or col.class %} class="{{ col.align }} {{col.class}}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}>
                                                 {% for td in cols[ col.key ] %}
 
                                                     {% set value = val[ td.kval ] %}
@@ -67,7 +68,7 @@
 
                                                     {% elseif td.type == 'ago' %}
                                                         <i class="icon-clock"></i> {{ value|ago }}
-        				                            	<span style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value }}</span>
+        				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value }}</span>
 
                                                     {% elseif td.type == 'fixed' %}
                                                         {% set fixedfilldefault = true %}

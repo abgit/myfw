@@ -99,8 +99,9 @@ class myajax{
         return $this;
     }
 
-    public function visibility( $el, $mode ){
+    public function & visibility( $el, $mode ){
         $this->out[ 'vi' ][] = array( 'e' => $el, 'm' => $mode ? 'visible' : 'hidden' );
+        return $this;
     }
 
     public function & text( $el, $html ){
@@ -110,6 +111,11 @@ class myajax{
 
     public function & val( $el, $html ){
         $this->out[ 'va' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        return $this;
+    }
+
+    public function & css( $el, $property, $value ){
+        $this->out[ 'cc' ][] = array( 'e' => $el, 'p' => $property, 'v' => $value );
         return $this;
     }
 

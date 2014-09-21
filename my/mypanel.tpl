@@ -6,10 +6,10 @@
                                                 {% for menu in elements.tmenu %}
 
                                                     {% if menu.type == 0 %}
-                                                        <a style="margin-left:2px;margin-top:5px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %}{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
+                                                        <a style="margin-left:2px;margin-top:6px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %}{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
 
                                                     {% elseif menu.type == 1 %}
-                                                    <div class="btn-group" style="margin-left:2px;margin-top:5px">
+                                                    <div class="btn-group" style="margin-left:2px;margin-top:6px">
                                                     <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"><i class="{{ menu.icon }}"></i> {{menu.label}} <span class="caret"></span></a>
     													<ul class="dropdown-menu icons-right dropdown-menu-right">
                                                             {% for submenu in menu.options %}
@@ -19,11 +19,11 @@
     											    </div>
 
                                                     {% elseif menu.type == 2 %}
-                                                    <div class="btn-group" style="margin-left:2px;margin-top:5px">
+                                                    <div class="btn-group" style="margin-left:2px;margin-top:6px">
                                                     <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"><i class="{{ menu.icon }}"></i> <span id="menbl{{ menu.id }}">{{menu.label}}</span> <span class="caret"></span></a>
     													<ul class="dropdown-menu icons-left dropdown-menu-right">
                                                             {% for submenu in menu.options %}
-                                                                <li><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i id="meni{{ menu.id }}{{ loop.index0 }}" class="icon-checkmark" style="visibility:{{ submenu.selected ? 'visible' : 'hidden' }}"></i> {{ submenu.label }}</a></li>
+                                                                <li {{submenu.selected ? 'class="active"' }} id="menl{{ menu.id }}{{ loop.index0 }}"><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i id="meni{{ menu.id }}{{ loop.index0 }}" class="icon-checkmark" style="visibility:{{ submenu.selected ? 'visible' : 'hidden' }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </div>
@@ -119,7 +119,20 @@
                                                     {% if status.type == 1 %}
                                                         {{ value[ status.key ]|t(90)}}
                                                     {% elseif status.type == 2 %}
-                                                        <i class="{{ value[ status.key ]|replace( status.icons ) }}"></i>
+                                                    
+                                                        {% if status.icon %}
+                                                            {% set iconval = status.icon %}
+                                                        {% else %}
+                                                            {% set iconval = value[ status.key ]|replace( status.icons ) %}
+                                                        {% endif %}
+                                                    
+                                                        {% if status.depends %}
+                                                            {% set statusdisplay = value[ status.depends ] %}
+                                                        {% else %}
+                                                            {% set statusdisplay = 1 %}
+                                                        {% endif %}
+
+                                                        <i id="pani{{ value[ key ] }}{{ status.key }}" {{ statusdisplay != 1 ? 'style="display:none"' }} class="{{ iconval }}"></i>
                                                     {% elseif status.type == 0 %}
                                                         {{ status.sep }} 
                                                     {% endif %}
@@ -139,7 +152,14 @@
                                                     <li class="dropup"><a style="font-size:12px;" href="#" class="dropdown-toggle" data-toggle="dropdown">{{ menu.label }} <i class="{{ menu.icon|default('icon-arrow-up2') }}"></i></a>
     													<ul class="dropdown-menu icons-right dropdown-menu-right">
                                                             {% for submenu in menu.options %}
-                                                                <li><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
+                                                                
+                                                                {% if submenu.depends %}
+                                                                    {% set submenudisplay = value[ submenu.depends ] %}
+                                                                {% else %}
+                                                                    {% set submenudisplay = 1 %}
+                                                                {% endif %}
+                                                            
+                                                                <li id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </li>
@@ -157,6 +177,6 @@
 {% if allitems %}
     </div>
                                 {% if more and values|length == perpage %}
-                                    <button id="{{ name }}more" style="margin:0px 0px 30px 3px; float:right" onclick="{{ more.onclick }}" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
+                                    <button id="{{ name }}more" style="margin:0px 0px 0px 3px; float:right" onclick="{{ more.onclick }}" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
                                 {% endif %}
 {% endif %}

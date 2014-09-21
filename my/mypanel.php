@@ -79,8 +79,18 @@ class mypanel{
         return $this;
     }
 
-    public function & addStatusIcon( $key, $icons ){
-        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 2, 'icons' => $icons );
+    public function & addStatusIcon( $key, $icons, $depends = false ){
+        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 2, 'icons' => $icons, 'icon' => is_string( $icons ) ? $icons : false, 'depends' => $depends );
+        return $this;
+    }
+
+    public function & ajaxStatusIconShow( $key, $id, $operation = true ){
+        $this->app->ajax()->css( '#pani' . $id . $key, 'display', $operation ? 'inline' : 'none' );
+        return $this;
+    }
+
+    public function & ajaxMenuShow( $index, $id, $operation = true ){
+        $this->app->ajax()->css( '#panm' . $id . $index, 'display', $operation ? 'block' : 'none' );
         return $this;
     }
 
@@ -121,7 +131,7 @@ class mypanel{
         if( $this->app->request->isAjax() ){
             if( isset( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] ) )
                 foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr )
-                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $i, ( $i == $index ) ? true : false );
+                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $i, ( $i == $index ) ? true : false )->attr( '#menl' . $ctxmenuid . $i, 'class', ( $i == $index ) ? 'active' : '' );
         }else{
                 foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr ){
                     $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ][ $i ][ 'selected' ] = ( $i == $index ) ? true : false;

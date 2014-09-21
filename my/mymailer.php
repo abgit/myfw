@@ -15,11 +15,11 @@
             return $this->send( $this->app->config( 'email.from' ), $this->app->config( 'email.to' ), is_null( $subject ) ? $this->app->config( 'email.subject' ) : $subject, $message );
         }
 
-        public function sendsystem( $to, $subject, $message ){
-            return $this->send( $this->app->config( 'email.from' ), $to, $subject, $message );
+        public function sendsystem( $to, $subject, $message, $mailgunoptions = array() ){
+            return $this->send( $this->app->config( 'email.from' ), $to, $subject, $message, $mailgunoptions );
         }
 
-        public function send( $from, $to, $subject, $text, $templatevars = array() ){
+        public function send( $from, $to, $subject, $text, $mailgunoptions = array() ){
 
             // log
             $this->app->log()->debug( "mymailer::send,to:" . $to . ',subject:' . $subject );
@@ -29,13 +29,13 @@
                 if( !($tag = $this->app->config( 'email.templatetag' ) ) ){
                     $tag = 'content';
                 }
-                $html = $this->app->render( $template, $templatevars + array( $tag => $text ), null, null, APP_CACHEAPC, false, false );    
+                $html = $this->app->render( $template, is_array( $text ) ? $text : array( $tag => $text ), null, null, APP_CACHEAPC, false, false );    
             }else{
                 $html = $text;
             }
 
             // comput mailgun email header
-            $email = array( 'from' => $from, 'to' => $to, 'subject' => $subject, 'text' => $text, 'html' => $html );
+            $email = array( 'from' => $from, 'to' => $to, 'subject' => $subject, 'text' => is_string( $text ) ? $text : '', 'html' => $html ) + $mailgunoptions;
 
             // check if we have custom additional header variables
             if( ( $headers = $this->app->config( 'email.headers' ) ) && is_array( $headers ) )
