@@ -105,7 +105,7 @@ class mynotify{
         return $this;
     }
 
-    public function & ajaxClear(){
+    public function & ajaxClearCounter(){
         $this->ajaxUpdateCounter(0);
         return $this;
     }

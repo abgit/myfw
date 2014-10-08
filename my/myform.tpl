@@ -91,7 +91,7 @@
 
 			{% elseif el.type == 'textarea' %}
                     <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-                	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="1"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.value}}</textarea>
+                	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="{{ el.rows }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.value}}</textarea>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'select' %}
@@ -101,7 +101,7 @@
                         <p class="form-control-static">{{ el.options[ el.value ]|default( preventmsg ) }}</p>
                     {% else %}
 
-                        <select class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                        <select class="form-control" style="width:auto" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
     					{% for opv, opl in el.options %}
                             <option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
     					{% endfor %}
@@ -194,13 +194,13 @@
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
                     <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}" style="margin-top:{% if not loop.first %}45px{% else %}10px{% endif %};">
-                        <i class="{{el.icon}}"></i>{{el.title}}{% if el.description %}<small class="display-block">{{el.description|nl2br}}</small>{% endif %} 
+                        <i class="{{el.icon}}"></i>{{el.title}}{% if el.description %}<small class="display-block" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>
 
 			{% elseif el.type == 'message' %}
                 <div class="callout callout-{{ el.css }} fade in">
-				    <h5>{{el.title}}</h5>
+				    {% if el.title %}<h5>{{el.title}}</h5>{% endif %}
 				    {% if el.description %}
                         <p>{{el.description|nl2br}}</p>
                     {% endif %}
@@ -230,7 +230,7 @@
 
                     {%if label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
                     <div>
-                    <img id="{{el.name}}" {% if not el.options.html.width and not el.options.html.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
+                    <img id="{{el.name}}" {% if el.width %}width="{{ el.width }}"{% endif %} {% if el.height %}height="{{ el.height }}"{% endif %} {% if not el.width and not el.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
                     </div>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 

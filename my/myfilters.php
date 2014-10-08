@@ -22,6 +22,10 @@ class myfilters{
         return nl2br( $string );
     }
 
+    public static function zeroempty( $string ){
+        return empty( $string ) ? '' : $string;
+    }
+
     public static function nl2space( $string ){
         return preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", " ", $string );
     }
@@ -40,6 +44,10 @@ class myfilters{
 
     public static function hexcolor( $val ){
         return ( strlen( $val ) > 2 && substr( $val, 0, 1 ) != '#' ) ? '#' . $val : $val;
+    }
+
+    public static function replaceurl( $val, $valuearray, $tags ){
+        return str_replace( isset( $tags[1] ) ? $tags[1] : array(), array_map( function($n) use ( $valuearray ){ return isset( $valuearray[ $n ] ) ? $valuearray[ $n ] : ''; }, isset( $tags[0] ) ? $tags[0] : array() ), $val );
     }
 
     public static function cdn( $html ){

@@ -16,6 +16,7 @@ class mygrid{
     private $classes  = array();
     private $actions  = array();
     private $modal    = null;
+    private $tags     = array();
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
@@ -30,6 +31,13 @@ class mygrid{
     public function & setKey( $key, $keyhtml = 'KEY' ){
         $this->key     = $key;
         $this->keyhtml = $keyhtml;
+        $this->addKey( $key, $keyhtml );
+        return $this;
+    }
+
+    public function & addKey( $key, $keyhtml ){
+        $this->tags[0][] = $key;
+        $this->tags[1][] = $keyhtml;
         return $this;
     }
 
@@ -95,6 +103,14 @@ class mygrid{
         return $this;
     }
 
+    public function & addThumb( $key, $kval, $kvals, $label = '', $onclick = '' ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $this->app->ishttps() ? $kvals : $kval, 'type' => 'thumb', 'onclick' => $onclick );
+        return $this;
+    }
+
     public function & addAgo( $key, $kval, $label, $align = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
@@ -125,6 +141,23 @@ class mygrid{
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
         }
         $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'options' => $options );
+        return $this;
+    }
+
+    public function & setMenuItemDisabled( $index, $depends ){
+    
+        foreach( $this->cols as $col => $list ){
+            foreach( $list as $k => $c){
+                if( $c[ 'type' ] == 'menu' && isset( $this->cols[ $col ][ $k ][ 'options' ][ $index ] ) ){
+                    $this->cols[ $col ][ $k ][ 'options' ][ $index ] += array( 'disabled' => true, 'disableddepends' => $depends );
+                }
+            }
+        }
+        return $this;
+    }
+
+    public function & ajaxSetMenuItemDisabled( $key, $index ){
+        $this->app->ajax()->attr( '#' . $key . 'm' . $index, 'class', 'disabled' );
         return $this;
     }
 
@@ -278,6 +311,7 @@ class mygrid{
         return $this->app->render( '@my/mygrid', array( 'name'     => $this->name,
                                                         'key'      => $this->key,
                                                         'keyhtml'  => $this->keyhtml,
+                                                        'tags'     => $this->tags,
                                                         'labels'   => $this->labels,
                                                         'allitems' => is_null( $values ),
                                                         'values'   => is_null( $values ) ? $this->values : $values,

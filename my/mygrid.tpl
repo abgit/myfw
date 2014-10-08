@@ -39,59 +39,76 @@
 
                                                     {% set value = val[ td.kval ] %}
 
-                                                    {% if td.replace %}
-                                                        {% set value = value|replace( td.replace ) %}
-                                                    {% endif %}
+                                                    {% if value is not empty or td.type == 'menu' %}
 
-                                                    {% if td.addonpre %}
-                                                        {% set value = td.addonpre ~ value %}
-                                                    {% endif %}
-
-                                                    {% if td.addopos %}
-                                                        {% set value = value ~ td.addonpos %}
-                                                    {% endif %}
-
-                                                    {% if td.type == 'simple' %}
-                                                        {{ value|nl2space|t(60) }}
-
-                                                    {% elseif td.type == 'h4' %}
-                                                        <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ value|nl2space|t(60) }}</h4>
-
-                                                    {% elseif td.type == 'h6' %}
-                                                        <h6{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ value|nl2space|t(60) }}</h6>
-
-                                                    {% elseif td.type == 'span' %}
-        				                            	<span{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %} style="display:block;font-size:11px;margin-top:-2px;">{{ value|nl2space|t(60) }}</span>
-
-                                                    {% elseif td.type == 'url' %}
-        				                            	<a{%if td.href %} href="{{ td.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{%if td.onclick %} onclick="{{ td.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}display:inline-block;margin-bottom:3px;margin-top:3px;">{{ value|t(60) }}</a>
-
-                                                    {% elseif td.type == 'ago' %}
-                                                        <i class="icon-clock"></i> {{ value|ago }}
-        				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value }}</span>
-
-                                                    {% elseif td.type == 'fixed' %}
-                                                        {% set fixedfilldefault = true %}
-                                                        {% for option in td.options if option.value == value %}
-                                                            <span class="label label-{{ option.type }}">{{ option.label }}</span>
-                                                            {% set fixedfilldefault = false %}
-                                                        {% endfor %}
-                                                        {% if fixedfilldefault and td.default.label %}
-                                                            <span class="label label-{{ td.default.type }}">{{ td.default.label }}</span>
+                                                        {% if td.replace %}
+                                                            {% set value = value|replace( td.replace ) %}
                                                         {% endif %}
 
-                                                    {% elseif td.type == 'menu' %}
-					                                    <div class="btn-group">
-						                                    <button data-toggle="dropdown" class="btn btn-icon dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon }}"></i></button>
-													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
-                                                            {% for option in td.options %}
-        														<li><a{% if option.href %} href="{{ option.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{% if option.onclick %} onclick="{{ option.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}><i class="{{ option.icon }}"></i> {{ option.label }}</a></li>
-		                                                    {% endfor %}
-            		    									</ul>
-	    				                                </div>
+                                                        {% if td.addonpre %}
+                                                            {% set value = td.addonpre ~ value %}
+                                                        {% endif %}
 
+                                                        {% if td.addopos %}
+                                                            {% set value = value ~ td.addonpos %}
+                                                        {% endif %}
+
+                                                        {% if td.type == 'simple' %}
+                                                            {{ value|nl2space|t(60) }}
+
+                                                        {% elseif td.type == 'h4' %}
+                                                            <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ value|nl2space|t(60) }}</h4>
+
+                                                        {% elseif td.type == 'h6' %}
+                                                            <h6{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ value|nl2space|t(60) }}</h6>
+
+                                                        {% elseif td.type == 'span' %}
+            				                            	<span{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %} style="display:block;font-size:11px;margin-top:-2px;">{{ value|nl2space|t(60) }}</span>
+
+                                                        {% elseif td.type == 'thumb' %}
+                                                        
+                                                            {% if td.onclick %}
+                				                            	<a onclick="{{ td.onclick|replace({ (keyhtml): val[ key ] }) }}">
+                                                            {% endif %}
+
+                                                            <img src="{{ value }}" alt="" class="user-face">
+
+                                                            {% if td.onclick %}
+                				                            	</a>
+                                                            {% endif %}
+
+                                                        {% elseif td.type == 'url' %}
+            				                            	<a{%if td.href %} href="{{ td.href|replaceurl( val, tags ) }}"{% endif %}{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}display:inline-block;margin-bottom:3px;margin-top:3px;">{{ value|t(60) }}</a>
+
+                                                        {% elseif td.type == 'ago' %}
+                                                            <i class="icon-clock"></i> {{ value|ago }}
+            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value }}</span>
+
+                                                        {% elseif td.type == 'fixed' %}
+                                                            {% set fixedfilldefault = true %}
+                                                            {% for option in td.options if option.value == value %}
+                                                                <span class="label label-{{ option.type }}">{{ option.label }}</span>
+                                                                {% set fixedfilldefault = false %}
+                                                            {% endfor %}
+                                                            {% if fixedfilldefault and td.default.label %}
+                                                                <span class="label label-{{ td.default.type }}">{{ td.default.label }}</span>
+                                                            {% endif %}
+
+                                                        {% elseif td.type == 'menu' %}
+    					                                    <div class="btn-group">
+    						                                    <button data-toggle="dropdown" class="btn btn-icon dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon }}"></i></button>
+    													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
+                                                                {% for option in td.options %}
+                                                                    {% set optiondisabled = ( option.disabled and val[ option.disableddepends ] ) %}
+            														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}><i class="{{ option.icon }}"></i> {{ option.label }}</a></li>
+    		                                                    {% endfor %}
+                		    									</ul>
+    	    				                                </div>
+
+                                                        {% endif %}
                                                     {% endif %}
-                                                 {% endfor %}
+
+                                              {% endfor %}
 
 				                            </td>
                                             {% endfor %}

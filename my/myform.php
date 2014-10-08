@@ -91,42 +91,42 @@ class myform{
         return $this;
     }
 
-    public function & addText( $name, $label = '', $rules = array(), $filters = array(), $options = array(), $help = '' ){
-        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+    public function & addText( $name, $label = '', $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
-    public function & addHidden( $name, $rules = array(), $filters = array(), $options = array() ){
+    public function & addHidden( $name ){
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
-        $this->elements[ $name ] = array( 'type' => 'hidden', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => '', 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
+        $this->elements[ $name ] = array( 'type' => 'hidden', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => '', 'rules' => array(), 'filters' => array(), 'options' => array() );	
         return $this;
     }
 
-    public function & addCheckbox( $name, $label, $rules = array(), $filters = array(), $options = array() ){
-        $this->elements[ $name ] = array( 'type' => 'checkbox', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options );	
+    public function & addCheckbox( $name, $label ){
+        $this->elements[ $name ] = array( 'type' => 'checkbox', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );	
         return $this;
     }
 
-    public function & addTextarea( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
-        $this->elements[ $name ] = array( 'type' => 'textarea', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+    public function & addTextarea( $name, $label, $help = '', $rows = 2 ){
+        $this->elements[ $name ] = array( 'type' => 'textarea', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rows' => $rows, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
-    public function & addPassword( $name, $label, $rules = array(), $filters = array(), $options = array() ){
-        $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options );
+    public function & addPassword( $name, $label ){
+        $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
         return $this;
     }
 
-    public function & addStaticImage( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
+    public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '' ){
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
-        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
-    public function & addStaticMovie( $name, $label, $rules = array(), $filters = array(), $options = array(), $help = '' ){
-        $this->elements[ $name ] = array( 'type' => 'staticmovie', 'valuetype' => 'simple', 'name' => $name, 'label' => $label,  'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+    public function & addStaticMovie( $name, $label, $help = '', $width = '', $height = ''  ){
+        $this->elements[ $name ] = array( 'type' => 'staticmovie', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
@@ -193,35 +193,28 @@ class myform{
         return $this;
     }    
 
-    public function & addStats( $stats ){
-
-        // array( 'title' => , 'value' => 12476, 'percentage' => 50, 'icon' => 'icon-user-plus|icon-point-up', 'type' => 'success|info')
-        $this->elements[ 'sts' . $this->counter++ ] = array( 'type' => 'stats', 'stats' => $stats, 'rules' => array(), 'filters' => array() );
-        return $this;
-    }    
-
 
     // special elements
-    public function & addEmail( $name, $label = 'Email', $rules = array(), $filters = array() ){
+    public function & addEmail( $name, $label = 'Email' ){
         $rules = array_merge( $rules, array( 'email' => 'Email is not valid' ) );
-        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters );	
+        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array() );
         return $this;
     }
 
-    public function & addMonth( $name, $label, $rules = array(), $filters = array() ){
+    public function & addMonth( $name, $label ){
         $options = array();
         foreach (range(1, 12) as $number)
             $options[ sprintf('%02d', $number ) ] = sprintf('%02d', $number ) . ' - ' . date("F", mktime(0, 0, 0, $number, 10));
 
-        return $this->addSelect( $name, $label, $rules, $filters, $options );
+        return $this->addSelect( $name, $label, $options );
     }
 
-    public function & addYear( $name, $label, $rules = array(), $filters = array() ){
+    public function & addYear( $name, $label ){
         $options = array();
         foreach( range( date("Y"), date("Y") + 20 ) as $number)
             $options[ $number ] = $number;
 
-        return $this->addSelect( $name, $label, $rules, $filters, $options );
+        return $this->addSelect( $name, $label, $options );
     }
 
 
@@ -253,29 +246,29 @@ class myform{
         return $options;
     }
 
-    public function & addSelect( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $help = '' ){
+    public function & addSelect( $name, $label, $options = array(), $optionsFilter = null, $help = '' ){
         $options = $this->filterOptions( $options, $optionsFilter );
         $rules[ 'selectvalid' ] = array( $label . ' is not valid', $options );
 
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
-        $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options, 'help' => $help );
         return $this;
     }
 
-    public function & addMultiple( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $help = '' ){
+    public function & addMultiple( $name, $label, $options = array(), $optionsFilter = null, $help = '' ){
         $options = $this->filterOptions( $options, $optionsFilter );
-        $this->elements[ $name ] = array( 'type' => 'multiple', 'valuetype' => 'multiple', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'multiple', 'valuetype' => 'multiple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options, 'help' => $help );
         return $this;
     }
 
-    public function & addCheckboxgroup( $name, $label, $rules = array(), $filters = array(), $options = array(), $optionsFilter = null, $settings = array(), $help = '' ){
+    public function & addCheckboxgroup( $name, $label, $options = array(), $optionsFilter = null, $settings = array(), $help = '' ){
         $options = $this->filterOptions( $options, $optionsFilter );
-        $this->elements[ $name ] = array( 'type' => 'checkboxgroup', 'valuetype' => 'group', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'options' => $options, 'settings' => $settings, 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'checkboxgroup', 'valuetype' => 'group', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options, 'settings' => $settings, 'help' => $help );
         return $this;
     }
 
-    public function & addTransloadit( $name, $label, $rules = array(), $filters = array(), $options = array(), $settings = array(), $help = '' ){
+    public function & addTransloadit( $name, $label, $options = array(), $settings = array(), $help = '' ){
 
         // default options
         $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array(), 'mode' => 'image' );
@@ -291,7 +284,7 @@ class myform{
 
         $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
 
-        $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => $rules, 'filters' => $filters, 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->app->config('transloadit.s') ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->app->config('transloadit.s') ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
         return $this;
     }
 
@@ -737,9 +730,27 @@ class myform{
 
     public function & addRule(){
 	
+        $args = func_get_args();
+
+        if( !isset( $args[0] ) )
+            return $this;
+
         // add validation if form is submitted only
-        if( $this->isSubmitted() ){
-            $this->customRules[] = func_get_args();
+        if( is_string( $args[0] ) ){
+
+            if( isset( $args[1] ) && isset( $args[2] ) ){
+                $element  = array_shift($args);
+                $message  = array_shift($args);
+                $rulename = array_shift($args);
+                $ruleopt  = array_shift($args);
+                
+                $this->elements[ $element ][ 'rules' ][ $rulename ] = array( $message, $ruleopt );
+            }
+
+        }else{
+
+//            if( $this->isSubmitted() )
+                $this->customRules[] = $args;
         }
 
         return $this;
@@ -866,6 +877,21 @@ class myform{
         return $values;
     }
 
+
+    public function & addFilter( $element, $filter ){
+        if( isset( $this->elements[ $element ] ) )
+            $this->elements[ $element ][ 'filters' ][] = $filter;
+        return $this;
+    }
+
+
+    public function & addFilterHtml( $element, $filter ){
+        if( isset( $this->elements[ $element ] ) )
+            $this->elements[ $element ][ 'filtershtml' ][] = $filter;
+        return $this;
+    }
+
+
     public function getValue( $key, $default = null ){
         $vals = $this->getValues();
         return ( isset( $vals[ $key ] ) ? $vals[ $key ] : $default );
@@ -876,9 +902,18 @@ class myform{
         // get values
         $values = $this->getValues( false, true );
 
-        foreach( $this->elements as $n => $el ){		
-            $this->elements[$n][ 'value' ] = isset( $values[ $n ] ) ? $values[ $n ] : '';
-            if( $el[ 'type' ] == 'captcha' ) $this->initCaptcha();
+        foreach( $this->elements as $n => $el ){
+            
+            $v = isset( $values[ $n ] ) ? $values[ $n ] : '';
+            
+            if( isset( $el[ 'filtershtml' ] ) )
+                foreach( $el[ 'filtershtml' ] as $f )
+                    if( is_callable( array( 'myfilters', $f ) ) )
+                        $v = call_user_func( array( 'myfilters', $f ), $v );
+
+            $this->elements[$n][ 'value' ] = $v;
+            if( $el[ 'type' ] == 'captcha' )
+                $this->initCaptcha();
         }
 
         return array(   'hide'          => $this->hide,

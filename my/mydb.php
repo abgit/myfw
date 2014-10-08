@@ -102,6 +102,10 @@
             return $this->findOne( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
 
+        public function findOneKeyReturn( $procedure, $args = array(), $key = '' ){
+            return ( $this->findOne( $result, $procedure, $args, false ) && isset( $result[ $key ] ) ) ? $result[ $key ] : false;
+        }
+
         public function findOne( & $result, $procedure, $args = array(), $returnobject = false ){
 
             try{
