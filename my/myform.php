@@ -91,8 +91,13 @@ class myform{
         return $this;
     }
 
-    public function & addText( $name, $label = '', $help = '' ){
-        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
+    public function & addText( $name, $label = '', $help = '', $bitcoin = false ){
+        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'bitcoin' => $bitcoin );
+        return $this;
+    }
+
+    public function & addBitcoin( $name, $label = '', $help = '', $currencies = false ){
+        $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies );
         return $this;
     }
 
@@ -117,6 +122,12 @@ class myform{
         $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
         return $this;
     }
+
+    public function & addBitcoinQrCode( $name, $label, $help = '', $width = 200, $key = false, $acc = '' ){
+        $this->elements[ $name ] = array( 'type' => 'bitcoinqrcode', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'key' => $key, 'acc' => $acc );
+        return $this;
+    }
+
 
     public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '' ){
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
@@ -189,7 +200,7 @@ class myform{
     }
 
     public function & addCustom( $obj ){
-        $this->elements[ 'ctm' . $this->counter++ ] = array( 'type' => 'custom', 'obj' => $obj );
+        $this->elements[ 'ctm' . $this->counter++ ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
         return $this;
     }    
 
@@ -215,6 +226,22 @@ class myform{
             $options[ $number ] = $number;
 
         return $this->addSelect( $name, $label, $options );
+    }
+
+
+    public function & addDay( $name, $label, $labelnow = 'now', $labeltomorrow = 'tomorrow', $days = 10 ){
+
+        $now = new DateTime();
+        $schedule = array( 0 => $labelnow, 1 => $labeltomorrow );
+
+        if( $days > 1 ){
+            $schedule[ 2 ] = $now->modify( '+2 day' )->format( 'd F' );
+
+            for($i = 3; $i < $days; $i++ )
+                $schedule[ $i ] = $now->modify( '+1 day' )->format( 'd F' );
+        }
+
+        return $this->addSelect( $name, $label, $schedule );
     }
 
 
@@ -317,10 +344,12 @@ class myform{
 
     public function & addAddon( $name, $value, $prefix = true ){
         if( isset( $this->elements[ $name ] ) ){
-            if( $prefix ){
+            if( $prefix === true ){
                 $this->elements[ $name ][ 'addonpre' ] = $value;
-            }else{
-                $this->elements[ $name ][ 'addonpos' ] = $value;            
+            }elseif( $prefix === false ){
+                $this->elements[ $name ][ 'addonpos' ] = $value;
+            }elseif( is_null( $prefix ) ){
+                $this->elements[ $name ][ 'addonend' ] = $value;
             }
         }
         return $this;

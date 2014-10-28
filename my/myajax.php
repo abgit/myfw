@@ -119,6 +119,11 @@ class myajax{
         return $this;
     }
 
+    public function & switchClass( $el, $classdel, $classadd ){
+        $this->out[ 'sc' ][] = array( 'e' => $el, 'd' => $classdel, 'a' => $classadd );
+        return $this;    
+    }
+
     public function & remove( $el ){
         $this->out[ 'rm' ][] = array( 'e' => $el );
         return $this;
@@ -151,6 +156,26 @@ class myajax{
 
     public function filter( $s ){
         return trim( preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", "", $s ) );
+    }
+
+    public function & timeout( $action, $ms, $mode = 0 ){
+        $this->out[ 'ti' ] = array( 'a' => $action, 't' => $ms, 'm' => $mode ? 1 : 0 );
+        return $this;
+    }
+
+    public function & canceltimeout( $mode = 0 ){
+        $this->out[ 'tr' ] = array( 'm' => $mode ? 1 : 0 );
+        return $this;
+    }
+
+    public function & interval( $action, $ms, $mode = 0 ){
+        $this->out[ 'ii' ] = array( 'a' => $action, 't' => $ms, 'm' => $mode ? 1 : 0 );
+        return $this;
+    }
+
+    public function & cancelinterval( $mode = 0 ){
+        $this->out[ 'ir' ] = array( 'm' => $mode ? 1 : 0 );
+        return $this;
     }
 
     public function render(){

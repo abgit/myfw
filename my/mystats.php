@@ -5,6 +5,7 @@ class mystats{
     private $name;
     private $values = array();
     private $items;
+    private $hidebutton = false;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -16,6 +17,11 @@ class mystats{
         return $this;
     }
 
+    public function & hideButton(){
+        $this->hidebutton = true;
+        return $this;
+    }
+
     public function & setValues( $values ){
         if( is_array( $values ) )
             $this->values = $values;
@@ -23,8 +29,8 @@ class mystats{
         return $this;
     }
 
-    public function & addElement( $key, $label, $icon = 'icon-cog4', $type = 'info', $onclick = '', $href = '', $percentage = 100 ){
-        $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage );
+    public function & addElement( $key, $label, $icon = 'icon-cog4', $type = 'info', $onclick = '', $href = '', $percentage = 100, $class = '' ){
+        $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class );
         return $this;
     }
 
@@ -52,9 +58,10 @@ class mystats{
     }
 
     private function render( $values = null ){
-        return $this->app->render( '@my/mystats', array( 'values'   => is_null( $values ) ? $this->values : $values,
-                                                         'name'     => $this->name,
-                                                         'elements' => $this->elements
+        return $this->app->render( '@my/mystats', array( 'values'     => is_null( $values ) ? $this->values : $values,
+                                                         'name'       => $this->name,
+                                                         'elements'   => $this->elements,
+                                                         'hidebutton' => $this->hidebutton
                                                          ), null, null, null, false, false );
 
     }

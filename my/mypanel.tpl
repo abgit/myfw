@@ -8,6 +8,9 @@
                                                     {% if menu.type == 0 %}
                                                         <a style="margin-left:2px;margin-top:6px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %}{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
 
+                                                    {% elseif menu.type == 3 %}
+                                                        <br />
+
                                                     {% elseif menu.type == 1 %}
                                                     <div class="btn-group" style="margin-left:2px;margin-top:6px">
                                                     <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"><i class="{{ menu.icon }}"></i> {{menu.label}} <span class="caret"></span></a>
@@ -48,9 +51,9 @@
                                                 <img style="width:100%;max-width:120px;margin-top:10px" src="{{ value[ elements.thumb.key ] }}">
                                             </div>
 
-                                            {% set class2 = 'col-sm-6' %}
+                                            {% set class2 = elements.info ? 'col-sm-6' : 'col-sm-9' %}
                                         {% else %}
-                                            {% set class2 = 'col-sm-9' %}
+                                            {% set class2 = elements.info ? 'col-sm-9' : 'col-sm-12' %}
                                         {% endif %}
 
     										<div class="{{ class2 }} task-description">
@@ -67,8 +70,8 @@
     										        {% endif %}
     										</div>
                                             
+                                            {% if elements.info %}
     										<div class="col-sm-3">
-
     											<div class="task-info" style="margin-top:10px">
 
                                                     {% for info in elements.info %}
@@ -110,6 +113,7 @@
                                                     {% endfor %}
     											</div>
     										</div>
+                                            {% endif %}
 									</div>
 									<div class="panel-footer" style="min-height:38px">
                                         {% if elements.status %}
@@ -135,7 +139,34 @@
                                                         <i id="pani{{ value[ key ] }}{{ status.key }}" {{ statusdisplay != 1 ? 'style="display:none"' }} class="{{ iconval }}"></i>
                                                     {% elseif status.type == 0 %}
                                                         {{ status.sep }} 
+
+                                                    {% elseif status.type == 3 %}
+
+
+                                                        {% if value[ status.key ] %}
+
+                                                            <span style="padding:0.2em 0.6em 0.3em; vertical-align:middle;margin-right:6px;" class="label {{status.class|default('label-info')}}">
+
+                                                            {% set val = value[ status.key ] %}
+                                                            {% if status.filter == 'rnumber' %}
+                                                                {% set val = val|rnumber(true) %}
+                                                            {% endif %}
+                                                        
+                                                            {{ status.prefix }} {{ val|t(20) }} {{ status.sufix }}
+
+                                                            </span>
+
+                                                        {% elseif status.defaultvalue %}
+
+                                                            <span style="padding:0.2em 0.6em 0.3em; vertical-align:middle;margin-right:6px;" class="label {{status.defaultclass}}">
+                                                            {{ status.defaultprefix }} {{ status.defaultvalue }} {{ status.defaultsufix }}
+                                                            </span>
+
+                                                        {% endif %}
+
+
                                                     {% endif %}
+
                                             {% endfor %}
                                                     </span>
                                             </div>
@@ -159,7 +190,9 @@
                                                                     {% set submenudisplay = 1 %}
                                                                 {% endif %}
                                                             
-                                                                <li id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
+                                                                {% set optiondisabled = ( submenu.disabled and ( submenu.disableddepends == true or value[ submenu.disableddepends ] ) ) %}
+                                                            
+                                                                <li {{ optiondisabled ? 'class="disabled"' }} id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href and not optiondisabled %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick and not optiondisabled %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </li>

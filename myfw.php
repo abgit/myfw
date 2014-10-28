@@ -59,6 +59,11 @@
         private $panel       = null;
         private $notify      = null;
         private $stats       = null;
+        private $info        = null;
+        private $message     = null;
+        private $navbar      = null;
+        private $uuid        = false;
+        private $blockchain  = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -158,10 +163,34 @@
 			return $this->modals[ $id ];
 		}
 
+		public function blockchain(){
+			if( ! isset( $this->blockchain ) )
+				$this->blockchain = new myblockchain();
+			return $this->blockchain;
+		}
+
+		public function info( $id = 'in' ){
+			if( ! isset( $this->info[ $id ] ) )
+				$this->info[ $id ] = new myinfo( $id );
+			return $this->info[ $id ];
+		}
+
 		public function panel( $id = 'p' ){
 			if( ! isset( $this->panel[ $id ] ) )
 				$this->panel[ $id ] = new mypanel( $id );
 			return $this->panel[ $id ];
+		}
+
+		public function navbar( $id = 'n' ){
+			if( ! isset( $this->navbar[ $id ] ) )
+				$this->navbar[ $id ] = new mynavbar( $id );
+			return $this->navbar[ $id ];
+		}
+
+		public function message( $id = 'ms' ){
+			if( ! isset( $this->message[ $id ] ) )
+				$this->message[ $id ] = new mymessage( $id );
+			return $this->message[ $id ];
 		}
 
 		public function ajax(){
@@ -199,10 +228,21 @@
             $this->objusercall  = $callback;
         }
         
-        public function isLogged(){
+        public function setUUID( $uuid ){
+            $this->uuid = $uuid;
+        }
+        
+        public function getUUID(){
+            return $this->uuid;
+        }
+        
+        public function isLogged( $forceloginifanonimous = false ){
 
             if( $this->objuserlogg === true )
                 return true;
+
+            if( $forceloginifanonimous == false )
+                return false;
 
             $func = $this->objusercall;
             $func = call_user_func( $func );
@@ -464,7 +504,7 @@
     function islogged() {
         $app = \Slim\Slim::getInstance();
 
-        if( !$app->isLogged() && $app->config( 'islogged.enable' ) !== false ){
+        if( !$app->isLogged(true) && $app->config( 'islogged.enable' ) !== false ){
             $url = $app->getuserredir();
             if( is_string( $url ) && strlen( $url ) ){
                 $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render() : $app->redirect( $url );

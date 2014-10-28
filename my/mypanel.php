@@ -84,6 +84,16 @@ class mypanel{
         return $this;
     }
 
+    public function & addStatusInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '' ){
+        $this->elements[ 'status' ][ $key ] = array( 'key' => $key, 'type' => 3, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass );
+        return $this;
+    }
+
+    public function & setStatusInfoFilter( $key, $filter ){
+        $this->elements[ 'status' ][ $key ][ 'filter' ] = $filter;
+        return $this;
+    }
+
     public function & ajaxStatusIconShow( $key, $id, $operation = true ){
         $this->app->ajax()->css( '#pani' . $id . $key, 'display', $operation ? 'inline' : 'none' );
         return $this;
@@ -109,6 +119,15 @@ class mypanel{
         return $this;
     }
 
+    public function & setMenuItemDisabled( $menuindex, $subindex, $depends ){
+
+        if( isset( $this->elements[ 'menu' ][ $menuindex ][ 'options' ][ $subindex ] ) )
+            $this->elements[ 'menu' ][ $menuindex ][ 'options' ][ $subindex ] += array( 'disabled' => true, 'disableddepends' => $depends );
+        return $this;
+    }
+
+
+
     public function & addToolbarButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $class = '' ){
         $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'class' => $class );
         return $this;
@@ -122,6 +141,11 @@ class mypanel{
     public function & addToolbarMenuSelect( $options, $icon = 'icon-cog4', $label = '', $id = '' ){
         $id = empty( $id ) ? $this->name . 'sel' : $id;
         $this->elements[ 'tmenu' ][ $id ] = array( 'type' => 2, 'icon' => $icon, 'options' => $options, 'label' => $label, 'id' => $id );
+        return $this;
+    }
+
+    public function & addToolbarSeparator(){
+        $this->elements[ 'tmenu' ][] = array( 'type' => 3 );
         return $this;
     }
 

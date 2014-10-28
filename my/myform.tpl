@@ -69,7 +69,7 @@
 
         	{% if el.type == 'text' %}
 
-                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
                     {% if el.prevent %}
                         <p class="form-control-static">{{ el.value|default( preventmsg ) }}</p>
                     {% else %}
@@ -79,9 +79,26 @@
                         <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
                         {% if el.addonpos %}<span class="input-group-addon">{{ el.addonpos }}</span>{% endif %}
                         {% if el.addonpre or el.addonpos %}</div>{% endif %}
-                                                
+                        {% if el.addonend %}<span class="label label-block label-primary text-center">{{ el.addonend }}</span>{% endif %}
+
                         {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
+                    {% endif %}
+
+        	{% elseif el.type == 'bitcoin' %}
+
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    {% if el.prevent %}
+                        <p class="form-control-static">{{ el.value|default( preventmsg ) }}</p>
+                    {% else %}
+
+                        <div class="input-group">
+                            <span class="input-group-addon">BTC</span>
+                            <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                        </div>
+                        <span class="label label-block label-primary text-center">{{ el.value|bitcoinfrombtc( el.currencies ) }}</span>
+
+                        {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
                     {% endif %}
     
         	{% elseif el.type == 'password' %}
@@ -226,9 +243,21 @@
                 </div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
+        	{% elseif el.type == 'bitcoinqrcode' %}
+                    {%if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
+                    <div>
+                    <img id="{{el.name}}" src="{{el.key ? elements[ el.key ].value|bitcoinqrcode( el.acc, el.width ) : el.value}}" width="{{ el.width }}" height="{{ el.width }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
+                    </div>
+                    <span class="label label-block label-default text-center">{{ el.acc }}</span>
+
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+                	<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" type="hidden" value="{{el.acc}}">
+
+
         	{% elseif el.type == 'staticimage' %}
 
-                    {%if label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
+                    {%if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
                     <div>
                     <img id="{{el.name}}" {% if el.width %}width="{{ el.width }}"{% endif %} {% if el.height %}height="{{ el.height }}"{% endif %} {% if not el.width and not el.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
                     </div>
@@ -292,7 +321,7 @@
 
                 {% if not el.prevent %}
     				<input type="hidden" name="{{ name ~ el.name }}" value="{{ tvalue }}" id="{{name ~ el.name}}V" class="{{ name }}transloaditV"/>
-                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input{{ el.disabled ? ' disabled="disabled"' }} name="{{ name ~ el.name }}N" class="transloaditN" onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');" type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
+                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN"{% if el.disabled %} disabled="disabled"{% else %} onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"{% endif %} type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
 
                 {% elseif tvalue is empty %}
                     <p class="form-control-static">{{ preventmsg }}</p>
@@ -355,7 +384,12 @@
                     <input style="margin-top:3px;" onClick="myfwformsubmit('{{name}}','{{name ~ el.name}}ajax','{{el.label}}','{{name ~ el.name}}');" {{el.disabled ? 'disabled="disabled" '}}type="button" id="{{name ~ el.name}}ajax" class="btn {{el.css}}" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 
 	    		{% elseif el.type == 'ajaxbutton' %}
-                <input type="button" class="btn {{el.css}}" style="margin-left:5px;margin-top:3px;" {% if el.onclick %}onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
+                    
+                    {% if el.href %}
+                        <a type="button" href="{{ el.href }}" style="margin-left:5px;margin-top:3px;" class="btn btn-default">{{ el.labelbutton }}</a>
+                    {% else %}
+                        <input type="button" class="btn {{el.css}}" style="margin-left:5px;margin-top:3px;"{% if el.onclick %} onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
+                    {% endif %}
 
                 {% endif %}
             {% endfor %}

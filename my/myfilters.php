@@ -26,6 +26,20 @@ class myfilters{
         return empty( $string ) ? '' : $string;
     }
 
+    public static function bitcoinqrcode( $amount, $acc, $size ){
+        return \Slim\Slim::getInstance()->blockchain()->qrcode( $amount, '', $acc, $size );
+    }
+    
+    public static function bitcoinfrombtc( $amount, $currencies ){
+        $app  = \Slim\Slim::getInstance();
+        $vals = array();
+        if( is_array( $currencies ) )
+            foreach( $currencies as $cur )
+                $vals[] = $app->blockchain()->frombtc( $cur, $amount, true );
+
+        return implode( ' or ', $vals );
+    }
+
     public static function nl2space( $string ){
         return preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", " ", $string );
     }
