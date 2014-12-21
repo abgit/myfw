@@ -7,11 +7,31 @@
 
         public function __construct(){
             $this->app  = \Slim\Slim::getInstance();
-            $this->pdo  = new PDO( get_cfg_var( 'abrands.db.d' ), get_cfg_var( 'abrands.db.u' ), get_cfg_var( 'abrands.db.p' ), array( 1002 => 'SET NAMES utf8' ) );
+            $this->driver = $this->app->config( 'db.driver' );
+
+            if( $this->driver === 'mysql' ){
+                $this->pdo  = new PDO( $this->app->config( 'db.dsn' ), $this->app->config( 'db.username' ), $this->app->config( 'db.password' ), array( 1002 => 'SET NAMES utf8' ) );
+
+            }elseif( $this->driver === 'postgresql' ){
+                $this->pdo  = new PDO( $this->app->config( 'db.dsn' ) );                
+
+            }elseif( $this->driver === 'heroku' ){
+                $url       = parse_url( getenv( 'DATABASE_URL' ) );
+                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ) ), $url[ 'user' ], $url[ 'pass' ] );
+
+            }else{
+                d( 'db invalid driver' );
+            }
+
             $this->stmt = null;
 
             if ( $this->app->config( 'debug' ) !== false )
                 $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+
+        }
+
+        public function & pdo(){
+            return $this->pdo;
         }
 
         private function & query( $procedure, $values = array() ){
@@ -70,7 +90,10 @@
                 }
             }
 
-            $this->stmt = $this->pdo->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+            if( $this->driver === 'mysql' )
+                $this->stmt = $this->pdo->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+            else
+                $this->stmt = $this->pdo->prepare( 'select ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
 
             // bind
             foreach( $elements as $col => $sett )
@@ -141,12 +164,4 @@
 
             return intval( reset( $result[0] ) ) > 0;
         }
-
-/*        public function apply( $procedure, $args = array() ){
-
-            $this->app->log()->debug( "mydb::apply,procedure:" . $procedure . ',args:' . json_encode( $args ) );
-
-            return $this->query( $procedure, $args );
-        }
-*/
     }
