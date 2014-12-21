@@ -10,10 +10,13 @@ return array(
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Slim' => array($vendorDir . '/slim/slim'),
+    'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'OpenCloud' => array($vendorDir . '/rackspace/php-opencloud/lib', $vendorDir . '/rackspace/php-opencloud/tests'),
+    'OAuth2' => array($vendorDir . '/adoy/oauth2/src'),
     'Michelf' => array($vendorDir . '/michelf/php-markdown'),
     'Mailgun\\Tests' => array($vendorDir . '/mailgun/mailgun-php/tests'),
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
     'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
     'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
+    'Dotenv' => array($vendorDir . '/vlucas/phpdotenv/src'),
 );

@@ -6,4 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Auth0SDK\\ApiException' => $vendorDir . '/auth0/auth0-php/src/Auth0.php',
+    'Auth0SDK\\Auth0' => $vendorDir . '/auth0/auth0-php/src/Auth0.php',
+    'Auth0SDK\\CoreException' => $vendorDir . '/auth0/auth0-php/src/Auth0.php',
+    'Auth0SDK\\EmptyStore' => $vendorDir . '/auth0/auth0-php/src/EmptyStore.php',
+    'Auth0SDK\\SessionStore' => $vendorDir . '/auth0/auth0-php/src/SessionStore.php',
 );
