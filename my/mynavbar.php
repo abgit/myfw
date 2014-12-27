@@ -22,8 +22,8 @@ class mynavbar{
         return $this;
     }
 
-    public function & addItem( $text, $onclick, $href, $class = '' ){
-        $this->elements[] = array( 'type' => 'item', 'text' => $text, 'onclick' => $onclick, 'href' => $href, 'class' => $class );
+    public function & addItem( $text, $onclick = '', $href = '', $class = '', $style = '' ){
+        $this->elements[] = array( 'type' => 'item', 'text' => $text, 'onclick' => $onclick, 'href' => $href, 'class' => $class, 'style' => $style );
         return $this;
     }
 

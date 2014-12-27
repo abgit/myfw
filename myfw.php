@@ -27,11 +27,12 @@
     // my framework
     class myfw extends \Slim\Slim{
 
+        public  $client      = null;
+
         private $forms       = array();
         private $modals      = array();
         private $ajax        = null;
         private $mailer      = null;
-        private $client      = null;
         private $cart        = null;
         private $tplobj      = null;
         private $pdodb       = null;
@@ -64,6 +65,7 @@
         private $navbar      = null;
         private $uuid        = false;
         private $blockchain  = null;
+        private $auth0       = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -103,6 +105,8 @@
                 $this->log->setEnabled( true );
                 $this->log->setLevel( $this->config( 'log.level' ) );
                 $this->loginit = true;
+            }else{
+                $this->log->setEnabled( false );
             }
 
             return $this->log;
@@ -130,6 +134,12 @@
             if( is_null( $this->filters ) )
 				$this->filters = new myfilters();
 			return $this->filters;
+		}
+
+        public function auth0(){
+            if( is_null( $this->auth0 ) )
+				$this->auth0 = new myauth0();
+			return $this->auth0;
 		}
 
 		// get form object
@@ -260,12 +270,13 @@
             return $this->objuserredir;
         }
 
+/*
 		public function client(){
 			if( is_null( $this->client ) && ( $client = $this->config( 'client.global' ) ) )
 				$this->client = new $client();
 			return $this->client;
 		}
-
+*/
 		public function i18n(){
 			if( is_null( $this->i18n ) )
 				$this->i18n = new myi18n();
@@ -448,7 +459,7 @@
 		
 		public function saveFile( $path, $content, $minimize = false ){
 
-            $filesaved = $app->config( 'savefile.enable' ) !== false ? file_put_contents( $path, $minimize ? str_replace(array("\r", "\n", "\t", "\v"), '', $content ) : $content ) : false;
+            $filesaved = $app->config( 'savefile.enable' ) !== 0 ? file_put_contents( $path, $minimize ? str_replace(array("\r", "\n", "\t", "\v"), '', $content ) : $content ) : false;
 
 			$this->log()->debug( "myfw::saveFile,path:" . $path . ',saved:' . intval( $filesaved ) );
 
@@ -504,7 +515,7 @@
     function islogged() {
         $app = \Slim\Slim::getInstance();
 
-        if( !$app->isLogged(true) && $app->config( 'islogged.enable' ) !== false ){
+        if( !$app->isLogged(true) && $app->config( 'islogged.enable' ) !== 0 ){
             $url = $app->getuserredir();
             if( is_string( $url ) && strlen( $url ) ){
                 $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render() : $app->redirect( $url );
@@ -516,21 +527,21 @@
     // check https protocol
     function ishttps(){
         $app = \Slim\Slim::getInstance();
-        if( $app->config( 'ishttps.enable' ) !== false && !$app->ishttps() )
+        if( $app->config( 'ishttps.enable' ) !== 0 && !$app->ishttps() )
             $app->redirect( "https://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
     }
 
     // check http protocol
     function ishttp(){
         $app = \Slim\Slim::getInstance();
-        if( $app->config( 'ishttp.enable' ) !== false && $app->ishttps() )
+        if( $app->config( 'ishttp.enable' ) !== 0 && $app->ishttps() )
             $app->redirect( "http://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
     }
 
     // check ajax post
     function isajax(){
         $app = \Slim\Slim::getInstance();
-        if( $app->config( 'isajax.enable' ) !== false && !$app->request->isAjax() )
+        if( $app->config( 'isajax.enable' ) !== 0 && !$app->request->isAjax() )
             $app->pass();
         else
             $app->setajaxmode();            
@@ -538,7 +549,7 @@
 
     function iscache(){
 		$app = \Slim\Slim::getInstance();
-        if( $app->config( 'iscache.enable' ) !== false ){
+        if( $app->config( 'iscache.enable' ) !== 0 ){
             $app->renderCached() ? $app->stop() : $app->setcacheable();
         }
     }

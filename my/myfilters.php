@@ -147,6 +147,11 @@ class myfilters{
         return isset( $b[$string] ) ? $b[$string][0] : 'unknown';
     }
 
+    public static function auth0config( $string ){
+        return \Slim\Slim::getInstance()->auth0()->getParams( $string );
+    }
+
+
     public static function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){
         if( strpos( $hash, '@' ) )
             $hash = md5( strtolower( trim( $hash ) ) );

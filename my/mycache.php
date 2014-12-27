@@ -7,6 +7,24 @@
 
         public function __construct(){
             $this->app = \Slim\Slim::getInstance();
+
+            if( $this->app->config( 'redis.driver' ) === 'heroku' ){
+                $this->redisro     = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_HOST );
+                $this->redisroport = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_PORT );
+                $this->redisropass = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_PASS );
+                $this->redisrw     = $this->redisro;
+                $this->redisrwport = $this->redisroport;
+                $this->redisrwpass = $this->redisropass;
+                $this->redisttl    = 900;
+            }else{
+                $this->redisro     = $this->app->config( 'redis.hostro' );
+                $this->redisroport = $this->app->config( 'redis.hostroport' );
+                $this->redisropass = $this->app->config( 'redis.hostropass' );
+                $this->redisrw     = $this->app->config( 'redis.hostrw' );
+                $this->redisrwport = $this->app->config( 'redis.hostrwport' );
+                $this->redisrwpass = $this->app->config( 'redis.hostrwpass' );
+                $this->redisttl    = $this->app->config( 'redis.ttl' );
+            }
         }
 
         // standard
@@ -61,7 +79,7 @@
         }
 
         public function redisset( $id, $content, $ttl = false ){
-            return $this->redisrwinit() ? ($this->redisrw->set( $id, $content, intval( intval( $ttl ) > 0 ? $ttl : $this->app->config( 'redis.ttl' ) ) ) ) : false;
+            return $this->redisrwinit() ? ($this->redisrw->set( $id, $content, intval( intval( $ttl ) > 0 ? $ttl : $this->redisttl ) ) ) : false;
         }
 
         public function redisget( $id ){
@@ -80,7 +98,11 @@
         private function redisroinit(){
             if( is_null( $this->redisro ) && class_exists( 'Redis' ) ){
                 $this->redisro = new Redis();
-                $this->redisro->connect( $this->app->config( 'redis.hostro' ), $this->app->config( 'redis.hostroport' ) || 6379 );
+                $this->redisro->connect( $this->redisro, $this->redisroport );
+            
+                if( $this->redisropass ){
+                    $this->redisro->auth( $this->redisropass );
+                }
             }
             return ( !is_null( $this->redisro ) && $this->redisro->IsConnected() );
         }
@@ -88,7 +110,11 @@
         private function redisrwinit(){
             if( is_null( $this->redisrw ) && class_exists( 'Redis' ) ){
                 $this->redisrw = new Redis();
-                $this->redisrw->connect( $this->app->config( 'redis.hostrw' ), $this->app->config( 'redis.hostrwport' ) || 6379 );
+                $this->redisrw->connect( $this->redisrw, $this->redisrwport );
+
+                if( $this->redisrwpass ){
+                    $this->redisrw->auth( $this->redisrwpass );
+                }
             }
             return ( !is_null( $this->redisrw ) && $this->redisrw->IsConnected() );
         }

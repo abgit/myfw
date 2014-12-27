@@ -25,7 +25,7 @@
 
             $this->stmt = null;
 
-            if ( $this->app->config( 'debug' ) !== false )
+            if ( $this->app->config( 'db.debug' ) )
                 $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
 
         }

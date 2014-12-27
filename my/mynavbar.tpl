@@ -23,8 +23,8 @@
                 {% for el in elements %}
                     
                     {% if el.type == 'item' %}
-        				<li class="{{ el.class }}" style="vertical-align:top;">
-	        				<a href="{{ el.href }}">{{ el.text }}</a>
+        				<li class="{{ el.class }}" style="vertical-align:top;{{ el.style }}">
+	        				<a{% if el.href %} href="{{ el.href }}"{% elseif el.onclick %} onclick="{{ el.onclick }}"{% endif %}>{{ el.text|t(50) }}</a>
 		        		</li>
 
                     {% elseif el.type == 'custom' %}

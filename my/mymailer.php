@@ -7,7 +7,7 @@
         public function __construct(){
 
             $this->app    = \Slim\Slim::getInstance();
-            $this->mg     = new Mailgun( $this->app->config( 'email.mailgunkey' ) );
+            $this->mg     = new Mailgun( $this->app->config( 'email.driver' ) === 'heroku' ? getenv( 'MAILGUN_API_KEY' ) : $this->app->config( 'email.mailgunkey' ) );
             $this->domain = $this->app->config( 'email.mailgundomain' );
         }
 

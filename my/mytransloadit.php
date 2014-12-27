@@ -9,13 +9,23 @@ class mytransloadit{
 
     public function __construct(){
         $this->app = \Slim\Slim::getInstance();
+        
+        if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
+            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
+            $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
+            $this->apiurl    = getenv( 'TRANSLOADIT_URL' );
+        }else{
+            $this->apikey    = $this->app->config( 'transloadit.k' );
+            $this->apisecret = $this->app->config( 'transloadit.s' );
+            $this->apiurl    = 'http://api2.transloadit.com';
+        }        
     }
 
     public function createAssembly( & $returndata, $arg ){
 
         $this->app->log()->debug( 'mytransloadit::createAssembly,arg:' . json_encode( $arg ) );
 
-        $tl  = new Transloadit( array( 'key' => $this->app->config( 'transloadit.k' ), 'secret' => $this->app->config( 'transloadit.s' ) ) );
+        $tl  = new Transloadit( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
         $res = $tl->createAssembly( $arg );
         $returndata = $res->error() ? array() : $res->data;
 
@@ -26,7 +36,7 @@ class mytransloadit{
 
         $this->app->log()->debug( 'mytransloadit::request,url:' . $url );
 
-        $tl = new TransloaditRequest( array( 'key' => $this->app->config( 'transloadit.k' ), 'secret' => $this->app->config( 'transloadit.s' ) ) );
+        $tl = new TransloaditRequest( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
         $tl->url = $url;
         $res = $tl->execute();
         $returndata = $res->error() ? array() : $res->data;
@@ -48,8 +58,8 @@ class mytransloadit{
             return false;
         }
 
-        $tl = new TransloaditRequest( array( 'key' => $this->app->config( 'transloadit.k' ), 'secret' => $this->app->config( 'transloadit.s' ) ) );
-        $tl->url = 'http://api2.transloadit.com/assemblies/' . $id;
+        $tl = new TransloaditRequest( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
+        $tl->url = $this->apiurl . '/assemblies/' . $id;
         $res = $tl->execute();
 
         if( $res->error() ){
