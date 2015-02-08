@@ -14,6 +14,11 @@ class myblockchain{
     }
 
 
+    public function exchangebtc(){
+        return $this->load( 'ticker' );
+    }
+
+
     public function frombtc( $currency, $value, $addsymbol = false, $decimals = 2 ){
 
         if( is_null( $this->exchange ) )
@@ -83,10 +88,15 @@ class myblockchain{
         if( $returnUrl )
             return $url;
 
-        if( ( $response = file_get_contents( $url ) ) === false )
-            return false;
+        if( !( $response = $this->app->cache()->memcachedget( md5( $returnUrl ) ) ) ){
 
-        return json_decode($response, true );
+            if( ( $response = file_get_contents( $url ) ) === false )
+                return false;
+
+            $this->app->cache()->memcachedset( md5( $returnUrl ), $response );
+        }
+
+        return json_decode( $response, true );
     }
 
 

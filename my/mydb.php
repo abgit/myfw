@@ -67,6 +67,9 @@
                         case 'text' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 65535 ) : null;
                                             break;
+                        case 'tag' :        $column_type  = PDO::PARAM_STR;
+                                            $column_value = isset( $values[ $column_name ] ) ? substr( preg_replace( "/[^A-Za-z0-9]/", '', $values[ $column_name ] ), 0, 100 ) : null;
+                                            break;
                         case 'float' :      $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? str_replace( ',', '.', $values[ $column_name] ) : 0;
                                             break;
@@ -76,8 +79,14 @@
                         case 'uuid' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 40 ) : null;
                                             break;
-                        case 'tag' :        $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 20 ) : null;
+                        case 'int' :        $column_type  = PDO::PARAM_STR;
+                                            $column_value = isset( $values[ $column_name ] ) ? intval( $values[ $column_name ] ) : null;
+                                            break;
+                        case 'json' :       $column_type  = PDO::PARAM_STR;
+                                            $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : '';
+                                            if( empty( $column_value ) || !is_string( $column_value ) || !is_array( json_decode( $column_value, true ) ) || json_last_error() != 0 ){
+                                                $column_value = json_encode( strval( $column_value ) );
+                                            }
                                             break;
                         case 'str' :
                         case 'varchar' :
@@ -93,7 +102,7 @@
             if( $this->driver === 'mysql' )
                 $this->stmt = $this->pdo->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
             else
-                $this->stmt = $this->pdo->prepare( 'select ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+                $this->stmt = $this->pdo->prepare( 'select * from ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
 
             // bind
             foreach( $elements as $col => $sett )
@@ -125,8 +134,14 @@
             return $this->findOne( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
 
-        public function findOneKeyReturn( $procedure, $args = array(), $key = '' ){
-            return ( $this->findOne( $result, $procedure, $args, false ) && isset( $result[ $key ] ) ) ? $result[ $key ] : false;
+        public function findValueReturn( $procedure, $args = array(), $returnobject = false ){
+            if( !$this->findOne( $result, $procedure, $args, $returnobject ) || empty( $result ) )
+                return false;
+
+            foreach( $result as $first )
+                break;
+            
+            return $first;
         }
 
         public function findOne( & $result, $procedure, $args = array(), $returnobject = false ){

@@ -31,13 +31,14 @@ class myfilters{
     }
     
     public static function bitcoinfrombtc( $amount, $currencies ){
-        $app  = \Slim\Slim::getInstance();
+        $btc  = \Slim\Slim::getInstance()->blockchain()->exchangebtc();
         $vals = array();
         if( is_array( $currencies ) )
             foreach( $currencies as $cur )
-                $vals[] = $app->blockchain()->frombtc( $cur, $amount, true );
+                $vals[ $cur ] = isset( $btc[ $cur ] ) ? $btc[ $cur ] : array();
+//                $vals[ $cur ] = $app->blockchain()->frombtc( $cur, $amount, true );
 
-        return implode( ' or ', $vals );
+        return $vals; //implode( ' or ', $vals );
     }
 
     public static function nl2space( $string ){
@@ -148,9 +149,8 @@ class myfilters{
     }
 
     public static function auth0config( $string ){
-        return \Slim\Slim::getInstance()->auth0()->getParams( $string );
+        return $string === 'access_token' ? \Slim\Slim::getInstance()->auth0()->getAccessToken() : \Slim\Slim::getInstance()->auth0()->getParams( $string );
     }
-
 
     public static function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){
         if( strpos( $hash, '@' ) )

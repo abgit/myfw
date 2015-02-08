@@ -96,7 +96,7 @@ class myform{
         return $this;
     }
 
-    public function & addBitcoin( $name, $label = '', $help = '', $currencies = false ){
+    public function & addBitcoin( $name, $label = '', $help = '', $currencies = array( 'USD', 'EUR' ) ){
         $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies );
         return $this;
     }
@@ -149,9 +149,9 @@ class myform{
     public function & addGroup( $size = 2, $total = null ){
         
         switch( $size ){
-            case 4: $css = 'col-md-3'; break;
-            case 3: $css = 'col-md-4'; break;
-            default:$css = 'col-md-6'; break;
+            case 4: $css = 'col-md-3 col-xs-6'; break;
+            case 3: $css = 'col-md-4 col-xs-6'; break;
+            default:$css = 'col-md-6 col-xs-9'; break;
         }
 
         if( is_null( $total ) )
@@ -300,7 +300,15 @@ class myform{
         // default options
         $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array(), 'mode' => 'image' );
 
-        $params = array( 'auth' => array( 'key'     => $this->app->config( 'transloadit.k' ),
+        if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
+            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
+            $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
+        }else{
+            $this->apikey    = $this->app->config( 'transloadit.k' );
+            $this->apisecret = $this->app->config( 'transloadit.s' );
+        }        
+
+        $params = array( 'auth' => array( 'key'     => $this->apikey,
                                           'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
 
         if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ))
@@ -311,7 +319,7 @@ class myform{
 
         $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
 
-        $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->app->config('transloadit.s') ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->apisecret ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
         return $this;
     }
 
@@ -371,6 +379,12 @@ class myform{
     public function & readonly( $name ){
         if( isset( $this->elements[ $name ] ) )
             $this->elements[ $name ][ 'readonly' ] = true;
+        return $this;
+    }
+
+    public function & setPlaceholder( $name, $placeholder ){
+        if( isset( $this->elements[ $name ] ) )
+            $this->elements[ $name ][ 'placeholder' ] = $placeholder;
         return $this;
     }
 
@@ -806,19 +820,21 @@ class myform{
             $value = isset( $values[ $n ] ) ? $values[ $n ] : '';
 
             // cycle element rules
-            foreach( $el[ 'rules' ] as $rulename => $rinfo ){
+            if( isset( $el[ 'rules' ] ) ){
+                foreach( $el[ 'rules' ] as $rulename => $rinfo ){
 
-                // check if info is string or array
-                $rulemessage = is_array( $rinfo ) ? $rinfo[0] : $rinfo;
-                $ruleoptions = is_array( $rinfo ) && isset( $rinfo[1] ) ? $rinfo[1] : null;
+                    // check if info is string or array
+                    $rulemessage = is_array( $rinfo ) ? $rinfo[0] : $rinfo;
+                    $ruleoptions = is_array( $rinfo ) && isset( $rinfo[1] ) ? $rinfo[1] : null;
 
-                // if element is not required and value is empty do not validate
-                if( empty( $value ) && !isset( $el[ 'rules' ][ 'required' ] ) )
-                    continue;
+                    // if element is not required and value is empty do not validate
+                    if( empty( $value ) && !isset( $el[ 'rules' ][ 'required' ] ) )
+                        continue;
 
-                if( ! is_callable( array( 'myrules', $rulename ) ) || ! call_user_func( array( 'myrules', $rulename ), $value, $ruleoptions, $values, $el ) ){
-                    $this->errors[ $n ] = $rulemessage;
-                    break;
+                    if( ! is_callable( array( 'myrules', $rulename ) ) || ! call_user_func( array( 'myrules', $rulename ), $value, $ruleoptions, $values, $el ) ){
+                        $this->errors[ $n ] = $rulemessage;
+                        break;
+                    }
                 }
             }
         }

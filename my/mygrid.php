@@ -87,6 +87,14 @@ class mygrid{
         return $this;
     }
 
+    public function & addDescription( $key, $kval, $label = '', $align = '' ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'description');
+        return $this;
+    }
+
     public function & addH4( $key, $kval, $label, $align = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
@@ -119,7 +127,7 @@ class mygrid{
         return $this;
     }
 
-    public function & addUrl( $key, $kval, $label, $onclick, $bold = false, $align = 'text-left' ){
+    public function & addUrl( $key, $kval, $label, $onclick = false, $bold = false, $align = 'text-left' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }

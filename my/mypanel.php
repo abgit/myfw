@@ -10,6 +10,8 @@ class mypanel{
     private $values   = array();
     private $elements = array();
     private $more     = false;
+    private $perpage  = 10;
+    private $offset   = 0;
 
     public function __construct( $name = 'p' ){
         $this->name = $name;
@@ -61,6 +63,11 @@ class mypanel{
 
     public function & addDescription( $key ){
         $this->elements[ 'description' ] = array( 'key' => $key );
+        return $this;
+    }
+
+    public function & addBackground( $key, $keyhttps ){
+        $this->elements[ 'back' ] = array( 'key' => $this->app->ishttps() ? $keyhttps : $key );
         return $this;
     }
 
@@ -175,29 +182,43 @@ class mypanel{
     public function & setMore( $onclick, $perpage = 10, $offset = 0, $label = 'more' ){
         
         // reset counter
-        $this->app->session()->set( 'p' . $this->name . 'perpage', $perpage );
-        $this->app->session()->set( 'p' . $this->name . 'offset',  $offset );
+//        $this->app->session()->set( 'p' . $this->name . 'perpage', $perpage );
+//        $this->app->session()->set( 'p' . $this->name . 'offset',  $offset );
         
-        $this->more = array( 'onclick' => $onclick, 'label' => $label );
+        $this->perpage = $perpage;
+        
+        $this->more = array( 'to' => $onclick, 'label' => $label /*, 'offset' => $this->offset*/ );
+
+        if( isset( $_POST[ 'os' ] ) ){
+            $this->offset = intval( $_POST[ 'os' ] );
+            $this->app->ajax()->val( '#' . $this->name . 'moreos', $this->offset + $this->perpage );
+        }else{
+            $this->offset  = $offset;        
+        }
 
         return $this;
     }
 
-    public function getPerPage(){
-        return intval( $this->app->session()->get( 'p' . $this->name . 'perpage', 10 ) );
-    }
 
-    public function getOffset( $increase = false ){
+//    public function getPerPage(){
+//        return intval( $this->perpage /*$this->app->session()->get( 'p' . $this->name . 'perpage', 10 )*/ );
+//    }
 
-        $newoffset = intval( $this->app->session()->get( 'p' . $this->name . 'offset', 0 ) ) + $this->getPerPage();
+    public function getOffset( /*$increase = false*/ ){
 
-        $this->app->session()->set( 'p' . $this->name . 'offset', $newoffset );
+//        $newoffset = intval( $this->app->session()->get( 'p' . $this->name . 'offset', 0 ) ) + $this->getPerPage();
 
-        return $newoffset;
+//        $this->app->session()->set( 'p' . $this->name . 'offset', $newoffset );
+
+//        if( $increase )
+//            $this->offset += $this->perpage;
+
+        return $this->offset;
     }
     
     public function & resetOffset(){
-        $this->app->session()->set( 'p' . $this->name . 'offset', 0 );
+        $this->offset = 0;
+//        $this->app->session()->set( 'p' . $this->name . 'offset', 0 );
         return $this;
     }
 
@@ -212,7 +233,7 @@ class mypanel{
             $append ? $this->app->ajax()->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax()->prepend( '#' . $this->name, $this->render( $values ) );
         }
 
-        if( $this->getPerPage() > $counter )
+        if( $this->perpage > $counter )
             $this->app->ajax()->hide( '#' . $this->name . 'more' );
 
         return $this;
@@ -225,7 +246,7 @@ class mypanel{
 
         $counter = count( $values );
 
-        if( $this->getPerPage() > $counter )
+        if( $this->perpage > $counter )
             $this->app->ajax()->hide( '#' . $this->name . 'more' );
         else
             $this->app->ajax()->show( '#' . $this->name . 'more' );
@@ -254,7 +275,8 @@ class mypanel{
                                                          'keyhtml'  => $this->keyhtml,
                                                          'emptymsg' => $this->emptymsg,
                                                          'more'     => $this->more,
-                                                         'perpage'  => $this->getPerPage(),
+                                                         'offset'   => $this->offset + $this->perpage,
+                                                         'perpage'  => $this->perpage,
                                                          'allitems' => is_null( $values )
                                                          ), null, null, null, false, false );
     }

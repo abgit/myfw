@@ -1,7 +1,7 @@
 
 {% if allitems %}
     {% if elements.tmenu %}
-        <div class="row" style="margin-bottom:10px;">
+        <div class="row" style="margin-bottom:20px;">
         <div class="col-md-12 text-right">
                                                 {% for menu in elements.tmenu %}
 
@@ -42,7 +42,7 @@
 
         {% for value in values %}
 						  <div class="col-md-6" id="{{ name }}{{ value[ key ] }}">
-                                <div class="block task task-low" style="margin-bottom:10px">
+                                <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ value[ elements.back.key ] }}){% endif %}">
 									<div class="row with-padding" style="min-height:135px">
 
                                         {% if value[ elements.thumb.key ] %}
@@ -210,6 +210,7 @@
 {% if allitems %}
     </div>
                                 {% if more and values|length == perpage %}
-                                    <button id="{{ name }}more" style="margin:0px 0px 0px 3px; float:right" onclick="{{ more.onclick }}" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
+                                    <input type="hidden" value="{{ offset }}" id="{{ name }}moreos">
+                                    <button id="{{ name }}more" style="margin:0px 0px 0px 3px; float:right" onclick="myfwsubmit('{{ more.to }}','Loading',{os:$('#{{ name }}moreos').val()})" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
                                 {% endif %}
 {% endif %}

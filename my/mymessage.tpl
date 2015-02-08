@@ -12,7 +12,7 @@
 {% if elements %}           
 
     {% if video %}
-        <div class="row" style="padding-bottom:22px;">
+        <div class="row" style="padding-bottom:30px;">
             <div class="col-md-8">
     {% endif %}
 
@@ -54,11 +54,11 @@
     {% if video %}
     </div>
         {% if video.iframe %}
-        <div class="col-md-4 text-center" style="padding-top:22px;">
+        <div class="col-md-4 text-center" style="padding-top:30px;">
              <iframe src="{{video.src}}" allowtransparency="true" frameborder="0" scrolling="no" class="{{video.class}}" name="{{video.name}}" allowfullscreen mozallowfullscreen webkitallowfullscreen oallowfullscreen msallowfullscreen  style="min-height:226px;min-width:100%;width:100px;" scrolling=no></iframe>
         </div>
         {% else %}
-        <div class="col-md-4 text-center" style="padding-top:22px;">
+        <div class="col-md-4 text-center" style="padding-top:30px;">
             <a href="{{ video.src }}" class="wistia-popover[height=360,playerColor=3b5998,width=640]"><img src="{{ video.thumb }}" alt="" width="100%" style="max-width:400px" /></a>
             <script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/popover-v1.js"></script>
         </div>

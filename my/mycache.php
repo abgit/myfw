@@ -2,29 +2,38 @@
 
     class mycache{
 
-        private $redisrw = null;
-        private $redisro = null;
+        private $redisrw   = null;
+        private $redisro   = null;
+        private $memcached = null;
 
         public function __construct(){
             $this->app = \Slim\Slim::getInstance();
 
             if( $this->app->config( 'redis.driver' ) === 'heroku' ){
-                $this->redisro     = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_HOST );
-                $this->redisroport = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_PORT );
-                $this->redisropass = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_PASS );
-                $this->redisrw     = $this->redisro;
-                $this->redisrwport = $this->redisroport;
-                $this->redisrwpass = $this->redisropass;
-                $this->redisttl    = 900;
+                $this->redisro      = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_HOST );
+                $this->redisroport  = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_PORT );
+                $this->redisropass  = parse_url( getenv( 'REDISCLOUD_URL' ), PHP_URL_PASS );
+                $this->redisrw      = $this->redisro;
+                $this->redisrwport  = $this->redisroport;
+                $this->redisrwpass  = $this->redisropass;
+                $this->memcachedusr = getenv( 'MEMCACHIER_USERNAME' );
+                $this->memcachedpwd = getenv( 'MEMCACHIER_PASSWORD' );
+                $this->memcachedsrv = getenv( 'MEMCACHIER_SERVERS' );
             }else{
-                $this->redisro     = $this->app->config( 'redis.hostro' );
-                $this->redisroport = $this->app->config( 'redis.hostroport' );
-                $this->redisropass = $this->app->config( 'redis.hostropass' );
-                $this->redisrw     = $this->app->config( 'redis.hostrw' );
-                $this->redisrwport = $this->app->config( 'redis.hostrwport' );
-                $this->redisrwpass = $this->app->config( 'redis.hostrwpass' );
-                $this->redisttl    = $this->app->config( 'redis.ttl' );
+                $this->redisro      = $this->app->config( 'redis.hostro' );
+                $this->redisroport  = $this->app->config( 'redis.hostroport' );
+                $this->redisropass  = $this->app->config( 'redis.hostropass' );
+                $this->redisrw      = $this->app->config( 'redis.hostrw' );
+                $this->redisrwport  = $this->app->config( 'redis.hostrwport' );
+                $this->redisrwpass  = $this->app->config( 'redis.hostrwpass' );
+                $this->memcachedusr = $this->app->config( 'memcached.username' );
+                $this->memcachedpwd = $this->app->config( 'memcached.password' );
+                $this->memcachedsrv = $this->app->config( 'memcached.servers' );
             }
+            
+            $this->apcttl       = $this->app->config( 'apc.ttl' )       === false ? 900 : $this->app->config( 'apc.ttl' );
+            $this->redisttl     = $this->app->config( 'redis.ttl' )     === false ? 900 : $this->app->config( 'redis.ttl' );
+            $this->memcachedttl = $this->app->config( 'memcached.ttl' ) === false ? 900 : $this->app->config( 'memcached.ttl' );
         }
 
         // standard
@@ -56,7 +65,11 @@
         }
 
         public function apcset( $id, $content, $ttl = false ){
-            return function_exists( 'apc_store' ) ? apc_store( $id, $content, intval( intval( $ttl ) > 0 ? $ttl : $this->app->config( 'apc.ttl' ) ) ) : false;
+            if( ! $ttl ){
+                $ttl = $this->apcttl;
+            }
+
+            return function_exists( 'apc_store' ) ? apc_store( $id, $content, intval( $ttl ) ) : false;
         }
 
         public function apcget( $id ){
@@ -73,13 +86,68 @@
         }
 
 
+        // memcached
+        public function memcachedexists( $id ){
+            return $this->memcachedinit() ? ( $this->memcached->get( $id ) === false ) : false;
+        }
+
+        public function memcachedset( $id, $content, $ttl = false ){
+            if( ! $ttl ){
+                $ttl = $this->memcachedttl;
+            }
+            
+            return $this->memcachedinit() ? $this->memcached->set( $id, $content, intval( $ttl ) ) : false;
+        }
+
+        public function memcachedget( $id ){
+            return $this->memcachedinit() ? $this->memcached->get( $id ) : false;
+        }
+
+        public function memcacheddelete( $k ){
+            return $this->memcachedinit() ? $this->memcached->delete( $k ) : false;
+        }
+
+        public function memcachedinit(){
+            if( !class_exists( 'Memcached' ) )
+                return false;
+
+            if( is_null( $this->memcached ) ){
+
+                $this->memcached = new Memcached( 'memcached_pool' );
+                $this->memcached->setOption( Memcached::OPT_BINARY_PROTOCOL, TRUE );
+                $this->memcached->setOption( Memcached::OPT_NO_BLOCK, TRUE );
+                $this->memcached->setOption( Memcached::OPT_AUTO_EJECT_HOSTS, TRUE );
+                $this->memcached->setOption( Memcached::OPT_CONNECT_TIMEOUT, 2000 );
+                $this->memcached->setOption( Memcached::OPT_POLL_TIMEOUT, 2000 );
+                $this->memcached->setOption( Memcached::OPT_RETRY_TIMEOUT, 2 );
+
+                $this->memcached->setSaslAuthData( $this->memcachedusr, $this->memcachedpwd );
+
+                if( !$this->memcached->getServerList() ){
+
+                    $servers = explode( ',', $this->memcachedsrv );
+                    foreach( $servers as $s ){
+                        $parts = explode( ':', $s );
+                        $this->memcached->addServer( $parts[0], $parts[1] );
+                    }
+                }
+                return true;
+            }
+            return true;
+        }
+
+
         // redis
         public function redisexists( $id ){
             return $this->redisroinit() ? $this->redisro->exists( $id ) : false;
         }
 
         public function redisset( $id, $content, $ttl = false ){
-            return $this->redisrwinit() ? ($this->redisrw->set( $id, $content, intval( intval( $ttl ) > 0 ? $ttl : $this->redisttl ) ) ) : false;
+            if( ! $ttl ){
+                $ttl = $this->redisttl;
+            }
+
+            return $this->redisrwinit() ? $this->redisrw->set( $id, $content, intval( $ttl ) ) : false;
         }
 
         public function redisget( $id ){

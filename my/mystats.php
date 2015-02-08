@@ -29,7 +29,7 @@ class mystats{
         return $this;
     }
 
-    public function & addElement( $key, $label, $icon = 'icon-cog4', $type = 'info', $onclick = '', $href = '', $percentage = 100, $class = '' ){
+    public function & addElement( $key, $label, $icon = false, $type = 'info', $onclick = '', $href = '', $percentage = 100, $class = '' ){
         $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class );
         return $this;
     }

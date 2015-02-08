@@ -49,7 +49,7 @@
 			</ul>
             
             {% if text %}
-            <div id="navbar-text" class="nav navbar-nav navbar-right collapse">
+            <div id="navbar-text" class="nav navbar-nav navbar-right collapse in hidden-sm hidden-xs">
 			  <p class="navbar-text">
                 <i class="{{ text.icon }}"></i> {{ text.message|t(60) }}
               </p>

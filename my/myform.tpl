@@ -76,7 +76,7 @@
 
                         {% if el.addonpre or el.addonpos %}<div class="input-group">{% endif %}
                         {% if el.addonpre %}<span class="input-group-addon">{{ el.addonpre }}</span> {% endif %}
-                        <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                        <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.placeholder ? 'placeholder=' ~ el.placeholder }} name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}">
                         {% if el.addonpos %}<span class="input-group-addon">{{ el.addonpos }}</span>{% endif %}
                         {% if el.addonpre or el.addonpos %}</div>{% endif %}
                         {% if el.addonend %}<span class="label label-block label-primary text-center">{{ el.addonend }}</span>{% endif %}
@@ -87,16 +87,23 @@
 
         	{% elseif el.type == 'bitcoin' %}
 
-                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                    {% if el.label or el.rules.required %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
                     {% if el.prevent %}
                         <p class="form-control-static">{{ el.value|default( preventmsg ) }}</p>
                     {% else %}
 
                         <div class="input-group">
                             <span class="input-group-addon">BTC</span>
-                            <input class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}">
                         </div>
-                        <span class="label label-block label-primary text-center">{{ el.value|bitcoinfrombtc( el.currencies ) }}</span>
+                        <span class="label label-block label-primary text-center">
+                            {% for cur in el.value|bitcoinfrombtc( el.currencies ) %}
+                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.last }}">{{ cur.symbol }} {{ cur.last * el.value }}</span>
+                                {% if not loop.last %}
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                {% endif %}
+                            {% endfor %}
+                        </span>
 
                         {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
                     {% endif %}
@@ -211,7 +218,7 @@
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
                     <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}" style="margin-top:{% if not loop.first %}45px{% else %}10px{% endif %};">
-                        <i class="{{el.icon}}"></i>{{el.title}}{% if el.description %}<small class="display-block" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
+                        {% if el.icon %}<i class="{{el.icon}}"></i>{% endif %}{{el.title}}{% if el.description %}<small class="display-block" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>
 
@@ -239,7 +246,7 @@
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
                 <div>
-                <input type="button" class="btn btn-default" {% if el.onclick %}onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
+                <input type="button" class="btn btn-default" {% if el.onclick %}onClick="{{el.onclick|raw}}"{% endif %} {% if el.href %}href="{{el.href|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
                 </div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 

@@ -78,20 +78,32 @@
                                                             {% endif %}
 
                                                         {% elseif td.type == 'url' %}
-            				                            	<a{%if td.href %} href="{{ td.href|replaceurl( val, tags ) }}"{% endif %}{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}display:inline-block;margin-bottom:3px;margin-top:3px;">{{ value|t(60) }}</a>
+            				                            	<a {%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}display:inline-block;margin-bottom:3px;margin-top:3px;">{{ value|t(60) }}</a>
 
                                                         {% elseif td.type == 'ago' %}
                                                             <i class="icon-clock"></i> {{ value|ago }}
-            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value }}</span>
+            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|t(19,'') }}</span>
+
+                                                        {% elseif td.type == 'description' %}
+            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|nl2space|t(36) }}</span>
 
                                                         {% elseif td.type == 'fixed' %}
                                                             {% set fixedfilldefault = true %}
-                                                            {% for option in td.options if option.value == value %}
-                                                                <span class="label label-{{ option.type }}">{{ option.label }}</span>
+                                                            
+                                                            {% for option in td.options if ( option.value is defined and option.value == value ) %}
+                                                                <span class="label label-{{ option.type }}">{{ option.label ? option.label : value }}</span>
                                                                 {% set fixedfilldefault = false %}
                                                             {% endfor %}
-                                                            {% if fixedfilldefault and td.default.label %}
-                                                                <span class="label label-{{ td.default.type }}">{{ td.default.label }}</span>
+
+                                                            {% set break = 0 %}
+                                                            {% for option in td.options if ( break == 0 and option.range is defined and option.range >= value ) %}
+                                                                <span class="label label-{{ option.type }}">{{ option.label ? option.label : value }}</span>
+                                                                {% set fixedfilldefault = false %}
+                                                                {% set break = 1 %}
+                                                            {% endfor %}
+
+                                                            {% if fixedfilldefault and td.default.type %}
+                                                                <span class="label label-{{ td.default.type }}">{{ td.default.label ? td.default.label : value }}</span>
                                                             {% endif %}
 
                                                         {% elseif td.type == 'menu' %}

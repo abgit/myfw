@@ -27,7 +27,7 @@
     // my framework
     class myfw extends \Slim\Slim{
 
-        public  $client      = null;
+        public  $client      = false;
 
         private $forms       = array();
         private $modals      = array();
@@ -257,7 +257,7 @@
             $func = $this->objusercall;
             $func = call_user_func( $func );
 
-            if( is_string( $func ) && strlen( $func ) ){
+            if( is_string( $func ) || !$func ){
                 $this->objuserredir = $func;
                 return false;
             }
@@ -270,13 +270,6 @@
             return $this->objuserredir;
         }
 
-/*
-		public function client(){
-			if( is_null( $this->client ) && ( $client = $this->config( 'client.global' ) ) )
-				$this->client = new $client();
-			return $this->client;
-		}
-*/
 		public function i18n(){
 			if( is_null( $this->i18n ) )
 				$this->i18n = new myi18n();
@@ -517,8 +510,14 @@
 
         if( !$app->isLogged(true) && $app->config( 'islogged.enable' ) !== 0 ){
             $url = $app->getuserredir();
-            if( is_string( $url ) && strlen( $url ) ){
-                $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render() : $app->redirect( $url );
+            if( is_string( $url ) ){
+                if( !$app->request->isAjax() ){
+                    $app->redirect( $url );
+                }elseif( strlen( $url ) ){
+                    $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render();
+                }else{
+                    $app->ajax()->login()->render();
+                }
             }
             $app->stop();
         }
@@ -557,6 +556,6 @@
     // check developmentmode
     function isdevelopment(){
         $app = \Slim\Slim::getInstance();
-        if( $app->config( 'mode' ) !== 'development' )
+        if( strpos( $app->config( 'mode' ),  'dev' ) === false )
             $app->pass();
     }

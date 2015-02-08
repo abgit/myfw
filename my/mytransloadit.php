@@ -59,7 +59,7 @@ class mytransloadit{
         }
 
         $tl = new TransloaditRequest( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
-        $tl->url = $this->apiurl . '/assemblies/' . $id;
+        $tl->url = 'http://api2.transloadit.com/assemblies/' . $id;
         $res = $tl->execute();
 
         if( $res->error() ){

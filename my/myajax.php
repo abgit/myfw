@@ -178,6 +178,11 @@ class myajax{
         return $this;
     }
 
+    public function & login(){
+        $this->out[ 'lo' ] = array();
+        return $this;
+    }
+
     public function render(){
         print json_encode( $this->out );
     }
