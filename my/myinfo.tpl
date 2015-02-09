@@ -1,7 +1,7 @@
 
 <div class="row">
 <div class="col-lg-12">
-<div class="block">
+<div class="">
 
 {% for el in elements %}
 
@@ -34,25 +34,25 @@
             <div class="col-sm-12">
                 <div class="well">
                     <dl>
-                        {% for opt in el.options %}
+                        {% set isempty = true %}
+                        {% for opt in el.options if values[ opt.key ] is not empty %}
                             <dt class="{{ opt.class|default('text-info') }}">{{ opt.label }}</dt>
-
                             <dd>
                             {% if opt.replace %}
-                                {% for optvals in values[ opt.key ]|split(';') %}
-
-                                    {% if optvals %}
+                                {% for optvals in values[ opt.key ]|split(';') if optvals is not empty %}
                                         {% if not loop.first %}, {% endif %}
                                         {{ optvals|replace( opt.replace ) }}
-                                    {% endif %}
-
                                 {% endfor %}
                             {% else %}
                                 {{ values[ opt.key ] }}
                             {% endif %}
                             </dd>
-
+                            {% set isempty = false %}
                         {% endfor %}
+
+                        {% if isempty %}
+                            {{ emptymsg }}
+                        {% endif %}
                         </dl>
                 </div>
             </div>

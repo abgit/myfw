@@ -124,6 +124,11 @@ class myajax{
         return $this;    
     }
 
+    public function & removeClass( $el, $class ){
+        $this->out[ 'rc' ][] = array( 'e' => $el, 'c' => $class );
+        return $this;    
+    }
+
     public function & remove( $el ){
         $this->out[ 'rm' ][] = array( 'e' => $el );
         return $this;

@@ -17,6 +17,7 @@ class mynotify{
     private $itemlabel;
     private $counter = null;
     private $emptymsg = 'No elements to display';
+    private $unreadkey = false;
 
     public function __construct( $name = 'n' ){
         $this->name = $name;
@@ -36,6 +37,11 @@ class mynotify{
 
     public function & setEmptyMessage( $emptymsg ){
         $this->emptymsg = $emptymsg;
+        return $this;
+    }
+
+    public function & setUnreadKey( $key ){
+        $this->unreadkey = $key;
         return $this;
     }
 
@@ -113,6 +119,10 @@ class mynotify{
     public function & ajaxUpdateCounter( $c ){
         $c = intval( $c );
         $this->app->ajax()->text( '#' . $this->name . 'counter', $c ? $c : '' );
+
+        if( !$c )
+            $this->app->ajax()->removeClass( '.' . $this->name . 'msg', 'unread' );
+
         return $this;
     }
 
@@ -121,22 +131,23 @@ class mynotify{
     }
 
     private function render( $values = null ){
-        return $this->app->render( '@my/mynotify', array( 'values'   => is_null( $values ) ? $this->values : $values,
-                                                          'name'     => $this->name,
-                                                          'key'      => $this->key,
-                                                          'keyhtml'  => $this->keyhtml,
-                                                          'title'       => $this->title,
-                                                          'icon'        => $this->icon,
-                                                          'buttonright' => $this->buttonright,
-                                                          'buttonleft'  => $this->buttonleft,
-                                                          'itemtitle'    => $this->itemtitle,
-                                                          'itemlabel'    => $this->itemlabel,
-                                                          'itemthumb'    => $this->itemthumb,
+        return $this->app->render( '@my/mynotify', array( 'values'          => is_null( $values ) ? $this->values : $values,
+                                                          'name'            => $this->name,
+                                                          'key'             => $this->key,
+                                                          'keyhtml'         => $this->keyhtml,
+                                                          'title'           => $this->title,
+                                                          'icon'            => $this->icon,
+                                                          'buttonright'     => $this->buttonright,
+                                                          'buttonleft'      => $this->buttonleft,
+                                                          'itemtitle'       => $this->itemtitle,
+                                                          'itemlabel'       => $this->itemlabel,
+                                                          'itemthumb'       => $this->itemthumb,
                                                           'itemdescription' => $this->itemdescription,
                                                           'itemaction'      => $this->itemaction,
                                                           'itemmore'        => $this->itemmore,
                                                           'counter'         => $this->counter,
-                                                          'emptymsg'        => $this->emptymsg
+                                                          'emptymsg'        => $this->emptymsg,
+                                                          'unreadkey'       => $this->unreadkey
                                                          ), null, null, null, false, false );
 
     }

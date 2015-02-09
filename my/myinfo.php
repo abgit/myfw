@@ -6,6 +6,7 @@ class myinfo{
     private $values = array();
     private $elements = array();
     private $counter  = 0;
+    private $emptymsg = 'No information to display';
 
     public function __construct( $name ){
         $this->name = $name;
@@ -19,6 +20,11 @@ class myinfo{
 
     public function & addH5( $key ){
         $this->elements[ $key ] = array( 'key' => $key, 'type' => 'h5' );
+        return $this;
+    }
+
+    public function & setEmptyMessage( $emptymsg ){
+        $this->emptymsg = $emptymsg;
         return $this;
     }
 
@@ -57,7 +63,8 @@ class myinfo{
         return $this->app->render( '@my/myinfo', array( 'values'   => is_null( $values ) ? $this->values : $values,
                                                         'name'     => $this->name,
                                                         'elements' => $this->elements,
-                                                        'values'   => $this->values
+                                                        'values'   => $this->values,
+                                                        'emptymsg' => $this->emptymsg
                                                          ), null, null, null, false, false );
     }
     

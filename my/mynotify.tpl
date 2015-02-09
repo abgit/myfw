@@ -29,7 +29,7 @@
 
             {% if values %}
                 {% for val in values %}
-                <li class="{{name}}msg">
+                <li class="{{name}}msg {{ ( unreadkey and val[ unreadkey ] ) ? 'unread' }}">
                 <a {%if itemaction.href %} href="{{ itemaction.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{%if itemaction.onclick %} onclick="{{ itemaction.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}>
                     
                     {% if itemthumb.key and val[ itemthumb.key ] %}
