@@ -599,12 +599,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/vlucas/phpdotenv.git",
-            "reference": "c5232d963bca31ab886fb40ab706d89f42769fcc"
+            "reference": "ae388efe53a2c352ddd270f4d316bad58952b8e3"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/c5232d963bca31ab886fb40ab706d89f42769fcc",
-            "reference": "c5232d963bca31ab886fb40ab706d89f42769fcc",
+            "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/ae388efe53a2c352ddd270f4d316bad58952b8e3",
+            "reference": "ae388efe53a2c352ddd270f4d316bad58952b8e3",
             "shasum": ""
         },
         "require": {
@@ -613,7 +613,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.0"
         },
-        "time": "2015-01-30 14:58:26",
+        "time": "2015-02-19 20:37:05",
         "type": "library",
         "extra": {
             "branch-alias": {
