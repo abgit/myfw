@@ -41,32 +41,32 @@
 {% endif %}
 
         {% for value in values %}
-						  <div class="col-md-6" id="{{ name }}{{ value[ key ] }}">
+						  <div class="col-md-{{ size }}{%if sizeoffset %} col-md-offset-{{sizeoffset}}{% endif %}" id="{{ name }}{{ value[ key ] }}">
                                 <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ value[ elements.back.key ] }}){% endif %}">
 									<div class="row with-padding" style="min-height:135px">
 
-                                        {% if value[ elements.thumb.key ] %}
+                                        {% if elements.thumb.static or value[ elements.thumb.key ] %}
 
-    										<div class="col-sm-3 " style="text-align: center;">
-                                                <img style="width:100%;max-width:120px;margin-top:10px" src="{{ value[ elements.thumb.key ] }}">
+    										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
+                                                <img style="margin-top:10px" src="{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
                                             </div>
 
-                                            {% set class2 = elements.info ? 'col-sm-6' : 'col-sm-9' %}
+                                            {% set class2 = elements.info ? 'col-sm-' ~ ( 12 - 3 - elements.thumb.size ) : 'col-sm-' ~ ( 12 - elements.thumb.size ) %}
                                         {% else %}
                                             {% set class2 = elements.info ? 'col-sm-9' : 'col-sm-12' %}
                                         {% endif %}
 
     										<div class="{{ class2 }} task-description">
     										        {% if elements.title %}
-                                            		    <span class="task-d">{{ value[ elements.title.key ]|t(40) }}</span>
+                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(40) }}{% endif %}</span>
     										        {% endif %}
 
     										        {% if elements.reference %}
                                                         <span class="text-success" style="font-size:10px">{{ value[ elements.reference.key ]|t(40) }}</span>
     										        {% endif %}
 
-    										        {% if elements.description %}                                            		
-    												    <span>{{ value[ elements.description.key ]|t(150)}}</span>
+    										        {% if elements.description %}
+    												    <span>{% if elements.description.static %}{{ elements.description.key|raw }}{% else %}{{ value[ elements.description.key ]|t(150) }}{% endif %}</span>
     										        {% endif %}
     										</div>
                                             

@@ -17,7 +17,11 @@
 
 namespace OpenCloud\Tests\ObjectStore\Resource;
 
+use Guzzle\Http\Message\Response;
+use OpenCloud\Common\Constants\Header;
 use OpenCloud\ObjectStore\Constants\UrlType;
+use OpenCloud\ObjectStore\Exception\ObjectNotEmptyException;
+use OpenCloud\Tests\MockSubscriber;
 use OpenCloud\Tests\ObjectStore\ObjectStoreTestCase;
 
 class DataObjectTest extends ObjectStoreTestCase
@@ -68,7 +72,7 @@ class DataObjectTest extends ObjectStoreTestCase
     }
 
     /**
-     * @expectedException OpenCloud\Common\Exceptions\NoNameError
+     * @expectedException \OpenCloud\Common\Exceptions\NoNameError
      */
     public function test_Copy_Fails()
     {
@@ -76,16 +80,43 @@ class DataObjectTest extends ObjectStoreTestCase
     }
 
     /**
-     * @expectedException OpenCloud\Common\Exceptions\InvalidArgumentError
+     * @expectedException \OpenCloud\Common\Exceptions\InvalidArgumentError
      */
     public function test_Temp_Url_Fails_With_Incorrect_Method()
     {
         $this->container->dataObject('foobar')->getTemporaryUrl(1000, 'DELETE');
     }
 
+    public function test_Temp_Url_Inherits_Url_Type()
+    {
+        $service = $this->getClient()->objectStoreService(null, 'IAD', 'internalURL');
+        $object = $service->getContainer('foo')->dataObject('bar');
+
+        $this->addMockSubscriber(new Response(204, ['X-Account-Meta-Temp-URL-Key' => 'secret']));
+
+        $tempUrl = $object->getTemporaryUrl(60, 'GET');
+
+        // Check that internal URLs are used
+        $this->assertContains('snet-storage', $tempUrl);
+    }
+
+    public function test_temp_urls_can_be_forced_to_use_public_urls()
+    {
+        $service = $this->getClient()->objectStoreService(null, 'IAD', 'internalURL');
+        $object = $service->getContainer('foo')->dataObject('bar');
+
+        $this->addMockSubscriber(new Response(204, ['X-Account-Meta-Temp-URL-Key' => 'secret']));
+
+        $tempUrl = $object->getTemporaryUrl(60, 'GET', true);
+
+        // Check that internal URLs are NOT used
+        $this->assertNotContains('snet-storage', $tempUrl);
+    }
+
     public function test_Purge()
     {
         $object = $this->container->dataObject('foobar');
+        $this->setupCdnContainerMockResponse();
         $this->assertInstanceOf(
             'Guzzle\Http\Message\Response',
             $object->purge('test@example.com')
@@ -96,9 +127,88 @@ class DataObjectTest extends ObjectStoreTestCase
     {
         $object = $this->container->dataObject('foobar');
 
+        $this->setupCdnContainerMockResponse();
         $this->assertNotNull($object->getPublicUrl());
         $this->assertNotNull($object->getPublicUrl(UrlType::SSL));
         $this->assertNotNull($object->getPublicUrl(UrlType::STREAMING));
         $this->assertNotNull($object->getPublicUrl(UrlType::IOS_STREAMING));
+    }
+
+    public function test_Symlink_To()
+    {
+        $targetName = 'new_container/new_object';
+        $this->addMockSubscriber(new Response(200, array(Header::X_OBJECT_MANIFEST => $targetName)));
+        $object = $this->container->dataObject('foobar');
+        $this->assertInstanceOf('Guzzle\Http\Message\Response', $object->createSymlinkTo($targetName));
+        $this->assertEquals($targetName, $object->getManifest());
+    }
+
+    /**
+     * @expectedException OpenCloud\Common\Exceptions\NoNameError
+     */
+    public function test_Symlink_To_Fails_With_NoName()
+    {
+        $object = $this->container->dataObject()->createSymlinkTo(null);
+    }
+
+    /**
+     * @expectedException OpenCloud\ObjectStore\Exception\ObjectNotEmptyException
+     */
+    public function test_Symlink_To_Fails_With_NotEmpty()
+    {
+        $this->addMockSubscriber(new Response(200, array(Header::CONTENT_LENGTH => 100)));
+        $object = $this->container->dataObject('foobar')->createSymlinkTo('new_container/new_object');
+    }
+
+    public function test_Symlink_From()
+    {
+        $symlinkName = 'new_container/new_object';
+
+        // We have to fill the mock response queue to properly get the correct X-Object-Manifest header
+        // Container\dataObject( )
+        //  - Container\refresh( )
+        $this->addMockSubscriber(new Response(200));
+        // DataObject\createSymlinkFrom( )
+        //  - Container\createRefreshRequest( )
+        $this->addMockSubscriber(new Response(200));
+        //  - CDNContainer\createRefreshRequest( )
+        $this->addMockSubscriber(new Response(200));
+        //  - Container\objectExists( )
+        $this->addMockSubscriber(new Response(200));
+        //  - Container\getPartialObject( )
+        $this->addMockSubscriber(new Response(200));
+        //  - Container\uploadObject( )
+        $this->addMockSubscriber(new Response(200, array(Header::X_OBJECT_MANIFEST => $symlinkName)));
+
+        $object = $this->container->dataObject('foobar')->createSymlinkFrom($symlinkName);
+        $this->assertInstanceOf('OpenCloud\ObjectStore\Resource\DataObject', $object);
+    }
+
+    /**
+     * @expectedException OpenCloud\Common\Exceptions\NoNameError
+     */
+    public function test_Symlink_From_Fails_With_NoName()
+    {
+        $object = $this->container->dataObject()->createSymlinkFrom(null);
+    }
+
+    /**
+     * @expectedException OpenCloud\ObjectStore\Exception\ObjectNotEmptyException
+     */
+    public function test_Symlink_From_Fails_With_NotEmpty()
+    {
+        // We have to fill the mock response queue to properly get the correct Content-Length header
+        // Container\dataObject( )
+        //  - Container\refresh( )
+        $this->addMockSubscriber(new Response(200));
+        // DataObject\createSymlinkFrom( )
+        //  - Container\createRefreshRequest( )
+        $this->addMockSubscriber(new Response(200));
+        //  - Container\objectExists( )
+        $this->addMockSubscriber(new Response(200));
+        //  - Container\getPartialObject( )
+        $this->addMockSubscriber(new Response(200, array(Header::CONTENT_LENGTH => 100)));
+
+        $object = $this->container->dataObject('foobar')->createSymlinkFrom('new_container/new_object');
     }
 }

@@ -37,8 +37,8 @@
 				<div class="modal-dialog{{ modal.class ? ' ' ~ modal.class }}"{% if modal.width %} style="max-width:{{modal.width}}px"{% endif %}>
 					<div class="modal-content">
 						<div class="modal-header" style="background-color:#3B5998">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title"><i class="{{ modal.icon }}"></i> {{ modal.title }}</h4>
+							{% if modal.closebutton %}<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>{% endif %}
+							<h4 class="modal-title">{% if modal.icon %}<i class="{{ modal.icon }}"></i> {% endif %}{{ modal.title }}</h4>
 						</div>
     					<div class="modal-body with-padding" style="padding:20px 21px 0px 21px">
 	{% endif %}
@@ -304,6 +304,9 @@
 			{% elseif el.type == 'separatorline' %}
 				<div class="line_2" style="margin:10px 0px 15px"></div>
 
+			{% elseif el.type == 'separatorhr' %}
+                <hr>
+
 			{% elseif el.type == 'captcha' %}
                 <label>Security code</label>
                 <script type="text/javascript">document.write('<a href="#" onclick="$(\'#cap{{name ~ el.name}}\').attr(\'src\', \'/captcha/\'+Math.floor(89999999*Math.random()+10000000));return false;"><img id="cap{{name ~ el.name}}" width="200" height="100" src="/captcha/'+Math.floor(89999999*Math.random()+10000000)+'" alt="c" /></a>');</script>
@@ -379,7 +382,7 @@
 
 	{% if ismodal %}
                         </div>
-                        <div class="modal-footer" style="margin-bottom:40px">
+                        <div class="modal-footer">
 								
 	{% endif %}
             
@@ -403,8 +406,8 @@
             <input type="hidden" name="{{csrfname}}" id="{{csrfname}}" value="{{csrf}}"/>
 
 	{% if ismodal %}                                
-                            {% if isajax %}
-                                <button data-dismiss="modal" class="btn btn-default" style="margin-left:5px;margin-top:3px;">Close</button>
+                            {% if closeb %}
+                                <button data-dismiss="modal" class="btn btn-{{closeset.class|default('default')}}" style="margin-left:5px;margin-top:3px;">{{closeset.label|default('Close')}}</button>
                             {% endif %}
 						</div>
                     </div>                            

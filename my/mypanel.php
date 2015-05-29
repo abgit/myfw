@@ -6,12 +6,14 @@ class mypanel{
     private $key;
     private $keyhtml;
     private $title;
-    private $emptymsg = 'No elements to display';
-    private $values   = array();
-    private $elements = array();
-    private $more     = false;
-    private $perpage  = 10;
-    private $offset   = 0;
+    private $emptymsg   = 'No elements to display';
+    private $values     = array();
+    private $elements   = array();
+    private $more       = false;
+    private $perpage    = 10;
+    private $offset     = 0;
+    private $size       = 6;
+    private $sizeoffset = 0;
 
     public function __construct( $name = 'p' ){
         $this->name = $name;
@@ -26,6 +28,12 @@ class mypanel{
     public function & setKey( $key, $keyhtml = 'KEY' ){
         $this->key     = $key;
         $this->keyhtml = $keyhtml;
+        return $this;
+    }
+
+    public function & setSize( $size, $sizeoffset = 0 ){
+        $this->size       = $size;
+        $this->sizeoffset = $sizeoffset;
         return $this;
     }
 
@@ -46,13 +54,13 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps ){
-        $this->elements[ 'thumb' ] = array( 'key' => $this->app->ishttps() ? $keyhttps : $key );
+    public function & addThumb( $key, $keyhttps, $static = false, $size = 3 ){
+        $this->elements[ 'thumb' ] = array( 'key' => $this->app->ishttps() ? $keyhttps : $key, 'static' => $static, 'size' => $size );
         return $this;
     }
 
-    public function & addTitle( $key ){
-        $this->elements[ 'title' ] = array( 'key' => $key );
+    public function & addTitle( $key, $static = false ){
+        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static );
         return $this;
     }
 
@@ -61,8 +69,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addDescription( $key ){
-        $this->elements[ 'description' ] = array( 'key' => $key );
+    public function & addDescription( $key, $static = false ){
+        $this->elements[ 'description' ] = array( 'key' => $key, 'static' => $static );
         return $this;
     }
 
@@ -268,15 +276,17 @@ class mypanel{
     }
 
     private function render( $values = null ){
-        return $this->app->render( '@my/mypanel', array( 'values'   => is_null( $values ) ? $this->values : $values,
-                                                         'elements' => $this->elements,
-                                                         'name'     => $this->name,
-                                                         'key'      => $this->key,
-                                                         'keyhtml'  => $this->keyhtml,
-                                                         'emptymsg' => $this->emptymsg,
-                                                         'more'     => $this->more,
-                                                         'offset'   => $this->offset + $this->perpage,
-                                                         'perpage'  => $this->perpage,
+        return $this->app->render( '@my/mypanel', array( 'values'     => is_null( $values ) ? $this->values : $values,
+                                                         'elements'   => $this->elements,
+                                                         'name'       => $this->name,
+                                                         'key'        => $this->key,
+                                                         'keyhtml'    => $this->keyhtml,
+                                                         'emptymsg'   => $this->emptymsg,
+                                                         'more'       => $this->more,
+                                                         'offset'     => $this->offset + $this->perpage,
+                                                         'perpage'    => $this->perpage,
+                                                         'size'       => $this->size,
+                                                         'sizeoffset' => $this->sizeoffset,
                                                          'allitems' => is_null( $values )
                                                          ), null, null, null, false, false );
     }

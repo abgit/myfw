@@ -27,6 +27,8 @@
 
 namespace OpenCloud\Tests\Database;
 
+use OpenCloud\Database\Service;
+
 class ServiceTest extends DatabaseTestCase
 {
     public function test__construct()

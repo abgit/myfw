@@ -74,8 +74,23 @@ class myajax{
         return $this;
     }
 
+    public function & preloadImages( $images ){
+        $this->out[ 'pl' ] =  array( 'i' => $images );
+        return $this;
+    }
+
     public function & append( $el, $html ){
         $this->out[ 'ap' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        return $this;
+    }
+
+    public function & appendTextArea( $el, $html ){
+        $this->out[ 'ta' ][] = array( 'e' => $el, 'h' => $html );
+        return $this;
+    }
+
+    public function & prependTextArea( $el, $html ){
+        $this->out[ 'tp' ][] = array( 'e' => $el, 'h' => $html );
         return $this;
     }
 
@@ -144,18 +159,18 @@ class myajax{
         return $this;
     }
 
-    public function & show( $el ){
-        $this->out[ 'sh' ][] = array( 'e' => $el );
+    public function & show( $el, $duration = 400 ){
+        $this->out[ 'sh' ][] = array( 'e' => $el, 'd' => $duration );
         return $this;
     }
 
-    public function & fadeOut( $el ){
-        $this->out[ 'fo' ][] = array( 'e' => $el );
+    public function & fadeOut( $el, $duration = 400 ){
+        $this->out[ 'fo' ][] = array( 'e' => $el, 'd' => $duration );
         return $this;
     }
 
-    public function & fadeIn( $el ){
-        $this->out[ 'fi' ][] = array( 'e' => $el );
+    public function & fadeIn( $el, $duration = 400 ){
+        $this->out[ 'fi' ][] = array( 'e' => $el, 'd' => $duration );
         return $this;
     }
 

@@ -21,6 +21,8 @@ class myform{
     private $preventmsg;
     private $isajax = false;
     private $modal = array();
+    private $closebutton = true;
+    private $closebuttonsettings;
 
     private $csrfname;
     private $csrfinit = false;
@@ -86,8 +88,18 @@ class myform{
         return $this->formname;
     }
 
-    public function & setModal( $title, $class = 'modal-lg', $icon = 'icon-paragraph-justify2', $static = true, $width = '' ){
-        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width );
+    public function & setModal( $title, $class = 'modal-lg', $icon = 'icon-paragraph-justify2', $static = true, $width = '', $closebutton = true ){
+        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width, 'closebutton' => $closebutton );
+        return $this;
+    }
+
+    public function & hideCloseButton(){
+        $this->closebutton = false;
+        return $this;
+    }
+
+    public function & setCloseButton( $label, $class = 'default' ){
+        $this->closebuttonsettings = array( 'label' => $label, 'class' => $class );
         return $this;
     }
 
@@ -330,6 +342,11 @@ class myform{
 
     public function & addSeparatorLine(){
         $this->elements[ 'sep' . $this->counter++ ] = array( 'type' => 'separatorline', 'rules' => array(), 'filters' => array() );
+        return $this;
+    }
+
+    public function & addSeparatorHR(){
+        $this->elements[ 'sep' . $this->counter++ ] = array( 'type' => 'separatorhr', 'rules' => array(), 'filters' => array() );
         return $this;
     }
 
@@ -977,6 +994,8 @@ class myform{
                         'csrfname'      => $this->csrfname,
                         'csrf'          => $this->app->session()->get( $this->csrfname, '' ),
                         'isajax'        => $this->isajax,
+                        'closeb'        => $this->isajax && $this->closebutton,
+                        'closeset'      => $this->closebuttonsettings,
                         'ismodal'       => !empty( $this->modal ),
                         'modal'         => $this->modal
                         );

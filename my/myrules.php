@@ -42,6 +42,10 @@ class myrules{
         return myrules::regex( strval( $value ), '/^([a-z0-9]{32})$/' );
     }
 
+    public static function bitcoinaddress( $value, $opts='', $formelement = null ) {
+        return myrules::regex( strval( $value ), '/^([13][a-km-zA-HJ-NP-Z0-9]{26,33})$/' );
+    }
+
     public static function tag( $value, $opts='', $formelement = null ) {
         return myrules::regex( strval( $value ), '/^([0-9a-zA-Z\-]{3,20})$/' );
     }

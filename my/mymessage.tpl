@@ -25,6 +25,11 @@
         </div>
     {% endif %}
 
+
+    {% if offset %}
+        <div class="row"><div class="col-md-{{ 12 - offset - offset }} col-md-offset-{{ offset }}">
+    {% endif %}
+
 <div{% if id %} id="{{ id }}"{% endif %} class="callout {{ classname|default( 'callout-info' ) }} fade in" style="margin-bottom:0px">
 
     {% if closebutton %}
@@ -38,10 +43,13 @@
             <h5 id="{{ id }}t">{{ el.text }}</h5>        
         
         {% elseif el.type == 'message' %}
-            <p id="{{ id }}m">{{ el.text }}</p>
+            <p id="{{ id }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ el.text }}</p>
 
         {% elseif el.type == 'small' %}
-            <br><small style="color:#999">{{ el.text }}</small>
+            <small style="color:#999">{{ el.text }}</small>
+
+        {% elseif el.type == 'nl' %}
+            <br>
 
         {% elseif el.type == 'button' %}
             <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn {{el.class}}" {%if el.onclick %}onclick="{{ el.onclick }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>            
@@ -50,6 +58,11 @@
 
     {% endfor %}
 </div>
+
+    {% if offset %}
+        </div></div>
+    {% endif %}
+
 
     {% if video %}
     </div>

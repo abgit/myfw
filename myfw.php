@@ -1,7 +1,7 @@
 <?php
 
     define( "APP_START",      round( microtime( true ) * 1000 ) );
-    define( "APP_WEBMODE",    !isset( $_SERVER['argc'] ) );
+    define( "APP_WEBMODE",    isset( $_SERVER['HTTP_HOST'] ) );
     define( "APP_CACHEAPC",   0 );
     define( "APP_CACHEREDIS", 1 );
 
@@ -65,6 +65,7 @@
         private $navbar      = null;
         private $uuid        = false;
         private $blockchain  = null;
+        private $blockcypher = null;
         private $auth0       = null;
 
         public function __construct( $arr = array() ){
@@ -177,6 +178,12 @@
 			if( ! isset( $this->blockchain ) )
 				$this->blockchain = new myblockchain();
 			return $this->blockchain;
+		}
+
+		public function blockcypher(){
+			if( ! isset( $this->blockcypher ) )
+				$this->blockcypher = new myblockcypher();
+			return $this->blockcypher;
 		}
 
 		public function info( $id = 'in' ){

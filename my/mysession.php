@@ -16,6 +16,10 @@
             return $this->sessionactive;
         }
 
+        public function getId(){
+            return $this->sessionactive ? session_id() : 0;
+        }
+
         public function exists( $key ){
             if( ! $this->sessionactive )
                 return false;

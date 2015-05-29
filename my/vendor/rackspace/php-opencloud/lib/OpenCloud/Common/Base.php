@@ -32,6 +32,8 @@ use Psr\Log\LoggerInterface;
  */
 abstract class Base
 {
+    const PATCH_CONTENT_TYPE = MimeConst::JSON_PATCH;
+
     /**
      * Holds all the properties added by overloading.
      *
@@ -265,6 +267,14 @@ abstract class Base
     }
 
     /**
+     * @return bool
+     */
+    public function hasLogger()
+    {
+        return (null !== $this->logger);
+    }
+
+    /**
      * @deprecated
      */
     public function url($path = null, array $query = array())
@@ -418,5 +428,10 @@ abstract class Base
     protected static function getJsonHeader()
     {
         return array(HeaderConst::CONTENT_TYPE => MimeConst::JSON);
+    }
+
+    protected static function getPatchHeaders()
+    {
+        return array(HeaderConst::CONTENT_TYPE => static::PATCH_CONTENT_TYPE);
     }
 }

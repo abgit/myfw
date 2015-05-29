@@ -10,6 +10,7 @@ class mymessage{
     private $customheader;
     private $customsubheader;
     private $video;
+    private $offset;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -41,6 +42,11 @@ class mymessage{
         return $this;
     }
 
+    public function & setOffset( $offset ){
+        $this->offset = $offset;
+        return $this;
+    }
+
     public function & setVideo( $src, $name, $class, $width, $height, $iframe = true, $thumb = '' ){
         $this->video = array( 'src' => $src, 'name' => $name, 'class' => $class, 'width' => $width, 'height' => $height, 'iframe' => $iframe, 'thumb' => $thumb );
         return $this;
@@ -56,8 +62,18 @@ class mymessage{
         return $this;
     }
 
-    public function & addMessage( $message ){
-        $this->elements[] = array( 'type' => 'message', 'text' => $message );
+    public function & addMessage( $message, $thumb = false, $thumbhttps = false ){
+        $this->elements[] = array( 'type' => 'message', 'text' => $message, 'thumb' => $this->app->ishttps() ? $thumbhttps : $thumb );
+        return $this;
+    }
+
+    public function & addThumb( $key, $keyhttps ){
+        $this->elements[] = array( 'type' => 'thumb', 'key' => $this->app->ishttps() ? $keyhttps : $key );
+        return $this;
+    }
+
+    public function & addNewLine(){
+        $this->elements[] = array( 'type' => 'nl' );
         return $this;
     }
 
@@ -89,7 +105,8 @@ class mymessage{
                                                            'customsubheader' => $this->customsubheader,
                                                            'video'           => $this->video,
                                                            'elements'        => $this->elements,
-                                                           'closebutton'     => $this->closebutton
+                                                           'closebutton'     => $this->closebutton,
+                                                           'offset'          => $this->offset
                                                          ), null, null, null, false, false );
     }
 

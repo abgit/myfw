@@ -65,6 +65,18 @@
                                                         {% elseif td.type == 'span' %}
             				                            	<span{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %} style="display:block;font-size:11px;margin-top:-2px;">{{ value|nl2space|t(60) }}</span>
 
+                                                        {% elseif td.type == 'progress' %}
+                                                            <div class="progress">
+                                                                {% set prog_val = value|number_format(0) %}
+                                                                
+                                                                {% if prog_val > 20 %}
+                                                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;padding-right:5px;margin-right:4px">{{ prog_val }}%</div>
+                                                                {% else %}
+                                                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;padding-right:5px;margin-right:4px"></div>
+                                                                    <span style="font-size:11px;vertical-align:-2px;">{{ prog_val }}%</span>
+                                                                {% endif %}
+                                                            </div>
+
                                                         {% elseif td.type == 'thumb' %}
                                                         
                                                             {% if td.onclick %}

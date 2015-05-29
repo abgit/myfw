@@ -127,6 +127,14 @@ class mygrid{
         return $this;
     }
 
+    public function & addProgress( $key, $kval, $label ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'progress' );
+        return $this;
+    }
+
     public function & addUrl( $key, $kval, $label, $onclick = false, $bold = false, $align = 'text-left' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );

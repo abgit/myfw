@@ -33,8 +33,24 @@ class myblockchain{
     }
     
 
-    public function checkaddress( $address ){
-        return $this->load( 'address/' . $address, array( 'format' => 'json' ) );
+    public function checkaddress( $address, $unique = false ){
+
+        $address = trim( $address );
+
+        $json = $this->load( 'address/' . $address, array( 'format' => 'json' ) );
+    
+        if( $unique == false )
+            return $json;
+
+        $addresses = array();
+
+        foreach( $json['txs'] as $transaction )
+            if( isset( $transaction[ 'inputs' ] ) )
+                foreach( $transaction[ 'inputs' ] as $input )
+                    if( isset( $input[ 'prev_out' ][ 'addr' ] ) && $input[ 'prev_out' ][ 'addr' ] != $address )
+                        $addresses[] = $input[ 'prev_out' ][ 'addr' ];
+
+        return array_reverse( array_unique( $addresses ) );
     }
 
 
@@ -63,15 +79,40 @@ class myblockchain{
     }
 
 
-    public function payment( $guid, $password, $second_password, $to, $amount, $from, $fee, $note ){
+    public function payment( $guid, $password, $to, $amount, $from = '', $second_password = '', $fee = '', $note = '' ){
 
-        return $this->load( 'api/merchant/' . $guid . '/payment', array( 'password'        => $password,
-                                                                         'second_password' => $second_password,
-                                                                         'to'              => $to,
-                                                                         'amount'          => $amount,
-                                                                         'from'            => $from,
-                                                                         'fee'             => $fee,
-                                                                         'note'            => $note ) );
+        $params = array( 'password'        => $password,
+                         'to'              => $to,
+                         'amount'          => $amount );
+
+        if( $from )
+            $params[ 'from' ] = $from;
+        if( $second_password )
+            $params[ 'second_password' ] = $second_password;
+        if( $fee )
+            $params[ 'fee' ] = $fee;
+        if( $note )
+            $params[ 'note' ] = $note;
+
+        return $this->load( 'merchant/' . $guid . '/payment', $params );
+    }
+
+
+    public function sendmany( $guid, $password, $recipients, $from = '', $second_password = '', $fee = '', $note = '' ){
+
+        $params = array( 'password'   => $password,
+                         'recipients' => $recipients );
+
+        if( $from )
+            $params[ 'from' ] = $from;
+        if( $second_password )
+            $params[ 'second_password' ] = $second_password;
+        if( $fee )
+            $params[ 'fee' ] = $fee;
+        if( $note )
+            $params[ 'note' ] = $note;
+
+        return $this->load( 'merchant/' . $guid . '/sendmany', $params );
     }
 
 
@@ -88,13 +129,8 @@ class myblockchain{
         if( $returnUrl )
             return $url;
 
-        if( !( $response = $this->app->cache()->memcachedget( md5( $returnUrl ) ) ) ){
-
-            if( ( $response = file_get_contents( $url ) ) === false )
-                return false;
-
-            $this->app->cache()->memcachedset( md5( $returnUrl ), $response );
-        }
+        if( ( $response = file_get_contents( $url ) ) === false )
+            return false;
 
         return json_decode( $response, true );
     }
