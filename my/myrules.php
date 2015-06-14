@@ -50,6 +50,10 @@ class myrules{
         return myrules::regex( strval( $value ), '/^([0-9a-zA-Z\-]{3,20})$/' );
     }
 
+    public static function twofactortoken( $value, $opts='', $formelement = null ) {
+        return myrules::regex( strval( $value ), '/^([0-9]{6})$/' );
+    }
+
     public static function lettersonly( $values, $opts='', $formelement = null ) {
         return ( myrules::regex( $values, '/([\D^ ]+)$/' ) && myrules::nopunctuation( $values, array() ) );
     }

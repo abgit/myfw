@@ -67,6 +67,9 @@
         private $blockchain  = null;
         private $blockcypher = null;
         private $auth0       = null;
+        private $objTFActive = null;
+        private $objTFValid  = null;
+        private $chats       = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -78,11 +81,18 @@
                     $this->ajax()->render();
                 $this->isajaxmode = null;
             });
-            $this->post( '/myfwconfirm/:h', function( $h ){
+            $this->post( '/myfwconfirm/:h(/:twotoken)(/)', 'islogged', function( $h, $twotoken ){
 
                 $obj = $this->session()->get( $h, false );
 
                 if( isset( $obj[ 'uri' ] ) && isset( $obj[ 'method' ] ) ){
+
+                    if( isset( $obj[ '2f' ] ) ){
+                        if ( !$this->rules()->twofactortoken( $twotoken ) || !call_user_func( $this->objTFValid, $twotoken ) )
+                            return $this->ajax()->msgWarning( 'Token is not valid.' )->render();
+
+                        $this->ajax()->confirmDialogClose();
+                    }
 
                     $route = $this->router->getMatchedRoutes( $obj[ 'method' ], $obj[ 'uri' ], true );
 
@@ -154,6 +164,12 @@
 			if( ! isset( $this->grids[ $name ] ) )
 				$this->grids[ $name ] = new mygrid( $name );
 			return $this->grids[ $name ];
+		}
+
+		public function chat( $name ){
+			if( ! isset( $this->chats[ $name ] ) )
+				$this->chats[ $name ] = new mychat( $name );
+			return $this->chats[ $name ];
 		}
 
 		public function notify( $name = 'n' ){
@@ -331,7 +347,7 @@
             return $this->otp;
         }
 
-        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $mode = 1 ){
+        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $mode = 1, $twofactor = false ){
 
             $route = $this->router->getCurrentRoute();
             $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) ) );
@@ -341,13 +357,25 @@
                 $this->session()->delete( $hash );
                 return true;
             }
+            
+            if( $twofactor && ( is_null( $this->objTFActive ) or !call_user_func( $this->objTFActive ) ) ){
+                $twofactor = false;
+            }
 
             $uri    = $this->request->getResourceUri();
             $method = $this->request->getMethod();
 
-            $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method ) );
-            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $help, $mode )->render();
+            $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ) ) );
+            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $help, $mode, $twofactor )->render();
             $this->stop();
+        }
+
+        public function setTwoFactorActive( $callback ){
+            $this->objTFActive = $callback;
+        }
+
+        public function setTwoFactorValid( $callback ){
+            $this->objTFValid = $callback;
         }
 
         // show template
@@ -374,7 +402,8 @@
                             return call_user_func_array( 'sprintf', $v );
                         }));
 
-                $env->addFunction( new Twig_SimpleFunction( '_n', '_n' ) );  
+                $env->addFunction( new Twig_SimpleFunction( '_n', '_n' ) );
+                $env->addFunction( new Twig_SimpleFunction( 'd', 'var_export' ) );
 
                 $env->addFilter( new Twig_SimpleFilter( 'cdn', array( 'myfilters', 'cdn' )
                 , array( 'is_safe' => array( 'html' ) ) ) );

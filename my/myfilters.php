@@ -161,7 +161,7 @@ class myfilters{
 
     public static function transloadit( $json, $step, $property = null, $property2 = null ){
     
-        $arr = json_decode( $json );
+        $arr = is_string( $json ) ? json_decode( $json ) : $json;
 
         if( is_null( $property ) )
             return ( isset( $arr->ok ) && $arr->ok == 'ASSEMBLY_COMPLETED' && isset( $arr->results->$step ) );

@@ -7,9 +7,14 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'mikemccabe\\JsonPatch\\' => array($vendorDir . '/mikemccabe/json-patch-php/src'),
+    'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Slim\\Views\\' => array($vendorDir . '/slim/views'),
     'React\\Promise\\' => array($vendorDir . '/react/promise/src'),
+    'Happyr\\LinkedIn\\' => array($vendorDir . '/happyr/linkedin-api-client/src'),
     'GuzzleHttp\\Stream\\' => array($vendorDir . '/guzzlehttp/streams/src'),
     'GuzzleHttp\\Ring\\' => array($vendorDir . '/guzzlehttp/ringphp/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
+    'Facebook\\' => array($vendorDir . '/facebook/php-sdk-v4/src/Facebook'),
+    'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
+    'Base32\\' => array($vendorDir . '/christian-riesen/base32/src'),
 );

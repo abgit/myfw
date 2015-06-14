@@ -1,6 +1,49 @@
 
 <div class="row">
-<div class="col-lg-12">
+
+{% if profile %}
+    <div class="col-lg-4">
+
+							<div class="thumbnail">
+                                {% if values[ profile.thumb.key ] %}
+						    	    <div class="thumb">
+                                        {% if profile.thumb.onclick %}
+                                        <a onClick="{{ profile.thumb.onclick }}">
+                                        {% endif %}
+                                    
+    									<img src="{{ profile.thumb.cdn }}{{ values[ profile.thumb.key ] }}" alt="" style="max-width:{{ profile.thumb.size|default(150) }}px" width="{{ profile.thumb.size|default(150) }}" height="{{ profile.thumb.size|default(150) }}">
+
+                                        {% if profile.thumb.onclick %}
+                                        </a>
+                                        {% endif %}
+
+                                    </div>
+							    {% endif %}						    
+
+						    	<div class="caption text-center">
+						    		<h6>{{ profile.desc.keytitle ? values[ profile.desc.keytitle ] }}<small>
+                                    
+                                    {% if values[ profile.descimg.key ] %}
+                                        <img width="{{ profile.descimg.width|default(30) }}" height="{{ profile.descimg.height|default(30) }}" style="display:inline;max-width:{{ profile.descimg.width|default(30) }}px;max-height:{{ profile.descimg.height|default(30) }}px;" src="{{ profile.descimg.cdn }}{{ values[ profile.descimg.key ] }}{{ profile.descimg.sufix }}">&nbsp;
+                                    {% endif %}
+                                    
+                                    {{ values[ profile.desc.keysubtitle ] }}</small></h6>
+
+                                    {% if profile.icons %}
+    					    			<div class="icons-group">
+                                            {% for icon in profile.icons %}
+        				                    	<a class="{{ icon.class|default('tip') }}" title="{{ icon.title }}" href="{{ icon.href }}" data-original-title="{{ icon.prefix }}{{ values[ icon.key ]}}{{ icon.sufix }}"><i class="{{ icon.icon }}"></i></a>
+    			                    	    {% endfor %}
+                                        </div>
+                                    {% endif %}
+						    	</div>
+					    	</div>
+    </div>
+    <div class="col-lg-8">
+{% else %}
+    <div class="col-lg-12">
+{% endif %}
+
 <div class="">
 
 {% for el in elements %}
@@ -25,6 +68,8 @@
         {% endif %}
     {{ val }}
 
+    {% elseif el.type == 'custom' %}
+        <p>{% if el.title %}<h6>{{ el.title }}</h6>{% endif %}{{el.obj|raw}}
 
     {% elseif el.type == 'sep' %}
         <hr>

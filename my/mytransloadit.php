@@ -44,7 +44,7 @@ class mytransloadit{
         return !$res->error();
     }
     
-    public function requestAssembly( & $returndata, $id, $refresh = false ){
+    public function requestAssembly( & $returndata, $id, $refresh = false, $encode = true ){
 
         if( !$refresh && isset( $this->cache[ $id ] ) ){
             $returndata = $this->cache[ $id ];
@@ -68,8 +68,8 @@ class mytransloadit{
                 unset( $this->cache[ $id ] );
         }else{
 
-            $returndata = json_encode( $res->data );
-            $this->cache[ $id ] = json_encode( $res->data );
+            $returndata = $encode ? json_encode( $res->data ) : $this->data;
+            $this->cache[ $id ] = $returndata;
         }
 
         return !$res->error();

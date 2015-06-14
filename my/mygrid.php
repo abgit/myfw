@@ -17,6 +17,8 @@ class mygrid{
     private $actions  = array();
     private $modal    = null;
     private $tags     = array();
+    private $orderby  = false;
+    private $orderbya = null;
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
@@ -60,6 +62,12 @@ class mygrid{
                 $this->labels[ $k ][ 'width' ] = $arg[$i];
             $i++;
         }
+        return $this;
+    }
+
+    public function & setOrderby( $col, $asc = false ){
+        $this->orderby  = $col;
+        $this->orderbya = $asc;
         return $this;
     }
 
@@ -174,6 +182,12 @@ class mygrid{
 
     public function & ajaxSetMenuItemDisabled( $key, $index ){
         $this->app->ajax()->attr( '#' . $key . 'm' . $index, 'class', 'disabled' );
+        return $this;
+    }
+
+    public function & setAction( $key, $onclick ){
+        if( isset( $this->labels[ $key ] ) )
+            $this->labels[ $key ][ 'onclick' ] = $onclick;
         return $this;
     }
 
@@ -336,6 +350,8 @@ class mygrid{
                                                         'emptymsg' => $this->emptymsg,
                                                         'buttons'  => $this->buttons,
                                                         'perpage'  => $this->getPerPage(),
+                                                        'orderby'  => $this->orderby,
+                                                        'orderbya' => $this->orderbya,
                                                         'cols'     => $this->cols ), null, null, APP_CACHEAPC, false, false );        
     }
 }

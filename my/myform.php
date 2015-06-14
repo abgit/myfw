@@ -23,6 +23,7 @@ class myform{
     private $modal = array();
     private $closebutton = true;
     private $closebuttonsettings;
+    private $footer = false;
 
     private $csrfname;
     private $csrfinit = false;
@@ -141,10 +142,10 @@ class myform{
     }
 
 
-    public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '' ){
+    public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '', $align = '' ){
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
-        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'align' => $align, 'help' => $help );
         return $this;
     }
 
@@ -175,6 +176,11 @@ class myform{
 
     public function & addHeader( $title, $description = '', $icon = 'icon-books' ){
         $this->elements[ 'hdr' . $this->counter++ ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'icon' => $icon, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }
+
+    public function & setFooter(){
+        $this->footer = true;
         return $this;
     }
 
@@ -216,11 +222,53 @@ class myform{
         return $this;
     }    
 
+    public function & addCalendar( $id, $onclick = '', $onclickloadingmsg = '' ){
+        $this->elements[ $id ] = array( 'type' => 'calendar', 'id' => 'cal' . $this->formname . $id, 'ce' => $onclick, 'cm' => $onclickloadingmsg, 'rules' => array(), 'filters' => array() );
+
+        if( $this->isajax )
+            $this->app->ajax()->calendar( '#cal' . $this->formname . $id );
+            
+        return $this;
+    }    
+
+    public function & addChat( $id, $urlmsg, $urlupdate = null, $currentelementid = null, $options = array(), $wait = array() ){
+
+        if( !empty( $urlupdate ) )
+            $this->app->ajax()->interval( $urlupdate, 4000, 1 ); 
+
+        if( is_int( $currentelementid ) ){
+            $this->app->session()->set( 'myfwchat' . $id, $currentelementid );
+        }
+
+        // default options
+        $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array() );
+
+        if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
+            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
+            $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
+        }else{
+            $this->apikey    = $this->app->config( 'transloadit.k' );
+            $this->apisecret = $this->app->config( 'transloadit.s' );
+        }        
+
+        $params = array( 'auth' => array( 'key'     => $this->apikey,
+                                          'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
+
+        if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ))
+            $params[ 'template_id' ] = $options[ 'template_id' ];
+
+        if( isset( $options[ 'steps' ] ) && !empty( $options[ 'steps' ] ))
+            $params[ 'steps' ] = $options[ 'steps' ];
+
+        $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
+
+        $this->elements[ $id ] = array( 'type' => 'chat', 'id' => $id, 'wait' => $wait, 'url' => $urlmsg, 'rules' => array(), 'filters' => array(), 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->apisecret ) ) );
+        return $this;
+    }
 
     // special elements
     public function & addEmail( $name, $label = 'Email' ){
-        $rules = array_merge( $rules, array( 'email' => 'Email is not valid' ) );
-        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array() );
+        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array( 'email' => 'Email is not valid' ), 'filters' => array() );
         return $this;
     }
 
@@ -634,7 +682,7 @@ class myform{
 
     public function & addAjaxButton( $name, $labelbutton = null, $onclick = '', $href = '', $css = '' ){
 
-        $this->elements[ $name ] = array( 'type' => 'ajaxbutton', 'name' => $name, 'onclick' => $onclick, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'css' => $css );
+        $this->elements[ $name ] = array( 'type' => 'ajaxbutton', 'isbutton' => true, 'name' => $name, 'onclick' => $onclick, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'css' => $css );
         return $this;
     }
 
@@ -643,7 +691,7 @@ class myform{
 
         if( empty( $name ) )  $name = 'save';
         if( empty( $label ) ) $label = 'Save';
-        $this->elements[ $name ] = array( 'type' => 'submit', 'name' => $name, 'position' => $position, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
+        $this->elements[ $name ] = array( 'type' => 'submit', 'isbutton' => true, 'name' => $name, 'position' => $position, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
         $this->applyCsrf();
 
         return $this;
@@ -652,7 +700,7 @@ class myform{
     public function & addAjax( $label = null, $name = null, $css = 'btn-success', $position = '', $options = array() ){
 
         if( empty( $name ) )  $name = 'save';
-        $this->elements[ $name ] = array( 'type' => 'ajax', 'name' => $name, 'position' => $position, 'css' => $css, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
+        $this->elements[ $name ] = array( 'type' => 'ajax', 'isbutton' => true, 'name' => $name, 'position' => $position, 'css' => $css, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
         $this->applyCsrf();
 
         return $this;
@@ -745,7 +793,7 @@ class myform{
         // check special form element: transloadit
         $transloadit = 0;
         foreach( $this->elements as $n => $el ){
-            if( $el[ 'type' ] == 'transloadit' ){
+            if( $el[ 'type' ] == 'transloadit' || $el[ 'type' ] == 'chat' ){
                 $transloadit = 1;
                 break;
             }
@@ -996,6 +1044,7 @@ class myform{
                         'isajax'        => $this->isajax,
                         'closeb'        => $this->isajax && $this->closebutton,
                         'closeset'      => $this->closebuttonsettings,
+                        'footer'        => $this->footer,
                         'ismodal'       => !empty( $this->modal ),
                         'modal'         => $this->modal
                         );

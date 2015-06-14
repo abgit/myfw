@@ -3,20 +3,26 @@
 class mynavbar{
     
     private $name;
-    private $values = array();
+    private $values   = array();
     private $elements = array();
-    private $header = array();
+    private $header   = array();
+    private $cdn      = false;
 
     public function __construct( $name ){
         $this->name = $name;
         $this->app = \Slim\Slim::getInstance();
     }
 
-    public function & setHeader( $logo, $logosecure, $href = '', $toogle = true ){
-        $this->header = array( 'logo' => $this->app->ishttps() ? $logosecure : $logo, 'href' => $href, 'toogle' => $toogle );
+    public function & setHeader( $logo, $logosecure = null, $href = '', $toogle = true ){
+        $this->header = array( 'logo' => ( !is_null( $logosecure ) && $this->app->ishttps() ) ? $logosecure : $logo, 'href' => $href, 'toogle' => $toogle );
         return $this;
     }
-    
+
+    public function & setCDN( $cdn ){
+        $this->cdn = $cdn;
+        return $this;
+    }
+
     public function & setText( $message, $icon ){
         $this->text = array( 'message' => $message, 'icon' => $icon );
         return $this;
@@ -46,6 +52,7 @@ class mynavbar{
                                                           'name'     => $this->name,
                                                           'header'   => $this->header,
                                                           'text'     => $this->text,
+                                                          'cdn'      => $this->cdn,
                                                           'elements' => $this->elements
                                                          ), null, null, null, false, false );
     }

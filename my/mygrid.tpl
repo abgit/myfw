@@ -21,7 +21,7 @@
 				                    <thead>
 				                        <tr role="row">
                                 		{% for col in labels %}
-                                            <th role="columnheader" class="text-center{%if col.class %} {{col.class}}{% endif %}"{%if col.width %} width="{{col.width}}"{% endif %}>{{col.label}}</th>
+                                            <th role="columnheader" class="text-center{%if col.class %} {{col.class}}{% endif %}{%if orderby and orderby == col.key %} {{ orderbya == 1 ? 'sorting_asc' : 'sorting_desc' }}{% endif %}"{%if col.width %} width="{{col.width}}"{% endif %}>{{col.label}}</th>
                                         {% endfor %}
                                         </tr>
 				                    </thead>
@@ -34,7 +34,7 @@
 
                                     		{% for col in labels %}
                                             
-				                            <td{% if col.align or col.class %} class="{{ col.align }} {{col.class}}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}>
+				                            <td{% if col.align or col.class %} class="{{ col.align }} {{col.class}}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}{%if col.onclick %} onclick="{{ col.onclick|replaceurl( val, tags ) }}" style="cursor:pointer"{% endif %}>
                                                 {% for td in cols[ col.key ] %}
 
                                                     {% set value = val[ td.kval ] %}

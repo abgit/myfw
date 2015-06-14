@@ -85,7 +85,7 @@
                         case 'json' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : '';
                                             if( empty( $column_value ) || !is_string( $column_value ) || !is_array( json_decode( $column_value, true ) ) || json_last_error() != 0 ){
-                                                $column_value = json_encode( strval( $column_value ) );
+                                                $column_value = json_encode( $column_value );
                                             }
                                             break;
                         case 'str' :

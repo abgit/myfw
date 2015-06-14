@@ -7,6 +7,7 @@ class myinfo{
     private $elements = array();
     private $counter  = 0;
     private $emptymsg = 'No information to display';
+    private $profile = false;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -38,8 +39,33 @@ class myinfo{
         return $this;
     }
 
+    public function & addCustom( $obj, $title = '' ){
+        $this->elements[] = array( 'obj' => $obj, 'title' => $title, 'type' => 'custom' );
+        return $this;
+    }
+
     public function & addTextImage( $key, $keytitle, $keyimage, $keyimagesec, $imagewidth = 200, $imageheight = 150 ){
         $this->elements[] = array( 'key' => $key, 'keyt' => $keytitle, 'keyi' => $this->app->ishttps() ? $keyimagesec : $keyimage, 'type' => 'textimage', 'imagewidth' => $imagewidth, 'imageheight' => $imageheight );
+        return $this;
+    }
+
+    public function & setProfileThumb( $key, $size = 150, $cdn = '', $onclick = '' ){
+        $this->profile[ 'thumb' ] = array( 'key' => $key, 'size' => $size, 'cdn' => $cdn, 'onclick' => $onclick );
+        return $this;
+    }
+
+    public function & setProfileDescription( $keytitle, $keysubtitle ){
+        $this->profile[ 'desc' ] = array( 'keytitle' => $keytitle, 'keysubtitle' => $keysubtitle );
+        return $this;
+    }
+
+    public function & setProfileDescriptionImage( $key, $cdn, $sufix, $width, $height ){
+        $this->profile[ 'descimg' ] = array( 'key' => $key, 'cdn' => $cdn, 'sufix' => $sufix, 'width' => $width, 'height' => $height );
+        return $this;
+    }
+
+    public function & addProfileIcon( $icon, $href, $key, $prefix, $sufix ){
+        $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix );
         return $this;
     }
 
@@ -64,7 +90,8 @@ class myinfo{
                                                         'name'     => $this->name,
                                                         'elements' => $this->elements,
                                                         'values'   => $this->values,
-                                                        'emptymsg' => $this->emptymsg
+                                                        'emptymsg' => $this->emptymsg,
+                                                        'profile'  => $this->profile
                                                          ), null, null, null, false, false );
     }
     

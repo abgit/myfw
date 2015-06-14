@@ -62,7 +62,7 @@
             {% elseif formgroup > 0 %}
                 <div class="{{formgroupcss}}">
 
-            {% else %}
+            {% elseif not el.isbutton %}
                 <div class="form-group">
             {% endif %}
         
@@ -93,7 +93,7 @@
                     {% else %}
 
                         <div class="input-group">
-                            <span class="input-group-addon">BTC</span>
+                            <span class="input-group-addon">&#3647;</span>
                             <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}">
                         </div>
                         <span class="label label-block label-primary text-center">
@@ -152,8 +152,42 @@
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'hidden' %}
-            	<input {{el.disabled ? 'disabled="disabled" '}}name="{{ el.name}}" type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-                
+            	<input {{el.disabled ? 'disabled="disabled" '}}name="{{ el.name }}" type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+
+			{% elseif el.type == 'calendar' %}
+                <div class="block"><div id="{{ el.id }}" ce="{{ el.ce }}" cm="{{ el.cm|default('Loading ...') }}" ev="{{ el.value|default('[]')|raw }}"></div></div>
+
+			{% elseif el.type == 'chat' %}
+                <div class="chat" id="{{el.id}}box">
+                    <div id="{{el.id}}msgs">
+    					{% for msg in el.value %}
+                            <div class="message {{ msg.me ? 'reversed' }}">
+                                <img class="message-img" width="40" height="40"  alt="" src="{{msg.thumb}}">
+                                <div class="message-body">
+                                    {{msg.content}}<span class="attribution">{{msg.owner}}, {{msg.when|ago}}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="message {{ el.wait.me ? 'reversed' }}" id="{{el.id}}wait" style="visibility:hidden">
+                        <img class="message-img" width="40" height="40" alt="" src="{{ el.wait.thumb }}">
+                        <div class="message-body">
+                            <span class="typing"></span>
+                        </div>
+                    </div>
+                </div>
+                <textarea id="{{el.id}}msg" placeholder="Enter your message..." cols="1" rows="3" class="form-control" name="enter-message"></textarea>
+                <div class="message-controls">
+                    <div class="pull-right">
+                        <div class="uploader" style="width:150px">
+                            <input id="{{el.id}}msgp" name="{{el.id}}msgp" class="btn btn-default btn-loading" type="file" onchange="$('form#{{name}}').data('transloadit.uploader')._options['myfwmode']=2;$('form#{{name}}').data('transloadit.uploader')._options['myfwmodeopt']={'u':'{{ el.url }}','w':'#{{el.id}}wait'};$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ el.id }}msgp])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"></input>
+                                <span style="-moz-user-select:none" class="filename">Submit a photo</span>
+                                <span style="-moz-user-select:none" class="action">Choose File</span>
+                        </div>
+                        <button onClick="$('#{{el.id}}wait').css('visibility','visible');myfwsubmit('{{ el.url }}','',{msg:$('#{{el.id}}msg').val()})" class="btn btn-primary btn-loading" type="button" style="margin-left:5px; padding:6px 12px">Submit message</button>
+                    </div>
+                </div>
+
 			{% elseif el.type == 'checkboxgroup' %}
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 
@@ -265,7 +299,7 @@
         	{% elseif el.type == 'staticimage' %}
 
                     {%if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
-                    <div>
+                    <div{%if el.align %} style="text-align:{{ el.align }}"{% endif %}>
                     <img id="{{el.name}}" {% if el.width %}width="{{ el.width }}"{% endif %} {% if el.height %}height="{{ el.height }}"{% endif %} {% if not el.width and not el.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
                     </div>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
@@ -331,14 +365,14 @@
 
                 {% if not el.prevent %}
     				<input type="hidden" name="{{ name ~ el.name }}" value="{{ tvalue }}" id="{{name ~ el.name}}V" class="{{ name }}transloaditV"/>
-                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN"{% if el.disabled %} disabled="disabled"{% else %} onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"{% endif %} type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
+                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN"{% if el.disabled %} disabled="disabled"{% else %} onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['myfwmode']=1;$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"{% endif %} type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
 
                 {% elseif tvalue is empty %}
                     <p class="form-control-static">{{ preventmsg }}</p>
 
                 {% endif %}
 
-            <div class="row {{ name }}transloaditC" id="{{name ~ el.name}}C"{{ tvalue is empty ? ' style="display:none"' }}>
+            <div class="row {{ name }}transloaditC" id="{{name ~ el.name}}C"{{ tvalue is empty ? ' style="display:none;padding-top:7px"' }}>
                 <div class="col-xs-10" id="{{name ~ el.name}}P">
 
                 {% if tvalue is not empty %}
@@ -366,7 +400,7 @@
                 {% if el.help and not el.prevent %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
             {% endif %}
 
-        	{% if el.type != 'formgroup' %}
+        	{% if el.type != 'formgroup' and not el.isbutton %}
                 {% if formgroup > 1 or formgroup < 1 %}
                         </div>
                 {% elseif formgroup == 1 %}
@@ -386,7 +420,11 @@
 								
 	{% endif %}
             
-            {% for el in elements %}
+        {% if footer %}
+            <div style="text-align:right">
+        {% endif %}
+            
+            {% for el in elements if el.isbutton %}
     			{% if el.type == 'submit' and rendersubmit %}
                     <input style="margin-top:3px;" onClick="{%if formtransloadit%}$('form#{{name}}').unbind('submit.transloadit');{% endif %}this.disabled=true;this.value='please wait';this.form.submit();" {{el.disabled ? 'disabled="disabled" '}}type="submit" name="{{name ~ el.name}}" id="{{name}}submit" class="btn btn-success" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 
@@ -404,6 +442,11 @@
                 {% endif %}
             {% endfor %}
             <input type="hidden" name="{{csrfname}}" id="{{csrfname}}" value="{{csrf}}"/>
+
+        {% if footer %}
+            </div>
+        {% endif %}
+
 
 	{% if ismodal %}                                
                             {% if closeb %}

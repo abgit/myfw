@@ -22,15 +22,8 @@ class mystats{
         return $this;
     }
 
-    public function & setValues( $values ){
-        if( is_array( $values ) )
-            $this->values = $values;
-
-        return $this;
-    }
-
-    public function & addElement( $key, $label, $icon = false, $type = 'info', $onclick = '', $href = '', $percentage = 100, $class = '' ){
-        $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class );
+    public function & addElement( $key, $label, $icon = false, $type = 'info', $onclick = '', $href = '', $percentage = 100, $class = '', $islabel = false ){
+        $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class, 'islabel' => $islabel );
         return $this;
     }
 
@@ -45,11 +38,23 @@ class mystats{
         return $this;
     }
 
+    public function & setValues( $values ){
+        if( is_array( $values ) )
+            $this->values = $values;
+
+        return $this;
+    }
+
     public function &updateAjaxValues( $values ){
         foreach( $this->elements as $name => $el ){
             if( isset( $values[ $el[ 'key' ] ] ) )
                 $this->app->ajax()->text( '#st' . $el[ 'key' ], $values[ $el[ 'key' ] ] );
         }
+        return $this;
+    }
+
+    public function & changeValues( $values, $mode ){
+        $mode == 1 ? $this->setValues( $values ) : $this->updateAjaxValues( $values );
         return $this;
     }
 

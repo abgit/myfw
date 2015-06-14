@@ -44,13 +44,11 @@
                     $client[ 'provider' ] = strstr( $client[ 'user_id' ], '|', true );
 
                 // custom properties
-                $client[ 'uuid' ]     = md5( $client[ 'user_id' ] );
-                $client[ 'fullname' ] = isset( $client[ 'nickname' ] ) ? $client[ 'nickname' ] : ( $client[ 'given_name' ] . ' ' . $app->client[ 'family_name' ] );
-                $client[ 'icon' ]     = $client[ 'provider' ];
-                
-                if( $client[ 'icon' ] == 'auth0' )
-                    $client[ 'icon' ] = 'user';
-                
+                $client[ 'uuid' ]      = md5( $client[ 'user_id' ] );
+                $client[ 'fullname' ]  = isset( $client[ 'nickname' ] ) ? $client[ 'nickname' ] : ( $client[ 'given_name' ] . ' ' . $app->client[ 'family_name' ] );
+                $client[ 'icon' ]      = $client[ 'provider' ] == 'auth0' ? 'user' : $client[ 'provider' ];
+                $client[ 'loginmode' ] = $client[ 'provider' ] == 'auth0' ? 'username & password' : $client[ 'provider' ];
+
                 $this->app->client = $client;
                 return true;
             }

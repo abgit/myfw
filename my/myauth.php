@@ -1,8 +1,5 @@
 <?php
 
-    require_once( __DIR__  . "/3rdparty/Hybrid/Auth.php" );
-    require_once( __DIR__  . "/3rdparty/Hybrid/Endpoint.php" ); 
-
     class myauth{
 
         public function __construct(){

@@ -64,8 +64,13 @@ class myajax{
         return $this;
     }
 
-    public function & confirm( $url, $msg, $title, $help, $mode ){
-        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 't' => $title, 'h' => $help, 'o' => $mode );
+    public function & confirm( $url, $msg, $title, $help, $mode, $twofactor ){
+        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => intval( $twofactor ) );
+        return $this;
+    }
+
+    public function & confirmDialogClose(){
+        $this->out[ 'cd' ] = array();
         return $this;
     }
 
@@ -86,6 +91,11 @@ class myajax{
 
     public function & appendTextArea( $el, $html ){
         $this->out[ 'ta' ][] = array( 'e' => $el, 'h' => $html );
+        return $this;
+    }
+
+    public function & calendar( $el ){
+        $this->out[ 'cr' ][] = array( 'e' => $el );
         return $this;
     }
 
@@ -171,6 +181,11 @@ class myajax{
 
     public function & fadeIn( $el, $duration = 400 ){
         $this->out[ 'fi' ][] = array( 'e' => $el, 'd' => $duration );
+        return $this;
+    }
+
+    public function & scrollBottom( $el ){
+        $this->out[ 'sb' ][] = array( 'e' => $el );
         return $this;
     }
 

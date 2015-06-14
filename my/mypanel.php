@@ -14,6 +14,9 @@ class mypanel{
     private $offset     = 0;
     private $size       = 6;
     private $sizeoffset = 0;
+    private $action     = false;
+    private $idmenusel  = 0;
+    private $cdn        = false;
 
     public function __construct( $name = 'p' ){
         $this->name = $name;
@@ -42,6 +45,11 @@ class mypanel{
         return $this;
     }
 
+    public function & setAction( $onclick ){
+        $this->action = $onclick;
+        return $this;
+    }
+
     public function & setEmptyMessage( $emptymsg ){
         $this->emptymsg = $emptymsg;
         return $this;
@@ -54,8 +62,13 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps, $static = false, $size = 3 ){
-        $this->elements[ 'thumb' ] = array( 'key' => $this->app->ishttps() ? $keyhttps : $key, 'static' => $static, 'size' => $size );
+    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3 ){
+        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size );
+        return $this;
+    }
+    
+    public function & setCDN( $cdn ){
+        $this->cdn = $cdn;
         return $this;
     }
 
@@ -74,13 +87,13 @@ class mypanel{
         return $this;
     }
 
-    public function & addBackground( $key, $keyhttps ){
-        $this->elements[ 'back' ] = array( 'key' => $this->app->ishttps() ? $keyhttps : $key );
+    public function & addBackground( $key, $keyhttps = null ){
+        $this->elements[ 'back' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key );
         return $this;
     }
 
-    public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '' ){
-        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass );
+    public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '' ){
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix );
         return $this;
     }
 
@@ -99,8 +112,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addStatusInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '' ){
-        $this->elements[ 'status' ][ $key ] = array( 'key' => $key, 'type' => 3, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass );
+    public function & addStatusInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '' ){
+        $this->elements[ 'status' ][ $key ] = array( 'key' => $key, 'type' => 3, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix );
         return $this;
     }
 
@@ -153,14 +166,14 @@ class mypanel{
         return $this;
     }
 
-    public function & addToolbarMenuSelect( $options, $icon = 'icon-cog4', $label = '', $id = '' ){
-        $id = empty( $id ) ? $this->name . 'sel' : $id;
+    public function & addToolbarMenuSelect( $options, $icon = 'icon-cog4', $label = '' ){
+        $id = $this->name . 'sel' . $this->idmenusel++;
         $this->elements[ 'tmenu' ][ $id ] = array( 'type' => 2, 'icon' => $icon, 'options' => $options, 'label' => $label, 'id' => $id );
         return $this;
     }
 
-    public function & addToolbarSeparator(){
-        $this->elements[ 'tmenu' ][] = array( 'type' => 3 );
+    public function & addToolbarSeparator( $iterations = 1 ){
+        $this->elements[ 'tmenu' ][] = array( 'type' => 3, 'it' => $iterations );
         return $this;
     }
 
@@ -282,12 +295,15 @@ class mypanel{
                                                          'key'        => $this->key,
                                                          'keyhtml'    => $this->keyhtml,
                                                          'emptymsg'   => $this->emptymsg,
+                                                         'cdn'        => $this->cdn,
                                                          'more'       => $this->more,
                                                          'offset'     => $this->offset + $this->perpage,
                                                          'perpage'    => $this->perpage,
                                                          'size'       => $this->size,
                                                          'sizeoffset' => $this->sizeoffset,
-                                                         'allitems' => is_null( $values )
+                                                         'allitems'   => is_null( $values ),
+                                                         'action'     => $this->action,
+                                                         'tags'       => array( array( $this->key ), array( $this->keyhtml ) )
                                                          ), null, null, null, false, false );
     }
 }

@@ -9,7 +9,7 @@
                                                         <a style="margin-left:2px;margin-top:6px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %}{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
 
                                                     {% elseif menu.type == 3 %}
-                                                        <br />
+                                                        {% for i in 1..menu.it %}<br />{% endfor %}
 
                                                     {% elseif menu.type == 1 %}
                                                     <div class="btn-group" style="margin-left:2px;margin-top:6px">
@@ -42,13 +42,13 @@
 
         {% for value in values %}
 						  <div class="col-md-{{ size }}{%if sizeoffset %} col-md-offset-{{sizeoffset}}{% endif %}" id="{{ name }}{{ value[ key ] }}">
-                                <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ value[ elements.back.key ] }}){% endif %}">
-									<div class="row with-padding" style="min-height:135px">
+                                <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ cdn }}{{ value[ elements.back.key ] }}){% endif %}">
+									<div class="with-padding"{% if action %} onclick="{{ action|replaceurl( value, tags ) }}" style="margin: 0px;cursor:pointer;min-height:145px"{% else %} style="min-height:145px"{% endif %}>
 
                                         {% if elements.thumb.static or value[ elements.thumb.key ] %}
 
     										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
-                                                <img style="margin-top:10px" src="{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
+                                                <img style="margin-top:10px;margin-left:-10px" src="{{ cdn }}{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
                                             </div>
 
                                             {% set class2 = elements.info ? 'col-sm-' ~ ( 12 - 3 - elements.thumb.size ) : 'col-sm-' ~ ( 12 - elements.thumb.size ) %}
@@ -89,6 +89,10 @@
                                                             {% endif %}
                                                         
                                                             {{ info.prefix }} {{ val|t(20) }} {{ info.sufix }}
+
+        												    {% if info.extrakey %}
+                                                                {{ value[ info.extrakey ]|t(20) }} {{ info.extrasufix }}
+                                                            {% endif %}
 
         												    {% if info.class %}
                                                                 </span>
@@ -145,14 +149,18 @@
 
                                                         {% if value[ status.key ] %}
 
-                                                            <span style="padding:0.2em 0.6em 0.3em; vertical-align:middle;margin-right:6px;" class="label {{status.class|default('label-info')}}">
+                                                            <span style="vertical-align:middle;margin-right:6px;" class="label label-mini {{status.class|default('label-info')}}">
 
                                                             {% set val = value[ status.key ] %}
                                                             {% if status.filter == 'rnumber' %}
                                                                 {% set val = val|rnumber(true) %}
                                                             {% endif %}
                                                         
-                                                            {{ status.prefix }} {{ val|t(20) }} {{ status.sufix }}
+                                                            {{ status.prefix|raw }} {{ val|t(20) }} {{ status.sufix|raw }}
+
+        												    {% if status.extrakey %}
+                                                                {{ value[ status.extrakey ]|t(20) }} {{ status.extrasufix }}
+                                                            {% endif %}
 
                                                             </span>
 

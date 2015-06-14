@@ -8,15 +8,16 @@ $baseDir = dirname($vendorDir);
 return array(
     'transloadit' => array($vendorDir . '/transloadit/php-sdk/lib'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
-    'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Slim' => array($vendorDir . '/slim/slim'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
+    'PHPQRCode' => array($vendorDir . '/aferrandini/phpqrcode/lib'),
+    'Otp' => array($vendorDir . '/christian-riesen/otp/src'),
     'OpenCloud' => array($vendorDir . '/rackspace/php-opencloud/lib', $vendorDir . '/rackspace/php-opencloud/tests'),
     'OAuth2' => array($vendorDir . '/adoy/oauth2/src'),
     'Michelf' => array($vendorDir . '/michelf/php-markdown'),
     'Mailgun\\Tests' => array($vendorDir . '/mailgun/mailgun-php/tests'),
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
+    'Hybrid' => array($vendorDir . '/hybridauth/hybridauth/hybridauth'),
     'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
     'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
-    'Dotenv' => array($vendorDir . '/vlucas/phpdotenv/src'),
 );

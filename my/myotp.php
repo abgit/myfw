@@ -1,10 +1,21 @@
 <?php
 
-require __DIR__ . '/3rdparty/GoogleAuthenticator/PHPGangsta_GoogleAuthenticator.php';
+use Otp\Otp;
+use Otp\GoogleAuthenticator;
+use Base32\Base32;
 
-class myotp extends PHPGangsta_GoogleAuthenticator{
+class myotp{
 
-    public function getQRCode( $name, $secret, $size = '200x200' ){
-        return '//chart.apis.google.com/chart?cht=qr&chs=' . $size . '&chld=H%7C0&chl=otpauth://totp/' . urlencode( $name ) . '?secret=' . $secret;
+    public function qrcode( $string ){
+        \Slim\Slim::getInstance()->response->headers->set('Content-Type', 'image/png');
+        \PHPQRCode\QRcode::png( $string, false, 'L', 5, 1 );
+    }
+    
+    public function createSecret(){
+        return GoogleAuthenticator::generateRandom();
+    }
+    
+    public function verifyCode( $secret, $key ){
+        return (new Otp())->checkTotp(Base32::decode($secret), $key);
     }
 }
