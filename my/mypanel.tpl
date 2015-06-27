@@ -71,47 +71,56 @@
     										</div>
                                             
                                             {% if elements.info %}
-    										<div class="col-sm-3">
+    										<div class="col-sm-3 task-panel">
     											<div class="task-info" style="margin-top:10px">
 
                                                     {% for info in elements.info %}
 
-                                                        {% if value[ info.key ] %}
+                                                        {% if info.type == 0 %}
 
-                                                            <span>
-        												    {% if info.class %}
-                                                                <span class="label {{info.class}}">
-                                                            {% endif %}
+                                                            {% if value[ info.key ] %}
+
+                                                                <span>
+            												    {% if info.class %}
+                                                                    <span class="label {{info.class}}">
+                                                                {% endif %}
                                                         
-                                                            {% set val = value[ info.key ] %}
-                                                            {% if info.filter == 'rnumber' %}
-                                                                {% set val = val|rnumber(true) %}
-                                                            {% endif %}
+                                                                {% set val = value[ info.key ] %}
+                                                                {% if info.filter == 'rnumber' %}
+                                                                    {% set val = val|rnumber(true) %}
+                                                                {% endif %}
                                                         
-                                                            {{ info.prefix }} {{ val|t(20) }} {{ info.sufix }}
+                                                                {{ info.prefix }} {{ val|t(20) }} {{ info.sufix }}
 
-        												    {% if info.extrakey %}
-                                                                {{ value[ info.extrakey ]|t(20) }} {{ info.extrasufix }}
-                                                            {% endif %}
+            												    {% if info.extrakey %}
+                                                                    {{ value[ info.extrakey ]|t(20) }} {{ info.extrasufix }}
+                                                                {% endif %}
 
-        												    {% if info.class %}
+            												    {% if info.class %}
+                                                                    </span>
+                                                                {% endif %}                                                        
                                                                 </span>
-                                                            {% endif %}                                                        
-                                                            </span>
 
-                                                        {% elseif info.defaultvalue %}
+                                                            {% elseif info.defaultvalue %}
 
-                                                            <span>
-        												    {% if info.defaultclass %}
-                                                                <span class="label {{info.defaultclass}}">
-                                                            {% endif %}
+                                                                <span>
+            												    {% if info.defaultclass %}
+                                                                    <span class="label {{info.defaultclass}}">
+                                                                {% endif %}
                                                         
-                                                            {{ info.defaultprefix }} {{ info.defaultvalue }} {{ info.defaultsufix }}
+                                                                {{ info.defaultprefix }} {{ info.defaultvalue }} {{ info.defaultsufix }}
 
-        												    {% if info.defaultclass %}
+            												    {% if info.defaultclass %}
+                                                                    </span>
+                                                                {% endif %}                                                        
                                                                 </span>
-                                                            {% endif %}                                                        
-                                                            </span>
+                                                            {% endif %}
+
+                                                        {% elseif info.type == 1 %}
+
+                                                            {% if value[ info.key ] %}
+                                                                <img class="infothumb" width="{{ info.size|default(40) }}" height="{{ info.size|default(40) }}" style="max-width:{{ info.size|default(40) }}px;" alt="" src="{{ cdn }}{{ value[ info.key ] }}">
+                                                            {% endif %}
 
                                                         {% endif %}
                                                     {% endfor %}
@@ -185,7 +194,9 @@
                                                 {% for menu in elements.menu %}
 
                                                     {% if menu.type == 0 %}
-                                                        <li><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"></i> {{ menu.label }}</a></li>
+                                                        {% if menu.depends == false or values[ menu.depends ] %}
+                                                            <li{% if menu.id %} id="{{ menu.id }}"{% endif %}><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"></i> {{ menu.label }}</a></li>
+                                                        {% endif %}
 
                                                     {% elseif menu.type == 1 %}
                                                     <li class="dropup"><a style="font-size:12px;" href="#" class="dropdown-toggle" data-toggle="dropdown">{{ menu.label }} <i class="{{ menu.icon|default('icon-arrow-up2') }}"></i></a>

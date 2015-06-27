@@ -39,7 +39,7 @@
 
                                                     {% set value = val[ td.kval ] %}
 
-                                                    {% if value is not empty or td.type == 'menu' %}
+                                                    {% if value is not empty or td.type == 'menu' or td.type == 'br' or td.type == 'space'  %}
 
                                                         {% if td.replace %}
                                                             {% set value = value|replace( td.replace ) %}
@@ -89,8 +89,20 @@
                 				                            	</a>
                                                             {% endif %}
 
+                                                        {% elseif td.type == 'image' %}
+                                                            <img height="{{ td.height }}" width="{{ td.width }}" src="{{ td.cdn }}{{ value }}{{ td.sufix }}">
+
+                                                        {% elseif td.type == 'label' %}
+                                                            <span class="label label-mini {{ ( td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list )|default( 'label-primary' ) }}">{{ value|t(20) }}</span>
+
                                                         {% elseif td.type == 'url' %}
-            				                            	<a {%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}display:inline-block;margin-bottom:3px;margin-top:3px;">{{ value|t(60) }}</a>
+            				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t(60) }}</a>
+
+                                                        {% elseif td.type == 'br' %}
+                                                            <br />
+
+                                                        {% elseif td.type == 'space' %}
+                                                            &nbsp;
 
                                                         {% elseif td.type == 'ago' %}
                                                             <i class="icon-clock"></i> {{ value|ago }}
@@ -98,6 +110,9 @@
 
                                                         {% elseif td.type == 'description' %}
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|nl2space|t(36) }}</span>
+
+                                                        {% elseif td.type == 'info' %}
+                                                            <span><strong>{{ td.title }}</strong>{{ value|t(50) }}</span>
 
                                                         {% elseif td.type == 'fixed' %}
                                                             {% set fixedfilldefault = true %}

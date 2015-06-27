@@ -157,37 +157,6 @@
 			{% elseif el.type == 'calendar' %}
                 <div class="block"><div id="{{ el.id }}" ce="{{ el.ce }}" cm="{{ el.cm|default('Loading ...') }}" ev="{{ el.value|default('[]')|raw }}"></div></div>
 
-			{% elseif el.type == 'chat' %}
-                <div class="chat" id="{{el.id}}box">
-                    <div id="{{el.id}}msgs">
-    					{% for msg in el.value %}
-                            <div class="message {{ msg.me ? 'reversed' }}">
-                                <img class="message-img" width="40" height="40"  alt="" src="{{msg.thumb}}">
-                                <div class="message-body">
-                                    {{msg.content}}<span class="attribution">{{msg.owner}}, {{msg.when|ago}}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="message {{ el.wait.me ? 'reversed' }}" id="{{el.id}}wait" style="visibility:hidden">
-                        <img class="message-img" width="40" height="40" alt="" src="{{ el.wait.thumb }}">
-                        <div class="message-body">
-                            <span class="typing"></span>
-                        </div>
-                    </div>
-                </div>
-                <textarea id="{{el.id}}msg" placeholder="Enter your message..." cols="1" rows="3" class="form-control" name="enter-message"></textarea>
-                <div class="message-controls">
-                    <div class="pull-right">
-                        <div class="uploader" style="width:150px">
-                            <input id="{{el.id}}msgp" name="{{el.id}}msgp" class="btn btn-default btn-loading" type="file" onchange="$('form#{{name}}').data('transloadit.uploader')._options['myfwmode']=2;$('form#{{name}}').data('transloadit.uploader')._options['myfwmodeopt']={'u':'{{ el.url }}','w':'#{{el.id}}wait'};$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ el.id }}msgp])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"></input>
-                                <span style="-moz-user-select:none" class="filename">Submit a photo</span>
-                                <span style="-moz-user-select:none" class="action">Choose File</span>
-                        </div>
-                        <button onClick="$('#{{el.id}}wait').css('visibility','visible');myfwsubmit('{{ el.url }}','',{msg:$('#{{el.id}}msg').val()})" class="btn btn-primary btn-loading" type="button" style="margin-left:5px; padding:6px 12px">Submit message</button>
-                    </div>
-                </div>
-
 			{% elseif el.type == 'checkboxgroup' %}
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 
@@ -251,7 +220,7 @@
 
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
-                    <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}" style="margin-top:{% if not loop.first %}45px{% else %}10px{% endif %};">
+                    <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}">
                         {% if el.icon %}<i class="{{el.icon}}"></i>{% endif %}{{el.title}}{% if el.description %}<small class="display-block" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>

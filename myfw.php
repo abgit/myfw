@@ -1,6 +1,5 @@
 <?php
 
-    define( "APP_START",      round( microtime( true ) * 1000 ) );
     define( "APP_WEBMODE",    isset( $_SERVER['HTTP_HOST'] ) );
     define( "APP_CACHEAPC",   0 );
     define( "APP_CACHEREDIS", 1 );
@@ -70,6 +69,7 @@
         private $objTFActive = null;
         private $objTFValid  = null;
         private $chats       = null;
+        private $ishttps     = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -479,11 +479,14 @@
         }
 
 		private function printFooter( $print = true, $appendString = '' ){
-			return $print ? "\n<!-- " . ( ( round(microtime(true) * 1000)-APP_START) /1000 ) . 's on s' . substr( $_SERVER["SERVER_NAME"], 3, 2 ) . ' ' . $appendString . ' -->' : '';
+			return $print ? "\n<!-- " . round( microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 2 ) . 's ' . $appendString . ' -->' : '';
 		}
 
 		public function ishttps(){
-			return ( ( isset( $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] ) && $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] == 'https' ) || $this->request()->getScheme() === 'https' );
+            if( is_null( $this->ishttps ) )
+    			$this->ishttps = ( ( isset( $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] ) && $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] === 'https' ) || $this->request()->getScheme() === 'https' );
+
+            return $this->ishttps;
 		}
 		
 		public function saveFile( $path, $content, $minimize = false ){
@@ -571,6 +574,13 @@
         $app = \Slim\Slim::getInstance();
         if( $app->config( 'ishttp.enable' ) !== 0 && $app->ishttps() )
             $app->redirect( "http://" . $app->config( 'app.hostname' ) . $_SERVER['REQUEST_URI'] );
+    }
+
+    // check if referrer exists and belong to current host
+    function isreferrer(){
+        $app = \Slim\Slim::getInstance();
+        if( strpos( strtolower( $app->request->getReferer() ), strtolower( $app->config( 'app.hostname' ) ) ) === false )
+            $app->pass();
     }
 
     // check ajax post

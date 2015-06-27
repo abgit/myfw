@@ -2,7 +2,7 @@
 <div class="row">
 
 {% if profile %}
-    <div class="col-lg-4">
+    <div class="col-lg-{{ meta.size|default( 4 ) }}">
 
 							<div class="thumbnail">
                                 {% if values[ profile.thumb.key ] %}
@@ -32,14 +32,14 @@
                                     {% if profile.icons %}
     					    			<div class="icons-group">
                                             {% for icon in profile.icons %}
-        				                    	<a class="{{ icon.class|default('tip') }}" title="{{ icon.title }}" href="{{ icon.href }}" data-original-title="{{ icon.prefix }}{{ values[ icon.key ]}}{{ icon.sufix }}"><i class="{{ icon.icon }}"></i></a>
+        				                    	<a class="{{ icon.class|default('tip') }}" title="{{ icon.title }}" href="{{ icon.href }}" data-original-title="{{ icon.prefix }}{{ values[ icon.key ]}}{{ icon.sufix }}" target="_blank"><i class="{{ icon.icon }}"></i></a>
     			                    	    {% endfor %}
                                         </div>
                                     {% endif %}
 						    	</div>
 					    	</div>
     </div>
-    <div class="col-lg-8">
+    <div class="col-lg-{{ 12 - meta.size|default( 4 ) }}">
 {% else %}
     <div class="col-lg-12">
 {% endif %}
@@ -57,7 +57,7 @@
         <h5>{{ val }}</h5>
 
     {% elseif el.type == 'text' %}
-        <p>{{ val }}</p>
+        <p>{{ val|nl2br }}</p>
 
     {% elseif el.type == 'textimage' %}
         {% if values[ el.keyi ] %}

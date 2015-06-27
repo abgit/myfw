@@ -205,8 +205,8 @@ class myform{
         return $this;
     }    
 
-    public function & addStatistics( $obj ){
-        $name = is_string( $obj ) ? $obj : ( 'sts' . $this->counter++ );
+    public function & addStatistics( $name, $obj ){
+//        $name = is_string( $obj ) ? $obj : ( 'sts' . $this->counter++ );
         $this->elements[ $name ] = array( 'type' => 'statistics', 'obj' => $obj );
         return $this;
     }    
@@ -217,8 +217,11 @@ class myform{
         return $this;
     }
 
-    public function & addCustom( $obj ){
-        $this->elements[ 'ctm' . $this->counter++ ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
+    public function & addCustom( $name, $obj  ){
+//        if( is_null( $name ) )
+//            $name = 'ctm' . $this->counter++;
+
+        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
         return $this;
     }    
 
@@ -230,41 +233,6 @@ class myform{
             
         return $this;
     }    
-
-    public function & addChat( $id, $urlmsg, $urlupdate = null, $currentelementid = null, $options = array(), $wait = array() ){
-
-        if( !empty( $urlupdate ) )
-            $this->app->ajax()->interval( $urlupdate, 4000, 1 ); 
-
-        if( is_int( $currentelementid ) ){
-            $this->app->session()->set( 'myfwchat' . $id, $currentelementid );
-        }
-
-        // default options
-        $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array() );
-
-        if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
-            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
-            $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
-        }else{
-            $this->apikey    = $this->app->config( 'transloadit.k' );
-            $this->apisecret = $this->app->config( 'transloadit.s' );
-        }        
-
-        $params = array( 'auth' => array( 'key'     => $this->apikey,
-                                          'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
-
-        if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ))
-            $params[ 'template_id' ] = $options[ 'template_id' ];
-
-        if( isset( $options[ 'steps' ] ) && !empty( $options[ 'steps' ] ))
-            $params[ 'steps' ] = $options[ 'steps' ];
-
-        $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
-
-        $this->elements[ $id ] = array( 'type' => 'chat', 'id' => $id, 'wait' => $wait, 'url' => $urlmsg, 'rules' => array(), 'filters' => array(), 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->apisecret ) ) );
-        return $this;
-    }
 
     // special elements
     public function & addEmail( $name, $label = 'Email' ){
@@ -793,7 +761,7 @@ class myform{
         // check special form element: transloadit
         $transloadit = 0;
         foreach( $this->elements as $n => $el ){
-            if( $el[ 'type' ] == 'transloadit' || $el[ 'type' ] == 'chat' ){
+            if( $el[ 'type' ] == 'transloadit' || ( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ) ){
                 $transloadit = 1;
                 break;
             }
@@ -817,14 +785,31 @@ class myform{
                     $val[ $n ] = $values->$n;
 
             $this->valuesdefault = $append ? ( $this->valuesdefault + $val ) : $val;
-        }else{
-            $this->valuesdefault = $append ? ( $this->valuesdefault + $values ) : $values;
+        }elseif( is_array( $values ) ){
+            if( $append == false ){
+                $this->valuesdefault = array();
+            }
+
+            foreach( $this->elements as $n => $el ){
+                if( isset( $values[ $n ] ) ){
+                    if( isset( $el[ 'obj' ] ) && method_exists( $el[ 'obj' ], 'setvalues' ) ){
+                        $el[ 'obj' ]->setValues( $values[ $n ] );
+                    }else{
+                        $this->valuesdefault[ $n ] = $values[ $n ];
+                    }
+                }
+            }
         }
         return $this;
     }
 
     public function & setDefaultValue( $elementname, $value ){
         $this->valuesdefault[ $elementname ] = $value;
+        return $this;
+    }
+
+    public function & replaceDefaultValues( $values ){
+        $this->setDefaultValues( $values, true );
         return $this;
     }
 

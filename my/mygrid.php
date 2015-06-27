@@ -159,6 +159,40 @@ class mygrid{
         return $this;
     }
 
+    public function & addInfo( $key, $kval, $label, $title ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'info', 'title' => $title );
+        return $this;
+    }
+
+    public function & addImage( $key, $kval, $label, $cdn = '', $sufix = '', $width = 20, $height = 15 ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'image', 'cdn' => $cdn, 'sufix' => $sufix, 'width' => $width, 'height' => $height);
+        return $this;
+    }
+
+    public function & addLabel( $key, $kval, $label = '' ){
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label' );
+        return $this;
+    }
+
+    public function & addBr( $key ){
+        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'br' );
+        return $this;
+    }
+
+    public function & addSpace( $key ){
+        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'space' );
+        return $this;
+    }
+
     public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'text-center' ){
         $key = 'm' . $this->menu++;
         if( !isset( $this->labels[ $key ] ) ){

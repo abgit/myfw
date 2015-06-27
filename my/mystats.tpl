@@ -16,7 +16,8 @@
     <li{% if stat.class %} class="{{ stat.class }}"{% endif %}>
         <div class="statistics-info">
             {% if stat.icon %}<a class="bg-{{stat.type}}"><i class="{{stat.icon}}"></i></a>{% endif %}
-            <strong>{{ stat.addonpre|replace({' ': '&nbsp;'})|raw }}
+            <strong>
+                    <span class="infopre">{{ stat.addonpre|replace({' ': '&nbsp;'})|raw }}</span>
 
                     {% if stat.onclick %}
                         <a onClick="{{ stat.onclick }}">
@@ -28,7 +29,7 @@
                         </a>
                     {% endif %}
 
-                    {{ stat.addonpos|replace({' ': '&nbsp;'})|raw }}
+                    <span class="infopos">{{ stat.addonpos|replace({' ': '&nbsp;'})|raw }}</span>
             </strong>
         </div>
         <div class="progress progress-micro">

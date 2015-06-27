@@ -93,7 +93,12 @@ class mypanel{
     }
 
     public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '' ){
-        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix );
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix );
+        return $this;
+    }
+
+    public function & addInfoThumb( $key, $size = null ){
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 1, 'size' => $size );
         return $this;
     }
 
@@ -137,8 +142,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '' ){
-        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color );
+    public function & addButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $id = '', $depends = false ){
+        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'id' => $id, 'depends' => $depends );
         return $this;
     }
 

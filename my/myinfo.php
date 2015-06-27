@@ -8,6 +8,7 @@ class myinfo{
     private $counter  = 0;
     private $emptymsg = 'No information to display';
     private $profile = false;
+    private $meta = array();
 
     public function __construct( $name ){
         $this->name = $name;
@@ -39,13 +40,18 @@ class myinfo{
         return $this;
     }
 
-    public function & addCustom( $obj, $title = '' ){
-        $this->elements[] = array( 'obj' => $obj, 'title' => $title, 'type' => 'custom' );
+    public function & addCustom( $name, $obj, $title = '' ){
+        $this->elements[ $name ] = array( 'obj' => $obj, 'title' => $title, 'type' => 'custom' );
         return $this;
     }
 
     public function & addTextImage( $key, $keytitle, $keyimage, $keyimagesec, $imagewidth = 200, $imageheight = 150 ){
         $this->elements[] = array( 'key' => $key, 'keyt' => $keytitle, 'keyi' => $this->app->ishttps() ? $keyimagesec : $keyimage, 'type' => 'textimage', 'imagewidth' => $imagewidth, 'imageheight' => $imageheight );
+        return $this;
+    }
+
+    public function & setProfile( $size ){
+        $this->meta = array( 'size' => $size );
         return $this;
     }
 
@@ -78,6 +84,11 @@ class myinfo{
         if( is_array( $values ) )
             $this->values = $values;
 
+        foreach( $this->elements as $n => $el ){
+            if( is_string( $n ) && isset( $values[ $n ] ) && isset( $el[ 'obj' ] ) && method_exists( $el[ 'obj' ], 'setvalues' ) )
+                $el[ 'obj' ]->setValues( $values[ $n ] );
+        }
+
         return $this;
     }
 
@@ -91,7 +102,8 @@ class myinfo{
                                                         'elements' => $this->elements,
                                                         'values'   => $this->values,
                                                         'emptymsg' => $this->emptymsg,
-                                                        'profile'  => $this->profile
+                                                        'profile'  => $this->profile,
+                                                        'meta'     => $this->meta
                                                          ), null, null, null, false, false );
     }
     
