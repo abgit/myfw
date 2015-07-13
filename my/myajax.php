@@ -174,6 +174,11 @@ class myajax{
         return $this;
     }
 
+    public function & display( $el, $bool = true ){
+        $this->out[ 'di' ][] = array( 'e' => $el, 'b' => $bool );
+        return $this;
+    }
+
     public function & fadeOut( $el, $duration = 400 ){
         $this->out[ 'fo' ][] = array( 'e' => $el, 'd' => $duration );
         return $this;

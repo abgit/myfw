@@ -133,52 +133,6 @@
         "description": "Auth0 PHP SDK."
     },
     {
-        "name": "react/promise",
-        "version": "v2.2.0",
-        "version_normalized": "2.2.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/promise.git",
-            "reference": "365fcee430dfa4ace1fbc75737ca60ceea7eeeef"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/promise/zipball/365fcee430dfa4ace1fbc75737ca60ceea7eeeef",
-            "reference": "365fcee430dfa4ace1fbc75737ca60ceea7eeeef",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.4.0"
-        },
-        "time": "2014-12-30 13:32:42",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "React\\Promise\\": "src/"
-            },
-            "files": [
-                "src/functions_include.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jan Sorgalla",
-                "email": "jsorgalla@googlemail.com"
-            }
-        ],
-        "description": "A lightweight implementation of CommonJS Promises/A for PHP"
-    },
-    {
         "name": "guzzlehttp/streams",
         "version": "3.0.0",
         "version_normalized": "3.0.0.0",
@@ -682,48 +636,6 @@
         ]
     },
     {
-        "name": "adoy/oauth2",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/adoy/PHP-OAuth2.git",
-            "reference": "8b39849eba97b439940bb92a70d820a8235a183d"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/adoy/PHP-OAuth2/zipball/8b39849eba97b439940bb92a70d820a8235a183d",
-            "reference": "8b39849eba97b439940bb92a70d820a8235a183d",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2015-05-21 14:17:01",
-        "type": "library",
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "OAuth2": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL-2.1"
-        ],
-        "authors": [
-            {
-                "name": "Berejeb Anis",
-                "email": "anis.berejeb@gmail.com"
-            },
-            {
-                "name": "Charron Pierrick",
-                "email": "pierrick@webstart.fr"
-            }
-        ],
-        "description": "Light PHP wrapper for the OAuth 2.0 protocol (based on OAuth 2.0 Authorization Protocol draft-ietf-oauth-v2-15)"
-    },
-    {
         "name": "slim/views",
         "version": "0.1.3",
         "version_normalized": "0.1.3.0",
@@ -1048,57 +960,6 @@
         ]
     },
     {
-        "name": "happyr/linkedin-api-client",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Happyr/LinkedIn-API-client.git",
-            "reference": "195e93c643ba3cc0c6ff77ab85ff250ccecda61e"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Happyr/LinkedIn-API-client/zipball/195e93c643ba3cc0c6ff77ab85ff250ccecda61e",
-            "reference": "195e93c643ba3cc0c6ff77ab85ff250ccecda61e",
-            "shasum": ""
-        },
-        "require": {
-            "guzzlehttp/guzzle": "~5.0",
-            "php": ">=5.4"
-        },
-        "require-dev": {
-            "illuminate/support": "*",
-            "mockery/mockery": "*"
-        },
-        "time": "2015-06-11 07:58:00",
-        "type": "library",
-        "installation-source": "source",
-        "autoload": {
-            "psr-4": {
-                "Happyr\\LinkedIn\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Tobias Nyholm",
-                "email": "tobias@happyr.com"
-            }
-        ],
-        "description": "LinkedIn API client. Handles OAuth, CSRF protection. Easy to implement and extend. This is a standalone library for any composer project.",
-        "homepage": "http://developer.happyr.com/libraries/linkedin-php-client",
-        "keywords": [
-            "api",
-            "client",
-            "linkedin",
-            "oauth",
-            "sdk"
-        ]
-    },
-    {
         "name": "symfony/event-dispatcher",
         "version": "v2.7.1",
         "version_normalized": "2.7.1.0",
@@ -1309,5 +1170,144 @@
             "php",
             "twitter"
         ]
+    },
+    {
+        "name": "happyr/linkedin-api-client",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Happyr/LinkedIn-API-client.git",
+            "reference": "a1197145a1f58a160b114d11db1ffe57ae633d61"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Happyr/LinkedIn-API-client/zipball/a1197145a1f58a160b114d11db1ffe57ae633d61",
+            "reference": "a1197145a1f58a160b114d11db1ffe57ae633d61",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/guzzle": "~5.0",
+            "php": ">=5.4"
+        },
+        "require-dev": {
+            "illuminate/support": "*",
+            "mockery/mockery": "*"
+        },
+        "time": "2015-07-01 14:17:45",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Happyr\\LinkedIn\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias@happyr.com"
+            }
+        ],
+        "description": "LinkedIn API client. Handles OAuth, CSRF protection. Easy to implement and extend. This is a standalone library for any composer project.",
+        "homepage": "http://developer.happyr.com/libraries/linkedin-php-client",
+        "keywords": [
+            "api",
+            "client",
+            "linkedin",
+            "oauth",
+            "sdk"
+        ]
+    },
+    {
+        "name": "react/promise",
+        "version": "v2.2.1",
+        "version_normalized": "2.2.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/reactphp/promise.git",
+            "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/reactphp/promise/zipball/3b6fca09c7d56321057fa8867c8dbe1abf648627",
+            "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0"
+        },
+        "time": "2015-07-03 13:48:55",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "React\\Promise\\": "src/"
+            },
+            "files": [
+                "src/functions_include.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jan Sorgalla",
+                "email": "jsorgalla@gmail.com"
+            }
+        ],
+        "description": "A lightweight implementation of CommonJS Promises/A for PHP"
+    },
+    {
+        "name": "adoy/oauth2",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/adoy/PHP-OAuth2.git",
+            "reference": "0e035fdeea289a0b4a4e3834783ae8430a40fe6e"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/adoy/PHP-OAuth2/zipball/0e035fdeea289a0b4a4e3834783ae8430a40fe6e",
+            "reference": "0e035fdeea289a0b4a4e3834783ae8430a40fe6e",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2015-07-05 02:23:30",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "OAuth2": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Berejeb Anis",
+                "email": "anis.berejeb@gmail.com"
+            },
+            {
+                "name": "Charron Pierrick",
+                "email": "pierrick@webstart.fr"
+            }
+        ],
+        "description": "Light PHP wrapper for the OAuth 2.0 protocol (based on OAuth 2.0 Authorization Protocol draft-ietf-oauth-v2-15)"
     }
 ]

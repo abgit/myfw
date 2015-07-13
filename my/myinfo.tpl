@@ -31,8 +31,8 @@
 
                                     {% if profile.icons %}
     					    			<div class="icons-group">
-                                            {% for icon in profile.icons %}
-        				                    	<a class="{{ icon.class|default('tip') }}" title="{{ icon.title }}" href="{{ icon.href }}" data-original-title="{{ icon.prefix }}{{ values[ icon.key ]}}{{ icon.sufix }}" target="_blank"><i class="{{ icon.icon }}"></i></a>
+                                            {% for icon in profile.icons if ( icon.depends == false or values[ icon.depends ] )%}
+        				                    	<a class="{{ icon.class|default('tip') }}" title="{{ icon.title }}"{% if icon.hrefkey and values[ icon.hrefkey ] %} href="{{ values[ icon.hrefkey ] }}"{% elseif icon.href %} href="{{ icon.href }}"{% endif %} data-original-title="{{ icon.prefix }}{{ values[ icon.key ]}}{{ icon.sufix }}" target="_blank"><i class="{{ icon.icon }}"></i></a>
     			                    	    {% endfor %}
                                         </div>
                                     {% endif %}
@@ -57,7 +57,7 @@
         <h5>{{ val }}</h5>
 
     {% elseif el.type == 'text' %}
-        <p>{{ val|nl2br }}</p>
+        <p>{{ val|trim|nl2br }}</p>
 
     {% elseif el.type == 'textimage' %}
         {% if values[ el.keyi ] %}
@@ -66,7 +66,7 @@
         {% if el.keyt %}
             <h6>{{ values[ el.keyt ] }}</h6>
         {% endif %}
-    {{ val }}
+    {{ val|trim|nl2br }}
 
     {% elseif el.type == 'custom' %}
         <p>{% if el.title %}<h6>{{ el.title }}</h6>{% endif %}{{el.obj|raw}}

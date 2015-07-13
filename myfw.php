@@ -70,6 +70,7 @@
         private $objTFValid  = null;
         private $chats       = null;
         private $ishttps     = null;
+        private $sms         = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -151,6 +152,12 @@
             if( is_null( $this->auth0 ) )
 				$this->auth0 = new myauth0();
 			return $this->auth0;
+		}
+
+        public function sms(){
+            if( is_null( $this->sms ) )
+				$this->sms = new mysms();
+			return $this->sms;
 		}
 
 		// get form object
@@ -472,6 +479,11 @@
         
         public function urlForAjax( $action, $options = array(), $msg = false ){
             return "myfwsubmit('" . $this->urlFor( $action, $options ) . "'" . ( is_string( $msg ) ? ( ",'" . $msg . "'" ) : '' ) . ")";
+        }
+
+        public function urlForAjaxForm( $formobj, $submitbutton, $action, $options = array(), $msg = '' ){
+            if( is_a( $formobj, 'myform' ) )
+                return "myfwformsubmit('" . $formobj->getName() . "','','','" . $formobj->getName() . $submitbutton . "','" . $msg . "','" . $this->urlFor( $action, $options ) . "')";
         }
 
         public function urlForWindow( $action, $options = array() ){

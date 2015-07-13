@@ -221,7 +221,7 @@
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
                     <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}">
-                        {% if el.icon %}<i class="{{el.icon}}"></i>{% endif %}{{el.title}}{% if el.description %}<small class="display-block" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
+                        {% if el.icon %}<i class="{{el.icon}}"></i>{% endif %}{{el.title}}{% if el.description %}<small class="display-block{% if el.descriptionclass %} {{ el.descriptionclass }}{% endif %}" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>
 
@@ -405,7 +405,7 @@
                     {% if el.href %}
                         <a type="button" href="{{ el.href }}" style="margin-left:5px;margin-top:3px;" class="btn btn-default">{{ el.labelbutton }}</a>
                     {% else %}
-                        <input type="button" class="btn {{el.css}}" style="margin-left:5px;margin-top:3px;"{% if el.onclick %} onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
+                        <input type="button" class="btn {{ el.css|default( 'btn-default' ) }}" style="margin-left:5px;margin-top:3px;"{% if el.onclick %} onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
                     {% endif %}
 
                 {% endif %}

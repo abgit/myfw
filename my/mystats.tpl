@@ -13,31 +13,54 @@
 
 <ul class="statistics">
 {% for stat in elements %}
+
+                    {% set value = values[ stat.key ] %}
+
+                    {% set type = ( stat.typekey ? values[ stat.typekey ] : stat.type )|default( 'default' ) %}
+
+                    {% if stat.classreplace %}
+                        {% set type = (stat.classreplacekey ? values[ stat.classreplacekey ] : value)|replaceonly( stat.classreplace )|default( stat.classreplacedefault )|default( 'default' ) %}
+                    {% endif %}
+
     <li{% if stat.class %} class="{{ stat.class }}"{% endif %}>
         <div class="statistics-info">
-            {% if stat.icon %}<a class="bg-{{stat.type}}"><i class="{{stat.icon}}"></i></a>{% endif %}
+            {% if stat.icon %}<a class="bg-{{ type }}"><i class="{{stat.icon}}"></i></a>{% endif %}
+
+            {% if stat.keytype == 1 %}
             <strong>
-                    <span class="infopre">{{ stat.addonpre|replace({' ': '&nbsp;'})|raw }}</span>
+            
+                    {% set infopre = stat.addonpre|replace({' ': '&nbsp;'}) %}
+            
+                    {% if infopre %}<span class="infopre">{{ infopre|raw }}</span>{% endif %}
 
                     {% if stat.onclick %}
                         <a onClick="{{ stat.onclick }}">
                     {% endif %}
-                    
-                    <span id="st{{ stat.key }}"{% if stat.islabel %} class="label label-stats label-{{ stat.type }}"{% endif %}>{{values[ stat.key ]|t(15)}}</span>
+
+                    {% if stat.replace %}
+                        {% set value = value|replaceonly( stat.replace )|default( stat.replacedefault ) %}
+                    {% endif %}
+
+                    <span id="st{{ stat.key }}"{% if stat.islabel %} class="label label-stats label-{{ type }}"{% endif %}>{{ value|t(15) }}</span>
 
                     {% if stat.onclick %}
                         </a>
                     {% endif %}
 
-                    <span class="infopos">{{ stat.addonpos|replace({' ': '&nbsp;'})|raw }}</span>
+                    {% set infopos = stat.addonpos|replace({' ': '&nbsp;'}) %}
+                    {% if infopos %}<span class="infopos">{{ infopos|raw }}</span>{% endif %}
             </strong>
+            {% endif %}
         </div>
-        <div class="progress progress-micro">
-            <div style="width:{{ stat.percentage|default(100) }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{ stat.percentage }}" role="progressbar" class="progress-bar progress-bar-{{ stat.type }}">
-                <span class="sr-only">{{ stat.percentage|default(100) }}%</span>
+        {% if stat.percentagetype %}
+            {% set pervalue = ( stat.percentagekey ? values[ stat.percentagekey ] : stat.percentage )|default(100) %}
+            <div class="progress {% if stat.percentagetype == 1 %}progress-micro{% endif %}">
+                <div style="width:{{ pervalue|round(0, 'ceil') }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{ pervalue|round }}" role="progressbar" class="progress-bar progress-bar-{{ type }}">
+                    <span class="sr-only">{{ pervalue }}%</span>
+                </div>
             </div>
-        </div>
-        <span>{{ stat.label|raw }}</span>
+        {% endif %}
+        <span>{{ stat.addonlabelpre|raw }}{{ stat.addonlabelprekey ? values[ stat.addonlabelprekey ]|raw }}{{ stat.label|raw }}{{ stat.addonlabelposkey ? values[ stat.addonlabelposkey ]|raw }}{{ stat.addonlabelpos|raw }}</span>
     </li>
 {% endfor %}
 </ul>

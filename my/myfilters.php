@@ -36,9 +36,12 @@ class myfilters{
         if( is_array( $currencies ) )
             foreach( $currencies as $cur )
                 $vals[ $cur ] = isset( $btc[ $cur ] ) ? $btc[ $cur ] : array();
-//                $vals[ $cur ] = $app->blockchain()->frombtc( $cur, $amount, true );
 
-        return $vals; //implode( ' or ', $vals );
+        return $vals;
+    }
+
+    public static function satoshi( $amount ){
+        return $amount * 100000000;
     }
 
     public static function nl2space( $string ){
@@ -87,6 +90,12 @@ class myfilters{
 
     public static function values( $array ){
         return is_array( $array ) ? implode( ', ', array_values( $array ) ) : $array;
+    }
+
+    public static function replaceonly( $string, $array ){
+        foreach( $array as $k => $v )
+            if( strval( $string ) === strval( $k ) )
+                return $v;
     }
 
     public static function inarray( $string, $array, $default = 'unknown' ){

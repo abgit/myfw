@@ -62,8 +62,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3 ){
-        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size );
+    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '' ){
+        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick );
         return $this;
     }
     
@@ -72,8 +72,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addTitle( $key, $static = false ){
-        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static );
+    public function & addTitle( $key, $static = false, $onclick = '' ){
+        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick );
         return $this;
     }
 
@@ -82,8 +82,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addDescription( $key, $static = false ){
-        $this->elements[ 'description' ] = array( 'key' => $key, 'static' => $static );
+    public function & addDescription( $key, $static = false, $onclick = '' ){
+        $this->elements[ 'description' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick );
         return $this;
     }
 
@@ -97,8 +97,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addInfoThumb( $key, $size = null ){
-        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 1, 'size' => $size );
+    public function & addInfoThumb( $key, $size = null, $onclick = '' ){
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 1, 'size' => $size, 'onclick' => $onclick );
         return $this;
     }
 

@@ -45,25 +45,21 @@
                                                             {% set value = value|replace( td.replace ) %}
                                                         {% endif %}
 
-                                                        {% if td.addonpre %}
-                                                            {% set value = td.addonpre ~ value %}
-                                                        {% endif %}
+                                                        {% set addonpre = td.addonpre %}
 
-                                                        {% if td.addopos %}
-                                                            {% set value = value ~ td.addonpos %}
-                                                        {% endif %}
+                                                        {% set addonpos = td.addonpos %}
 
                                                         {% if td.type == 'simple' %}
                                                             {{ value|nl2space|t(60) }}
 
                                                         {% elseif td.type == 'h4' %}
-                                                            <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ value|nl2space|t(60) }}</h4>
+                                                            <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}</h4>
 
                                                         {% elseif td.type == 'h6' %}
-                                                            <h6{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ value|nl2space|t(60) }}</h6>
+                                                            <h6{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}</h6>
 
                                                         {% elseif td.type == 'span' %}
-            				                            	<span{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %} style="display:block;font-size:11px;margin-top:-2px;">{{ value|nl2space|t(60) }}</span>
+            				                            	<span{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %} style="display:block;font-size:11px;margin-top:-2px;">{{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'progress' %}
                                                             <div class="progress">
@@ -83,7 +79,7 @@
                 				                            	<a onclick="{{ td.onclick|replace({ (keyhtml): val[ key ] }) }}">
                                                             {% endif %}
 
-                                                            <img src="{{ value }}" alt="" class="user-face">
+                                                            <img src="{{ td.cdn }}{{ value }}" alt="" class="user-face">
 
                                                             {% if td.onclick %}
                 				                            	</a>
@@ -93,7 +89,7 @@
                                                             <img height="{{ td.height }}" width="{{ td.width }}" src="{{ td.cdn }}{{ value }}{{ td.sufix }}">
 
                                                         {% elseif td.type == 'label' %}
-                                                            <span class="label label-mini {{ ( td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list )|default( 'label-primary' ) }}">{{ value|t(20) }}</span>
+                                                            <span class="label label-mini label-{{ ( td.class.key ? val[ td.class.key ] : value )|replaceonly( td.class.list )|default( td.class.default ? td.class.default : 'default' ) }}">{{ value|t(20) }}</span>
 
                                                         {% elseif td.type == 'url' %}
             				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t(60) }}</a>
@@ -102,11 +98,11 @@
                                                             <br />
 
                                                         {% elseif td.type == 'space' %}
-                                                            &nbsp;
+                                                            &nbsp;&nbsp;
 
                                                         {% elseif td.type == 'ago' %}
                                                             <i class="icon-clock"></i> {{ value|ago }}
-            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|t(19,'') }}</span>
+            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|date("Y-m-d H:i:s") }}</span>
 
                                                         {% elseif td.type == 'description' %}
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|nl2space|t(36) }}</span>

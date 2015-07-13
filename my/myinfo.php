@@ -70,8 +70,8 @@ class myinfo{
         return $this;
     }
 
-    public function & addProfileIcon( $icon, $href, $key, $prefix, $sufix ){
-        $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix );
+    public function & addProfileIcon( $icon, $href, $key, $prefix, $sufix, $hrefkey = false, $depends = false ){
+        $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'hrefkey' => $hrefkey, 'depends' => $depends );
         return $this;
     }
 
@@ -81,12 +81,11 @@ class myinfo{
     }
 
     public function & setValues( $values ){
-        if( is_array( $values ) )
-            $this->values = $values;
+        $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
         foreach( $this->elements as $n => $el ){
-            if( is_string( $n ) && isset( $values[ $n ] ) && isset( $el[ 'obj' ] ) && method_exists( $el[ 'obj' ], 'setvalues' ) )
-                $el[ 'obj' ]->setValues( $values[ $n ] );
+            if( is_string( $n ) && isset( $this->values[ $n ] ) && isset( $el[ 'obj' ] ) && method_exists( $el[ 'obj' ], 'setvalues' ) )
+                $el[ 'obj' ]->setValues( $this->values[ $n ] );
         }
 
         return $this;

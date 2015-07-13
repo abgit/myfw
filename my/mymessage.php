@@ -11,6 +11,8 @@ class mymessage{
     private $customsubheader;
     private $video;
     private $offset;
+    private $reltitle;
+    private $relmessagekey;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -32,7 +34,7 @@ class mymessage{
         return $this;
     }
     
-    public function & setHeader( $title, $subtitle, $custom ){
+    public function & setHeader( $title, $subtitle = '', $custom = ''){
         $this->customheader = array( 'title' => $title, 'subtitle' => $subtitle, 'custom' => $custom );
         return $this;
     }
@@ -66,6 +68,25 @@ class mymessage{
         $this->elements[] = array( 'type' => 'message', 'text' => $message, 'thumb' => $this->app->ishttps() ? $thumbhttps : $thumb );
         return $this;
     }
+
+    public function & addTitleMessageRelative( $title, $messagekey ){
+        $this->reltitle = $title;
+        $this->relmessagekey = $messagekey;
+        return $this;
+    }
+    
+    public function & setValues( $values ){
+
+        if( is_string( $values ) )
+            $values = json_decode( $values, true );
+
+        if( isset( $values[ $this->relmessagekey ] ) )
+            $this->addTitle( $this->reltitle )
+                 ->addMessage( $values[ $this->relmessagekey ] );
+
+        return $this;
+    }
+
 
     public function & addThumb( $key, $keyhttps ){
         $this->elements[] = array( 'type' => 'thumb', 'key' => $this->app->ishttps() ? $keyhttps : $key );

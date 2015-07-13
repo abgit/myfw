@@ -174,8 +174,16 @@ class myform{
         return $this;
     }
 
-    public function & addHeader( $title, $description = '', $icon = 'icon-books' ){
-        $this->elements[ 'hdr' . $this->counter++ ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'icon' => $icon, 'rules' => array(), 'filters' => array() );
+    public function & addHeader( $title, $description = '', $icon = 'icon-books', $descriptionclass = '' ){
+        $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array() );
+        return $this;
+    }
+
+    public function & setHeaderDescription( $description, $class = '' ){
+        if( isset( $this->elements[ 'hdr' . strtolower( $title ) ] ) ){
+            $this->elements[ 'hdr' . strtolower( $title ) ][ 'description' ] = $description;
+            $this->elements[ 'hdr' . strtolower( $title ) ][ 'descriptionclass' ] = $class;
+        }
         return $this;
     }
 

@@ -22,8 +22,25 @@ class mystats{
         return $this;
     }
 
-    public function & addElement( $key, $label, $icon = false, $type = 'info', $onclick = '', $href = '', $percentage = 100, $class = '', $islabel = false ){
-        $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class, 'islabel' => $islabel );
+    public function & addElement( $key, $label, $icon = false, $type = '', $onclick = '', $href = '', $percentage = 100, $class = '', $islabel = false, $typekey = false, $percentagetype = 1, $percentagekey = false, $keytype = 1 ){
+        $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class, 'islabel' => $islabel, 'typekey' => $typekey, 'percentagetype' => $percentagetype, 'percentagekey' => $percentagekey, 'keytype' => $keytype );
+        return $this;
+    }
+
+    public function & setReplace( $key, $replace, $default ){
+        if( isset( $this->elements[ $key ] ) ){
+            $this->elements[ $key ][ 'replace' ]        = $replace;
+            $this->elements[ $key ][ 'replacedefault' ] = $default;
+        }
+        return $this;
+    }
+
+    public function & setClass( $key, $replace, $default, $customkey = false ){
+        if( isset( $this->elements[ $key ] ) ){
+            $this->elements[ $key ][ 'classreplace' ]        = $replace;
+            $this->elements[ $key ][ 'classreplacedefault' ] = $default;
+            $this->elements[ $key ][ 'classreplacekey' ]     = $customkey;
+        }
         return $this;
     }
 
@@ -38,10 +55,23 @@ class mystats{
         return $this;
     }
 
-    public function & setValues( $values ){
-        if( is_array( $values ) )
-            $this->values = $values;
+    public function & addAddonLabel( $name, $value, $prefix = true, $key = false ){
+        if( isset( $this->elements[ $name ] ) ){
+            if( $prefix ){
+                    $this->elements[ $name ][ 'addonlabelpre' ] = $value;
+                    if( is_string( $key ) )
+                        $this->elements[ $name ][ 'addonlabelprekey' ] = $key;
+            }else{
+                    $this->elements[ $name ][ 'addonlabelpos' ] = $value;
+                    if( is_string( $key ) )
+                        $this->elements[ $name ][ 'addonlabelposkey' ] = $key;
+            }
+        }
+        return $this;
+    }
 
+    public function & setValues( $values ){
+        $this->values = is_array( $values ) ? $values : json_decode( $values, true );
         return $this;
     }
 

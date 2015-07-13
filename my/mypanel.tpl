@@ -48,7 +48,16 @@
                                         {% if elements.thumb.static or value[ elements.thumb.key ] %}
 
     										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
+                                                
+                                                {% if elements.thumb.onclick %}
+                                                    <a onclick="{{ elements.thumb.onclick|replaceurl( value, tags ) }}">
+                                                {% endif %}
+
                                                 <img style="margin-top:10px;margin-left:-10px" src="{{ cdn }}{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
+
+                                                {% if elements.thumb.onclick %}
+                                                    </a>
+                                                {% endif %}
                                             </div>
 
                                             {% set class2 = elements.info ? 'col-sm-' ~ ( 12 - 3 - elements.thumb.size ) : 'col-sm-' ~ ( 12 - elements.thumb.size ) %}
@@ -57,17 +66,34 @@
                                         {% endif %}
 
     										<div class="{{ class2 }} task-description">
+
+                                                    {% if elements.title.onclick %}
+                                                        <a onclick="{{ elements.title.onclick|replaceurl( value, tags ) }}">
+                                                    {% endif %}
+
     										        {% if elements.title %}
                                             		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(40) }}{% endif %}</span>
     										        {% endif %}
+
+                                                    {% if elements.title.onclick %}
+                                                        </a>
+                                                    {% endif %}
 
     										        {% if elements.reference %}
                                                         <span class="text-success" style="font-size:10px">{{ value[ elements.reference.key ]|t(40) }}</span>
     										        {% endif %}
 
+                                                    {% if elements.description.onclick %}
+                                                        <a onclick="{{ elements.description.onclick|replaceurl( value, tags ) }}">
+                                                    {% endif %}
+
     										        {% if elements.description %}
     												    <span>{% if elements.description.static %}{{ elements.description.key|raw }}{% else %}{{ value[ elements.description.key ]|t(150) }}{% endif %}</span>
     										        {% endif %}
+
+                                                    {% if elements.description.onclick %}
+                                                        </a>
+                                                    {% endif %}
     										</div>
                                             
                                             {% if elements.info %}
@@ -119,7 +145,17 @@
                                                         {% elseif info.type == 1 %}
 
                                                             {% if value[ info.key ] %}
+
+                                                                {% if info.onclick %}
+                                                                    <a onclick="{{ info.onclick|replaceurl( value, tags ) }}">
+                                                                {% endif %}
+
                                                                 <img class="infothumb" width="{{ info.size|default(40) }}" height="{{ info.size|default(40) }}" style="max-width:{{ info.size|default(40) }}px;" alt="" src="{{ cdn }}{{ value[ info.key ] }}">
+
+                                                                {% if info.onclick %}
+                                                                    </a>
+                                                                {% endif %}
+
                                                             {% endif %}
 
                                                         {% endif %}

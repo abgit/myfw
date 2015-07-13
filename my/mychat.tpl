@@ -5,16 +5,25 @@
                     <div id="{{id}}msgs">
 
     {% endif %}
-    					{% for msg in elements %}
-                            <div class="message {{ msg.me ? 'reversed' }}">
-                                <img class="message-img" width="40" height="40"  alt="" src="{{ cdn }}{{ msg.thumb }}">
+    					{% for msg in values %}
+                            <div class="message{{ ( keyme and msg[ keyme ] ) ? ' reversed' }}">
+                                {% if keythumb %}
+                                    <img class="message-img" width="40" height="40"  alt="" src="{{ cdn }}{{ msg[ keythumb ] }}">
+                                {% endif %}
+
                                 <div class="message-body">
-                                    {% if msg.image %}
-                                        <img src="{{ cdn }}{{ msg.image }}" width="{{ image.w|default(300) }}" height="{{ image.h|default(200) }}" />
+                                    {% if msg[ message.imgkey ] %}
+                                        <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" width="{{ msg[ message.imgwidth]|default(300) }}" height="{{ msg[ message.imgheight]|default(200) }}" />
                                     {% else %}
-                                        {{msg.content|t(2000)}}
+                                        {{ msg[ message.key ]|t(2000) }}
                                     {% endif %}
-                                    <span class="attribution">{{msg.owner|t(40)}}, {{msg.when|ago}}</span>
+                                    
+                                    {% if keyowner or keydate %}
+                                    <span class="attribution">
+                                        {{msg[ keyowner ]|t(40)}}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}
+                                    </span>
+                                    {% endif %}
+
                                 </div>
                             </div>
                         {% endfor %}
@@ -22,7 +31,7 @@
     {% if init %}
 
                     </div>
-                    <div class="message {{ wait.me ? 'reversed' }}" id="{{id}}wait" style="visibility:hidden">
+                    <div class="message {{ wait.me ? 'reversed' }}" id="{{id}}wait" style="display:none">
                         <img class="message-img" width="{{ wait.size }}" height="{{ wait.size }}" alt="" src="{{ wait.thumb }}">
                         <div class="message-body">
                             <span class="typing"></span>
@@ -48,7 +57,7 @@
                         {% endif %}
 
                         {% if message %}
-                            <button onClick="$('#{{id}}wait').css('visibility','visible');myfwsubmit('{{ message.url }}','',{msg:$('#{{ id }}msg').val()})" class="btn btn-primary btn-loading" type="button" style="margin-left:5px; padding:6px 12px">{{ message.caption|default( 'Submit message' ) }}</button>
+                            <button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ message.url }}','Sending ...',{msg:$('#{{ id }}msg').val()});$('#{{ id }}msg').val('');}" class="btn btn-primary btn-loading" type="button" style="margin-left:5px; padding:6px 12px">{{ message.caption|default( 'Submit message' ) }}</button>
                         {% endif %}
 
                         {% for button in buttons %}

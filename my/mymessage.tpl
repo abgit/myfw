@@ -1,10 +1,17 @@
 
     {% if customheader %}
         <div class="page-header">
-				<div class="page-title">
-					<h3>{{ customheader.title }}<small>{{ customheader.subtitle }}</small></h3>
-				</div>
-                {{ customheader.custom|raw }}
+                {% if customheader.title or customheader.subtitle %}
+    				<div class="page-title">
+    					<h3>{{ customheader.title }}
+
+                            {% if customheader.subtitle %}                        
+                                <small>{{ customheader.subtitle }}</small>
+                            {% endif %}
+                        </h3>
+    				</div>
+                 {% endif %}
+                {{ customheader.custom ? customheader.custom|raw }}
         </div>
     {% endif %}                            
                             
@@ -30,7 +37,7 @@
         <div class="row"><div class="col-md-{{ 12 - offset - offset }} col-md-offset-{{ offset }}">
     {% endif %}
 
-<div{% if id %} id="{{ id }}"{% endif %} class="callout {{ classname|default( 'callout-info' ) }} fade in" style="margin-bottom:0px">
+<div{% if id %} id="{{ id }}"{% endif %} class="callout callout-{{ classname|default( 'info' ) }} fade in" style="margin-bottom:0px">
 
     {% if closebutton %}
         <button type="button" class="close" data-dismiss="alert" onclick="{{ closebutton.onclick }}">×</button>

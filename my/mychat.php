@@ -4,7 +4,7 @@
 
         private $app;
         private $id;
-        private $elements;
+        private $values;
         private $urlupdate;
         private $interval;
         private $urlimage;
@@ -15,6 +15,10 @@
         private $wait;
         private $init;
         private $cdn;
+        private $keyowner;
+        private $keydate;
+        private $keythumb;
+        private $keyme;
         private $buttons = array();
 
         public function __construct( $id ){
@@ -28,9 +32,55 @@
             $this->interval  = $interval * 1000;
             return $this;
         }
-        
-        public function & setMessage( $url, $caption = '', $textarea = '' ){
-            $this->message = array( 'url' => $url, 'caption' => $caption, 'textarea' => $textarea );
+
+        public function & setValues( $values ){
+            $this->values = is_array( $values ) ? $values : json_decode( $values, true );
+
+            $this->app->session()->set( 'myfwchat' . $this->id . 'f', empty( $this->values ) ? 0 : $this->values[0][ 'id' ] );
+            $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $this->values ) ? 0 : $this->values[count($this->values) - 1][ 'id' ] );
+            return $this;
+        }
+
+        public function getFirst(){
+            return $this->app->session()->get( 'myfwchat' . $this->id . 'f', 0 );
+        }
+
+        public function getLast(){
+            return $this->app->session()->get( 'myfwchat' . $this->id . 'l', 0 );
+        }
+
+        public function & setMessage( $url, $key, $caption = '', $textarea = '' ){
+            if( !is_array( $this->message ) )
+                $this->message = array();
+            $this->message[ 'url' ]      = $url;
+            $this->message[ 'key' ]      = $key;
+            $this->message[ 'caption' ]  = $caption;
+            $this->message[ 'textarea' ] = $textarea;
+            return $this;
+        }
+
+        public function & setImage( $key, $width = '', $height = ''){
+            if( !is_array( $this->message ) )
+                $this->message = array();
+            $this->message[ 'imgkey' ]    = $key;
+            $this->message[ 'imgwidth' ]  = $width;
+            $this->message[ 'imgheight' ] = $height;
+            return $this;
+        }
+
+        public function & setAttribution( $keyowner, $keydate ){
+            $this->keyowner = $keyowner;
+            $this->keydate  = $keydate;
+            return $this;
+        }
+
+        public function & setThumb( $key ){
+            $this->keythumb = $key;
+            return $this;
+        }
+
+        public function & setMe( $key ){
+            $this->keyme = $key;
             return $this;
         }
 
@@ -61,17 +111,23 @@
             return $this->app->session()->get( 'myfwchat' . $this->id, false );
         }
 
-        public function updateAjax( $elements, $currentelementid = false ){
-            $this->init     = false;
-            $this->elements = $elements;
+        public function addAjax( $values /*, $currentelementid = false */){
+            $this->init   = false;
+            $this->values = $values;
             $this->app->ajax()->append( '#' . $this->id . 'msgs', $this->__toString() )
                               ->scrollBottom( '#' . $this->id . 'box' )
-                              ->val( '#' . $this->id . 'msg', '' )
-                              ->visibility( '#' . $this->id . 'wait', false );
+                              ->val( '#' . $this->id . 'msg', '' );
+//                              ->display( '#' . $this->id . 'wait', false );
 
-            if( is_int( $currentelementid ) ){
-                $this->app->session()->set( 'myfwchat' . $this->id, $currentelementid );
-            }
+//            if( is_int( $currentelementid ) ){
+//                $this->app->session()->set( 'myfwchat' . $this->id, $currentelementid );
+//            }
+            $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $values ) ? 0 : $this->values[count($values) - 1][ 'id' ] );
+        }
+
+        public function & ajaxClearTextarea(){
+            $this->app->ajax()->val( '#' . $this->id . 'msg', '' );
+            return $this;
         }
 
         public function & setTransloadit( $urlimage, $formname, $options ){
@@ -115,15 +171,23 @@
 
                 if( is_int( $this->currentelementid ) )
                     $this->app->session()->set( 'myfwchat' . $id, $this->currentelementid );
+
+                $this->app->ajax()->scrollBottom( '#' . $this->id . 'box' );
             }
 
-            return array( 'elements'    => $this->elements,
+            return array( 'values'      => $this->values,
+                          'message'     => $this->message,
                           'transloadit' => $this->transloadit,
                           'urlupdate'   => $this->urlupdate,
                           'urlimage'    => $this->urlimage,
                           'formname'    => $this->formname,
                           'message'     => $this->message,
                           'buttons'     => $this->buttons,
+                          'keyowner'    => $this->keyowner,
+                          'keydate'     => $this->keydate,
+                          'keythumb'    => $this->keythumb,
+                          'keyme'       => $this->keyme,
+                          'cdn'         => $this->cdn,
                           'id'          => $this->id,
                           'init'        => $this->init );
         }

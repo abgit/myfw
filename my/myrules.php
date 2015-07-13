@@ -50,6 +50,10 @@ class myrules{
         return myrules::regex( strval( $value ), '/^([0-9a-zA-Z\-]{3,20})$/' );
     }
 
+    public static function phonenumber( $value, $opts='', $formelement = null ) {
+        return myrules::regex( strval( $value ), '/^([0-9]{10,18})$/' );
+    }
+
     public static function twofactortoken( $value, $opts='', $formelement = null ) {
         return myrules::regex( strval( $value ), '/^([0-9]{6})$/' );
     }

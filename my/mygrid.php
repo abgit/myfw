@@ -119,11 +119,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addThumb( $key, $kval, $kvals, $label = '', $onclick = '' ){
+    public function & addThumb( $key, $kval, $kvals, $label = '', $onclick = '', $cdn = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $this->app->ishttps() ? $kvals : $kval, 'type' => 'thumb', 'onclick' => $onclick );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $this->app->ishttps() ? $kvals : $kval, 'type' => 'thumb', 'onclick' => $onclick, 'cdn' => $cdn );
         return $this;
     }
 
@@ -183,6 +183,17 @@ class mygrid{
         return $this;
     }
 
+    public function & setLabelClass( $key, $kval, $replace, $default, $customkey = false ){
+        foreach( $this->cols[ $key ] as $index => $subrow ){
+            if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval ){
+                $this->cols[ $key ][ $index ][ 'classreplace' ] = $replace;
+                $this->cols[ $key ][ $index ][ 'classreplacedefault' ] = $default;
+                $this->cols[ $key ][ $index ][ 'classreplacekey' ] = $customkey;
+            }
+        }
+        return $this;
+    }
+
     public function & addBr( $key ){
         $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'br' );
         return $this;
@@ -226,8 +237,7 @@ class mygrid{
     }
 
     public function & setValues( $values ){
-        if( is_array( $values ) )
-            $this->values = $values;
+        $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
         return $this;
     }
@@ -245,13 +255,11 @@ class mygrid{
         return $this;
     }
 
-
-
-    public function & setRowClass( $key, $kval, $class, $dependkey = false ){
+    public function & setRowClass( $key, $kval, $class, $default, $dependkey = false ){
 
         foreach( $this->cols[ $key ] as $index => $subrow ){
-            if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
-                $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey );
+            if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey, 'default' => $default );
         }
         return $this;
     }
@@ -259,7 +267,7 @@ class mygrid{
 
     public function & setRowReplace( $key, $kval, $replace ){
         foreach( $this->cols[ $key ] as $index => $subrow ){
-            if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+            if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
                 $this->cols[ $key ][ $index ][ 'replace' ] = $replace;
         }
         return $this;

@@ -64,6 +64,9 @@
                         case 'datetime' :   $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? substr( $values[ $column_name ], 0, 19 ) : null;
                                             break;
+                        case 'timestamp' :  $column_type  = PDO::PARAM_STR;
+                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d H:i:s", strtotime( $values[ $column_name ] ) ) : null;
+                                            break;
                         case 'text' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 65535 ) : null;
                                             break;
@@ -83,7 +86,7 @@
                                             $column_value = isset( $values[ $column_name ] ) ? intval( $values[ $column_name ] ) : null;
                                             break;
                         case 'json' :       $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : '';
+                                            $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : null;
                                             if( empty( $column_value ) || !is_string( $column_value ) || !is_array( json_decode( $column_value, true ) ) || json_last_error() != 0 ){
                                                 $column_value = json_encode( $column_value );
                                             }
