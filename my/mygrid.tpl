@@ -6,7 +6,7 @@
     {% endif %}
 
     {% if buttons is not empty %}
-    <div style="margin-bottom:10px;" class="row">
+    <div class="row">
         <div class="col-md-12 text-right">
         {% for button in buttons %}
             <a style="margin-left:3px;" type="button" class="btn btn-{{button.class}}" onclick="{{ button.onclick }}"><i class="{{ button.icon }}"></i> {{ button.label }}</a>
@@ -14,6 +14,8 @@
         </div>
     </div>
     {% endif %}
+    
+    {{ menuhtml|raw }}
 
     <div style="overflow-y:visible">
 				                <div role="grid">
@@ -34,7 +36,7 @@
 
                                     		{% for col in labels %}
                                             
-				                            <td{% if col.align or col.class %} class="{{ col.align }} {{col.class}}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}{%if col.onclick %} onclick="{{ col.onclick|replaceurl( val, tags ) }}" style="cursor:pointer"{% endif %}>
+				                            <td{% if col.align or col.class %} class="{{ col.class }}{{ col.align ? ' text-' ~ col.align }}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}{%if col.onclick %} onclick="{{ col.onclick|replaceurl( val, tags ) }}" style="cursor:pointer"{% endif %}>
                                                 {% for td in cols[ col.key ] %}
 
                                                     {% set value = val[ td.kval ] %}
@@ -47,10 +49,10 @@
 
                                                         {% set addonpre = td.addonpre %}
 
-                                                        {% set addonpos = td.addonpos %}
+                                                        {% set addonpos = ( td.addonposorder ? value|order(false) ) ~ ( value == 1 ? td.addonpossing : td.addonpos ) %}
 
                                                         {% if td.type == 'simple' %}
-                                                            {{ value|nl2space|t(60) }}
+                                                            {{ value|nl2space|t( td.truncate|default( 60 ) ) }}
 
                                                         {% elseif td.type == 'h4' %}
                                                             <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}</h4>
@@ -65,10 +67,12 @@
                                                             <div class="progress">
                                                                 {% set prog_val = value|number_format(0) %}
                                                                 
+                                                                {% set class = value|intervalmin( td.class )|default( 'info' ) %}
+                                                                
                                                                 {% if prog_val > 20 %}
-                                                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;padding-right:5px;margin-right:4px">{{ prog_val }}%</div>
+                                                                    <div class="progress-bar progress-bar-{{ class }}" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;margin-right:4px">{{ prog_val }}%</div>
                                                                 {% else %}
-                                                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;padding-right:5px;margin-right:4px"></div>
+                                                                    <div class="progress-bar progress-bar-{{ class }}" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;margin-right:4px"></div>
                                                                     <span style="font-size:11px;vertical-align:-2px;">{{ prog_val }}%</span>
                                                                 {% endif %}
                                                             </div>
@@ -89,10 +93,10 @@
                                                             <img height="{{ td.height }}" width="{{ td.width }}" src="{{ td.cdn }}{{ value }}{{ td.sufix }}">
 
                                                         {% elseif td.type == 'label' %}
-                                                            <span class="label label-mini label-{{ ( td.class.key ? val[ td.class.key ] : value )|replaceonly( td.class.list )|default( td.class.default ? td.class.default : 'default' ) }}">{{ value|t(20) }}</span>
+                                                            <span class="label label-mini label-{{ ( td.class.key ? val[ td.class.key ] : value )|replaceonly( td.class.list ? td.class.list : [] )|default( td.class.default ? td.class.default : 'default' ) }}">{{ value|t(20) }}</span>
 
                                                         {% elseif td.type == 'url' %}
-            				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t(60) }}</a>
+            				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 60 ) ) }}</a>
 
                                                         {% elseif td.type == 'br' %}
                                                             <br />
@@ -102,13 +106,13 @@
 
                                                         {% elseif td.type == 'ago' %}
                                                             <i class="icon-clock"></i> {{ value|ago }}
-            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|date("Y-m-d H:i:s") }}</span>
+            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s") }}</span>
 
                                                         {% elseif td.type == 'description' %}
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|nl2space|t(36) }}</span>
 
                                                         {% elseif td.type == 'info' %}
-                                                            <span><strong>{{ td.title }}</strong>{{ value|t(50) }}</span>
+                                                            <span>{% if td.title %}<strong>{{ td.title }}</strong>{% endif %}{{ addonpre|raw }}{{ value|t(50) }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'fixed' %}
                                                             {% set fixedfilldefault = true %}
@@ -160,7 +164,7 @@
                             {% if ( more or buttons is not empty ) %}
                               <div style="margin:8px 0px 5px 0px;text-align:right">
 
-                                {% if values|length > 1 %}
+                                {% if values|length > 4 %}
                                     {% for button in buttons %}
                                         <a style="margin-left:3px;margin-top:3px" type="button" class="btn btn-{{button.class}}" onclick="{{ button.onclick }}"><i class="{{ button.icon }}"></i> {{ button.label }}</a>
                                     {% endfor %}

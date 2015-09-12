@@ -8,7 +8,7 @@
     					{% for msg in values %}
                             <div class="message{{ ( keyme and msg[ keyme ] ) ? ' reversed' }}">
                                 {% if keythumb %}
-                                    <img class="message-img" width="40" height="40"  alt="" src="{{ cdn }}{{ msg[ keythumb ] }}">
+                                    <img class="message-img" width="40" height="40"  alt="" src="{{ keythumbcdn }}{{ msg[ keythumb ] }}">
                                 {% endif %}
 
                                 <div class="message-body">
@@ -49,15 +49,15 @@
             {% endif %}
 
                         {% if transloadit %}
-                        <div class="uploader" style="width:150px">
+                        <div class="uploader" style="width:120px">
                             <input id="{{ id }}msgp" name="{{ id }}msgp" class="btn btn-default btn-loading" type="file" onchange="$('form#{{ formname }}').data('transloadit.uploader')._options['myfwmode']=2;$('form#{{ formname }}').data('transloadit.uploader')._options['myfwmodeopt']={'u':'{{ urlimage }}','w':'#{{ id }}wait'};$('form#{{ formname }}').data('transloadit.uploader')._options['exclude']='input:not([name={{ id }}msgp])';$('form#{{ formname }}').data('transloadit.uploader')._options['signature']='{{ transloadit.signature }}';$('form#{{ formname }}').data('transloadit.uploader')._options['params']=JSON.parse('{{ transloadit.params }}');"></input>
-                                <span style="-moz-user-select:none" class="filename">Submit a photo</span>
-                                <span style="-moz-user-select:none" class="action">Choose File</span>
+                                <span style="-moz-user-select:none" class="filename">Send a photo</span>
+                                <span style="-moz-user-select:none" class="action">Choose file</span>
                         </div>
                         {% endif %}
 
                         {% if message %}
-                            <button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ message.url }}','Sending ...',{msg:$('#{{ id }}msg').val()});$('#{{ id }}msg').val('');}" class="btn btn-primary btn-loading" type="button" style="margin-left:5px; padding:6px 12px">{{ message.caption|default( 'Submit message' ) }}</button>
+                            <button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ message.url }}','Sending ...',{msg:$('#{{ id }}msg').val()});$('#{{ id }}msg').val('');}" class="btn btn-primary btn-loading" type="button" style="margin-left:5px; padding:6px 12px">{{ message.caption|default( 'Send message' ) }}</button>
                         {% endif %}
 
                         {% for button in buttons %}

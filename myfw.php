@@ -71,6 +71,8 @@
         private $chats       = null;
         private $ishttps     = null;
         private $sms         = null;
+        private $calendar    = null;
+        private $menu        = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -167,7 +169,7 @@
 			return $this->forms[ $formname ];
 		}
 
-		public function grid( $name = 'l' ){
+		public function grid( $name = 'g' ){
 			if( ! isset( $this->grids[ $name ] ) )
 				$this->grids[ $name ] = new mygrid( $name );
 			return $this->grids[ $name ];
@@ -177,6 +179,18 @@
 			if( ! isset( $this->chats[ $name ] ) )
 				$this->chats[ $name ] = new mychat( $name );
 			return $this->chats[ $name ];
+		}
+
+		public function menu( $name ){
+			if( ! isset( $this->menu[ $name ] ) )
+				$this->menu[ $name ] = new mymenu( $name );
+			return $this->menu[ $name ];
+		}
+
+		public function calendar( $name = 'c' ){
+			if( ! isset( $this->calendar[ $name ] ) )
+				$this->calendar[ $name ] = new mycalendar( $name );
+			return $this->calendar[ $name ];
 		}
 
 		public function notify( $name = 'n' ){

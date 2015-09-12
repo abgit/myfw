@@ -19,10 +19,16 @@ class mygrid{
     private $tags     = array();
     private $orderby  = false;
     private $orderbya = null;
+    private $menuhtml = null;
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
         $this->app = \Slim\Slim::getInstance();
+    }
+
+    public function & setID( $id ){
+        $this->name = $id;
+        return $this;
     }
 
     public function & setName( $name ){
@@ -87,11 +93,11 @@ class mygrid{
         return $this;
     }
     
-    public function & addSimple( $key, $kval, $label = '', $align = '' ){
+    public function & addSimple( $key, $kval, $label = '', $align = '', $truncate = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'simple');
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'simple', 'truncate' => $truncate );
         return $this;
     }
 
@@ -123,35 +129,35 @@ class mygrid{
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $this->app->ishttps() ? $kvals : $kval, 'type' => 'thumb', 'onclick' => $onclick, 'cdn' => $cdn );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => ( !empty( $kvals ) && $this->app->ishttps() ) ? $kvals : $kval, 'type' => 'thumb', 'onclick' => $onclick, 'cdn' => $cdn );
         return $this;
     }
 
-    public function & addAgo( $key, $kval, $label, $align = '' ){
+    public function & addAgo( $key, $kval, $label, $dateonly = false, $align = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'ago' );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'ago', 'dateonly' => $dateonly );
         return $this;
     }
 
-    public function & addProgress( $key, $kval, $label ){
+    public function & addProgress( $key, $kval, $label, $class = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'progress' );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'progress', 'class' => $class );
         return $this;
     }
 
-    public function & addUrl( $key, $kval, $label, $onclick = false, $bold = false, $align = 'text-left' ){
+    public function & addUrl( $key, $kval, $label, $onclick = false, $bold = false, $align = 'left', $truncate = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'url', 'onclick' => $onclick, 'bold' => $bold );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'url', 'onclick' => $onclick, 'bold' => $bold, 'truncate' => $truncate );
         return $this;
     }
 
-    public function & addFixed( $key, $kval, $label, $options, $default = array(), $align = 'text-center' ){
+    public function & addFixed( $key, $kval, $label, $options, $default = array(), $align = 'center' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
@@ -159,9 +165,9 @@ class mygrid{
         return $this;
     }
 
-    public function & addInfo( $key, $kval, $label, $title ){
+    public function & addInfo( $key, $kval, $label = '', $title = '', $align = 'left' ){
         if( !isset( $this->labels[ $key ] ) ){
-            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
         }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'info', 'title' => $title );
         return $this;
@@ -204,7 +210,12 @@ class mygrid{
         return $this;
     }
 
-    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'text-center' ){
+    public function & setMenu( $obj ){
+        $this->menuhtml = $obj;
+        return $this;
+    }
+
+    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'center' ){
         $key = 'm' . $this->menu++;
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
@@ -257,36 +268,42 @@ class mygrid{
 
     public function & setRowClass( $key, $kval, $class, $default, $dependkey = false ){
 
-        foreach( $this->cols[ $key ] as $index => $subrow ){
-            if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
-                $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey, 'default' => $default );
+        if( isset( $this->cols[ $key ] ) ){
+            foreach( $this->cols[ $key ] as $index => $subrow ){
+                if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                    $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey, 'default' => $default );
+            }
         }
         return $this;
     }
 
 
     public function & setRowReplace( $key, $kval, $replace ){
-        foreach( $this->cols[ $key ] as $index => $subrow ){
-            if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
-                $this->cols[ $key ][ $index ][ 'replace' ] = $replace;
+
+        if( isset( $this->cols[ $key ] ) ){
+            foreach( $this->cols[ $key ] as $index => $subrow ){
+                if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                    $this->cols[ $key ][ $index ][ 'replace' ] = $replace;
+            }
         }
         return $this;
     }
 
-    public function & addAddon( $key, $kval, $value, $prefix = true ){
+    public function & addAddon( $key, $kval, $value, $prefix = true, $valuesingular = null, $isorder = null ){
 
-        if( $prefix )
-            foreach( $this->cols[ $key ] as $index => $subrow )
-                if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
-                    $this->cols[ $key ][ $index ][ 'addonpre' ] = $value;
-        else
-            foreach( $this->cols[ $key ] as $index => $subrow )
-                if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
-                    $this->cols[ $key ][ $index ][ 'addonpos' ] = $value;
+        foreach( $this->cols[ $key ] as $index => $subrow ){
+            if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval ){
+                $this->cols[ $key ][ $index ][ $prefix ? 'addonpre' : 'addonpos' ] = $value;
+
+                if( !$prefix ){
+                    $this->cols[ $key ][ $index ][ 'addonpossing' ]  = empty( $valuesingular ) ? $value : $valuesingular;
+                    $this->cols[ $key ][ $index ][ 'addonposorder' ] = !empty( $isorder );
+                }
+            }
+        }
 
         return $this;
     }
-
 
     public function & refreshAjaxValue( $value ){
         return $this->refreshAjaxValues( array( $value ) );
@@ -394,6 +411,7 @@ class mygrid{
                                                         'perpage'  => $this->getPerPage(),
                                                         'orderby'  => $this->orderby,
                                                         'orderbya' => $this->orderbya,
+                                                        'menuhtml' => $this->menuhtml,
                                                         'cols'     => $this->cols ), null, null, APP_CACHEAPC, false, false );        
     }
 }

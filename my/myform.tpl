@@ -38,7 +38,7 @@
 					<div class="modal-content">
 						<div class="modal-header" style="background-color:#3B5998">
 							{% if modal.closebutton %}<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>{% endif %}
-							<h4 class="modal-title">{% if modal.icon %}<i class="{{ modal.icon }}"></i> {% endif %}{{ modal.title }}</h4>
+							<h4 class="modal-title">{% if modal.icon %}<i class="{{ modal.icon }}"></i>{% endif %}&nbsp;{{ modal.title }}</h4>
 						</div>
     					<div class="modal-body with-padding" style="padding:20px 21px 0px 21px">
 	{% endif %}
@@ -97,8 +97,8 @@
                             <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}">
                         </div>
                         <span class="label label-block label-primary text-center">
-                            {% for cur in el.value|bitcoinfrombtc( el.currencies ) %}
-                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.last }}">{{ cur.symbol }} {{ cur.last * el.value }}</span>
+                            {% for cur in el.currencies %}
+                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.rate }}">{{ cur.symbol }} {{ cur.rate * el.value }}</span>
                                 {% if not loop.last %}
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 {% endif %}
@@ -153,9 +153,6 @@
 
 			{% elseif el.type == 'hidden' %}
             	<input {{el.disabled ? 'disabled="disabled" '}}name="{{ el.name }}" type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-
-			{% elseif el.type == 'calendar' %}
-                <div class="block"><div id="{{ el.id }}" ce="{{ el.ce }}" cm="{{ el.cm|default('Loading ...') }}" ev="{{ el.value|default('[]')|raw }}"></div></div>
 
 			{% elseif el.type == 'checkboxgroup' %}
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
@@ -220,8 +217,8 @@
 
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
-                    <h6 class="heading {% if el.options.hr %}heading-hr{% endif %}">
-                        {% if el.icon %}<i class="{{el.icon}}"></i>{% endif %}{{el.title}}{% if el.description %}<small class="display-block{% if el.descriptionclass %} {{ el.descriptionclass }}{% endif %}" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
+                    <h6 class="heading{% if el.options.hr %} heading-hr{% endif %}{% if el.align %} text-{{ el.align }}{% endif %}">
+                        {% if el.title %}<i class="{{ el.icon|default( 'icon-books' ) }}"></i>{{ el.title }}{% endif %}{% if el.description %}<small class="display-block{% if el.descriptionclass %} {{ el.descriptionclass }}{% endif %}" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>
 
@@ -334,22 +331,22 @@
 
                 {% if not el.prevent %}
     				<input type="hidden" name="{{ name ~ el.name }}" value="{{ tvalue }}" id="{{name ~ el.name}}V" class="{{ name }}transloaditV"/>
-                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN"{% if el.disabled %} disabled="disabled"{% else %} onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['myfwmode']=1;$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"{% endif %} type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">No file selected</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
+                    <div class="uploader {{ name }}transloaditU" id="{{ name ~ el.name }}U"{{ tvalue is not empty ? ' style="display:none"' }}><input name="{{ name ~ el.name }}N" class="transloaditN"{% if el.disabled %} disabled="disabled"{% else %} onChange="$('#{{ name }}transloaditid').val($(this).attr('id'));$('form#{{name}}').data('transloadit.uploader')._options['myfwmode']=1;$('form#{{name}}').data('transloadit.uploader')._options['exclude']='input:not([name={{ name ~ el.name }}N])';$('form#{{name}}').data('transloadit.uploader')._options['signature']='{{el.options.signature}}';$('form#{{name}}').data('transloadit.uploader')._options['params']=JSON.parse('{{el.options.params}}');"{% endif %} type="file" id="{{name ~ el.name}}" class="styled"><span id="{{ name ~ el.name }}S" class="filename {{ name }}transloaditS" style="-moz-user-select:none">Select file</span><span class="action" style="-moz-user-select:none">Choose File</span></div>
 
                 {% elseif tvalue is empty %}
                     <p class="form-control-static">{{ preventmsg }}</p>
 
                 {% endif %}
 
-            <div class="row {{ name }}transloaditC" id="{{name ~ el.name}}C"{{ tvalue is empty ? ' style="display:none;padding-top:7px"' }}>
-                <div class="col-xs-10" id="{{name ~ el.name}}P">
+            <div class="row {{ name }}transloaditC" id="{{name ~ el.name}}C"{{ tvalue is empty ? ' style="display:none;"' }}>
+                <div class="col-xs-9" id="{{name ~ el.name}}P">
 
                 {% if tvalue is not empty %}
                     {% if el.options.mode == 'image' %}
                         {% set imgssl_url = el.value|transloadit( 'upimage', 'ssl_url' ) %}
                         {% set imgwidth   = el.value|transloadit( 'upimage', 'meta', 'width' ) %}
                         {% set imgheight  = el.value|transloadit( 'upimage', 'meta', 'height' ) %}
-                        <img style="height:auto;width:100%" src="{{ imgssl_url }}" width="{{ imgwidth }}" height="{{ imgheight }}" />
+                        <img style="height:auto;width:100%;max-width:{{ imgwidth }}px" src="{{ imgssl_url }}" width="{{ imgwidth }}" height="{{ imgheight }}" />
                     {% elseif el.options.mode == 'video' %}
                         {% set vposter    = el.value|transloadit( 'upvideo',      'ssl_url' ) %}
                         {% set vmp4       = el.value|transloadit( 'upvideomp4',   'ssl_url' ) %}
@@ -359,9 +356,9 @@
                     {% endif %}
                 {% endif %}
                 </div>
-                <div class="col-xs-2" style="padding:0px;">
+                <div class="col-xs-3" style="padding:0px;">
                     {% if not el.prevent %}
-                        <button onClick="$('#{{name ~ el.name}}C').hide();$('#{{name ~ el.name}}U').show();$('#{{name ~ el.name}}S').text('No file selected');$('#{{name ~ el.name}}V').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick="$('#{{name ~ el.name}}C').hide();$('#{{name ~ el.name}}U').show();$('#{{name ~ el.name}}S').text('Select file');$('#{{name ~ el.name}}V').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     {% endif %}
                 </div>
             </div>

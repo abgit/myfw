@@ -89,7 +89,7 @@ class myform{
         return $this->formname;
     }
 
-    public function & setModal( $title, $class = 'modal-lg', $icon = 'icon-paragraph-justify2', $static = true, $width = '', $closebutton = true ){
+    public function & setModal( $title = '', $class = 'modal-lg', $icon = '', $static = true, $width = '', $closebutton = true ){
         $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width, 'closebutton' => $closebutton );
         return $this;
     }
@@ -109,7 +109,7 @@ class myform{
         return $this;
     }
 
-    public function & addBitcoin( $name, $label = '', $help = '', $currencies = array( 'USD', 'EUR' ) ){
+    public function & addBitcoin( $name, $label = '', $help = '', $currencies = array() ){
         $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies );
         return $this;
     }
@@ -174,8 +174,8 @@ class myform{
         return $this;
     }
 
-    public function & addHeader( $title, $description = '', $icon = 'icon-books', $descriptionclass = '' ){
-        $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array() );
+    public function & addHeader( $title, $description = '', $icon = '', $descriptionclass = '', $align = '' ){
+        $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array(), 'align' => $align );
         return $this;
     }
 
@@ -226,23 +226,10 @@ class myform{
     }
 
     public function & addCustom( $name, $obj  ){
-//        if( is_null( $name ) )
-//            $name = 'ctm' . $this->counter++;
-
-        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
+        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => method_exists( $obj, 'setID' ) ? $obj->setID( $this->formname . $name ) : $obj, 'rules' => array(), 'filters' => array() );
         return $this;
-    }    
+    }
 
-    public function & addCalendar( $id, $onclick = '', $onclickloadingmsg = '' ){
-        $this->elements[ $id ] = array( 'type' => 'calendar', 'id' => 'cal' . $this->formname . $id, 'ce' => $onclick, 'cm' => $onclickloadingmsg, 'rules' => array(), 'filters' => array() );
-
-        if( $this->isajax )
-            $this->app->ajax()->calendar( '#cal' . $this->formname . $id );
-            
-        return $this;
-    }    
-
-    // special elements
     public function & addEmail( $name, $label = 'Email' ){
         $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array( 'email' => 'Email is not valid' ), 'filters' => array() );
         return $this;
@@ -777,7 +764,7 @@ class myform{
 
         // if modal undefined, create one
         if( ! isset( $this->modal['id'] ) )
-            $this->setModal( 'Form' );
+            $this->setModal();
 
         $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit );
         return $this;

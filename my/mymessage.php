@@ -108,7 +108,7 @@ class mymessage{
         return $this;
     }
 
-    public function & addButton( $label, $icon, $onclick, $class = 'info', $color = false, $colorbackground = false ){
+    public function & addButton( $label, $icon, $onclick, $class = 'default', $color = false, $colorbackground = false ){
         $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'onclick' => $onclick, 'class' => $class, 'color' => $color, 'colorbackground' => $colorbackground );
         return $this;
     }

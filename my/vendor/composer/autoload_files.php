@@ -7,5 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     $vendorDir . '/react/promise/src/functions_include.php',
+    $vendorDir . '/guzzlehttp/psr7/src/functions_include.php',
+    $vendorDir . '/rych/hash_pbkdf2-compat/src/hash_pbkdf2_compat.php',
+    $vendorDir . '/lastguest/murmurhash/murmurhash3.php',
     $vendorDir . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
 );

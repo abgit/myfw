@@ -18,6 +18,7 @@
         private $keyowner;
         private $keydate;
         private $keythumb;
+        private $keythumbcdn;
         private $keyme;
         private $buttons = array();
 
@@ -74,8 +75,9 @@
             return $this;
         }
 
-        public function & setThumb( $key ){
-            $this->keythumb = $key;
+        public function & setThumb( $key, $cdn = '' ){
+            $this->keythumb    = $key;
+            $this->keythumbcdn = $cdn;
             return $this;
         }
 
@@ -186,6 +188,7 @@
                           'keyowner'    => $this->keyowner,
                           'keydate'     => $this->keydate,
                           'keythumb'    => $this->keythumb,
+                          'keythumbcdn' => $this->keythumbcdn,
                           'keyme'       => $this->keyme,
                           'cdn'         => $this->cdn,
                           'id'          => $this->id,

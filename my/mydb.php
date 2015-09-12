@@ -137,14 +137,18 @@
             return $this->findOne( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
 
-        public function findValueReturn( $procedure, $args = array(), $returnobject = false ){
-            if( !$this->findOne( $result, $procedure, $args, $returnobject ) || empty( $result ) )
+        public function findValue( & $result, $procedure, $args = array(), $returnobject = false ){
+            if( !$this->findOne( $oneresult, $procedure, $args, $returnobject ) || empty( $oneresult ) )
                 return false;
 
-            foreach( $result as $first )
+            foreach( $oneresult as $result )
                 break;
-            
-            return $first;
+
+            return ( count( $oneresult ) > 0 );
+        }
+
+        public function findValueReturn( $procedure, $args = array(), $returnobject = false ){
+            return $this->findValue( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
 
         public function findOne( & $result, $procedure, $args = array(), $returnobject = false ){

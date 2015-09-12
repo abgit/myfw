@@ -27,7 +27,7 @@ class myrules{
     }
 
     public static function money( $value, $opts='', $formelement = null){
-        return myrules::regex( strval( $value ), '/^([0-9]{1,5}([\.\,][0-9]{1,2})?)$/' );
+        return myrules::regex( strval( $value ), '/^([0-9]{1,5}([\.\,][0-9]{1,8})?)$/' );
     }
 
     public static function unsigned( $value, $opts='', $formelement = null){

@@ -12,6 +12,11 @@ class mystats{
         $this->app = \Slim\Slim::getInstance();
     }
 
+    public function & setID( $id ){
+        $this->name = $id;
+        return $this;
+    }
+
     public function & setName( $name ){
         $this->name = $name;
         return $this;
@@ -72,6 +77,7 @@ class mystats{
 
     public function & setValues( $values ){
         $this->values = is_array( $values ) ? $values : json_decode( $values, true );
+
         return $this;
     }
 
@@ -79,6 +85,13 @@ class mystats{
         foreach( $this->elements as $name => $el ){
             if( isset( $values[ $el[ 'key' ] ] ) )
                 $this->app->ajax()->text( '#st' . $el[ 'key' ], $values[ $el[ 'key' ] ] );
+
+            if( isset( $values[ $el[ 'key' ] ] ) && isset( $el[ 'addonlabelprekey' ] ) )
+                $this->app->ajax()->text( '#st' . $el[ 'key' ] . 'lpre', $values[ $el[ 'addonlabelprekey' ] ] );
+
+            if( isset( $values[ $el[ 'key' ] ] ) && isset( $el[ 'addonlabelposkey' ] ) )
+                $this->app->ajax()->text( '#st' . $el[ 'key' ] . 'lpos', $values[ $el[ 'addonlabelposkey' ] ] );
+
         }
         return $this;
     }

@@ -59,7 +59,7 @@
             <br>
 
         {% elseif el.type == 'button' %}
-            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn {{el.class}}" {%if el.onclick %}onclick="{{ el.onclick }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>            
+            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn {{el.class ? 'btn-' ~ el.class}}" {%if el.onclick %}onclick="{{ el.onclick }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>            
 
         {% endif %}
 

@@ -60,7 +60,7 @@
                 </div>
             </div>
         {% endif %}
-        <span>{{ stat.addonlabelpre|raw }}{{ stat.addonlabelprekey ? values[ stat.addonlabelprekey ]|raw }}{{ stat.label|raw }}{{ stat.addonlabelposkey ? values[ stat.addonlabelposkey ]|raw }}{{ stat.addonlabelpos|raw }}</span>
+        <span>{{ stat.addonlabelpre|raw }}<span id="st{{ stat.key}}lpre">{{ stat.addonlabelprekey ? values[ stat.addonlabelprekey ]|raw }}</span>{{ stat.label|raw }}<span id="st{{ stat.key}}lpos">{{ stat.addonlabelposkey ? values[ stat.addonlabelposkey ]|raw }}</span>{{ stat.addonlabelpos|raw }}</span>
     </li>
 {% endfor %}
 </ul>

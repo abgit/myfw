@@ -65,23 +65,15 @@ class myblockchain{
 
     public function process( $func ){
     
-        if( /*$this->getClientIP() === '190.93.243.195' &&*/
-            /*isset( $_GET['confirmations'] ) && 
-            isset( $_GET['transaction_hash'] ) &&
-            isset( $_GET['input_transaction_hash'] ) &&
-            isset( $_GET['input_address'] ) &&
-            isset( $_GET['value'] ) &&
-            $_GET['confirmations'] >= 6 &&*/
-            $func() === true ){
-    
-                echo '*ok*';
+        if( $_GET['confirmations'] >= 6 && $func() === true ){
+            echo '*ok*';
         }
     }
 
 
-    public function payment( $guid, $password, $to, $amount, $from = '', $second_password = '', $fee = '', $note = '' ){
+    public function payment( $to, $amount, $guid = '', $password = '', $from = '', $second_password = '', $fee = '', $note = '' ){
 
-        $params = array( 'password'        => $password,
+        $params = array( 'password'        => empty( $password ) ? $this->app->config( 'bitcoin.p' ) : $password,
                          'to'              => $to,
                          'amount'          => $amount );
 
@@ -94,7 +86,7 @@ class myblockchain{
         if( $note )
             $params[ 'note' ] = $note;
 
-        return $this->load( 'merchant/' . $guid . '/payment', $params );
+        return $this->load( 'merchant/' . ( empty( $guid ) ? $this->app->config( 'bitcoin.guid' ) : $guid ) . '/payment', $params );
     }
 
 
@@ -116,7 +108,7 @@ class myblockchain{
     }
 
 
-    private function load( $uri, $options = array(), $returnUrl = false ){
+    private function load( $uri, $options = array(), $returnUrl = false, $returnString = false ){
 
         $opts = array();
     
@@ -132,7 +124,7 @@ class myblockchain{
         if( ( $response = file_get_contents( $url ) ) === false )
             return false;
 
-        return json_decode( $response, true );
+        return $returnString ? $response : json_decode( $response, true );
     }
 
 

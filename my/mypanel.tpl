@@ -43,7 +43,7 @@
         {% for value in values %}
 						  <div class="col-md-{{ size }}{%if sizeoffset %} col-md-offset-{{sizeoffset}}{% endif %}" id="{{ name }}{{ value[ key ] }}">
                                 <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ cdn }}{{ value[ elements.back.key ] }}){% endif %}">
-									<div class="with-padding"{% if action %} onclick="{{ action|replaceurl( value, tags ) }}" style="margin: 0px;cursor:pointer;min-height:145px"{% else %} style="min-height:145px"{% endif %}>
+									<div class="with-padding"{% if action %} onclick="{{ action|replaceurl( value, tags ) }}" style="margin: 0px;cursor:pointer;min-height:150px"{% else %} style="min-height:150px"{% endif %}>
 
                                         {% if elements.thumb.static or value[ elements.thumb.key ] %}
 
@@ -72,7 +72,7 @@
                                                     {% endif %}
 
     										        {% if elements.title %}
-                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(40) }}{% endif %}</span>
+                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(45) }}{% endif %}</span>
     										        {% endif %}
 
                                                     {% if elements.title.onclick %}
@@ -104,11 +104,11 @@
 
                                                         {% if info.type == 0 %}
 
-                                                            {% if value[ info.key ] %}
+                                                            {% if value[ info.key ] is defined %}
 
                                                                 <span>
             												    {% if info.class %}
-                                                                    <span class="label {{info.class}}">
+                                                                    <span class="label {{ info.classreplacekey ? ( value[ info.classreplacekey ]|replaceonly( info.class )|default( info.defaultclass ) ) : info.class }}">
                                                                 {% endif %}
                                                         
                                                                 {% set val = value[ info.key ] %}
@@ -116,16 +116,16 @@
                                                                     {% set val = val|rnumber(true) %}
                                                                 {% endif %}
                                                         
-                                                                {{ info.prefix }} {{ val|t(20) }} {{ info.sufix }}
+                                                                {{ info.prefix }}{{ val|t(20) }}{{ info.sufix }}
 
             												    {% if info.extrakey %}
-                                                                    {{ value[ info.extrakey ]|t(20) }} {{ info.extrasufix }}
+                                                                    {{ value[ info.extrakey ]|t(20) }}{{ info.extrasufix }}
                                                                 {% endif %}
 
             												    {% if info.class %}
                                                                     </span>
                                                                 {% endif %}                                                        
-                                                                </span>
+                                                               </span>
 
                                                             {% elseif info.defaultvalue %}
 
@@ -134,7 +134,7 @@
                                                                     <span class="label {{info.defaultclass}}">
                                                                 {% endif %}
                                                         
-                                                                {{ info.defaultprefix }} {{ info.defaultvalue }} {{ info.defaultsufix }}
+                                                                {{ info.defaultprefix }}{{ info.defaultvalue }}{{ info.defaultsufix }}
 
             												    {% if info.defaultclass %}
                                                                     </span>
@@ -192,19 +192,19 @@
                                                     {% elseif status.type == 3 %}
 
 
-                                                        {% if value[ status.key ] %}
+                                                        {% if value[ status.key ] is defined %}
 
-                                                            <span style="vertical-align:middle;margin-right:6px;" class="label label-mini {{status.class|default('label-info')}}">
+                                                            <span style="vertical-align:middle;margin-right:6px;" class="label label-mini label-{{ status.classreplacekey ? ( value[ status.classreplacekey ]|replaceonly( status.class )|default( status.defaultclass )|default( 'info' ) ) : status.class|default( 'info' ) }}">
 
                                                             {% set val = value[ status.key ] %}
                                                             {% if status.filter == 'rnumber' %}
                                                                 {% set val = val|rnumber(true) %}
                                                             {% endif %}
                                                         
-                                                            {{ status.prefix|raw }} {{ val|t(20) }} {{ status.sufix|raw }}
+                                                            {{ status.prefix|raw }}{{ val|t(20) }}{{ status.sufix|raw }}
 
         												    {% if status.extrakey %}
-                                                                {{ value[ status.extrakey ]|t(20) }} {{ status.extrasufix }}
+                                                                {{ value[ status.extrakey ]|t(20) }}{{ status.extrasufix }}
                                                             {% endif %}
 
                                                             </span>
@@ -212,7 +212,7 @@
                                                         {% elseif status.defaultvalue %}
 
                                                             <span style="padding:0.2em 0.6em 0.3em; vertical-align:middle;margin-right:6px;" class="label {{status.defaultclass}}">
-                                                            {{ status.defaultprefix }} {{ status.defaultvalue }} {{ status.defaultsufix }}
+                                                            {{ status.defaultprefix }}{{ status.defaultvalue }}{{ status.defaultsufix }}
                                                             </span>
 
                                                         {% endif %}
@@ -230,7 +230,7 @@
                                                 {% for menu in elements.menu %}
 
                                                     {% if menu.type == 0 %}
-                                                        {% if menu.depends == false or values[ menu.depends ] %}
+                                                        {% if menu.depends == false or value[ menu.depends ] %}
                                                             <li{% if menu.id %} id="{{ menu.id }}"{% endif %}><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"></i> {{ menu.label }}</a></li>
                                                         {% endif %}
 

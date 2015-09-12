@@ -41,7 +41,7 @@ class myfilters{
     }
 
     public static function satoshi( $amount ){
-        return $amount * 100000000;
+        return str_replace(',', '.', $amount ) * 100000000;
     }
 
     public static function nl2space( $string ){
@@ -73,6 +73,21 @@ class myfilters{
         return preg_replace( '~(href|src|url)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $app->config( 'filter.cdn.ext' ). ')(["\'])~i', '$1$2"' . $app->config( 'filter.cdn.domain' ) . '$5$6"', $html  );
     }
 
+    public static function intervalmin( $value, $intervals ){
+        if( !is_array( $intervals ) )
+            return $intervals;
+
+        $value = intval( $value );
+        ksort( $intervals );
+
+        foreach( $intervals as $k => $v ){
+            if( is_numeric( $k ) && $value < intval( $k ) )
+                return $v;
+        }
+    
+        return isset( $intervals[ 'default' ] ) ? $intervals[ 'default' ] : '';
+    }
+
     public static function intersect( $array, $optarray ){
 
         if( !is_array( $optarray ) )
@@ -93,9 +108,12 @@ class myfilters{
     }
 
     public static function replaceonly( $string, $array ){
-        foreach( $array as $k => $v )
-            if( strval( $string ) === strval( $k ) )
+        foreach( $array as $k => $v ){
+            if( strval( $string ) === strval( $k ) ){
                 return $v;
+            }
+        }
+        return '';
     }
 
     public static function inarray( $string, $array, $default = 'unknown' ){
@@ -119,13 +137,14 @@ class myfilters{
         return strtolower( pathinfo( $string, PATHINFO_EXTENSION ) );
     }
 
-    public static function order( $string ){
+    public static function order( $string, $returnOriginal = true ){
+        $sufix = 'th';
         switch( intval( $string ) ){
-            case 1: return '1st';
-            case 2: return '2nd';
-            case 3: return '3rd';
-            default: return $string . 'th';
+            case 1: $sufix = 'st'; break;
+            case 2: $sufix = 'nd'; break;
+            case 3: $sufix = 'rd'; break;
         }
+        return $returnOriginal ? $string . $sufix : $sufix;
     }
 
     public static function t( $string, $chars=10, $rep='...' ){
@@ -232,7 +251,7 @@ class myfilters{
         if( !$full )
             $string = array_slice( $string, 0, 1 );
         
-        return ( $string ? implode( ', ', $string ) . ' ago' : 'just now' ) . ( $includeoriginal ? ( ', ' . $datetime ) : '' );
+        return ( $string ? implode( ', ', $string ) . ( strtotime( $datetime ) < time() ? ' ago' : '' ) : 'just now' ) . ( $includeoriginal ? ( ', ' . $datetime ) : '' );
     }
 
     public static function xss( $data ){
