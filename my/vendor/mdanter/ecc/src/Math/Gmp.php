@@ -2,114 +2,106 @@
 
 namespace Mdanter\Ecc\Math;
 
-use Mdanter\Ecc\Primitives\CurveFpInterface;
-use Mdanter\Ecc\Primitives\GeneratorPoint;
+use Mdanter\Ecc\MathAdapter;
 
-class Gmp implements MathAdapterInterface
+class Gmp implements MathAdapter
 {
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::cmp()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::cmp()
      */
     public function cmp($first, $other)
     {
-        return gmp_cmp(gmp_init($first, 10), gmp_init($other, 10));
+        return gmp_cmp($first, $other);
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::mod()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::mod()
      */
     public function mod($number, $modulus)
     {
-        return gmp_strval(gmp_mod(gmp_init($number, 10), gmp_init($modulus, 10)));
+        $res = gmp_div_r($number, $modulus);
+
+        if (gmp_cmp(0, $res) > 0) {
+            $res = gmp_add($modulus, $res);
+        }
+
+        return gmp_strval($res);
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::add()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::add()
      */
     public function add($augend, $addend)
     {
-        return gmp_strval(gmp_add(gmp_init($augend, 10), gmp_init($addend, 10)));
+        return gmp_strval(gmp_add($augend, $addend));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::sub()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::sub()
      */
     public function sub($minuend, $subtrahend)
     {
-        return gmp_strval(gmp_sub(gmp_init($minuend, 10), gmp_init($subtrahend, 10)));
+        return gmp_strval(gmp_sub($minuend, $subtrahend));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::mul()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::mul()
      */
     public function mul($multiplier, $multiplicand)
     {
-        return gmp_strval(gmp_mul(gmp_init($multiplier, 10), gmp_init($multiplicand, 10)));
+        return gmp_strval(gmp_mul($multiplier, $multiplicand));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::div()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::div()
      */
     public function div($dividend, $divisor)
     {
-        return gmp_strval(gmp_div(gmp_init($dividend, 10), gmp_init($divisor, 10)));
+        return gmp_strval(gmp_div($dividend, $divisor));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::pow()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::pow()
      */
     public function pow($base, $exponent)
     {
-        return gmp_strval(gmp_pow(gmp_init($base, 10), $exponent));
+        return gmp_strval(gmp_pow($base, $exponent));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::bitwiseAnd()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::rand()
+     */
+    public function rand($n)
+    {
+        $random = gmp_strval(gmp_random());
+        $small_rand = rand();
+
+        while (gmp_cmp($random, $n) > 0) {
+            $random = gmp_div($random, $small_rand, GMP_ROUND_ZERO);
+        }
+
+        return gmp_strval($random);
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::bitwiseAnd()
      */
     public function bitwiseAnd($first, $other)
     {
-        return gmp_strval(gmp_and(gmp_init($first, 10), gmp_init($other, 10)));
+        return gmp_strval(gmp_and($first, $other));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapter::rightShift()
-     */
-    public function rightShift($number, $positions)
-    {
-        // Shift 1 right = div / 2
-        return gmp_strval(gmp_div($number, gmp_pow(2, $positions)));
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapter::bitwiseXor()
-     */
-    public function bitwiseXor($first, $other)
-    {
-        return gmp_strval(gmp_xor(gmp_init($first, 10), gmp_init($other, 10)));
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapter::leftShift()
-     */
-    public function leftShift($number, $positions)
-    {
-        // Shift 1 left = mul by 2
-        return gmp_strval(gmp_mul(gmp_init($number), gmp_pow(2, $positions)));
-    }
-
-    /**
-     * {@inheritDoc}
+     * (non-PHPdoc)
      * @see \Mdanter\Ecc\MathAdapter::toString()
      */
     public function toString($value)
@@ -122,8 +114,8 @@ class Gmp implements MathAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::hexDec()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::hexDec()
      */
     public function hexDec($hex)
     {
@@ -131,23 +123,17 @@ class Gmp implements MathAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::decHex()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::decHex()
      */
     public function decHex($dec)
     {
-        $hex = gmp_strval(gmp_init($dec, 10), 16);
-
-        if (strlen($hex) % 2 != 0) {
-            $hex = '0'.$hex;
-        }
-
-        return $hex;
+        return gmp_strval(gmp_init($dec, 10), 16);
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::powmod()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::powmod()
      */
     public function powmod($base, $exponent, $modulus)
     {
@@ -155,16 +141,16 @@ class Gmp implements MathAdapterInterface
             throw new \InvalidArgumentException("Negative exponents ($exponent) not allowed.");
         }
 
-        return gmp_strval(gmp_powm(gmp_init($base, 10), gmp_init($exponent, 10), gmp_init($modulus, 10)));
+        return gmp_strval(gmp_powm($base, $exponent, $modulus));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::isPrime()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::isPrime()
      */
     public function isPrime($n)
     {
-        $prob = gmp_prob_prime(gmp_init($n, 10));
+        $prob = gmp_prob_prime($n);
 
         if ($prob > 0) {
             return true;
@@ -174,52 +160,51 @@ class Gmp implements MathAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::nextPrime()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::nextPrime()
      */
     public function nextPrime($starting_value)
     {
-        return gmp_strval(gmp_nextprime(gmp_init($starting_value, 10)));
+        return gmp_strval(gmp_nextprime($starting_value));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::inverseMod()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::inverseMod()
      */
     public function inverseMod($a, $m)
     {
-        return gmp_strval(gmp_invert(gmp_init($a, 10), gmp_init($m, 10)));
+        return gmp_strval(gmp_invert($a, $m));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::jacobi()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::jacobi()
      */
     public function jacobi($a, $n)
     {
-        return gmp_strval(gmp_jacobi(gmp_init($a, 10), gmp_init($n, 10)));
+        return gmp_strval(gmp_jacobi($a, $n));
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::intToString()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::intToString()
      */
     public function intToString($x)
     {
-        $x = gmp_init($x, 10);
+        $math = $this;
 
         if (gmp_cmp($x, 0) == 0) {
             return chr(0);
         }
 
-        if (gmp_cmp($x, 0) > 0) {
+        if ($math->cmp($x, 0) > 0) {
             $result = "";
 
             while (gmp_cmp($x, 0) > 0) {
                 $q = gmp_div($x, 256, 0);
-                $r = gmp_mod($x, 256);
-
-                $ascii = chr(gmp_strval($r));
+                $r = $math->mod($x, 256);
+                $ascii = chr($r);
 
                 $result = $ascii . $result;
                 $x = $q;
@@ -227,30 +212,26 @@ class Gmp implements MathAdapterInterface
 
             return $result;
         }
-
-        throw new \RuntimeException('Unable to convert int to string');
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::stringToInt()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::stringToInt()
      */
     public function stringToInt($s)
     {
         $math = $this;
         $result = 0;
-        $sLen = strlen($s);
 
-        for ($c = 0; $c < $sLen; $c ++) {
+        for ($c = 0; $c < strlen($s); $c ++) {
             $result = $math->add($math->mul(256, $result), ord($s[$c]));
         }
-
         return $result;
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::digestInteger()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::digestInteger()
      */
     public function digestInteger($m)
     {
@@ -258,8 +239,8 @@ class Gmp implements MathAdapterInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::gcd2()
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapter::gcd2()
      */
     public function gcd2($a, $b)
     {
@@ -270,51 +251,5 @@ class Gmp implements MathAdapterInterface
         }
 
         return gmp_strval($b);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::baseConvert()
-     */
-    public function baseConvert($number, $from, $to)
-    {
-        return gmp_strval(gmp_init($number, $from), $to);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::getNumberTheory()
-     */
-    public function getNumberTheory()
-    {
-        return new NumberTheory($this);
-    }
-
-    /**
-     * @param $modulus
-     * @return ModularArithmetic
-     */
-    public function getModularArithmetic($modulus)
-    {
-        return new ModularArithmetic($this, $modulus);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see \Mdanter\Ecc\MathAdapterInterface::getPrimeFieldArithmetic()
-     */
-    public function getPrimeFieldArithmetic(CurveFpInterface $curve)
-    {
-        return $this->getModularArithmetic($curve->getPrime());
-    }
-
-    /**
-     * @param GeneratorPoint $generatorPoint
-     * @param $input
-     * @return EcMath
-     */
-    public function getEcMath(GeneratorPoint $generatorPoint, $input)
-    {
-        return new EcMath($input, $generatorPoint, $this);
     }
 }

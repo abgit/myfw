@@ -15,28 +15,21 @@ class ResultPrinter
     private static $printResultCounter = 0;
 
     /**
-     * Prints success response HTML TXOutput to web page.
+     * Prints success response HTML Output to web page.
      *
      * @param string $title
      * @param string $objectName
      * @param string $objectId
      * @param mixed $request
      * @param mixed $response
-     * @param bool $forceConsole
      */
-    public static function printResult(
-        $title,
-        $objectName,
-        $objectId = null,
-        $request = null,
-        $response = null,
-        $forceConsole = false)
+    public static function printResult($title, $objectName, $objectId = null, $request = null, $response = null)
     {
-        self::printOutput($title, $objectName, $objectId, $request, $response, false, $forceConsole);
+        self::printOutput($title, $objectName, $objectId, $request, $response, false);
     }
 
     /**
-     * Prints HTML TXOutput to web page.
+     * Prints HTML Output to web page.
      *
      * @param string $title
      * @param string $objectName
@@ -44,19 +37,10 @@ class ResultPrinter
      * @param mixed $request
      * @param mixed $response
      * @param string $errorMessage
-     * @param bool $forceConsole
      */
-    public static function printOutput(
-        $title,
-        $objectName,
-        $objectId = null,
-        $request = null,
-        $response = null,
-        $errorMessage = null,
-        $forceConsole = false
-    )
+    public static function printOutput($title, $objectName, $objectId = null, $request = null, $response = null, $errorMessage = null)
     {
-        if ((PHP_SAPI == 'cli') || $forceConsole == true) {
+        if (PHP_SAPI == 'cli') {
             self::$printResultCounter++;
             printf("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
             printf("(%d) %s", self::$printResultCounter, strtoupper($title));
@@ -135,14 +119,6 @@ class ResultPrinter
                 echo str_replace('\\/', '/', json_encode(json_decode($object), 128));
             } elseif (is_string($object)) {
                 echo $object;
-            } elseif (is_array($object)) {
-                echo "[\n";
-                $cont = 0;
-                foreach ($object as $item) {
-                    if ($cont++ > 0) echo ",\n";
-                    self::printConsoleObject($item);
-                }
-                echo ']';
             } else {
                 print_r($object);
             }
@@ -188,15 +164,14 @@ class ResultPrinter
      * @param null $objectId
      * @param null $request
      * @param \Exception $exception
-     * @param bool $forceConsole
      */
-    public static function printError($title, $objectName, $objectId = null, $request = null, $exception = null, $forceConsole = false)
+    public static function printError($title, $objectName, $objectId = null, $request = null, $exception = null)
     {
         $data = null;
         if ($exception instanceof \BlockCypher\Exception\BlockCypherConnectionException) {
             $data = $exception->getData();
         }
-        self::printOutput($title, $objectName, $objectId, $request, $data, $exception->getMessage(), $forceConsole);
+        self::printOutput($title, $objectName, $objectId, $request, $data, $exception->getMessage());
     }
 }
 

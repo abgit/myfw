@@ -9,6 +9,7 @@ namespace BlockCypher\Core;
  */
 class BlockCypherLoggingManager
 {
+
     /**
      * Default Logging Level
      */
@@ -108,16 +109,8 @@ class BlockCypherLoggingManager
     {
         if ($this->isLoggingEnabled) {
             $config = BlockCypherConfigManager::getInstance()->getConfigHashmap();
-
-            if (isset($config['mode'])) {
-                $configMode = $config['mode'];
-            } else {
-                // mode has not been configured by user
-                $configMode = null;
-            }
-
             // Check if logging in live
-            if ($configMode == 'live') {
+            if ($config['mode'] == 'live') {
                 // Live should not have logging level above INFO.
                 if ($this->loggingLevel >= BlockCypherLoggingLevel::INFO) {
                     // If it is at Debug Level, throw an warning in the log.
@@ -156,7 +149,17 @@ class BlockCypherLoggingManager
     }
 
     /**
-     * Log Debug
+     * Log Fine
+     *
+     * @param string $message
+     */
+    public function fine($message)
+    {
+        $this->log("FINE\t: " . $message, BlockCypherLoggingLevel::FINE);
+    }
+
+    /**
+     * Log Fine
      *
      * @param string $message
      */

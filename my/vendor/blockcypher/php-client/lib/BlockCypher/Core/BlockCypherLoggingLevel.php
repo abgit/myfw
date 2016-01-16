@@ -9,7 +9,10 @@ namespace BlockCypher\Core;
 class BlockCypherLoggingLevel
 {
     // DEBUG Logging Level
-    const DEBUG = 3;
+    const DEBUG = 4;
+
+    // FINE Logging Level
+    const FINE = 3;
 
     // INFO Logging Level
     const INFO = 2;

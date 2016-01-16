@@ -1,5 +1,4 @@
 <?php
-
 use BlockCypher\Exception\BlockCypherConfigurationException;
 
 /**
@@ -13,7 +12,7 @@ class BlockCypherConfigurationExceptionTest extends \PHPUnit_Framework_TestCase
      */
     protected $object;
 
-    public function testBCConfigurationException()
+    public function testPPConfigurationException()
     {
         $this->assertEquals('Test BlockCypherConfigurationException', $this->object->getMessage());
     }
@@ -35,3 +34,5 @@ class BlockCypherConfigurationExceptionTest extends \PHPUnit_Framework_TestCase
     {
     }
 }
+
+?>

@@ -84,6 +84,13 @@ class Twig_Tests_TemplateTest extends PHPUnit_Framework_TestCase
         return $tests;
     }
 
+    public function testGetSource()
+    {
+        $template = new Twig_TemplateTest(new Twig_Environment($this->getMock('Twig_LoaderInterface')), false);
+
+        $this->assertSame("<? */*bar*/ ?>\n", $template->getSource());
+    }
+
     /**
      * @dataProvider getGetAttributeWithSandbox
      */
@@ -463,6 +470,8 @@ class Twig_TemplateTest extends Twig_Template
         }
     }
 }
+/* <? *//* *bar*//*  ?>*/
+/* */
 
 class Twig_TemplateArrayAccessObject implements ArrayAccess
 {
@@ -657,7 +666,7 @@ class Twig_TemplateMagicMethodExceptionObject
 {
     public function __call($method, $arguments)
     {
-        throw new BadMethodCallException(sprintf('Unkown method %s', $method));
+        throw new BadMethodCallException(sprintf('Unknown method "%s".', $method));
     }
 }
 

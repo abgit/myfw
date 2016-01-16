@@ -1,6 +1,6 @@
 <?php
 
-    use Auth0SDK\Auth0;
+    use Auth0\SDK\Auth0;
 
     class myauth0{
 

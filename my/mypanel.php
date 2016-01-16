@@ -97,8 +97,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '' ){
-        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix );
+    public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $depends = false ){
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix, 'depends' => $depends );
         return $this;
     }
 
@@ -112,8 +112,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addStatus( $key ){
-        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1 );
+    public function & addStatus( $key, $prefix = '', $sufix = '' ){
+        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1, 'prefix' => $prefix, 'sufix' => $sufix );
         return $this;
     }
 
@@ -147,8 +147,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $id = '', $depends = false ){
-        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'id' => $id, 'depends' => $depends );
+    public function & addButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $id = '', $depends = false, $dependsLabelPrefix = '', $dependsLabelSufix = '', $dependsValueKey = '' ){
+        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'id' => $id, 'depends' => $depends, 'dependsLabelPrefix' => $dependsLabelPrefix, 'dependsLabelSufix' => $dependsLabelSufix, 'dependsValueKey' => $dependsValueKey );
         return $this;
     }
 

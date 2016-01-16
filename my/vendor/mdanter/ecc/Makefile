@@ -3,11 +3,11 @@ test: phpunit phpcs
 .PHONY: test phpunit phpcs
 
 pretest:
-		composer install
+		composer install --dev
 
 phpunit: pretest
 		mkdir -p tests/output
-		vendor/bin/phpunit --coverage-text --coverage-clover=tests/output/coverage.clover --coverage-html=tests/output/Results
+		vendor/bin/phpunit --coverage-text --coverage-clover=tests/output/coverage.clover
 
 ifndef STRICT
 STRICT = 0
@@ -15,14 +15,11 @@ endif
 
 ifeq "$(STRICT)" "1"
 phpcs: pretest
-		vendor/bin/phpcs --standard=PSR2 src
+		vendor/bin/phpcs --standard=phpcs.xml src
 else
 phpcs: pretest
-		vendor/bin/phpcs --standard=PSR2 -n src
+		vendor/bin/phpcs --standard=phpcs.xml -n src
 endif
-
-phpcbf: pretest
-		vendor/bin/phpcbf --standard=PSR2 -n src
 
 ifdef OCULAR_TOKEN
 scrutinizer: ocular

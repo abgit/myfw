@@ -174,8 +174,8 @@ class myform{
         return $this;
     }
 
-    public function & addHeader( $title, $description = '', $icon = '', $descriptionclass = '', $align = '' ){
-        $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array(), 'align' => $align );
+    public function & addHeader( $title, $description = '', $icon = '', $descriptionclass = '', $align = '', $hr = false ){
+        $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array(), 'align' => $align, 'hr' => $hr );
         return $this;
     }
 
@@ -755,10 +755,14 @@ class myform{
 
         // check special form element: transloadit
         $transloadit = 0;
+        $chatscroll = 0;
         foreach( $this->elements as $n => $el ){
-            if( $el[ 'type' ] == 'transloadit' || ( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ) ){
+            if( $el[ 'type' ] == 'transloadit' ){
                 $transloadit = 1;
-                break;
+            }
+            if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
+                $transloadit = 1;
+                $chatscroll = '#' . $el[ 'obj' ]->getWindowId();
             }
         }
 
@@ -766,7 +770,7 @@ class myform{
         if( ! isset( $this->modal['id'] ) )
             $this->setModal();
 
-        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit );
+        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll );
         return $this;
     }
 

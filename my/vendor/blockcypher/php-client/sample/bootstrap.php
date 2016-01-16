@@ -17,24 +17,15 @@ if (!file_exists($composerAutoload)) {
         exit(1);
     }
 }
-
 /** @noinspection PhpIncludeInspection */
 require $composerAutoload;
 require __DIR__ . '/common.php';
 
 use BlockCypher\Auth\SimpleTokenCredential;
-use BlockCypher\Core\BlockCypherCoinSymbolConstants;
 use BlockCypher\Rest\ApiContext;
-use BlockCypher\Validation\TokenValidator;
 
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-if (ini_set('precision', 17) === false) {
-    die("Couldn't update precision.");
-}
-if (ini_set('serialize_precision', 17) === false) {
-    die("Couldn't update serialize_precision.");
-}
 
 // Replace these values by entering your own token by visiting https://accounts.blockcypher.com/
 /** @noinspection SpellCheckingInspection */
@@ -47,41 +38,16 @@ if (!validateToken($token)) {
 }
 
 /** @var \BlockCypher\Rest\ApiContext $apiContext */
-$apiContextSdkConfigFile = getApiContextUsingConfigIni();
+$apiContext = getApiContextUsingConfigArray($token);
 
-$apiContexts = createApiContextForAllChains($token);
-$apiContexts['sdk_config'] = $apiContextSdkConfigFile; // Add ApiContext created using sdk_config.ini custom settings
-
-return $apiContexts;
-
-/**
- * Create an ApiContext for each chain
- * @param $token
- * @return array
- */
-function createApiContextForAllChains($token)
-{
-    $version = 'v1';
-
-    $chainNames = BlockCypherCoinSymbolConstants::CHAIN_NAMES();
-
-    $apiContexts = array();
-    foreach ($chainNames as $chainName) {
-
-        list($coin, $chain) = explode(".", $chainName);
-        $coin = strtolower($coin);
-
-        $apiContexts[$chainName] = getApiContextUsingConfigArray($token, $chain, $coin, $version);
-    }
-
-    return $apiContexts;
-}
+return $apiContext;
 
 /**
  * Helper method for getting an APIContext for all calls (getting config from ini file)
+ * @param string $token
  * @return \BlockCypher\Rest\ApiContext
  */
-function getApiContextUsingConfigIni()
+function getApiContextUsingConfigIni($token)
 {
     // #### SDK configuration
     // Register the sdk_config.ini file in current directory
@@ -90,7 +56,11 @@ function getApiContextUsingConfigIni()
         define("BC_CONFIG_PATH", __DIR__);
     }
 
-    $apiContext = ApiContext::create('main', 'btc', 'v1');
+    $credentials = new SimpleTokenCredential($token);
+
+    $apiContext = ApiContext::create($credentials);
+
+    ApiContext::setDefault($apiContext);
 
     return $apiContext;
 }
@@ -98,12 +68,9 @@ function getApiContextUsingConfigIni()
 /**
  * Helper method for getting an APIContext for all calls (getting config from array)
  * @param string $token
- * @param string $version v1
- * @param string $coin btc|doge|ltc|uro|bcy
- * @param string $chain main|test3|test
- * @return ApiContext
+ * @return \BlockCypher\Rest\ApiContext
  */
-function getApiContextUsingConfigArray($token, $chain = 'main', $coin = 'btc', $version = 'v1')
+function getApiContextUsingConfigArray($token)
 {
     $credentials = new SimpleTokenCredential($token);
 
@@ -111,12 +78,12 @@ function getApiContextUsingConfigArray($token, $chain = 'main', $coin = 'btc', $
         'mode' => 'sandbox',
         'log.LogEnabled' => true,
         'log.FileName' => '../BlockCypher.log',
-        'log.LogLevel' => 'DEBUG', // PLEASE USE `INFO` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
+        'log.LogLevel' => 'DEBUG', // PLEASE USE `FINE` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
         'validation.level' => 'log',
         // 'http.CURLOPT_CONNECTTIMEOUT' => 30
     );
 
-    $apiContext = ApiContext::create($chain, $coin, $version, $credentials, $config);
+    $apiContext = ApiContext::create($credentials, $config);
 
     ApiContext::setDefault($apiContext);
 
@@ -129,5 +96,13 @@ function getApiContextUsingConfigArray($token, $chain = 'main', $coin = 'btc', $
  */
 function validateToken($token)
 {
-    return TokenValidator::validate($token);
+    // sample tokens:
+    // c0afcccdde5081d6429de37d16166ead
+    // ddf3g04f-0f31-4060-978b-63b1ff43e185
+
+    if (strlen($token) < 20) return false;
+    if (strlen($token) > 50) return false;
+    if (!preg_match('/[a-z0-9-]+/', $token)) return false;
+
+    return true;
 }

@@ -87,6 +87,6 @@ class ListenerAttacherTraitTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidatesEvents()
     {
-        new ObjectWithEvents(['foo' => 'bar']);
+        $o = new ObjectWithEvents(['foo' => 'bar']);
     }
 }

@@ -5,12 +5,9 @@
         private $app;
         private $id;
         private $values;
-        private $urlupdate;
-        private $interval;
         private $urlimage;
         private $formname;
         private $message;
-        private $currentelementid;
         private $transloadit;
         private $wait;
         private $init;
@@ -21,17 +18,17 @@
         private $keythumbcdn;
         private $keyme;
         private $buttons = array();
+        private $windowid;
 
         public function __construct( $id ){
             $this->app  = \Slim\Slim::getInstance();
             $this->id   = $id;
             $this->init = true;
+            $this->windowid = $id . 'box';
         }
 
-        public function & setUpdateAjax( $urlupdate, $interval = 4 ){
-            $this->urlupdate = $urlupdate;
-            $this->interval  = $interval * 1000;
-            return $this;
+        public function getWindowId(){
+            return $this->windowid;
         }
 
         public function & setValues( $values ){
@@ -109,22 +106,26 @@
             return ( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && $this->app->rules()->md5( $_POST[ 'img' ] ) ) ? $_POST[ 'img' ] : false;
         }
 
-        public function getCurrentElementId(){
-            return $this->app->session()->get( 'myfwchat' . $this->id, false );
-        }
-
-        public function addAjax( $values /*, $currentelementid = false */){
+        public function addAjax( $values ){
             $this->init   = false;
             $this->values = $values;
             $this->app->ajax()->append( '#' . $this->id . 'msgs', $this->__toString() )
                               ->scrollBottom( '#' . $this->id . 'box' )
                               ->val( '#' . $this->id . 'msg', '' );
-//                              ->display( '#' . $this->id . 'wait', false );
-
-//            if( is_int( $currentelementid ) ){
-//                $this->app->session()->set( 'myfwchat' . $this->id, $currentelementid );
-//            }
             $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $values ) ? 0 : $this->values[count($values) - 1][ 'id' ] );
+        }
+
+        public function & pusher( $channel, $event ){
+            $this->app->ajax()->pusher( $this->app->pusher()->getPKey(), $channel, $event, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box' );
+            return $this;
+        }
+        
+        public function & pusherAdd( $channel, $event, $values ){
+            $this->init   = false;
+            $this->values = $values;
+
+            $this->app->pusher()->trigger( $channel, $event, $this->app->ajax()->filter( $this->__toString() ) );
+            return $this;
         }
 
         public function & ajaxClearTextarea(){
@@ -165,22 +166,10 @@
 
 
         public function obj(){
-            
-            if( $this->init ){
-
-                if( !empty( $this->urlupdate ) )
-                    $this->app->ajax()->interval( $this->urlupdate, $this->interval, 1 ); 
-
-                if( is_int( $this->currentelementid ) )
-                    $this->app->session()->set( 'myfwchat' . $id, $this->currentelementid );
-
-                $this->app->ajax()->scrollBottom( '#' . $this->id . 'box' );
-            }
-
             return array( 'values'      => $this->values,
                           'message'     => $this->message,
                           'transloadit' => $this->transloadit,
-                          'urlupdate'   => $this->urlupdate,
+                          'windowid'    => $this->windowid,
                           'urlimage'    => $this->urlimage,
                           'formname'    => $this->formname,
                           'message'     => $this->message,

@@ -93,6 +93,7 @@ class BlockCypherConfigManager
      */
     public function get($searchKey)
     {
+
         if (array_key_exists($searchKey, $this->configs)) {
             return $this->configs[$searchKey];
         } else {
@@ -105,6 +106,7 @@ class BlockCypherConfigManager
 
             return $arr;
         }
+
     }
 
     /**

@@ -1,7 +1,5 @@
 
-build/artifacts
-build/coverage
-build/junit.xml
+build
 .DS_Store
 phpunit.local.xml
 *.log
@@ -16,8 +14,8 @@ atlassian-ide-plugin.xml
 
 # Composer
 vendor
+composer.lock
 
 # Project
 var
 tools
-apigen.phar

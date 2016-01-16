@@ -16,8 +16,7 @@ use BlockCypher\Validation\ArgumentValidator;
  *
  * @package BlockCypher\Api
  *
- * @property string address Only present when object represents an address
- * @property \BlockCypher\Api\WalletInfo wallet Only present when object represents a wallet
+ * @property string address
  * @property int total_received
  * @property int total_sent
  * @property int balance
@@ -32,7 +31,6 @@ class AddressBalance extends BlockCypherResourceModel
     /**
      * Obtain the AddressBalance resource for the given identifier.
      *
-     * @deprecated since version 1.2. Use AddressClient.
      * @param string $address
      * @param array $params Parameters
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
@@ -48,7 +46,9 @@ class AddressBalance extends BlockCypherResourceModel
 
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/addrs/$address/balance" . http_build_query(array_intersect_key($params, $allowedParams)),
@@ -66,7 +66,6 @@ class AddressBalance extends BlockCypherResourceModel
     /**
      * Obtain multiple AddressBalances resources for the given identifiers.
      *
-     * @deprecated since version 1.2. Use AddressClient.
      * @param string[] $array
      * @param array $params Parameters
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
@@ -84,7 +83,9 @@ class AddressBalance extends BlockCypherResourceModel
 
         $addressList = implode(";", $array);
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/addrs/$addressList/balance" . http_build_query(array_intersect_key($params, $allowedParams)),
@@ -117,22 +118,6 @@ class AddressBalance extends BlockCypherResourceModel
     {
         $this->address = $address;
         return $this;
-    }
-
-    /**
-     * @return \BlockCypher\Api\Wallet
-     */
-    public function getWallet()
-    {
-        return $this->wallet;
-    }
-
-    /**
-     * @param \BlockCypher\Api\Wallet $wallet
-     */
-    public function setWallet($wallet)
-    {
-        $this->wallet = $wallet;
     }
 
     /**

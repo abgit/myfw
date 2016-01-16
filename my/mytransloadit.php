@@ -44,9 +44,9 @@ class mytransloadit{
         return !$res->error();
     }
     
-    public function requestAssembly( & $returndata, $id, $refresh = false, $encode = true ){
+    public function requestAssembly( & $returndata, $id, $usecache = true, $encode = true ){
 
-        if( !$refresh && isset( $this->cache[ $id ] ) ){
+        if( $usecache && isset( $this->cache[ $id ] ) ){
             $returndata = $this->cache[ $id ];
             return true;
         }

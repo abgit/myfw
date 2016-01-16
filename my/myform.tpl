@@ -217,7 +217,7 @@
 
 			{% elseif el.type == 'formheader' %}
                 <div class="block-inner">
-                    <h6 class="heading{% if el.options.hr %} heading-hr{% endif %}{% if el.align %} text-{{ el.align }}{% endif %}">
+                    <h6 class="heading{% if el.hr %} heading-hr{% endif %}{% if el.align %} text-{{ el.align }}{% endif %}">
                         {% if el.title %}<i class="{{ el.icon|default( 'icon-books' ) }}"></i>{{ el.title }}{% endif %}{% if el.description %}<small class="display-block{% if el.descriptionclass %} {{ el.descriptionclass }}{% endif %}" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %} 
                     </h6>
                 </div>

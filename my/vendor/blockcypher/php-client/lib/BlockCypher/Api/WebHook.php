@@ -13,17 +13,7 @@ use BlockCypher\Validation\UrlValidator;
 /**
  * Class WebHook
  *
- * It represents a WebHooks or WebSockets-based notification request, as detailed in the Events & Hooks
- * section of the documentation.
- *
- * script values:
- * pay-to-pubkey-hash (most common transaction transferring to a public key hash, and the default behavior if no out)
- * pay-to-multi-pubkey-hash (multi-signatures transaction, now actually less used than pay-to-script-hash for this purpose)
- * pay-to-pubkey (used for mining transactions)
- * pay-to-script-hash (used for transactions relying on arbitrary scripts, now used primarily for multi-sig transactions)
- * null-data (sometimes called op-return; used to embed small chunks of data in the blockchain)
- * empty (no script present, mostly used for mining transaction inputs)
- * unknown (non-standard script)*
+ * A resource representing a block.
  *
  * @package BlockCypher\Api
  *
@@ -35,7 +25,7 @@ use BlockCypher\Validation\UrlValidator;
  * @property string address
  * @property string script
  * @property string url
- * @property int callback_errors
+ * @property int|string|string[] errors
  * @property string filter
  */
 class WebHook extends BlockCypherResourceModel
@@ -43,7 +33,6 @@ class WebHook extends BlockCypherResourceModel
     /**
      * Obtain the WebHook resource for the given identifier.
      *
-     * @deprecated since version 1.2. Use WebHookClient.
      * @param string $webHookId
      * @param array $params Parameters.
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
@@ -59,7 +48,9 @@ class WebHook extends BlockCypherResourceModel
 
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/hooks/$webHookId?" . http_build_query($params),
@@ -77,7 +68,6 @@ class WebHook extends BlockCypherResourceModel
     /**
      * Obtain multiple WebHooks resources for the given identifiers.
      *
-     * @deprecated since version 1.2. Use WebHookClient.
      * @param string[] $array
      * @param array $params Parameters
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
@@ -96,7 +86,9 @@ class WebHook extends BlockCypherResourceModel
         $webHookList = implode(";", $array);
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/hooks/$webHookList?" . http_build_query($params),
@@ -112,7 +104,6 @@ class WebHook extends BlockCypherResourceModel
     /**
      * Obtain all WebHook resources for the provided token.
      *
-     * @deprecated since version 1.2. Use WebHookClient.
      * @param array $params Parameters. Options: token
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
      * @param BlockCypherRestCall $restCall is the Rest Call Service that is used to make rest calls
@@ -128,7 +119,9 @@ class WebHook extends BlockCypherResourceModel
 
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/hooks?" . http_build_query($params),
@@ -144,7 +137,6 @@ class WebHook extends BlockCypherResourceModel
     /**
      * Create a new WebHook.
      *
-     * @deprecated since version 1.2. Use WebHookClient.
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
      * @param BlockCypherRestCall $restCall is the Rest Call Service that is used to make rest calls
      * @return WebHook
@@ -153,7 +145,9 @@ class WebHook extends BlockCypherResourceModel
     {
         $payLoad = $this->toJSON();
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/hooks",
@@ -170,7 +164,6 @@ class WebHook extends BlockCypherResourceModel
     /**
      * Deletes the Webhook identified by webhook_id for the application associated with access token.
      *
-     * @deprecated since version 1.2. Use WebHookClient.
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
      * @param BlockCypherRestCall $restCall is the Rest Call Service that is used to make rest calls
      * @return bool
@@ -179,7 +172,9 @@ class WebHook extends BlockCypherResourceModel
     {
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         self::executeCall(
             "$chainUrlPrefix/hooks/{$this->getId()}",
@@ -363,26 +358,26 @@ class WebHook extends BlockCypherResourceModel
      */
     public function setUrl($url)
     {
-        UrlValidator::validate($url, "url");
+        UrlValidator::validate($url, "Url");
         $this->url = $url;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int|string|\string[]
      */
-    public function getCallbackErrors()
+    public function getErrors()
     {
-        return $this->callback_errors;
+        return $this->errors;
     }
 
     /**
-     * @param int $errors
+     * @param int|string|\string[] $errors
      * @return $this
      */
-    public function setCallbackErrors($errors)
+    public function setErrors($errors)
     {
-        $this->callback_errors = $errors;
+        $this->errors = $errors;
         return $this;
     }
 

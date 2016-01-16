@@ -3,10 +3,8 @@
 namespace BlockCypher\Rest;
 
 use BlockCypher\Auth\TokenCredential;
-use BlockCypher\Core\BlockCypherCoinSymbolConstants;
 use BlockCypher\Core\BlockCypherConfigManager;
 use BlockCypher\Core\BlockCypherCredentialManager;
-use BlockCypher\Exception\BlockCypherConfigurationException;
 
 /**
  * Class ApiContext
@@ -24,32 +22,6 @@ class ApiContext
     public static $defaultApiContext = null;
 
     /**
-     * This is a placeholder for holding credential for the request
-     * If the value is not set, it would get the value from @\BlockCypher\Core\BlockCypherCredentialManager
-     *
-     * @var \BlockCypher\Auth\SimpleTokenCredential
-     */
-    protected $credential;
-
-    /**
-     * main|test|test3
-     * @var string
-     */
-    protected $chain;
-
-    /**
-     * btc|doge|ltc|uro|bcy
-     * @var string
-     */
-    protected $coin;
-
-    /**
-     * v1
-     * @var string
-     */
-    protected $version;
-
-    /**
      * Unique request id to be used for this call
      * The user can either generate one as per application
      * needs or let the SDK generate one
@@ -59,48 +31,64 @@ class ApiContext
     protected $requestId;
 
     /**
+     * This is a placeholder for holding credential for the request
+     * If the value is not set, it would get the value from @\BlockCypher\Core\BlockCypherCredentialManager
+     *
+     * @var \BlockCypher\Auth\SimpleTokenCredential
+     */
+    protected $credential;
+
+    /**
+     * v1
+     * @var string
+     */
+    protected $version;
+
+    /**
+     * btc|doge|ltc|uro|bcy
+     * @var string
+     */
+    protected $coin;
+
+    /**
+     * main|test|test3
+     * @var string
+     */
+    protected $chain;
+
+    /**
      * Construct
      *
      * @param TokenCredential $credential
+     * @param string|null $requestId
      * @param string|null $chain
      * @param string|null $coin
      * @param string|null $version
-     * @param string|null $requestId
      */
     public function __construct(
         $credential = null,
+        $requestId = null,
         $chain = 'main',
         $coin = 'btc',
-        $version = 'v1',
-        $requestId = null
+        $version = 'v1'
     )
     {
         $this->credential = $credential;
+        $this->requestId = $requestId;
         $this->chain = $chain;
         $this->coin = $coin;
         $this->version = $version;
-        $this->requestId = $requestId;
     }
 
     /**
      * Create new default ApiContext.
      *
-     * @param string $chain
-     * @param string $coin
-     * @param string $version
      * @param TokenCredential $credential
-     * @param array|null $config
+     * @param array $config
      * @param string $blockCypherPartnerAttributionId
      * @return ApiContext
-     * @throws BlockCypherConfigurationException
      */
-    public static function create(
-        $chain = 'main',
-        $coin = 'btc',
-        $version = 'v1',
-        $credential = null,
-        $config = null,
-        $blockCypherPartnerAttributionId = null)
+    public static function create($credential, $config = array(), $blockCypherPartnerAttributionId = null)
     {
         // ### Api context
         // Use an ApiContext object to authenticate
@@ -108,15 +96,13 @@ class ApiContext
         // SimpleTokenCredential class can be retrieved from
         // https://accounts.blockcypher.com/
 
-        $apiContext = new ApiContext($credential, $chain, $coin, $version);
+        $apiContext = new ApiContext($credential);
 
-        if (is_array($config)) {
+        // #### SDK configuration
+        // Register the sdk_config.ini file in current directory
+        // as the configuration source.
+        if (!defined("BC_CONFIG_PATH")) {
             $apiContext->setConfig($config);
-        } else {
-            // BC_CONFIG_PATH should be defined
-            if (!defined("BC_CONFIG_PATH")) {
-                throw new BlockCypherConfigurationException('BC_CONFIG_PATH should be defined with the path of sdk_config.ini file if no config array is given');
-            }
         }
 
         // Partner Attribution Id. For the time being it is not used.
@@ -324,14 +310,5 @@ class ApiContext
     public function getBaseChainUrl()
     {
         return "/{$this->version}/{$this->coin}/{$this->chain}";
-    }
-
-    /**
-     * Map coin and chain to coin symbol
-     * @return string
-     */
-    public function getCoinSymbol()
-    {
-        return BlockCypherCoinSymbolConstants::getCoinSymbolFrom($this->coin, $this->chain);
     }
 }

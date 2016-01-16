@@ -18,9 +18,16 @@ class Setup
             'http.ConnectionTimeOut' => 30,
             'log.LogEnabled' => true,
             'log.FileName' => '../BlockCypher.log',
-            'log.LogLevel' => 'INFO',
+            'log.LogLevel' => 'FINE',
             'validation.level' => 'log'
         );
+
+        /*
+        // OAuthTokenCredential is still not supported
+        $test->apiContext = new ApiContext(
+            new OAuthTokenCredential('AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS', 'EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL')
+        );
+        */
 
         // Replace these values by entering your own token by visiting https://accounts.blockcypher.com/
         /** @noinspection SpellCheckingInspection */
@@ -33,8 +40,7 @@ class Setup
 
         //BlockCypherConfigManager::getInstance()->addConfigFromIni(__DIR__. '/../../../sdk_config.ini');
         //BlockCypherConfigManager::getInstance()->addConfigs($configs);
-        BlockCypherCredentialManager::getInstance()->setCredentialObject(
-            BlockCypherCredentialManager::getInstance()->getCredentialObject('acct1'));
+        BlockCypherCredentialManager::getInstance()->setCredentialObject(BlockCypherCredentialManager::getInstance()->getCredentialObject('acct1'));
 
         self::$mode = getenv('REST_MODE') ? getenv('REST_MODE') : 'mock';
         if (self::$mode != 'sandbox') {

@@ -2,7 +2,7 @@
 
 namespace BlockCypher\Api;
 
-use BlockCypher\Common\BlockCypherBaseModel;
+use BlockCypher\Common\BlockCypherModel;
 
 /**
  * Class RelatedResources
@@ -15,7 +15,7 @@ use BlockCypher\Common\BlockCypherBaseModel;
  *
  * @property string dummy_property
  */
-class RelatedResources extends BlockCypherBaseModel
+class RelatedResources extends BlockCypherModel
 {
     /**
      * @return string

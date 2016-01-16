@@ -187,7 +187,7 @@ class myfilters{
         return ( \Slim\Slim::getInstance()->request->isAjax() ? 'http://www.gravatar.com/avatar/' : 'https://secure.gravatar.com/avatar/' ) . $hash . "?s=$s&d=$d&r=$r";
     }
 
-    public static function transloadit( $json, $step, $property = null, $property2 = null ){
+    public static function transloadit( $json, $step, $property = null, $property2 = null, $property3 = null ){
     
         $arr = is_string( $json ) ? json_decode( $json ) : $json;
 
@@ -204,8 +204,13 @@ class myfilters{
                 if( is_null( $property2 ) )
                     return $p;
 
+                if( isset( $p->$property2->$property3 ) )
+                    return $p->$property2->$property3;
+
                 if( isset( $p->$property2 ) )
                     return $p->$property2;
+
+                return null;
             }
         }elseif( isset( $arr->$property ) ){
             return $arr->$property;

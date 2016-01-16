@@ -43,21 +43,19 @@ class AddressBalanceTest extends ResourceModelTestCase
     {
         /*
         {
-            "address": "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD",
-            "total_received": 4433416,
-            "total_sent": 0,
-            "balance": 4433416,
-            "unconfirmed_balance": 0,
-            "final_balance": 4433416,
-            "n_tx": 7,
-            "unconfirmed_n_tx": 0,
-            "final_n_tx": 7,
-            "error": "",
-            "errors": []
+          "address": "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD",
+          "total_received": 4433416,
+          "total_sent": 0,
+          "balance": 4433416,
+          "unconfirmed_balance": 0,
+          "final_balance": 4433416,
+          "n_tx": 7,
+          "unconfirmed_n_tx": 0,
+          "final_n_tx": 7
         }
         */
 
-        return '{"address":"1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD","total_received":4433416,"total_sent":0,"balance":4433416,"unconfirmed_balance":0,"final_balance":4433416,"n_tx":7,"unconfirmed_n_tx":0,"final_n_tx":7,"error":"","errors":[]}';
+        return '{"address":"1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD","total_received":4433416,"total_sent":0,"balance":4433416,"unconfirmed_balance":0,"final_balance":4433416,"n_tx":7,"unconfirmed_n_tx":0,"final_n_tx":7}';
     }
 
     /**
@@ -97,7 +95,6 @@ class AddressBalanceTest extends ResourceModelTestCase
         /** @noinspection PhpParamsInspection */
         $result = $obj->get("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD", array(), $mockApiContext, $mockBlockCypherRestCall);
         $this->assertNotNull($result);
-        $this->assertInstanceOf('BlockCypher\Api\AddressBalance', $result);
     }
 
     /**

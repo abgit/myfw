@@ -2,9 +2,6 @@
 
 namespace BlockCypher\Common;
 
-use BlockCypher\Api\Error;
-use BlockCypher\Converter\JsonConverter;
-use BlockCypher\Core\BlockCypherLoggingManager;
 use BlockCypher\Validation\JsonValidator;
 use BlockCypher\Validation\ModelAccessorValidator;
 
@@ -15,13 +12,13 @@ use BlockCypher\Validation\ModelAccessorValidator;
  */
 class BlockCypherModel
 {
+
     /**
-     * Credentials to use for this call
+     * OAuth Credentials to use for this call
      *
-     * @var \BlockCypher\Auth\TokenCredential $credential
+     * @var \BlockCypher\Auth\OAuthTokenCredential $credential
      */
     protected static $credential;
-
     private $_propMap = array();
 
     /**
@@ -57,8 +54,7 @@ class BlockCypherModel
      */
     public function fromJson($json)
     {
-        //return $this->fromArray(JsonConverter::decode($json, true, 512, JSON_BIGINT_AS_STRING));
-        return $this->fromArray(JsonConverter::decode($json, true));
+        return $this->fromArray(json_decode($json, true));
     }
 
     /**
@@ -97,18 +93,9 @@ class BlockCypherModel
                             // Iterate through each element in that array.
                             foreach ($v as $nk => $nv) {
                                 if (is_array($nv)) {
-                                    //BlockCypherLoggingManager::getInstance()->debug("new instance of class: $clazz");
-                                    if (!class_exists($clazz)) {
-                                        BlockCypherLoggingManager::getInstance()->error("Class not found: $clazz");
-                                    } else {
-                                        try {
-                                            $o = new $clazz();
-                                            $o->fromArray($nv);
-                                            $arr[$nk] = $o;
-                                        } catch (\Exception $e) {
-                                            BlockCypherLoggingManager::getInstance()->error($e->getMessage());
-                                        }
-                                    }
+                                    $o = new $clazz();
+                                    $o->fromArray($nv);
+                                    $arr[$nk] = $o;
                                 } else {
                                     $arr[$nk] = $nv;
                                 }
@@ -152,7 +139,7 @@ class BlockCypherModel
      * Sets Credential
      *
      * @deprecated Pass ApiContext to create/get methods instead
-     * @param \BlockCypher\Auth\TokenCredential $credential
+     * @param \BlockCypher\Auth\OAuthTokenCredential $credential
      */
     public static function setCredential($credential)
     {
@@ -175,28 +162,18 @@ class BlockCypherModel
 
         if (is_a($data, get_class(new \stdClass()))) {
             //This means, root element is object
-
-            $accessibleProperties = get_object_vars($data);
-
-            if (count($accessibleProperties) == 1
-                && (isset($accessibleProperties['error']) || isset($accessibleProperties['errors']))
-            ) {
-                // Object is only an error {"error":"message"} or {"errors":["error1":"message1"]}
-                return new Error(JsonConverter::encode($data));
-            } else {
-                return new static(JsonConverter::encode($data));
-            }
+            return new static(json_encode($data));
         }
 
         $list = array();
 
         if (is_array($data)) {
-            $data = JsonConverter::encode($data);
+            $data = json_encode($data);
         }
 
         if (JsonValidator::validate($data)) {
             // It is valid JSON
-            $decoded = JsonConverter::decode($data);
+            $decoded = json_decode($data);
             if ($decoded === null) {
                 return $list;
             }
@@ -207,7 +184,7 @@ class BlockCypherModel
             }
             if (is_a($decoded, get_class(new \stdClass()))) {
                 //This means, root element is object
-                $list[] = new static(JsonConverter::encode($decoded));
+                $list[] = new static(json_encode($decoded));
             }
         }
 
@@ -283,11 +260,15 @@ class BlockCypherModel
      */
     public function toJSON($options = 0)
     {
-        //$options = $options | JSON_HEX_AMP | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES;
-
-        $options = $options | 2 | 64; // $options | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES;
-
-        return JsonConverter::encode($this->toArray(), $options);
+        // Because of PHP Version 5.3, we cannot use JSON_UNESCAPED_SLASHES option
+        // Instead we would use the str_replace command for now.
+        // TODO: Replace this code with return json_encode($this->toArray(), $options | 64); once we support PHP >= 5.4
+        if (version_compare(phpversion(), '5.4.0', '>=') === true) {
+            // http://php.net/manual/es/json.constants.php
+            return json_encode($this->toArray(), $options | 2 | 64);
+        }
+        // TODO: replace &
+        return str_replace('\\/', '/', json_encode($this->toArray(), $options));
     }
 
     /**

@@ -4,7 +4,7 @@ namespace BlockCypher\Test\Functional\Api;
 
 use BlockCypher\Api\Address;
 use BlockCypher\Api\AddressBalance;
-use BlockCypher\Api\AddressKeyChain;
+use BlockCypher\Api\AddressCreateResponse;
 use BlockCypher\Api\FullAddress;
 use BlockCypher\Exception\BlockCypherConnectionException;
 use BlockCypher\Test\Functional\Setup;
@@ -47,20 +47,20 @@ class AddressFunctionalTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return AddressKeyChain|null
+     * @return AddressCreateResponse|null
      */
     public function testCreate()
     {
         //$request = $this->operation['request']['body'];
-        //$addressCreateResponse = new AddressKeyChain($request);
+        //$addressCreateResponse = new AddressCreateResponse($request);
         $result = null;
         try {
-            $result = Address::create(null, $this->apiContext, $this->mockBlockCypherRestCall);
+            $result = Address::create($this->apiContext, $this->mockBlockCypherRestCall);
         } catch (BlockCypherConnectionException $ex) {
             $this->fail($ex->getMessage());
         }
         $this->assertNotNull($result);
-        $this->assertInstanceOf('\BlockCypher\Api\AddressKeyChain', $result);
+        $this->assertInstanceOf('\BlockCypher\Api\AddressCreateResponse', $result);
         return $result;
     }
 
@@ -78,9 +78,7 @@ class AddressFunctionalTest extends \PHPUnit_Framework_TestCase
         // Assert only immutable values.
         $this->assertEquals($address->getAddress(), $result->getAddress());
         $this->assertEquals($address->getTxUrl(), $result->getTxUrl());
-        $addressTxrefs = $address->getTxrefs();
-        $resultTxrefs = $result->getTxrefs();
-        $this->assertEquals($addressTxrefs[0]->getTxHash(), $resultTxrefs[0]->getTxHash());
+        $this->assertEquals($address->getTxrefs()[0]->getTxHash(), $result->getTxrefs()[0]->getTxHash());
         return $result;
     }
 
@@ -99,7 +97,7 @@ class AddressFunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fullAddress->getAddress(), $result->getAddress());
         $this->assertEquals($fullAddress->getTxUrl(), $result->getTxUrl());
         $this->assertEquals(count($fullAddress->getTxs()), count($result->getTxs()));
-        $this->assertContainsOnlyInstancesOf('\BlockCypher\Api\TX', $result->getTxs());
+        $this->assertContainsOnlyInstancesOf('\BlockCypher\Api\Transaction', $result->getTxs());
         return $result;
     }
 

@@ -34,7 +34,7 @@ class RequestException extends TransferException
     }
 
     /**
-     * Wrap non-RequestExceptions with a RequestException
+     * Wrap non-RequesExceptions with a RequestException
      *
      * @param RequestInterface $request
      * @param \Exception       $e

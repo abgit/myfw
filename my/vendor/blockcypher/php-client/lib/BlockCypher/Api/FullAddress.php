@@ -16,8 +16,7 @@ use BlockCypher\Validation\ArgumentValidator;
  *
  * @package BlockCypher\Api
  *
- * @property string address Only present when object represents an address
- * @property \BlockCypher\Api\WalletInfo wallet Only present when object represents a wallet
+ * @property string address
  * @property int total_received
  * @property int total_sent
  * @property int balance
@@ -26,8 +25,7 @@ use BlockCypher\Validation\ArgumentValidator;
  * @property int n_tx
  * @property int unconfirmed_n_tx
  * @property int final_n_tx
- * @property bool has_more
- * @property \BlockCypher\Api\TX[] txs
+ * @property \BlockCypher\Api\Transaction[] txs
  * @property string tx_url
  */
 class FullAddress extends BlockCypherResourceModel
@@ -35,7 +33,6 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * Obtain the FullAddress resource for the given identifier.
      *
-     * @deprecated since version 1.2. Use AddressClient.
      * @param string $address
      * @param array $params Parameters. Options: unspentOnly, and before
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
@@ -54,7 +51,9 @@ class FullAddress extends BlockCypherResourceModel
 
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/addrs/$address/full?" . http_build_query($params),
@@ -72,7 +71,6 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * Obtain multiple FullAddress resources for the given identifiers.
      *
-     * @deprecated since version 1.2. Use AddressClient.
      * @param string[] $array
      * @param array $params Parameters. Options: unspentOnly, and before
      * @param ApiContext $apiContext is the APIContext for this call. It can be used to pass dynamic configuration and credentials.
@@ -92,7 +90,9 @@ class FullAddress extends BlockCypherResourceModel
         $addressList = implode(";", $array);
         $payLoad = "";
 
-        $chainUrlPrefix = self::getChainUrlPrefix($apiContext);
+        //Initialize the context if not provided explicitly
+        $apiContext = $apiContext ? $apiContext : new ApiContext(self::$credential);
+        $chainUrlPrefix = $apiContext->getBaseChainUrl();
 
         $json = self::executeCall(
             "$chainUrlPrefix/addrs/$addressList/full?" . http_build_query($params),
@@ -125,22 +125,6 @@ class FullAddress extends BlockCypherResourceModel
     {
         $this->address = $address;
         return $this;
-    }
-
-    /**
-     * @return \BlockCypher\Api\Wallet
-     */
-    public function getWallet()
-    {
-        return $this->wallet;
-    }
-
-    /**
-     * @param \BlockCypher\Api\Wallet $wallet
-     */
-    public function setWallet($wallet)
-    {
-        $this->wallet = $wallet;
     }
 
     /**
@@ -306,56 +290,9 @@ class FullAddress extends BlockCypherResourceModel
     }
 
     /**
-     * Final number of transactions, including unconfirmed transactions, for this address.
-     *
-     * @return int
-     */
-    public function getFinalNTx()
-    {
-        return $this->final_n_tx;
-    }
-
-    /**
-     * Final number of transactions, including unconfirmed transactions, for this address.
-     *
-     * @param int $final_n_tx
-     * @return $this
-     */
-    public function setFinalNTx($final_n_tx)
-    {
-        $this->final_n_tx = $final_n_tx;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function hasMore()
-    {
-        return $this->has_more;
-    }
-
-    /**
-     * @param boolean $has_more
-     * @return $this
-     */
-    public function setHasMore($has_more)
-    {
-        $this->has_more = $has_more;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getHasMore()
-    {
-        return $this->has_more;
-    }
-    /**
      * Alias for addTx method.
      *
-     * @param \BlockCypher\Api\TX $transaction
+     * @param \BlockCypher\Api\Transaction $transaction
      * @return $this
      */
     public function addTransaction($transaction)
@@ -364,9 +301,9 @@ class FullAddress extends BlockCypherResourceModel
     }
 
     /**
-     * Append TX to the list.
+     * Append Transaction to the list.
      *
-     * @param \BlockCypher\Api\TX $tx
+     * @param \BlockCypher\Api\Transaction $tx
      * @return $this
      */
     public function addTx($tx)
@@ -383,7 +320,7 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * All transaction inputs and outputs for the specified address.
      *
-     * @return \BlockCypher\Api\TX[]
+     * @return \BlockCypher\Api\Transaction[]
      */
     public function getTxs()
     {
@@ -393,7 +330,7 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * All transaction inputs and outputs for the specified address.
      *
-     * @param \BlockCypher\Api\TX[] $tx
+     * @param \BlockCypher\Api\Transaction[] $tx
      *
      * @return $this
      */
@@ -406,7 +343,7 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * Alias for getTxs method.
      *
-     * @return \BlockCypher\Api\TX[]
+     * @return \BlockCypher\Api\Transaction[]
      */
     public function getTransactions()
     {
@@ -416,7 +353,7 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * Alias for setTxs method.
      *
-     * @param \BlockCypher\Api\TX[] $transactions
+     * @param \BlockCypher\Api\Transaction[] $transactions
      *
      * @return $this
      */
@@ -428,7 +365,7 @@ class FullAddress extends BlockCypherResourceModel
     /**
      * Alias for removeTx method.
      *
-     * @param \BlockCypher\Api\TX $transaction
+     * @param \BlockCypher\Api\Transaction $transaction
      * @return $this
      */
     public function removeTransaction($transaction)
@@ -437,9 +374,9 @@ class FullAddress extends BlockCypherResourceModel
     }
 
     /**
-     * Remove TX from the list.
+     * Remove Transaction from the list.
      *
-     * @param \BlockCypher\Api\TX $tx
+     * @param \BlockCypher\Api\Transaction $tx
      * @return $this
      */
     public function removeTx($tx)
@@ -468,6 +405,28 @@ class FullAddress extends BlockCypherResourceModel
     public function setTxUrl($tx_url)
     {
         $this->tx_url = $tx_url;
+        return $this;
+    }
+
+    /**
+     * Final number of transactions, including unconfirmed transactions, for this address.
+     *
+     * @return int
+     */
+    public function getFinalNTx()
+    {
+        return $this->final_n_tx;
+    }
+
+    /**
+     * Final number of transactions, including unconfirmed transactions, for this address.
+     *
+     * @param int $final_n_tx
+     * @return $this
+     */
+    public function setFinalNTx($final_n_tx)
+    {
+        $this->final_n_tx = $final_n_tx;
         return $this;
     }
 }

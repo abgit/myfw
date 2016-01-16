@@ -31,12 +31,9 @@ class ResourceModelTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $version
-     * @param string $coin
-     * @param string $chain
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    public function getMockApiContext($version = 'v1', $coin = 'btc', $chain = 'main')
+    public function getMockApiContext()
     {
         $mockApiContext = $this->getMockBuilder('\BlockCypher\Rest\ApiContext')
             ->disableOriginalConstructor()
@@ -45,7 +42,7 @@ class ResourceModelTestCase extends \PHPUnit_Framework_TestCase
 
         $mockApiContext->expects($this->once())
             ->method('getBaseChainUrl')
-            ->will($this->returnValue("/$version/$coin/$chain"));
+            ->will($this->returnValue('/v1/btc/main'));
 
         return $mockApiContext;
     }

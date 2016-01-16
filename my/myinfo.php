@@ -31,12 +31,22 @@ class myinfo{
     }
 
     public function & addSeparatorLine(){
-        $this->elements[] = array( 'type' => 'sep' );
+        $this->elements[] = array( 'type' => 'sl' );
+        return $this;
+    }
+
+    public function & addSeparator(){
+        $this->elements[] = array( 'type' => 'se' );
         return $this;
     }
 
     public function & addText( $key ){
         $this->elements[] = array( 'key' => $key, 'type' => 'text' );
+        return $this;
+    }
+
+    public function & addTitle( $label, $icon = 'icon-stack' ){
+        $this->elements[] = array( 'type' => 'ti', 'label' => $label, 'icon' => $icon );
         return $this;
     }
 

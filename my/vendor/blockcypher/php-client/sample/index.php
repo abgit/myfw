@@ -225,17 +225,22 @@ if (PHP_SAPI == 'cli') {
         <div class="col-md-3 ">
             <div class="row-fluid fixed col-md-3" id="leftNavigation" role="navigation">
                 <ul class="nav nav-pills nav-stacked">
-                    <li><a href="#chain-api">Chain API</a></li>
-                    <li><a href="#block-api">Block API</a></li>
-                    <li><a href="#address-api">Address API</a></li>
-                    <li><a href="#wallet-api">Wallet API</a></li>
-                    <li><a href="#transaction-api">Transaction API</a></li>
-                    <li><a href="#microtransaction-api">Microtransaction API</a></li>
-                    <li><a href="#confidence-factor">Confidence Factor</a></li>
-                    <li><a href="#payment-api">Payment Forwarding</a></li>
-                    <li><a href="#hook-api">Events adn Hooks</a></li>
-                    <li><a href="#testing">Testing</a></li>
-                    <li><a href="#signer">Signer</a></li>
+                    <li><a href="#chains">Chains</a></li>
+                    <li><a href="#blocks">Blocks</a></li>
+                    <li><a href="#transactions">Transactions</a></li>
+                    <li><a href="#zero_confirmations">0-Confirmations</a></li>
+                    <li><a href="#address_details">Address Details</a></li>
+                    <li><a href="#address_gen">Address Generation</a></li>
+                    <li><a href="#wallet_api">Wallet</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#websockets">WebSockets</a></li>
+                    <li><a href="#webhooks">WebHooks</a></li>
+                    <li><a href="#payments_summary">Payments Summary</a></li>
+                    <li><a href="#payments_details">Payments Details</a></li>
+                    <li><a href="#generic_transactions">Generic Transactions</a></li>
+                    <li><a href="#micro_transactions">Micro Transactions</a></li>
+                    <li><a href="#signing_sending">Signing and sending</a></li>
+                    <li><a href="#multisig">Multisig</a></li>
                 </ul>
 
             </div>
@@ -243,11 +248,11 @@ if (PHP_SAPI == 'cli') {
 
         <div class="col-md-9 samples">
 
-            <!-- chain-api -->
+            <!-- chains -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="chain-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#chain-endpoint"
+                    <h3 id="chains" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#chains"
                             target="_blank">Chains</a></h3>
                 </div>
                 <!-- List group -->
@@ -256,9 +261,9 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get blockchain details</h5></div>
                             <div class="col-md-4">
-                                <a href="chain-api/GetChain.php" class="btn btn-primary pull-left execute"> Try It <i
+                                <a href="chains/GetChain.php" class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/chain-api/GetChain.html" class="btn btn-default pull-right">Source <i
+                                <a href="doc/chains/GetChain.html" class="btn btn-default pull-right">Source <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
@@ -266,11 +271,11 @@ if (PHP_SAPI == 'cli') {
                 </ul>
             </div>
 
-            <!-- block-api -->
+            <!-- blocks -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="block-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#block-hash-endpoint"
+                    <h3 id="blocks" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#blocks"
                             target="_blank">Blocks</a></h3>
                 </div>
                 <!-- List group -->
@@ -279,9 +284,9 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get block details by block hash</h5></div>
                             <div class="col-md-4">
-                                <a href="block-api/GetBlock.php" class="btn btn-primary pull-left execute"> Try It <i
+                                <a href="blocks/GetBlock.php" class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/block-api/GetBlock.html" class="btn btn-default pull-right">Source <i
+                                <a href="doc/blocks/GetBlock.html" class="btn btn-default pull-right">Source <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
@@ -290,12 +295,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get block details by block height</h5></div>
                             <div class="col-md-4">
-                                <a href="block-api/GetBlockByHeight.php" class="btn btn-primary pull-left execute"> Try
-                                    It
+                                <a href="blocks/GetBlockByHeight.php" class="btn btn-primary pull-left execute"> Try It
                                     <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/block-api/GetBlockByHeight.html" class="btn btn-default pull-right">Source
-                                    <i
+                                <a href="doc/blocks/GetBlockByHeight.html" class="btn btn-default pull-right">Source <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
@@ -304,12 +307,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get multiple blocks at once</h5></div>
                             <div class="col-md-4">
-                                <a href="block-api/GetMultipleBlocks.php" class="btn btn-primary pull-left execute"> Try
-                                    It
+                                <a href="blocks/GetMultipleBlocks.php" class="btn btn-primary pull-left execute"> Try It
                                     <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/block-api/GetMultipleBlocks.html" class="btn btn-default pull-right">Source
-                                    <i
+                                <a href="doc/blocks/GetMultipleBlocks.html" class="btn btn-default pull-right">Source <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
@@ -318,12 +319,11 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get block paging transaction list</h5></div>
                             <div class="col-md-4">
-                                <a href="block-api/GetBlockWithPaging.php" class="btn btn-primary pull-left execute">
-                                    Try
+                                <a href="blocks/GetBlockWithPaging.php" class="btn btn-primary pull-left execute"> Try
                                     It
                                     <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/block-api/GetBlockWithPaging.html" class="btn btn-default pull-right">Source
+                                <a href="doc/blocks/GetBlockWithPaging.html" class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
@@ -332,11 +332,85 @@ if (PHP_SAPI == 'cli') {
                 </ul>
             </div>
 
-            <!-- address-api -->
+            <!-- transactions -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="address-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#address-api"
+                    <h3 id="transactions" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#transactions"
+                            target="_blank">Transactions</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get transaction details</h5></div>
+                            <div class="col-md-4">
+                                <a href="transactions/GetTransaction.php" class="btn btn-primary pull-left execute"> Try
+                                    It <i
+                                        class="fa fa-play-circle-o"></i></a>
+                                <a href="doc/transactions/GetTransaction.html"
+                                   class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get multiple transactions at once</h5></div>
+                            <div class="col-md-4">
+                                <a href="transactions/GetMultipleTransactions.php"
+                                   class="btn btn-primary pull-left execute">
+                                    Try It
+                                    <i
+                                        class="fa fa-play-circle-o"></i></a>
+                                <a href="doc/transactions/GetMultipleTransactions.html"
+                                   class="btn btn-default pull-right">Source
+                                    <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get transaction paging inputs and outputs</h5></div>
+                            <div class="col-md-4">
+                                <a href="transactions/GetTransactionWithPaging.php"
+                                   class="btn btn-primary pull-left execute"> Try
+                                    It <i
+                                        class="fa fa-play-circle-o"></i></a>
+                                <a href="doc/transactions/GetTransactionWithPaging.html"
+                                   class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- zero_confirmations -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="zero_confirmations" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#zero_confirmations"
+                            target="_blank">0-Confirmations</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- address_details -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="address_details" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#address_details"
                             target="_blank">Addresses</a></h3>
                 </div>
                 <!-- List group -->
@@ -345,23 +419,9 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get address details</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetAddress.php" class="btn btn-primary pull-left execute"> Try It
-                                    <i
+                                <a href="addresses/GetAddress.php" class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetAddress.html" class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get address details (BTC Tesnet)</h5></div>
-                            <div class="col-md-4">
-                                <a href="address-api/GetAddressBtcTest3.php" class="btn btn-primary pull-left execute">
-                                    Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetAddressBtcTest3.html" class="btn btn-default pull-right">Source
+                                <a href="doc/addresses/GetAddress.html" class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
@@ -371,12 +431,11 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get multiple addresses at once</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetMultipleAddresses.php"
-                                   class="btn btn-primary pull-left execute">
+                                <a href="addresses/GetMultipleAddresses.php" class="btn btn-primary pull-left execute">
                                     Try It
                                     <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetMultipleAddresses.html" class="btn btn-default pull-right">Source
+                                <a href="doc/addresses/GetMultipleAddresses.html" class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
@@ -386,11 +445,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get only address balance</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetOnlyBalance.php" class="btn btn-primary pull-left execute"> Try
-                                    It
+                                <a href="addresses/GetOnlyBalance.php" class="btn btn-primary pull-left execute"> Try It
                                     <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetOnlyBalance.html" class="btn btn-default pull-right">Source
+                                <a href="doc/addresses/GetOnlyBalance.html" class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
@@ -400,10 +458,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get multiple addresses balance at once (only balance)</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetMultipleAddressesBalance.php"
+                                <a href="addresses/GetMultipleAddressesBalance.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetMultipleAddressesBalance.html"
+                                <a href="doc/addresses/GetMultipleAddressesBalance.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -414,11 +472,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get full address</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetFullAddressUsingAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try It
+                                <a href="addresses/GetFullAddress.php" class="btn btn-primary pull-left execute"> Try It
                                     <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetFullAddress.html" class="btn btn-default pull-right">Source
+                                <a href="doc/addresses/GetFullAddress.html" class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
@@ -428,10 +485,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get multiple full addresses at once</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetMultipleFullAddresses.php"
+                                <a href="addresses/GetMultipleFullAddresses.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetMultipleFullAddresses.html"
+                                <a href="doc/addresses/GetMultipleFullAddresses.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -442,10 +499,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get address only with unspent transactions</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetAddressWithUnspentOnly.php"
+                                <a href="addresses/GetAddressWithUnspentOnly.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetAddressWithUnspentOnly.html"
+                                <a href="doc/addresses/GetAddressWithUnspentOnly.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -456,70 +513,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get address with paging</h5></div>
                             <div class="col-md-4">
-                                <a href="address-api/GetAddressWithPaging.php"
+                                <a href="addresses/GetAddressWithPaging.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GetAddressWithPaging.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Generate new address</h5></div>
-                            <div class="col-md-4">
-                                <a href="address-api/GenerateAddress.php" class="btn btn-primary pull-left execute"> Try
-                                    It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GenerateAddress.html" class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Generate new BTC Testnet address</h5></div>
-                            <div class="col-md-4">
-                                <a href="address-api/GenerateAddressBtcTest3.php"
-                                   class="btn btn-primary pull-left execute"> Try
-                                    It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GenerateAddressBtcTest3.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Generate new multisig address</h5></div>
-                            <div class="col-md-4">
-                                <a href="address-api/GenerateMultisigAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GenerateMultisigAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Generate new BTC Testnet multisig address</h5></div>
-                            <div class="col-md-4">
-                                <a href="address-api/GenerateMultisigAddressBtcTest3.php"
-                                   class="btn btn-primary pull-left execute"> Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/address-api/GenerateMultisigAddressBtcTest3.html"
+                                <a href="doc/addresses/GetAddressWithPaging.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -529,292 +526,23 @@ if (PHP_SAPI == 'cli') {
                 </ul>
             </div>
 
-            <!-- wallet-api -->
+            <!-- address_gen -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="wallet-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#wallets"
-                            target="_blank">Wallets</a></h3>
+                    <h3 id="address_gen" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#address_gen"
+                            target="_blank">Address Generation</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Create wallet</h5></div>
+                            <div class="col-md-8"><h5>Create new address</h5></div>
                             <div class="col-md-4">
-                                <a href="wallet-api/CreateWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/CreateWallet.html"
-                                   class="btn btn-default pull-right">Source
+                                <a href="addresses/CreateAddress.php" class="btn btn-primary pull-left execute"> Try It
                                     <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Create HD wallet</h5></div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/CreateHDWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/CreateHDWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Get wallet*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GetWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GetWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Get HD wallet*
-                                    <small>(Depends on "Create HD wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GetHDWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GetHDWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Get wallet as address*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GetWalletAsAddress.php" class="btn btn-primary pull-left execute">
-                                    Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GetWalletAsAddress.html" class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Get wallet balance*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GetWalletBalanceAsAddressBalance.php"
-                                   class="btn btn-primary pull-left execute"> Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GetWalletBalanceAsAddressBalance.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Get full wallet*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GetWalletAsFullAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GetWalletAsFullAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Add addresses to a wallet*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/AddAddressesToWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/AddAddressesToWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Generate new address and associate it to a wallet*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GenerateNewAddressForWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GenerateNewAddressForWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Generate new address in HD wallet*
-                                    <small>(Depends on "Create HD wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GenerateAddressInHDWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GenerateAddressInHDWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Generate new address in HD wallet with subchain index*
-                                    <small>(Depends on "Create HD wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/GenerateAddressInHDWalletWithSubchainIndex.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/GenerateAddressInHDWalletWithSubchainIndex.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>List wallet addresses*
-                                    <small>(Depends on "Add addresses to a wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/ListWalletAddresses.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/ListWalletAddresses.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>List HD wallet addresses*
-                                    <small>(Depends on "Generate address in wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/ListHDWalletAddresses.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/ListHDWalletAddresses.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Remove addresses from a wallet*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/RemoveAddressesFromWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/RemoveAddressesFromWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Delete wallet*
-                                    <small>(Depends on "Create wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/DeleteWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/DeleteWallet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Delete HD wallet*
-                                    <small>(Depends on "Create HD wallet")</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="wallet-api/DeleteHDWallet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/wallet-api/DeleteHDWallet.html"
-                                   class="btn btn-default pull-right">Source
+                                <a href="doc/addresses/CreateAddress.html" class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
                             </div>
@@ -823,487 +551,68 @@ if (PHP_SAPI == 'cli') {
                 </ul>
             </div>
 
-            <!-- transaction-api -->
+            <!-- wallet_api -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="transaction-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#transaction-api"
-                            target="_blank">Transactions</a></h3>
+                    <h3 id="wallet_api" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#wallet_api"
+                            target="_blank">Wallet</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Get transaction details</h5></div>
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
                             <div class="col-md-4">
-                                <a href="transaction-api/GetTransaction.php" class="btn btn-primary pull-left execute">
-                                    Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/GetTransaction.html"
-                                   class="btn btn-default pull-right">Source <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get multiple transactions at once</h5></div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/GetMultipleTransactions.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/GetMultipleTransactions.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get unconfirmed transactions</h5></div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/GetAllUnconfirmedTransactions.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/GetAllUnconfirmedTransactions.html"
-                                   class="btn btn-default pull-right">Source <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get transaction paging inputs and outputs</h5></div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/GetTransactionWithPaging.php"
-                                   class="btn btn-primary pull-left execute"> Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/GetTransactionWithPaging.html"
-                                   class="btn btn-default pull-right">Source <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get transaction confidence</h5></div>
-                            <div class="col-md-4">
-                                <a href="confidence-factor/GetTransactionConfidence.php"
-                                   class="btn btn-primary pull-left execute"> Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/confidence-factor/GetTransactionConfidence.html"
-                                   class="btn btn-default pull-right">Source <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get multiple transactions confidence at once</h5></div>
-                            <div class="col-md-4">
-                                <a href="confidence-factor/GetMultipleTransactionsConfidence.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/confidence-factor/GetMultipleTransactionsConfidence.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Create transaction (without sending it)</h5></div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/CreateTransaction.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/CreateTransaction.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Create, sign and send transaction*
-                                    <small>(source address must contains enough balance)</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/CreateAndSignAndSendTransaction.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/CreateAndSignAndSendTransaction.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Push raw transaction</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/PushRawTransaction.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/PushRawTransaction.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Decode raw transaction</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/DecodeRawTransaction.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/DecodeRawTransaction.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Fund multisig address*
-                                    <small>(source address must contains enough balance)</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/CreateTransactionToFundMultisigAddress.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/CreateTransactionToFundMultisigAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Spend multisig funds*
-                                    <small>(source address must contains enough balance)</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/CreateTransactionToSpendMultisigFunds.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/CreateTransactionToSpendMultisigFunds.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Fund multisig address using TXBuilder*
-                                    <small>(source address must contains enough balance)</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/CreateTxToFundMultisigAddrWithBuilder.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/CreateTxToFundMultisigAddrWithBuilder.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Spend multisig funds using TXBuilder*
-                                    <small>(source address must contains enough balance)</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/CreateTxToSpendMultisigFundsWithBuilder.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/CreateTxToSpendMultisigFundsWithBuilder.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Create, sign and send multisig transaction*
-                                    <small>(source address must contains enough balance)</small>
-                                </h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/SpendMultisigFundsTransaction.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/SpendMultisigFundsTransaction.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h5>Embed data on Blockchain</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="transaction-api/EmbedDataOnBlockchain.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/transaction-api/EmbedDataOnBlockchain.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
 
-            <!-- microtransaction-api -->
+            <!-- events -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="microtransaction-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#microtransaction-api"
-                            target="_blank">Microtransactions API</a></h3>
+                    <h3 id="events" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#events"
+                            target="_blank">Events</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Create from private (using client)</h5>
-                            </div>
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
                             <div class="col-md-4">
-                                <a href="microtransaction-api/CreateMicroTXFromPrivate.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/microtransaction-api/CreateMicroTXFromPrivate.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Create from pubkey (using client)</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="microtransaction-api/CreateMicroTXFromPubkey.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/microtransaction-api/CreateMicroTXFromPubkey.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Create from WIF (using client)</h5>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="microtransaction-api/CreateMicroTXFromWif.php"
-                                   class="btn btn-primary pull-left execute">
-                                    Try It
-                                    <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/microtransaction-api/CreateMicroTXFromWif.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
 
-            <!-- confidence-factor -->
+            <!-- websockets -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="confidence-factor" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#confidence-factor"
-                            target="_blank">Confidence Factor</a></h3>
+                    <h3 id="websockets" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#websockets"
+                            target="_blank">WebSockets</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Get transaction confidence</h5></div>
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
                             <div class="col-md-4">
-                                <a href="confidence-factor/GetTransactionConfidence.php"
-                                   class="btn btn-primary pull-left execute"> Try
-                                    It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/confidence-factor/GetTransactionConfidence.html"
-                                   class="btn btn-default pull-right">Source <i
-                                        class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
 
-            <!-- payment-api -->
+            <!-- webhooks -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="payment-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#payment-forwarding"
-                            target="_blank">Payment Forwarding</a></h3>
-                </div>
-                <!-- List group -->
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Create forwarding address</h5></div>
-                            <div class="col-md-4">
-                                <a href="payment-api/CreateForwardingAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/payment-api/CreateForwardingAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get forwarding address</h5></div>
-                            <div class="col-md-4">
-                                <a href="payment-api/GetForwardingAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/payment-api/GetForwardingAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Get multiple forwarding address at once</h5></div>
-                            <div class="col-md-4">
-                                <a href="payment-api/GetMultipleForwardingAddresses.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/payment-api/GetMultipleForwardingAddresses.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>List forwarding addresses</h5></div>
-                            <div class="col-md-4">
-                                <a href="payment-api/CreateAndListForwardingAddresses.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/payment-api/CreateAndListForwardingAddresses.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Delete forwarding address</h5></div>
-                            <div class="col-md-4">
-                                <a href="payment-api/CreateAndDeleteForwardingAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/payment-api/CreateAndDeleteForwardingAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Delete all forwarding addresses</h5></div>
-                            <div class="col-md-4">
-                                <a href="payment-api/DeleteAllForwardingAddresses.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/payment-api/DeleteAllForwardingAddresses.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- hook-api -->
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 id="hook-api" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#events-and-hooks"
+                    <h3 id="webhooks" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#webhooks"
                             target="_blank">WebHooks</a></h3>
                 </div>
                 <!-- List group -->
@@ -1312,10 +621,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Create webhook</h5></div>
                             <div class="col-md-4">
-                                <a href="hook-api/CreateWebHook.php"
+                                <a href="webhooks/CreateWebHook.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/hook-api/CreateWebHook.html"
+                                <a href="doc/webhooks/CreateWebHook.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -1326,10 +635,10 @@ if (PHP_SAPI == 'cli') {
                         <div class="row">
                             <div class="col-md-8"><h5>Get webhook details</h5></div>
                             <div class="col-md-4">
-                                <a href="hook-api/GetWebHook.php"
+                                <a href="webhooks/GetWebHook.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/hook-api/GetWebHook.html"
+                                <a href="doc/webhooks/GetWebHook.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -1338,12 +647,12 @@ if (PHP_SAPI == 'cli') {
                     </li>
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Get multiple webhooks at once</h5></div>
+                            <div class="col-md-8"><h5>Get multiple webHooks at once</h5></div>
                             <div class="col-md-4">
-                                <a href="hook-api/GetMultipleWebHooks.php"
+                                <a href="webhooks/GetMultipleWebHooks.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/hook-api/GetMultipleWebHooks.html"
+                                <a href="doc/webhooks/GetMultipleWebHooks.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -1352,12 +661,12 @@ if (PHP_SAPI == 'cli') {
                     </li>
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>List all webhooks</h5></div>
+                            <div class="col-md-8"><h5>List all WebHooks</h5></div>
                             <div class="col-md-4">
-                                <a href="hook-api/CreateAndListWebHooks.php"
+                                <a href="webhooks/CreateAndListWebHooks.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/hook-api/CreateAndListWebHooks.html"
+                                <a href="doc/webhooks/CreateAndListWebHooks.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -1366,12 +675,12 @@ if (PHP_SAPI == 'cli') {
                     </li>
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Delete webhook</h5></div>
+                            <div class="col-md-8"><h5>Delete WebHook</h5></div>
                             <div class="col-md-4">
-                                <a href="hook-api/CreateAndDeleteWebHook.php"
+                                <a href="webhooks/CreateAndDeleteWebHook.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/hook-api/CreateAndDeleteWebHook.html"
+                                <a href="doc/webhooks/CreateAndDeleteWebHook.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -1380,12 +689,12 @@ if (PHP_SAPI == 'cli') {
                     </li>
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Delete all webhook</h5></div>
+                            <div class="col-md-8"><h5>Delete all WebHook</h5></div>
                             <div class="col-md-4">
-                                <a href="hook-api/DeleteAllWebHooks.php"
+                                <a href="webhooks/DeleteAllWebHooks.php"
                                    class="btn btn-primary pull-left execute"> Try It <i
                                         class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/hook-api/DeleteAllWebHooks.html"
+                                <a href="doc/webhooks/DeleteAllWebHooks.html"
                                    class="btn btn-default pull-right">Source
                                     <i
                                         class="fa fa-file-code-o"></i></a>
@@ -1395,73 +704,119 @@ if (PHP_SAPI == 'cli') {
                 </ul>
             </div>
 
-            <!-- testing -->
+            <!-- payments_summary -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="testing" class="panel-title"><a
-                            href="http://dev.blockcypher.com/#testing"
-                            target="_blank">Testing</a></h3>
+                    <h3 id="payments_summary" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#payments_summary"
+                            target="_blank">Payments Summary</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Generate test address</h5></div>
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
                             <div class="col-md-4">
-                                <a href="introduction/GenerateTestAddress.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/introduction/GenerateTestAddress.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div class="row">
-                            <div class="col-md-8"><h5>Fund address with faucet</h5></div>
-                            <div class="col-md-4">
-                                <a href="introduction/FundAddressWithFaucet.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/introduction/FundAddressWithFaucet.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
 
-            <!-- signer -->
+            <!-- payments_details -->
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="signer" class="panel-title">Signer</h3>
+                    <h3 id="payments_details" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#payments_details"
+                            target="_blank">Payments Details</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>Sign hex data with private key (using Signer class)</h5></div>
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
                             <div class="col-md-4">
-                                <a href="signer/Sign.php"
-                                   class="btn btn-primary pull-left execute"> Try It <i
-                                        class="fa fa-play-circle-o"></i></a>
-                                <a href="doc/signer/Sign.html"
-                                   class="btn btn-default pull-right">Source
-                                    <i
-                                        class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
 
-            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+            <!-- generic_transactions -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="generic_transactions" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#generic_transactions"
+                            target="_blank">Generic Transactions</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- micro_transactions -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="micro_transactions" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#micro_transactions"
+                            target="_blank">Micro Transactions</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- signing_sending -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="signing_sending" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#signing_sending"
+                            target="_blank">Signing and Sending</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- multisig -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="multisig" class="panel-title"><a
+                            href="http://dev.blockcypher.com/#multisig"
+                            target="_blank">Multisig</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Coming soon!</h5></div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
         </div>
     </div>

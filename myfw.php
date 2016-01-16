@@ -73,6 +73,7 @@
         private $sms         = null;
         private $calendar    = null;
         private $menu        = null;
+        private $pusher      = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -215,6 +216,12 @@
 			if( ! isset( $this->blockchain ) )
 				$this->blockchain = new myblockchain();
 			return $this->blockchain;
+		}
+
+		public function pusher(){
+			if( ! isset( $this->pusher ) )
+				$this->pusher = new mypusher();
+			return $this->pusher;
 		}
 
 		public function blockcypher(){

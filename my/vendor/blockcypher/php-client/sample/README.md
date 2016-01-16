@@ -1,5 +1,5 @@
 Rest API Samples
-================
+===================
 
 This sample project is a simple web app that you can explore to understand what the APIs can do for you.
 
@@ -32,7 +32,7 @@ Press Ctrl-C to quit.
 `http://localhost/php-client/sample/index.html`
 
 You should see a sample dashboard page as shown below:
-![Web TXOutput!](/sample/images/sample_web.png)
+![Web Output!](/sample/images/sample_web.png)
 
 #### Running on console
 > Please note that there are few samples that requires you to have a working local server
@@ -40,11 +40,11 @@ You should see a sample dashboard page as shown below:
 * To run samples itself on console, you need to open command prompt, and direct to samples directory.
 * Execute the sample php script by using `php -f` command as shown below:
 ```bat
-php -f .\sample\chain-api\GetChain.php
+php -f chains/GetChain.php
 ```
 
 The result would be as shown below:
-![Console TXOutput!](/sample/images/sample_console.png)
+![Console Output!](/sample/images/sample_console.png)
 #### Configuration
 
 The sample comes pre-configured with a test account but in case you need to try them against your account, you must
@@ -54,5 +54,4 @@ The sample comes pre-configured with a test account but in case you need to try 
 
 #### More Help
 
-If you are looking for a full fledged application that uses the new RESTful APIs, we are working on it ... :-) but it's already public:
-https://github.com/blockcypher/php-wallet-sample
+If you are looking for a full fledged application that uses the new RESTful APIs, we are working on it ... :-)

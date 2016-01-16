@@ -2,7 +2,7 @@
 {% if allitems %}
 
     {% if title %}
-        <h6 class="heading-hr" style="margin-top:30px;"><i class="{{ title.icon }}"></i> {{ title.label }}</h6>
+        <h6 class="heading-hr"><i class="{{ title.icon }}"></i> {{ title.label }}</h6>
     {% endif %}
 
     {% if buttons is not empty %}

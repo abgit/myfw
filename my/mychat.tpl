@@ -1,21 +1,20 @@
 
     {% if init %}
 
-                <div class="chat" id="{{id}}box">
+                <div class="chat" id="{{windowid}}">
                     <div id="{{id}}msgs">
 
     {% endif %}
     					{% for msg in values %}
                             <div class="message{{ ( keyme and msg[ keyme ] ) ? ' reversed' }}">
                                 {% if keythumb %}
-                                    <img class="message-img" width="40" height="40"  alt="" src="{{ keythumbcdn }}{{ msg[ keythumb ] }}">
+                                    <img class="message-img" width="40" height="40" src="{{ keythumbcdn }}{{ msg[ keythumb ] }}">
                                 {% endif %}
-
                                 <div class="message-body">
                                     {% if msg[ message.imgkey ] %}
-                                        <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" width="{{ msg[ message.imgwidth]|default(300) }}" height="{{ msg[ message.imgheight]|default(200) }}" />
+                                        <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" class="img-responsive" width="{{ msg[ message.imgwidth ] }}" height="{{ msg[ message.imgheight ] }}" />
                                     {% else %}
-                                        {{ msg[ message.key ]|t(2000) }}
+                                        {{ msg[ message.key ]|t(15000)|nl2br }}
                                     {% endif %}
                                     
                                     {% if keyowner or keydate %}
@@ -31,6 +30,7 @@
     {% if init %}
 
                     </div>
+            <div id="{{windowid}}end"></div>
                     <div class="message {{ wait.me ? 'reversed' }}" id="{{id}}wait" style="display:none">
                         <img class="message-img" width="{{ wait.size }}" height="{{ wait.size }}" alt="" src="{{ wait.thumb }}">
                         <div class="message-body">

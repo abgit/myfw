@@ -106,7 +106,7 @@
 
                                                             {% if value[ info.key ] is defined %}
 
-                                                                <span>
+                                                                <span id="pi{{ info.key }}{{ value[ key ] }}" {{ ( info.depends and not value[ info.depends ] ) ? 'class="hide"' }}>
             												    {% if info.class %}
                                                                     <span class="label {{ info.classreplacekey ? ( value[ info.classreplacekey ]|replaceonly( info.class )|default( info.defaultclass ) ) : info.class }}">
                                                                 {% endif %}
@@ -116,10 +116,10 @@
                                                                     {% set val = val|rnumber(true) %}
                                                                 {% endif %}
                                                         
-                                                                {{ info.prefix }}{{ val|t(20) }}{{ info.sufix }}
+                                                                {{ info.prefix|raw }}{{ val|t(20) }}{{ info.sufix|raw }}
 
             												    {% if info.extrakey %}
-                                                                    {{ value[ info.extrakey ]|t(20) }}{{ info.extrasufix }}
+                                                                    {{ value[ info.extrakey ]|t(20) }}{{ info.extrasufix|raw }}
                                                                 {% endif %}
 
             												    {% if info.class %}
@@ -170,7 +170,7 @@
                                                     <span>
                                             {% for status in elements.status %}
                                                     {% if status.type == 1 %}
-                                                        {{ value[ status.key ]|t(90)}}
+                                                        <span>{{ status.prefix|raw }}{{ value[ status.key ]|t(90)}}{{ status.sufix|raw }}</span>
                                                     {% elseif status.type == 2 %}
                                                     
                                                         {% if status.icon %}
@@ -187,7 +187,7 @@
 
                                                         <i id="pani{{ value[ key ] }}{{ status.key }}" {{ statusdisplay != 1 ? 'style="display:none"' }} class="{{ iconval }}"></i>
                                                     {% elseif status.type == 0 %}
-                                                        {{ status.sep }} 
+                                                        <span>{{ status.sep }}</span>
 
                                                     {% elseif status.type == 3 %}
 
@@ -230,9 +230,16 @@
                                                 {% for menu in elements.menu %}
 
                                                     {% if menu.type == 0 %}
-                                                        {% if menu.depends == false or value[ menu.depends ] %}
-                                                            <li{% if menu.id %} id="{{ menu.id }}"{% endif %}><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"></i> {{ menu.label }}</a></li>
+                                                    
+                                                        <li id="pm{{ menu.id }}{{ value[ key ] }}"><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"></i>
+                                                        
+                                                        {% if menu.depends and not value[ menu.depends ] %}
+                                                            {{ menu.label }}
+                                                        {% else %}
+                                                            {{menu.dependsLabelPrefix|raw }}{{ value[ menu.dependsValueKey ] }}{{ menu.dependsLabelSufix|raw }}
                                                         {% endif %}
+                                                        
+                                                        </a></li>
 
                                                     {% elseif menu.type == 1 %}
                                                     <li class="dropup"><a style="font-size:12px;" href="#" class="dropdown-toggle" data-toggle="dropdown">{{ menu.label }} <i class="{{ menu.icon|default('icon-arrow-up2') }}"></i></a>

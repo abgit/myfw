@@ -44,8 +44,8 @@ class myajax{
         return $this;
     }
     
-    public function & showForm( $formname, $html, $modal, $transloadit = 0 ){
-        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit );
+    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0 ){
+        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll );
         return $this;
     }
     
@@ -56,6 +56,11 @@ class myajax{
     
     public function & callAction( $action ){
         $this->out[ 'ca' ][] = array( 'a' => $action );
+        return $this;
+    }
+
+    public function & pusher( $key, $channel, $event, $element, $encryption, $region, $htmlbox ){
+        $this->out[ 'pu' ] = array( 'k' => $key, 'c' => $channel, 'v' => $event, 'e' => $element, 'i' => $encryption, 'r' => $region, 'h' => $htmlbox );
         return $this;
     }
 

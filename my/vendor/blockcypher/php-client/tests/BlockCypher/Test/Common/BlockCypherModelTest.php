@@ -316,7 +316,7 @@ class BlockCypherModelTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getProvider
-     * @param mixed $input
+     * @param string|null $input
      * @param int $count
      * @param mixed $expected
      */

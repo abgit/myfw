@@ -43,11 +43,32 @@ class myblockcypher{
     }
 
     public function processPayment(){
-        $json = file_get_contents('php://input');
-        return $json;
-//        return json_decode($json);
+        $p = json_decode( file_get_contents('php://input'), true );
+        return is_null( $p ) ? array() : $p;
     }
 
+
+    public function getConfirmations( $address, $txid ){
+        $json = file_get_contents( 'http://api.blockcypher.com/v1/btc/main/addrs/' . $address );
+        $json = json_decode( $json, true  );
+
+        foreach( $json['txrefs'] as $tx ){
+            if( $tx[ 'tx_hash' ] == $txid ){
+                return intval( $tx[ 'confirmations' ] );
+                break;
+            }
+        }
+
+        return 0;
+    }
+
+
+    public function getConfirmationsTx( $txid ){
+        $json = file_get_contents( 'https://bitcoin.toshi.io/api/v0/transactions/' . $txid );
+        $json = json_decode( $json, true  );
+
+        return isset( $json[ 'confirmations' ] ) ? intval( $json[ 'confirmations' ] ) : 0;
+    }
 
 
 
@@ -57,7 +78,6 @@ class myblockcypher{
 
 
     public function receive( $address = null, $callback = null ){
-d( array( 'token' => $this->token, 'destination' => is_null( $address ) ? $this->app->config( 'bitcoin.acc' ) : $address, 'callback_url' => is_null( $callback ) ? ( 'http://' . $this->app->config( 'app.hostname' ) . $this->app->urlFor( $this->app->config( 'bitcoin.callback' ) ) ) : $callback ) );
         return $this->load( 'btc/main/payments', array( 'token' => $this->token, 'destination' => is_null( $address ) ? $this->app->config( 'bitcoin.acc' ) : $address, 'callback_url' => is_null( $callback ) ? ( 'http://' . $this->app->config( 'app.hostname' ) . $this->app->urlFor( $this->app->config( 'bitcoin.callback' ) ) ) : $callback ) );    
     }
     

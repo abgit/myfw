@@ -36,7 +36,6 @@ class ReflectionUtil
      * @param $propertyName
      * @return null|string
      * @throws BlockCypherConfigurationException
-     * @throws \Exception
      */
     public static function getPropertyClass($class, $propertyName)
     {
@@ -56,21 +55,7 @@ class ReflectionUtil
 
         if (isset($param)) {
             $anno = preg_split("/[\s\[\]]+/", $param);
-
-            $clazz = $anno[0];
-
-            $primitiveTypes = array(
-                'int', 'integer', 'float', 'string', 'bool', 'boolean', 'array', 'mixed',
-            );
-
-            if (!in_array($clazz, $primitiveTypes)
-                && !in_array(ltrim($clazz, '\\'), $primitiveTypes)  // primitive types can also be \string, \int, ...
-                && !class_exists($clazz)
-            ) {
-                throw new \Exception("Class not found: $clazz. Check all class names are fully qualified in PHPDoc");
-            }
-
-            return $clazz;
+            return $anno[0];
         } else {
             throw new BlockCypherConfigurationException("Getter function for '$propertyName' in '$class' class should have a proper return type.");
         }

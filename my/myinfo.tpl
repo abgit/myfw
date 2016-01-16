@@ -69,10 +69,16 @@
     {{ val|trim|nl2br }}
 
     {% elseif el.type == 'custom' %}
-        <p>{% if el.title %}<h6>{{ el.title }}</h6>{% endif %}{{el.obj|raw}}
+        {% if el.title %}<h6>{{ el.title }}</h6>{% endif %}{{el.obj|raw}}
 
-    {% elseif el.type == 'sep' %}
+    {% elseif el.type == 'sl' %}
         <hr>
+
+    {% elseif el.type == 'se' %}
+        <br />
+
+    {% elseif el.type == 'ti' %}
+        <h6 class="heading-hr"><i class="{{ el.icon }}"></i> {{ el.label }}</h6>
 
     {% elseif el.type == 'list' %}
         <div class="row block-inner">

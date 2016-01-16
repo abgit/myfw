@@ -2,52 +2,32 @@
 
 namespace BlockCypher\Api;
 
-use BlockCypher\Common\BlockCypherBaseModel;
+use BlockCypher\Common\BlockCypherModel;
 
 /**
- * Class TXRef
+ * Class Txref
  *
- * A TXRef object represents summarized data about a transaction input or output. Typically found in an array
- * within an Address object, which is usually returned from the standard Address Endpoint.
+ * Information about a single line item.
  *
  * @package BlockCypher\Api
  *
- * @property string address Only present when parent object represents a wallet
  * @property string tx_hash
  * @property int block_height
  * @property int tx_input_n
  * @property int tx_output_n
  * @property int value
- * @property int ref_balance
  * @property string preference
  * @property bool spent
- * @property string spent_by
+ * @property string spend_by
  * @property int confirmations
  * @property string confirmed
- * @property string received
  * @property bool double_spend
  * @property string double_of
  * @property int receive_count
  * @property float confidence
  */
-class TXRef extends BlockCypherBaseModel
+class Txref extends BlockCypherModel
 {
-    /**
-     * @return string
-     */
-    public function getAddress()
-    {
-        return $this->address;
-    }
-
-    /**
-     * @param string $address
-     */
-    public function setAddress($address)
-    {
-        $this->address = $address;
-    }
-
     /**
      * @return int
      */
@@ -67,8 +47,6 @@ class TXRef extends BlockCypherBaseModel
     }
 
     /**
-     * Unconfirmed transactions only. Confidence this transaction will be confirmed (see Zero Confirmations).
-     *
      * @return float
      */
     public function getConfidence()
@@ -77,8 +55,6 @@ class TXRef extends BlockCypherBaseModel
     }
 
     /**
-     * Unconfirmed transactions only. Confidence this transaction will be confirmed (see Zero Confirmations).
-     *
      * @param float $confidence
      * @return $this
      */
@@ -89,8 +65,6 @@ class TXRef extends BlockCypherBaseModel
     }
 
     /**
-     * Date at which the transaction was included in a block, in ISO format.
-     *
      * @return string
      */
     public function getConfirmed()
@@ -99,36 +73,12 @@ class TXRef extends BlockCypherBaseModel
     }
 
     /**
-     * Date at which the transaction was included in a block, in ISO format.
-     *
      * @param string $confirmed
      * @return $this
      */
     public function setConfirmed($confirmed)
     {
         $this->confirmed = $confirmed;
-        return $this;
-    }
-
-    /**
-     * When the transaction was received by BlockCypher servers.
-     *
-     * @return string
-     */
-    public function getReceived()
-    {
-        return $this->received;
-    }
-
-    /**
-     * When the transaction was received by BlockCypher servers.
-     *
-     * @param string $received
-     * @return $this
-     */
-    public function setReceived($received)
-    {
-        $this->received = $received;
         return $this;
     }
 
@@ -297,48 +247,6 @@ class TXRef extends BlockCypherBaseModel
     }
 
     /**
-     * Optional The past balance of the parent address the moment this transaction was confirmed.
-     * Not present for unconfirmed transactions.
-     *
-     * @return int
-     */
-    public function getRefBalance()
-    {
-        return $this->ref_balance;
-    }
-
-    /**
-     * Optional The past balance of the parent address the moment this transaction was confirmed.
-     * Not present for unconfirmed transactions.
-     *
-     * @param int $ref_balance
-     * @return $this
-     */
-    public function setRefBalance($ref_balance)
-    {
-        $this->ref_balance = $ref_balance;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPreference()
-    {
-        return $this->preference;
-    }
-
-    /**
-     * @param string $preference
-     * @return $this
-     */
-    public function setPreference($preference)
-    {
-        $this->preference = $preference;
-        return $this;
-    }
-
-    /**
      * Is 'true' if the output was spent.
      *
      * @return boolean
@@ -367,24 +275,6 @@ class TXRef extends BlockCypherBaseModel
     public function setSpent($spent)
     {
         $this->spent = $spent;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSpentBy()
-    {
-        return $this->spent_by;
-    }
-
-    /**
-     * @param string $spent_by
-     * @return $this
-     */
-    public function setSpentBy($spent_by)
-    {
-        $this->spent_by = $spent_by;
         return $this;
     }
 
