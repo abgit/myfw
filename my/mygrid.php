@@ -412,6 +412,6 @@ class mygrid{
                                                         'orderby'  => $this->orderby,
                                                         'orderbya' => $this->orderbya,
                                                         'menuhtml' => $this->menuhtml,
-                                                        'cols'     => $this->cols ), null, null, APP_CACHEAPC, false, false );        
+                                                        'cols'     => $this->cols ), null, null, 0, false, false );        
     }
 }

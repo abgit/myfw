@@ -18,20 +18,20 @@ class myajax{
         return $this;
     }
 
-    public function & msgInfo( $msg, $header = 'Information', $args = array() ){
-        return $this->msg( $msg, $header, array( 'theme' => 'growl-info' ) + $args );
+    public function & msgInfo( $msg, $header, $args = array() ){
+        return $this->msg( $msg, empty( $header ) ? 'Information' : $header, array( 'theme' => 'growl-info' ) + $args );
     }
 
-    public function & msgOk( $msg, $header = 'Success', $args = array() ){
-        return $this->msg( $msg, $header, array( 'theme' => 'growl-success' ) + $args );
+    public function & msgOk( $msg, $header = null, $args = array() ){
+        return $this->msg( $msg, empty( $header ) ? 'Success' : $header, array( 'theme' => 'growl-success' ) + $args );
     }
 
     public function & msgWarning( $msg, $header = null, $args = array() ){
-        return $this->msg( $msg, is_null( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Warnings' : 'Warning' ) : $header, array( 'theme' => 'growl-warning' ) + $args );
+        return $this->msg( $msg, empty( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Warnings' : 'Warning' ) : $header, array( 'theme' => 'growl-warning' ) + $args );
     }
 
     public function & msgError( $msg, $header = null, $args = array() ){
-        return $this->msg( $msg, is_null( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Errors found' : 'Error found' ) : $header, array( 'theme' => 'growl-error' ) + $args );
+        return $this->msg( $msg, empty( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Errors found' : 'Error found' ) : $header, array( 'theme' => 'growl-error' ) + $args );
     }
 
     public function & addFormCsrf( $element, $csrf ){
@@ -69,8 +69,8 @@ class myajax{
         return $this;
     }
 
-    public function & confirm( $url, $msg, $title, $help, $mode, $twofactor ){
-        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => intval( $twofactor ) );
+    public function & confirm( $url, $msg, $title, $help, $mode, $requirepin, $pinLabel, $pinHelp ){
+        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => intval( $requirepin ), 'l' => $pinLabel, 'p' => $pinHelp );
         return $this;
     }
 
@@ -200,7 +200,7 @@ class myajax{
     }
 
     public function filter( $s ){
-        return trim( preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", "", $s ) );
+        return trim( preg_replace( "@( )*[\r\n\t]+( )*@", "", $s ) );
     }
 
     public function & timeout( $action, $ms, $mode = 0 ){

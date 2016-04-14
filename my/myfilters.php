@@ -41,9 +41,25 @@ class myfilters{
     }
 
     public static function satoshi( $amount ){
-        return str_replace(',', '.', $amount ) * 100000000;
+        return round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) );
     }
 
+    public static function toBTC($satoshi) {
+        return bcdiv((int)(string)$satoshi, 100000000, 8);
+    }
+
+    public static function toBTCString($satoshi) {
+        return sprintf("%.8f", self::toBTC($satoshi));
+    }
+
+    public static function toSatoshiString($btc) {
+        return bcmul(sprintf("%.8f", (float)$btc), 100000000, 0);
+    }
+
+    public static function toSatoshi($btc) {
+        return (int)self::toSatoshiString($btc);
+    }
+    
     public static function nl2space( $string ){
         return preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", " ", $string );
     }

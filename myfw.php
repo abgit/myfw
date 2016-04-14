@@ -1,8 +1,6 @@
 <?php
 
-    define( "APP_WEBMODE",    isset( $_SERVER['HTTP_HOST'] ) );
-    define( "APP_CACHEAPC",   0 );
-    define( "APP_CACHEREDIS", 1 );
+    define( "APP_WEBMODE", isset( $_SERVER['HTTP_HOST'] ) );
 
     // slim warnings on cron
     if( ! APP_WEBMODE ){
@@ -50,12 +48,11 @@
         private $cacheable   = null;
         private $isajaxmode  = null;
         private $auth        = null;
-        private $objusercall = null;
+        private $onlogincall = null;
         private $objuserredir= null;
         private $objuserlogg = null;
         private $otp         = null;
         private $grids       = null;
-        private $ipn         = null;
         private $panel       = null;
         private $notify      = null;
         private $stats       = null;
@@ -66,14 +63,16 @@
         private $blockchain  = null;
         private $blockcypher = null;
         private $auth0       = null;
-        private $objTFActive = null;
-        private $objTFValid  = null;
+        private $on2Fcall    = null;
+        private $bef2Fcall   = null;
+        private $onsmscall   = null;
         private $chats       = null;
         private $ishttps     = null;
         private $sms         = null;
         private $calendar    = null;
         private $menu        = null;
         private $pusher      = null;
+        private $memcached   = null;
 
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
@@ -85,15 +84,22 @@
                     $this->ajax()->render();
                 $this->isajaxmode = null;
             });
-            $this->post( '/myfwconfirm/:h(/:twotoken)(/)', 'islogged', function( $h, $twotoken ){
+            $this->post( '/myfwconfirm/:h(/:twotoken)(/)', 'islogged', function( $h, $twotoken = '' ){
 
                 $obj = $this->session()->get( $h, false );
 
                 if( isset( $obj[ 'uri' ] ) && isset( $obj[ 'method' ] ) ){
 
-                    if( isset( $obj[ '2f' ] ) ){
-                        if ( !$this->rules()->twofactortoken( $twotoken ) || !call_user_func( $this->objTFValid, $twotoken ) )
+                    if( isset( $obj[ '2f' ] ) && $obj[ '2f' ] ){
+                        if ( !$this->rules()->twofactortoken( $twotoken ) || call_user_func( $this->on2Fcall, $twotoken ) !== true )
                             return $this->ajax()->msgWarning( 'Token is not valid.' )->render();
+
+                        $this->ajax()->confirmDialogClose();
+                    }
+
+                    if( isset( $obj[ '2s' ] ) && $obj[ '2s' ] ){
+                        if ( !$this->rules()->smspin( $twotoken ) || call_user_func( $this->onsmscall, intval( $twotoken ) ) !== true )
+                            return $this->ajax()->msgWarning( 'Pin is not valid.' )->render();
 
                         $this->ajax()->confirmDialogClose();
                     }
@@ -102,6 +108,10 @@
 
                     if( isset( $route[0] ) ){
                         $this->session()->set( $h . 'confirm', 1 );
+                        
+                        if( isset( $obj[ 'postvars' ] ) )
+                            $_POST = $obj[ 'postvars' ];
+                        
                         return $route[0]->dispatch();
                     }
                 }
@@ -112,6 +122,51 @@
 
         public function setConditions( $cond ){
             \Slim\Route::setDefaultConditions( $cond );
+        }
+
+        public function config($name, $value = null){
+
+            if (is_array($name)) {
+                if (true === $value) {
+                    $this->container['settings'] = array_merge_recursive($this->container['settings'], $name);
+                } else {
+                    $this->container['settings'] = array_merge($this->container['settings'], $name);
+                }
+            } elseif (func_num_args() === 1) {
+                if( isset( $this->container['settings'][$name] ) ){
+                    switch( $this->container['settings'][$name]{0} ){
+                        case '@': return getenv( substr( $this->container['settings'][$name], 1 ) );
+                        case '#': return $this->configdecrypt( getenv( substr( $this->container['settings'][$name], 1 ) ) );
+                        case '!': return $this->configdecrypt( substr( $this->container['settings'][$name], 1 ) );
+                        default: return $this->container['settings'][$name];
+                    }
+                }
+                return null;
+            } else {
+                $settings = $this->container['settings'];
+                $settings[$name] = $value;
+                $this->container['settings'] = $settings;
+            }
+        }
+
+        public function configencrypt( $plain, $key = null ) {
+
+            $key = substr( is_null( $key ) ? $this->container['settings'][ 'app.mc' ] : $key, 0, 32 );
+
+            mt_srand( (double) microtime() * 1000000 );
+            $iv = mcrypt_create_iv( mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC ), MCRYPT_RAND );
+
+            $value = mcrypt_encrypt( MCRYPT_RIJNDAEL_256, $key, $plain, MCRYPT_MODE_CBC, $iv );
+
+            return rtrim( base64_encode( serialize( [ $iv, $value ] ) ), "\0\3" );
+        }
+
+        public function configdecrypt( $encoded, $key = null ){
+
+            $key = substr( is_null( $key ) ? $this->container['settings'][ 'app.mc' ] : $key, 0, 32 );
+
+            list( $iv, $value ) = unserialize( base64_decode( $encoded ) );
+            return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC, $iv ), "\0");
         }
 
         public function log(){
@@ -266,12 +321,6 @@
 			return $this->mailer;
 		}
 
-		public function ipn(){
-			if( is_null( $this->ipn ) )
-				$this->ipn = new myipn();
-			return $this->ipn;
-		}
-
 		public function tpl(){
 			if( is_null( $this->tplobj ) && ( $tplobj = $this->config( 'templates.global' ) ) ){
 				$this->tplobj = new $tplobj();
@@ -285,8 +334,8 @@
 			return $this->pdodb;
 		}
 
-        public function setIsLogged( $callback ){
-            $this->objusercall  = $callback;
+        public function onLogin( $callback ){
+            $this->onlogincall  = $callback;
         }
         
         public function setUUID( $uuid ){
@@ -297,24 +346,25 @@
             return $this->uuid;
         }
         
-        public function isLogged( $forceloginifanonimous = false ){
+        public function isLogged(){
 
-            if( $this->objuserlogg === true )
-                return true;
+//            if( $this->objuserlogg === true )
+//                return true;
 
-            if( $forceloginifanonimous == false )
-                return false;
+//            if( $forceloginifanonimous == false )
+//                return false;
 
-            $func = $this->objusercall;
-            $func = call_user_func( $func );
+//            $func = $this->onlogincall;
+            return call_user_func( $this->onlogincall ) === true;
 
-            if( is_string( $func ) || !$func ){
-                $this->objuserredir = $func;
-                return false;
-            }
 
-            $this->objuserlogg = true;
-            return true;
+//            if( is_string( $func ) || !$func ){
+//                $this->objuserredir = $func;
+//                return false;
+//            }
+
+//            $this->objuserlogg = true;
+//            return true;
         }
         
         public function getuserredir(){
@@ -337,6 +387,12 @@
 			if( is_null( $this->cache ) )
 				$this->cache = new mycache();
 			return $this->cache;
+		}
+
+		public function memcached(){
+			if( is_null( $this->memcached ) )
+				$this->memcached = new mymemcached();
+			return $this->memcached;
 		}
 
 		public function session(){
@@ -375,7 +431,11 @@
             return $this->otp;
         }
 
-        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $mode = 1, $twofactor = false ){
+        public function confirmSMS( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation' ){
+            return $this->confirm( $msg, $help, $title, 1, false, true );
+        }
+
+        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $mode = 1, $twofactor = false, $sms = false ){
 
             $route = $this->router->getCurrentRoute();
             $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) ) );
@@ -386,28 +446,44 @@
                 return true;
             }
             
-            if( $twofactor && ( is_null( $this->objTFActive ) or !call_user_func( $this->objTFActive ) ) ){
+            if( $twofactor && ( is_null( $this->bef2Fcall ) or !call_user_func( $this->bef2Fcall ) ) ){
                 $twofactor = false;
             }
 
             $uri    = $this->request->getResourceUri();
             $method = $this->request->getMethod();
 
-            $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ) ) );
-            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $help, $mode, $twofactor )->render();
+            $pin   = ( $twofactor == true or $sms == true );
+            $pinlabel = '';
+            $pinhelp  = '';
+
+            if( $twofactor == true ){
+                $pinlabel = 'Two-factor authentication token';
+                $pinhelp  = '';
+            }elseif( $sms == true ){
+                $pinlabel = 'SMS authentication pin';
+                $pinhelp  = 'This action requires an sms token. An sms was sent.';
+            }
+
+            $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
+            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $help, $mode, $pin, $pinlabel, $pinhelp )->render();
             $this->stop();
         }
 
-        public function setTwoFactorActive( $callback ){
-            $this->objTFActive = $callback;
+        public function on2Factor( $callback ){
+            $this->on2Fcall = $callback;
         }
 
-        public function setTwoFactorValid( $callback ){
-            $this->objTFValid = $callback;
+        public function before2Factor( $callback ){
+            $this->bef2Fcall = $callback;
+        }
+
+        public function onSMS( $callback ){
+            $this->onsmscall = $callback;
         }
 
         // show template
-        public function render( $tpl, $vars = array(), $cacheid = null, $cachettl = null, $cachetype = APP_CACHEAPC, $display = true, $printFooter = true ){
+        public function render( $tpl, $vars = array(), $cacheid = null, $cachettl = null, $cachetype = 0, $display = true, $printFooter = true ){
 
             if( !$this->renderinit ){
 
@@ -462,31 +538,27 @@
                 // add system path
                 $env->getLoader()->addPath( __DIR__ . '/my/', 'my' );
 
-                // add global tpl obj
-                if( $this->config( 'templates.global' ) )
-                    $env->addGlobal( 'tpl', $this->tpl() );
-
                 $this->renderinit = true;
             }
 
             $output = $env->render( $tpl . '.tpl', $vars );
 
             // optionally add to cache
-            if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
-                $this->cache()->set( $cachetype, 'tpl' . $this->request()->getPath() . $cacheid, $output, $cachettl );
-            }
+//            if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
+//                $this->cache()->set( $cachetype, 'tpl' . $this->request()->getPath() . $cacheid, $output, $cachettl );
+//            }
 
             if( $display == false ){
-                return $output . $this->printFooter( $printFooter, 'O' );
+                return $output;// . $this->printFooter( $printFooter, 'O' );
             }
 
             if( $display == true ){
-                echo $output, $this->printFooter( $printFooter, 'O' );                    
+                echo $output; //, $this->printFooter( $printFooter, 'O' );                    
             }
 		}
 
 		// try to render cache if available
-		public function renderCached( $cacheid = null, $cachetype = APP_CACHEAPC, $printFooter = true ){
+		public function renderCached( $cacheid = null, $cachetype = 0, $printFooter = true ){
 
 			$cacheid = 'tpl' . $this->request()->getPath() . $cacheid;
 
@@ -580,18 +652,23 @@
     function islogged() {
         $app = \Slim\Slim::getInstance();
 
-        if( !$app->isLogged(true) && $app->config( 'islogged.enable' ) !== 0 ){
-            $url = $app->getuserredir();
-            if( is_string( $url ) ){
-                if( !$app->request->isAjax() ){
-                    $app->redirect( $url );
-                }elseif( strlen( $url ) ){
-                    $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render();
-                }else{
-                    $app->ajax()->login()->render();
-                }
-            }
-            $app->stop();
+//            $func = $this->onlogincall;
+//            $func = call_user_func( $func );
+
+
+        if( !$app->isLogged() ){
+//            $url = $app->getuserredir();
+//            if( is_string( $url ) ){
+//                if( !$app->request->isAjax() ){
+//                    $app->redirect( $url );
+//                }else/*if( strlen( $url ) )*/{
+//                    $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render();
+//                }else{
+//                    $app->ajax()->login()->render();
+//                }
+//            }
+                $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $app->config( 'app.logouturl' ) )->render() : $app->redirect( $app->config( 'app.logouturl' ) );
+                $app->stop();
         }
     }
 
@@ -635,6 +712,17 @@
     // check developmentmode
     function isdevelopment(){
         $app = \Slim\Slim::getInstance();
-        if( strpos( $app->config( 'mode' ),  'dev' ) === false )
+        if( $app->config( 'app.isdevelopment' ) !== true )
             $app->pass();
+    }
+
+    function israte() {
+        $app = \Slim\Slim::getInstance();
+
+        if( $app->config( 'app.israte' ) !== false && !$app->memcached()->ratevalid() ){
+            if( $app->request->isAjax() ){
+                $app->ajax()->msgWarning( 'Too much calls. Please wait 60s.', 'Rate limit protection' )->render();
+            }
+            $app->stop();
+        }
     }

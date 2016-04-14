@@ -38,23 +38,23 @@
 
         // standard
         public function exists( $mode, $id ){
-            return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcexists( $id ) : $this->redisexists( $id );
+            return ( intval( $mode ) == 0 ) ? $this->apcexists( $id ) : $this->redisexists( $id );
         }
 
         public function set( $mode, $id, $content, $ttl = false ){
-            return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcset( $id, $content, $ttl ) : $this->redisset( $id, $content, $ttl );
+            return ( intval( $mode ) == 0 ) ? $this->apcset( $id, $content, $ttl ) : $this->redisset( $id, $content, $ttl );
         }
 
         public function get( $mode, $id ){
-            return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcget( $id ) : $this->redisget( $id );
+            return ( intval( $mode ) == 0 ) ? $this->apcget( $id ) : $this->redisget( $id );
         }
 
         public function delete( $mode, $k ){
-            return ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcdelete( $k ) : $this->redisdelete( $k );
+            return ( intval( $mode ) == 0 ) ? $this->apcdelete( $k ) : $this->redisdelete( $k );
         }
 
         public function & settimeout( $mode, $k, $ttl ){
-            ( intval( $mode ) == APP_CACHEAPC ) ? $this->apcsettimeout( $k, $ttl ) : $this->redissettimeout( $k, $ttl );
+            ( intval( $mode ) == 0 ) ? $this->apcsettimeout( $k, $ttl ) : $this->redissettimeout( $k, $ttl );
             return $this;
         }
 

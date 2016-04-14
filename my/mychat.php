@@ -66,6 +66,18 @@
             return $this;
         }
 
+        public function & setMovie( $keyThumb, $keyMp4, $keyWebM, $keyOgg, $keyWidth, $keyHeight ){
+            if( !is_array( $this->message ) )
+                $this->message = array();
+            $this->message[ 'moviekeythumb' ]  = $keyThumb;
+            $this->message[ 'moviekeymp4' ]    = $keyMp4;
+            $this->message[ 'moviekeywebm' ]   = $keyWebM;
+            $this->message[ 'moviekeyogg' ]    = $keyOgg;
+            $this->message[ 'moviekeywidth' ]  = $keyWidth;
+            $this->message[ 'moviekeyheight' ] = $keyHeight;
+            return $this;
+        }
+
         public function & setAttribution( $keyowner, $keydate ){
             $this->keyowner = $keyowner;
             $this->keydate  = $keydate;
@@ -135,9 +147,14 @@
 
         public function & setTransloadit( $urlimage, $formname, $options ){
 
-            if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
+            $driver = $this->app->config( 'transloadit.driver' );
+
+            if( $driver === 'heroku' ){
                 $apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
                 $apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
+            }elseif( $driver === 'fortrabbit' ){
+                $apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
+                $apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
             }else{
                 $apikey    = $this->app->config( 'transloadit.k' );
                 $apisecret = $this->app->config( 'transloadit.s' );
@@ -154,6 +171,9 @@
 
             if( !empty( $options[ 'steps' ] ) )
                 $params[ 'steps' ] = $options[ 'steps' ];
+
+            if( isset( $options[ 'fields' ] ) )
+                $params[ 'fields' ] = $options[ 'fields' ];
 
             $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
 
@@ -185,6 +205,6 @@
         }
         
         public function __toString(){
-            return $this->app->render( '@my/mychat', $this->obj(), null, null, APP_CACHEAPC, false, false );
+            return $this->app->render( '@my/mychat', $this->obj(), null, null, 0, false, false );
         }
     }

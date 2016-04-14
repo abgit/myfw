@@ -26,7 +26,7 @@
                                                     <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"><i class="{{ menu.icon }}"></i> <span id="menbl{{ menu.id }}">{{menu.label}}</span> <span class="caret"></span></a>
     													<ul class="dropdown-menu icons-left dropdown-menu-right">
                                                             {% for submenu in menu.options %}
-                                                                <li {{submenu.selected ? 'class="active"' }} id="menl{{ menu.id }}{{ loop.index0 }}"><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i id="meni{{ menu.id }}{{ loop.index0 }}" class="icon-checkmark" style="visibility:{{ submenu.selected ? 'visible' : 'hidden' }}"></i> {{ submenu.label }}</a></li>
+                                                                <li {{submenu.selected ? 'class="active"' }} id="menl{{ menu.id }}{{ submenu.id }}"><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i id="meni{{ menu.id }}{{ submenu.id }}" class="icon-checkmark" style="visibility:{{ submenu.selected ? 'visible' : 'hidden' }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </div>
@@ -53,7 +53,7 @@
                                                     <a onclick="{{ elements.thumb.onclick|replaceurl( value, tags ) }}">
                                                 {% endif %}
 
-                                                <img style="margin-top:10px;margin-left:-10px" src="{{ cdn }}{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
+                                                <img class="pt{{ value[ elements.thumb.classkey ] }}" style="margin-top:10px;margin-left:-10px" src="{{ cdn }}{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
 
                                                 {% if elements.thumb.onclick %}
                                                     </a>
@@ -108,7 +108,7 @@
 
                                                                 <span id="pi{{ info.key }}{{ value[ key ] }}" {{ ( info.depends and not value[ info.depends ] ) ? 'class="hide"' }}>
             												    {% if info.class %}
-                                                                    <span class="label {{ info.classreplacekey ? ( value[ info.classreplacekey ]|replaceonly( info.class )|default( info.defaultclass ) ) : info.class }}">
+                                                                    <span id="pic{{ info.key }}{{ value[ key ] }}" class="label {{ info.classreplacekey ? ( value[ info.classreplacekey ]|replaceonly( info.class )|default( info.defaultclass ) ) : info.class }}">
                                                                 {% endif %}
                                                         
                                                                 {% set val = value[ info.key ] %}
@@ -116,11 +116,7 @@
                                                                     {% set val = val|rnumber(true) %}
                                                                 {% endif %}
                                                         
-                                                                {{ info.prefix|raw }}{{ val|t(20) }}{{ info.sufix|raw }}
-
-            												    {% if info.extrakey %}
-                                                                    {{ value[ info.extrakey ]|t(20) }}{{ info.extrasufix|raw }}
-                                                                {% endif %}
+                                                                {{ info.prefix|raw }}{{ val|t(20) }}{{ info.sufix|raw }}{% if info.extrakey %}{{ value[ info.extrakey ]|t(20) }}{{ info.extrasufix|raw }}{% endif %}
 
             												    {% if info.class %}
                                                                     </span>
@@ -231,14 +227,9 @@
 
                                                     {% if menu.type == 0 %}
                                                     
-                                                        <li id="pm{{ menu.id }}{{ value[ key ] }}"><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"></i>
+                                                        <li id="pm{{ menu.id }}{{ value[ key ] }}"><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"> </i>
                                                         
-                                                        {% if menu.depends and not value[ menu.depends ] %}
-                                                            {{ menu.label }}
-                                                        {% else %}
-                                                            {{menu.dependsLabelPrefix|raw }}{{ value[ menu.dependsValueKey ] }}{{ menu.dependsLabelSufix|raw }}
-                                                        {% endif %}
-                                                        
+                                                            <span id="pms{{ value[ key ] }}">{% if menu.depends and not value[ menu.depends ] %}{{ menu.label }}{% else %}{{menu.dependsLabelPrefix|raw }}{{ value[ menu.dependsValueKey ] }}{{ menu.dependsLabelSufix|raw }}{% endif %}</span>
                                                         </a></li>
 
                                                     {% elseif menu.type == 1 %}

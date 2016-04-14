@@ -9,10 +9,15 @@ class mytransloadit{
 
     public function __construct(){
         $this->app = \Slim\Slim::getInstance();
-        
-        if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
+        $driver = $this->app->config( 'transloadit.driver' );
+
+        if( $driver === 'heroku' ){
             $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
             $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
+            $this->apiurl    = getenv( 'TRANSLOADIT_URL' );
+        }elseif( $driver === 'fortrabbit' ){
+            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
+            $this->apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
             $this->apiurl    = getenv( 'TRANSLOADIT_URL' );
         }else{
             $this->apikey    = $this->app->config( 'transloadit.k' );

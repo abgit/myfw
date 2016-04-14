@@ -30,6 +30,10 @@ class myrules{
         return myrules::regex( strval( $value ), '/^([0-9]{1,5}([\.\,][0-9]{1,8})?)$/' );
     }
 
+    public static function bitcoin( $value, $opts='', $formelement = null){
+        return myrules::regex( strval( $value ), '/^([1-9]?[0-9]([\.\,][0-9]{1,4})?)$/' );
+    }
+
     public static function unsigned( $value, $opts='', $formelement = null){
         return myrules::regex( strval( $value ), '/^([1-9]*[0-9]{1,20}(\.[0-9]{1,2}){0,1})$/' );
     }
@@ -56,6 +60,10 @@ class myrules{
 
     public static function twofactortoken( $value, $opts='', $formelement = null ) {
         return myrules::regex( strval( $value ), '/^([0-9]{6})$/' );
+    }
+
+    public static function smspin( $value, $opts='', $formelement = null ) {
+        return myrules::regex( strval( $value ), '/^([0-9]{4})$/' );
     }
 
     public static function lettersonly( $values, $opts='', $formelement = null ) {

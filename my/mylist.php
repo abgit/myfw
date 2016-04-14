@@ -268,4 +268,22 @@ class mylist{
 	"ZW" => "Zimbabwe",
 	"AX" => "Åland Islands" );
 
+    public static function getAWSips( $zone = null, $service = null ){
+    
+        $res = array();
+        $ips = json_decode( file_get_contents( 'https://ip-ranges.amazonaws.com/ip-ranges.json' ) );
+
+        if( isset( $ips->prefixes ) ){
+            foreach( $ips->prefixes as $net ){
+                if( (  is_null( $zone ) &&  is_null( $service ) ) or 
+                    ( !is_null( $zone ) &&  is_null( $service ) && $zone == $net->region ) or
+                    (  is_null( $zone ) && !is_null( $service ) && $service == $net->service ) or
+                    ( !is_null( $zone ) && !is_null( $service ) && $zone == $net->region && $service == $net->service ) )
+                    $res[] = $net->ip_prefix;
+            }
+        }
+
+        return $res;
+    }
+
 }

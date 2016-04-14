@@ -11,10 +11,17 @@
                                     <img class="message-img" width="40" height="40" src="{{ keythumbcdn }}{{ msg[ keythumb ] }}">
                                 {% endif %}
                                 <div class="message-body">
-                                    {% if msg[ message.imgkey ] %}
-                                        <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" class="img-responsive" width="{{ msg[ message.imgwidth ] }}" height="{{ msg[ message.imgheight ] }}" />
-                                    {% else %}
+                                    {% if msg[ message.key ] %}
                                         {{ msg[ message.key ]|t(15000)|nl2br }}
+                                    {% elseif msg[ message.imgkey ] %}
+                                        <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" class="img-responsive" width="{{ msg[ message.imgwidth ] }}" height="{{ msg[ message.imgheight ] }}" />
+                                    {% elseif msg[ message.moviekeythumb ] %}
+                                        <video poster="{{ cdn }}{{ msg[ message.moviekeythumb ] }}" width="{{ msg[ message.moviekeywidth ] }}" height="{{ msg[ message.moviekeyheight ] }}" controls>
+                                          <source src="{{ cdn }}{{ msg[ message.moviekeymp4 ] }}" type="video/mp4">
+                                          <source src="{{ cdn }}{{ msg[ message.moviekeyogg ] }}" type="video/ogg">
+                                          <source src="{{ cdn }}{{ msg[ message.moviekeywebm ] }}" type="video/webm">
+                                          Your browser does not support the video tag.
+                                        </video>
                                     {% endif %}
                                     
                                     {% if keyowner or keydate %}
@@ -49,9 +56,9 @@
             {% endif %}
 
                         {% if transloadit %}
-                        <div class="uploader" style="width:120px">
+                        <div class="uploader" style="width:155px">
                             <input id="{{ id }}msgp" name="{{ id }}msgp" class="btn btn-default btn-loading" type="file" onchange="$('form#{{ formname }}').data('transloadit.uploader')._options['myfwmode']=2;$('form#{{ formname }}').data('transloadit.uploader')._options['myfwmodeopt']={'u':'{{ urlimage }}','w':'#{{ id }}wait'};$('form#{{ formname }}').data('transloadit.uploader')._options['exclude']='input:not([name={{ id }}msgp])';$('form#{{ formname }}').data('transloadit.uploader')._options['signature']='{{ transloadit.signature }}';$('form#{{ formname }}').data('transloadit.uploader')._options['params']=JSON.parse('{{ transloadit.params }}');"></input>
-                                <span style="-moz-user-select:none" class="filename">Send a photo</span>
+                                <span style="-moz-user-select:none" class="filename">Send image{{ message.key and message.moviekeythumb ? ' or video' }}</span>
                                 <span style="-moz-user-select:none" class="action">Choose file</span>
                         </div>
                         {% endif %}

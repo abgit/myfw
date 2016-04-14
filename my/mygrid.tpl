@@ -32,7 +32,7 @@
 {% endif %}
 
                                 		{% for val in values %}
-                                        <tr id="{{ val[ key ] }}">
+                                        <tr{% if val[ key ] %} id="{{ val[ key ] }}"{% endif %}>
 
                                     		{% for col in labels %}
                                             

@@ -5,8 +5,17 @@
         private $pkey, $pcluster;
 
         public function __construct(){
+            $this->app  = \Slim\Slim::getInstance();
+            $this->driver = $this->app->config( 'pusher.driver' );
 
-            $url  = parse_url( getenv( 'PUSHER_URL' ) );
+            if( $this->driver === 'heroku' ){
+                $url = parse_url( getenv( 'PUSHER_URL' ) );
+            }elseif( $this->driver === 'fortrabbit' ){
+                $url = parse_url( $this->app->configdecrypt( getenv( 'PUSHER_URL' ) ) );
+            }else{
+                $url = parse_url( getenv( 'PUSHER_URL' ) );            
+            }
+
             $path = pathinfo( $url[ 'path' ] );
 
             $this->pkey = $url[ 'user' ];

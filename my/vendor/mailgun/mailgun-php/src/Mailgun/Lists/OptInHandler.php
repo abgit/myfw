@@ -6,20 +6,17 @@ use Mailgun\Messages\Exceptions\InvalidParameter;
 use Mailgun\Messages\Exceptions\TooManyParameters;
 use Mailgun\Messages\Expcetions\InvalidParameterType;
 
-/**
- * This class is used for creating a unique hash for
- * mailing list subscription double-opt in requests.
- *
- * @link https://github.com/mailgun/mailgun-php/blob/master/src/Mailgun/Lists/README.md
- */
+/* 
+   This class is used for creating a unique hash for 
+   mailing list subscription double-opt in requests.
+*/
+
 class OptInHandler{
 
-    /**
-     * @param string $mailingList
-     * @param string $secretAppId
-     * @param string $recipientAddress
-     * @return string
-     */
+	function __construct(){
+		
+	}
+	
 	public function generateHash($mailingList, $secretAppId, $recipientAddress){
 		$innerPayload = array('r' => $recipientAddress, 'l' => $mailingList);
 		$encodedInnerPayload = base64_encode(json_encode($innerPayload));
@@ -30,11 +27,6 @@ class OptInHandler{
 		return urlencode(base64_encode(json_encode($outerPayload)));
 	}
 
-    /**
-     * @param string $secretAppId
-     * @param string $uniqueHash
-     * @return array|bool
-     */
 	public function validateHash($secretAppId, $uniqueHash){
 		$decodedOuterPayload = json_decode(base64_decode(urldecode($uniqueHash)), true);
 

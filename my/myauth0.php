@@ -18,6 +18,14 @@
                     'redirect_uri'  => getenv( 'AUTH0_CALLBACK_URL' ),
                     'persist_access_token' => true
                 );
+            }elseif( $this->app->config( 'auth0.driver' ) === 'fortrabbit' ){
+                $this->params = array(
+                    'domain'        => getenv( 'AUTH0_DOMAIN' ),
+                    'client_id'     => getenv( 'AUTH0_CLIENT_ID' ),
+                    'client_secret' => $this->app->configdecrypt( getenv( 'AUTH0_CLIENT_SECRET' ) ),
+                    'redirect_uri'  => getenv( 'AUTH0_CALLBACK_URL' ),
+                    'persist_access_token' => true
+                );
             }else{
                 $this->params = array(
                     'domain'        => $this->app->config( 'auth0.domain' ),

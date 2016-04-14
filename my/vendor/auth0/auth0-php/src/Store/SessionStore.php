@@ -22,7 +22,7 @@ class SessionStore
     const BASE_NAME = 'auth0_';
 
     /**
-     * @see Auth0SDK\BaseAuth0
+     * @see Auth0\SDK\BaseAuth0
      */
     public function __construct() {
 
@@ -65,7 +65,7 @@ class SessionStore
      *
      * @return mixed
      */
-    public function get($key, $default=false) {
+    public function get($key, $default=null) {
         $key_name = $this->getSessionKeyName($key);
 
         if (isset($_SESSION[$key_name])) {

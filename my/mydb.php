@@ -19,19 +19,36 @@
                 $url       = parse_url( getenv( 'DATABASE_URL' ) );
                 $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ) ), $url[ 'user' ], $url[ 'pass' ] );
 
+            }elseif( $this->driver === 'fortrabbit' ){
+                $url       = parse_url( $this->app->configdecrypt( getenv( 'DATABASE_URL' ) ) );
+                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ) ), $url[ 'user' ], $url[ 'pass' ] );
+
             }else{
                 d( 'db invalid driver' );
             }
 
             $this->stmt = null;
 
-            if ( $this->app->config( 'db.debug' ) )
+            if( $this->app->config( 'db.debug' ) )
                 $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
-
         }
 
         public function & pdo(){
             return $this->pdo;
+        }
+        
+        public function & msg( $msgs = null ){
+
+            if( is_array( $msgs ) ){
+                $errcode = $this->app->db()->errorCode();
+                if( isset( $msgs[ $errcode ] ) ){
+                    $this->app->ajax()->msgError( $msgs[ $errcode ] );
+                    return $this;
+                }
+            }
+
+            $this->app->ajax()->msgWarning( $this->app->config( 'db.debug' ) === true ? $this->errorInfo() : 'Database error' );
+            return $this;
         }
 
         private function & query( $procedure, $values = array() ){
@@ -51,7 +68,6 @@
 
                     $column_name = $args[0];
                     $column_type = $args[1];
-                    $column_len  = isset( $args[2] ) ? $args[2] : 0;
 
                     // column type & value
                     switch( $column_type ){
@@ -59,13 +75,16 @@
                                             $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : null;
                                             break;
                         case 'int' :        $column_type  = PDO::PARAM_INT;
-                                            $column_value = isset( $values[ $column_name ] ) ? intval( $values[ $column_name ] ) : null;
+                                            $column_value = isset( $args[2] ) ? intval( $args[2] ) : ( isset( $values[ $column_name ] ) ? intval( $values[ $column_name ] ) : null );
                                             break;
                         case 'datetime' :   $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? substr( $values[ $column_name ], 0, 19 ) : null;
                                             break;
                         case 'timestamp' :  $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d H:i:s", strtotime( $values[ $column_name ] ) ) : null;
+                                            break;
+                        case 'bigint' :     $column_type  = PDO::PARAM_STR;
+                                            $column_value = isset( $values[ $column_name ] ) ? strval( $values[ $column_name ] ) : null;
                                             break;
                         case 'text' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 65535 ) : null;
@@ -76,14 +95,12 @@
                         case 'float' :      $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? str_replace( ',', '.', $values[ $column_name] ) : 0;
                                             break;
+                        case 'numeric' :
                         case 'double' :     $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? strval( round( floatval( str_replace( ',', '.', $values[ $column_name] ) ), 2 ) ) : 0;
                                             break;
                         case 'uuid' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 40 ) : null;
-                                            break;
-                        case 'int' :        $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? intval( $values[ $column_name ] ) : null;
                                             break;
                         case 'json' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : null;
@@ -94,7 +111,7 @@
                         case 'str' :
                         case 'varchar' :
                         default :           $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, $column_len ) : null;
+                                            $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, ( isset( $args[2] ) ? $args[2] : 0 ) ) : null;
                     }
 
                     // add elements
@@ -116,9 +133,6 @@
         }
 
         public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){
-
-
-            $this->app->log()->debug( "mydb::findAll,procedure:" . $procedure . ',args:' . json_encode( $args ) );
 
             try{
                 $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );		

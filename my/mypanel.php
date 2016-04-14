@@ -67,8 +67,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '' ){
-        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick );
+    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '', $classkey = '' ){
+        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick, 'classkey' => $classkey );
         return $this;
     }
     
@@ -99,6 +99,31 @@ class mypanel{
 
     public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $depends = false ){
         $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix, 'depends' => $depends );
+        return $this;
+    }
+
+    public function & ajaxUpdateInfo( $panelkey, $infokey, $value, $extravalue = '' ){
+        
+        // get prefix and extrasufix
+        if( isset( $this->elements[ 'info' ][ $infokey ] ) )
+            $value = $this->elements[ 'info' ][ $infokey ][ 'prefix' ] . $value . $this->elements[ 'info' ][ $infokey ][ 'sufix' ] . $extravalue . $this->elements[ 'info' ][ $infokey ][ 'extrasufix' ];
+        
+        $this->app->ajax()->html( '#pic' . $infokey . $panelkey, $value )
+                          ->removeClass( '#pi' . $infokey . $panelkey, 'hide' );
+        return $this;
+    }
+
+    public function & ajaxHideInfo( $panelkey, $infokey ){
+        
+        $this->app->ajax()->html( '#pic' . $infokey . $panelkey, '' )
+                          ->switchClass( '#pi' . $infokey . $panelkey, 'hide', 'hide' );
+        return $this;
+    }
+
+    public function & ajaxMenuLabel( $panelkey, $value ){
+        
+        $this->app->ajax()->html( '#pms' . $panelkey, $value );
+
         return $this;
     }
 
@@ -137,8 +162,26 @@ class mypanel{
         return $this;
     }
 
+    public function & ajaxThumbChange( $src, $class ){
+        $this->app->ajax()->attr( '.pt' . $class, 'src', $src );
+        return $this;
+    }
+
     public function & ajaxMenuShow( $index, $id, $operation = true ){
-        $this->app->ajax()->css( '#panm' . $id . $index, 'display', $operation ? 'block' : 'none' );
+
+        if( isset( $this->elements[ 'menu' ] ) ){
+            foreach( $this->elements[ 'menu' ] as $menu ){
+                if( $menu[ 'type' ] == 1 ){
+                    foreach( $menu[ 'options' ] as $k => $option ){
+                        if( isset( $option[ 'id' ] ) && $option[ 'id' ] == $index ){
+                            $this->app->ajax()->css( '#panm' . $id . $k, 'display', $operation ? 'block' : 'none' );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         return $this;
     }
 
@@ -176,9 +219,22 @@ class mypanel{
         return $this;
     }
 
-    public function & addToolbarMenuSelect( $options, $icon = 'icon-cog4', $label = '' ){
-        $id = $this->name . 'sel' . $this->idmenusel++;
-        $this->elements[ 'tmenu' ][ $id ] = array( 'type' => 2, 'icon' => $icon, 'options' => $options, 'label' => $label, 'id' => $id );
+    public function & addToolbarMenuSelect( $id, $options, $icon = 'icon-cog4', $label = null ){
+
+        if( is_null( $label ) ){
+            $label = 'menu';
+
+            foreach( $options as $op ){
+                if( isset( $op[ 'selected' ] ) && $op[ 'selected' ] === true ){
+                    if( isset( $op[ 'menu' ] ) ){
+                        $label = $op[ 'menu' ];
+                    }
+                    break;
+                }
+            }
+        }
+
+        $this->elements[ 'tmenu' ][ $id ] = array( 'type' => 2, 'icon' => $icon, 'options' => $options, 'label' => $label, 'id' => $id, 'idhtml' => $this->name . 'sel' . $id );
         return $this;
     }
 
@@ -187,29 +243,37 @@ class mypanel{
         return $this;
     }
 
-    public function & setToolbarMenuSelected( $index, $ctxmenuid = '' ){
-        $ctxmenuid = empty( $ctxmenuid ) ? $this->name . 'sel' : $ctxmenuid;
-    
-        if( $this->app->request->isAjax() ){
-            if( isset( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] ) )
-                foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr )
-                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $i, ( $i == $index ) ? true : false )->attr( '#menl' . $ctxmenuid . $i, 'class', ( $i == $index ) ? 'active' : '' );
-        }else{
-                foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr ){
-                    $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ][ $i ][ 'selected' ] = ( $i == $index ) ? true : false;
+    public function & ajaxToolbarMenuSelected( $ctxmenuid, $index ){
+
+        if( isset( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] ) ){
+            foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr ){
+                if( $arr[ 'id' ] == $index ){
+                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $arr[ 'id' ], true )
+                                      ->attr( '#menl' . $ctxmenuid . $arr[ 'id' ], 'class', 'active' );
+
+                    if( isset( $arr[ 'menu' ] ) ){
+                        $this->app->ajax()->text( '#menbl' . $ctxmenuid, $arr[ 'menu' ] );
+                    }
+                }else{
+                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $arr[ 'id' ], false )
+                                      ->attr( '#menl' . $ctxmenuid . $arr[ 'id' ], 'class', '' );
                 }
+            }
         }
 
         return $this;
     }
+/*
+    public function & ajaxToolbarMenuLabel( $label, $ctxmenuid, $selectid = null ){
 
-    public function & setToolbarMenuLabel( $label, $ctxmenuid = '' ){
-        $ctxmenuid = empty( $ctxmenuid ) ? $this->name . 'sel' : $ctxmenuid;
-        
         $this->app->ajax()->text( '#menbl' . $ctxmenuid, $label );
+
+        if( !is_null( $selectid ) )
+            $this->ajaxToolbarMenuSelected( $ctxmenuid, $selectid );
+
         return $this;
     }
-
+*/
     public function & setMore( $onclick, $perpage = 10, $offset = 0, $label = 'more' ){
         
         // reset counter

@@ -29,7 +29,7 @@
                 if( !($tag = $this->app->config( 'email.templatetag' ) ) ){
                     $tag = 'content';
                 }
-                $html = $this->app->render( $template, is_array( $text ) ? $text : array( $tag => $text ), null, null, APP_CACHEAPC, false, false );    
+                $html = $this->app->render( $template, is_array( $text ) ? $text : array( $tag => $text ), null, null, 0, false, false );    
             }else{
                 $html = $text;
             }

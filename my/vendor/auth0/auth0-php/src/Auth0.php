@@ -273,7 +273,7 @@ class Auth0 {
      */
     public function getUser() {
         // Ensure we have the user info
-        if ($this->user === false) {
+        if ($this->user === null) {
             $this->exchangeCode();
         }
         if (!is_array($this->user)) {
@@ -334,7 +334,7 @@ class Auth0 {
      *
      * @param string $access_token
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     public function setAccessToken($access_token) {
         $key = array_search('access_token',$this->persistantMap);
@@ -352,7 +352,7 @@ class Auth0 {
      * @return string
      */
     final public function getAccessToken() {
-        if ($this->access_token === false) {
+        if ($this->access_token === null) {
             $this->exchangeCode();
         }
         return $this->access_token;
@@ -363,7 +363,7 @@ class Auth0 {
      *
      * @param string $id_token
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     public function setIdToken($id_token) {
         $key = array_search('id_token',$this->persistantMap);
@@ -381,7 +381,7 @@ class Auth0 {
      * @return string
      */
     final public function getIdToken() {
-        if ($this->id_token === false) {
+        if ($this->id_token === null) {
             $this->exchangeCode();
         }
         return $this->id_token;
@@ -435,13 +435,13 @@ class Auth0 {
     }
 
     /**
-     * If debug mode is set, sends $info to debugger Closure.
+     * If debug mode is set, sends $info to debugger \Closure.
      *
      * @param  mixed $info  Info to debug. It will be converted to string.
      */
     public function debugInfo($info)
     {
-        if ($this->debug_mode && (is_object($this->debugger) && ($this->debugger instanceof Closure))) {
+        if ($this->debug_mode && (is_object($this->debugger) && ($this->debugger instanceof \Closure))) {
             list(, $caller) = debug_backtrace(false);
 
             $caller_function = $caller['function'];
@@ -467,7 +467,7 @@ class Auth0 {
      *
      * @param string $domain
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     final public function setDomain($domain)
     {
@@ -491,7 +491,7 @@ class Auth0 {
      *
      * @param string $client_id
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     final public function setClientId($client_id)
     {
@@ -515,7 +515,7 @@ class Auth0 {
      *
      * @param string $client_secret
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     final public function setClientSecret($client_secret)
     {
@@ -539,7 +539,7 @@ class Auth0 {
      *
      * @param string $redirect_uri
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     final public function setRedirectUri($redirect_uri)
     {
@@ -563,7 +563,7 @@ class Auth0 {
      *
      * @param boolean $debug_mode
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
     final public function setDebugMode($debug_mode)
     {
@@ -587,9 +587,9 @@ class Auth0 {
      *
      * @param \Closure $debugger
      *
-     * @return Auth0SDK\BaseAuth0
+     * @return Auth0\SDK\BaseAuth0
      */
-    final public function setDebugger(Closure $debugger)
+    final public function setDebugger(\Closure $debugger)
     {
         $this->debugger = $debugger;
 

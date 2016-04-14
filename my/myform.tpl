@@ -339,7 +339,7 @@
                 {% endif %}
 
             <div class="row {{ name }}transloaditC" id="{{name ~ el.name}}C"{{ tvalue is empty ? ' style="display:none;"' }}>
-                <div class="col-xs-9" id="{{name ~ el.name}}P">
+                <div class="col-xs-7" id="{{name ~ el.name}}P">
 
                 {% if tvalue is not empty %}
                     {% if el.options.mode == 'image' %}
@@ -356,7 +356,7 @@
                     {% endif %}
                 {% endif %}
                 </div>
-                <div class="col-xs-3" style="padding:0px;">
+                <div class="col-xs-5" style="padding:0px;">
                     {% if not el.prevent %}
                         <button onClick="$('#{{name ~ el.name}}C').hide();$('#{{name ~ el.name}}U').show();$('#{{name ~ el.name}}S').text('Select file');$('#{{name ~ el.name}}V').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     {% endif %}

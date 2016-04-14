@@ -6,21 +6,14 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Symfony\\Polyfill\\Php55\\' => array($vendorDir . '/symfony/polyfill-php55'),
-    'Symfony\\Polyfill\\Php54\\' => array($vendorDir . '/symfony/polyfill-php54'),
-    'Symfony\\Component\\HttpFoundation\\' => array($vendorDir . '/symfony/http-foundation'),
+    'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Slim\\Views\\' => array($vendorDir . '/slim/views'),
-    'React\\Promise\\' => array($vendorDir . '/react/promise/src'),
-    'Mdanter\\Ecc\\Tests\\' => array($vendorDir . '/mdanter/ecc/tests/unit'),
-    'Mdanter\\Ecc\\' => array($vendorDir . '/mdanter/ecc/src'),
-    'HttpSignatures\\' => array($vendorDir . '/99designs/http-signatures/src'),
-    'GuzzleHttp\\Stream\\' => array($vendorDir . '/guzzlehttp/streams/src'),
-    'GuzzleHttp\\Ring\\' => array($vendorDir . '/guzzlehttp/ringphp/src'),
+    'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
+    'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
+    'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
-    'Endroid\\QrCode\\' => array($vendorDir . '/endroid/qrcode/src'),
-    'Blocktrail\\SDK\\' => array($vendorDir . '/blocktrail/blocktrail-sdk/src'),
-    'BitWasp\\BitcoinLib\\' => array($vendorDir . '/blocktrail/bitcoin-lib/src'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
+    'Coinbase\\Wallet\\' => array($vendorDir . '/coinbase/coinbase/src'),
     'Base32\\' => array($vendorDir . '/christian-riesen/base32/src'),
     'Auth0\\SDK\\' => array($vendorDir . '/auth0/auth0-php/src'),
-    '' => array($vendorDir . '/99designs/http-signatures-guzzlehttp/src'),
 );

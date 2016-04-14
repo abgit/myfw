@@ -14,6 +14,7 @@
         private $colorfilter;
         private $addonpre = '';
         private $addonpos = '';
+        private $url;
 
         public function __construct( $id = null ){
             $this->app  = \Slim\Slim::getInstance();
@@ -23,6 +24,11 @@
 
         public function & setID( $id ){
             $this->id = $id;
+            return $this;
+        }
+
+        public function & setUrl( $url ){
+            $this->url = $url;
             return $this;
         }
 
@@ -70,13 +76,16 @@
             return $this;
         }
 
+        public function getValues(){
+            return json_encode($this->values, JSON_UNESCAPED_SLASHES );
+        }
 
         public function obj(){
             
             if( $this->init )
                 $this->app->ajax()->calendar( '#cal' . $this->id );
 
-            return array( 'values'      => json_encode($this->values, JSON_UNESCAPED_SLASHES ),
+            return array( 'url'         => $this->url,
                           'onclick'     => $this->onclick,
                           'onclickmsg'  => $this->onclickmsg,
                           'id'          => $this->id,
@@ -84,6 +93,6 @@
         }
         
         public function __toString(){
-            return $this->app->render( '@my/mycalendar', $this->obj(), null, null, APP_CACHEAPC, false, false );
+            return $this->app->render( '@my/mycalendar', $this->obj(), null, null, 0, false, false );
         }
     }

@@ -111,6 +111,7 @@ class myform{
 
     public function & addBitcoin( $name, $label = '', $help = '', $currencies = array() ){
         $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies );
+        $this->addFilter( $name, 'satoshi' );
         return $this;
     }
 
@@ -322,10 +323,14 @@ class myform{
 
         // default options
         $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array(), 'mode' => 'image' );
+        $driver = $this->app->config( 'transloadit.driver' );
 
-        if( $this->app->config( 'transloadit.driver' ) === 'heroku' ){
+        if( $driver === 'heroku' ){
             $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
             $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
+        }elseif( $driver === 'fortrabbit' ){
+            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
+            $this->apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
         }else{
             $this->apikey    = $this->app->config( 'transloadit.k' );
             $this->apisecret = $this->app->config( 'transloadit.s' );
@@ -334,11 +339,14 @@ class myform{
         $params = array( 'auth' => array( 'key'     => $this->apikey,
                                           'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
 
-        if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ))
+        if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ) )
             $params[ 'template_id' ] = $options[ 'template_id' ];
 
-        if( isset( $options[ 'steps' ] ) && !empty( $options[ 'steps' ] ))
+        if( isset( $options[ 'steps' ] ) && !empty( $options[ 'steps' ] ) )
             $params[ 'steps' ] = $options[ 'steps' ];
+
+        if( isset( $options[ 'fields' ] ) && !empty( $options[ 'fields' ] ) )
+            $params[ 'fields' ] = $options[ 'fields' ];
 
         $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
 
@@ -650,6 +658,13 @@ class myform{
     }
 
 
+    public function & deleteElement( $name ){
+        if( isset( $this->elements[ $name ] ) )
+            unset( $this->elements[ $name ] );
+
+        return $this;
+    }
+
     public function & addSubmit( $label = null, $name = null, $position = '', $options = array() ){
 
         if( empty( $name ) )  $name = 'save';
@@ -662,10 +677,17 @@ class myform{
 
     public function & addAjax( $label = null, $name = null, $css = 'btn-success', $position = '', $options = array() ){
 
-        if( empty( $name ) )  $name = 'save';
+        if( empty( $name ) )
+            $name = 'save';
         $this->elements[ $name ] = array( 'type' => 'ajax', 'isbutton' => true, 'name' => $name, 'position' => $position, 'css' => $css, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
         $this->applyCsrf();
 
+        return $this;
+    }
+
+    public function & setProperty( $name, $property, $value ){
+        if( isset( $this->elements[ $name ] ) )
+            $this->elements[ $name ][ $property ] = $value;
         return $this;
     }
 
@@ -1035,6 +1057,6 @@ class myform{
     }
 
     public function __toString(){
-        return $this->app->render( '@my/myform', $this->obj(), null, null, APP_CACHEAPC, false, false );
+        return $this->app->render( '@my/myform', $this->obj(), null, null, 0, false, false );
     }
 }

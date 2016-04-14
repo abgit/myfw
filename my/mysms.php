@@ -8,9 +8,12 @@ class mysms{
         $this->app = \Slim\Slim::getInstance();
     }
 
-    public function send( & $resultcode, $to, $text, $from ){
+    public function send( & $resultcode, $to, $text, $from = null ){
 
-        $json = json_decode( file_get_contents( 'https://rest.nexmo.com/sms/json?api_key=' . $this->app->config( 'sms.nexmo.key' ) . '&api_secret=' . $this->app->config( 'sms.nexmo.secret' ) . '&from=' . $from . '&to=' . $to . '&text=' . urlencode( $text ) ), true );
+        if( is_null( $from ) )
+            $from = $this->app->config( 'sms.nexmofrom' );
+
+        $json = json_decode( file_get_contents( 'https://rest.nexmo.com/sms/json?api_key=' . $this->app->config( 'sms.nexmokey' ) . '&api_secret=' . $this->app->config( 'sms.nexmosecret' ) . '&from=' . $from . '&to=' . $to . '&text=' . urlencode( $text ) ), true );
 
         if( ! isset( $json[ 'messages' ][0][ 'status' ] ) ){
             $this->resultcode = -1;
