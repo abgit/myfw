@@ -52,7 +52,7 @@
                     $client[ 'provider' ] = strstr( $client[ 'user_id' ], '|', true );
 
                 // custom properties
-                $client[ 'uuid' ]      = md5( $client[ 'user_id' ] );
+                $client[ 'auth0uuid' ] = md5( $client[ 'user_id' ] );
                 $client[ 'fullname' ]  = isset( $client[ 'nickname' ] ) ? $client[ 'nickname' ] : ( $client[ 'given_name' ] . ' ' . $app->client[ 'family_name' ] );
                 $client[ 'icon' ]      = $client[ 'provider' ] == 'auth0' ? 'user' : $client[ 'provider' ];
                 $client[ 'loginmode' ] = $client[ 'provider' ] == 'auth0' ? 'username & password' : $client[ 'provider' ];
@@ -72,12 +72,14 @@
             return $this->auth0->getAccessToken();
         }
         
-        public function logoutURL(){
+        public function logoutURL( $global = false ){
+
+            $cid = $global ? '' : ( '&client_id=' . $this->params[ 'client_id' ] );
 
             if( $this->app->client[ 'provider' ] == 'facebook' ){
-                return 'https://' . $this->params[ 'domain' ] . '/logout?access_token=' . $this->app->client[ 'identities' ][0][ 'access_token' ] . '&returnTo=' . urlencode( 'https://' . $this->params[ 'domain' ]. '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) );
+                return 'https://' . $this->params[ 'domain' ] . '/logout?access_token=' . $this->app->client[ 'identities' ][0][ 'access_token' ] . '&returnTo=' . urlencode( 'https://' . $this->params[ 'domain' ]. '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid );
             }else{
-                return 'https://' . $this->params[ 'domain' ] . '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' );
+                return 'https://' . $this->params[ 'domain' ] . '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid;
             }
         }
 

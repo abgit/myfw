@@ -44,8 +44,8 @@ class myajax{
         return $this;
     }
     
-    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0 ){
-        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll );
+    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0 ){
+        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll, 'p' => $pusher );
         return $this;
     }
     

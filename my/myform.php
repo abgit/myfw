@@ -776,15 +776,17 @@ class myform{
     public function & show(){
 
         // check special form element: transloadit
-        $transloadit = 0;
-        $chatscroll = 0;
+        $transloadit   = 0;
+        $chatscroll    = 0;
+        $pusherchannel = 0;
         foreach( $this->elements as $n => $el ){
             if( $el[ 'type' ] == 'transloadit' ){
                 $transloadit = 1;
             }
             if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
-                $transloadit = 1;
-                $chatscroll = '#' . $el[ 'obj' ]->getWindowId();
+                $transloadit   = 1;
+                $chatscroll    = '#' . $el[ 'obj' ]->getWindowId();
+                $pusherchannel = $el[ 'obj' ]->getChannel();
             }
         }
 
@@ -792,7 +794,7 @@ class myform{
         if( ! isset( $this->modal['id'] ) )
             $this->setModal();
 
-        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll );
+        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel );
         return $this;
     }
 

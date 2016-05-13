@@ -47,6 +47,7 @@
         private $cache       = null;
         private $cacheable   = null;
         private $isajaxmode  = null;
+        private $isratemode  = null;
         private $auth        = null;
         private $onlogincall = null;
         private $objuserredir= null;
@@ -80,8 +81,12 @@
                 $this->cacheable = null;
             });
             $this->hook( 'slim.after.dispatch', function(){
+                if( $this->config( 'app.israte' ) !== false )
+                    $this->memcached()->ratemonodelete();
+
                 if( $this->isajaxmode === true )
                     $this->ajax()->render();
+
                 $this->isajaxmode = null;
             });
             $this->post( '/myfwconfirm/:h(/:twotoken)(/)', 'islogged', function( $h, $twotoken = '' ){
@@ -188,6 +193,10 @@
 
         public function setajaxmode(){
             $this->isajaxmode = true;
+        }
+
+        public function setratemonomode(){
+            $this->isratemode = true;
         }
 
         public function iscacheable(){
@@ -718,10 +727,11 @@
 
     function israte() {
         $app = \Slim\Slim::getInstance();
+//        $app->setratemonomode();
 
         if( $app->config( 'app.israte' ) !== false && !$app->memcached()->ratevalid() ){
             if( $app->request->isAjax() ){
-                $app->ajax()->msgWarning( 'Too much calls. Please wait 60s.', 'Rate limit protection' )->render();
+                $app->ajax()->msgWarning( 'Too much calls. Please wait and retry. ', 'Rate limit protection' )->render();
             }
             $app->stop();
         }

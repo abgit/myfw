@@ -98,7 +98,7 @@
                         </div>
                         <span class="label label-block label-primary text-center">
                             {% for cur in el.currencies %}
-                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.rate }}">{{ cur.symbol }} {{ cur.rate * el.value }}</span>
+                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.rate }}">{{ cur.symbol }} {{ ( cur.rate * el.value )|number_format(2, '.', '') }}</span>
                                 {% if not loop.last %}
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 {% endif %}
@@ -115,7 +115,7 @@
 
 			{% elseif el.type == 'textarea' %}
                     <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-                	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="{{ el.rows }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.value}}</textarea>
+                	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="{{ el.rows }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{ isajax ? el.value|replace({"\n\r": "%0DMYFW", "\n": "%0DMYFW", "\r": "%0DMYFW"}) : el.value }}</textarea>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'select' %}

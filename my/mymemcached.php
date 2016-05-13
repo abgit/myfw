@@ -45,7 +45,7 @@
         }
 
 
-        public function ratevalid( $persecond = 5, $perminute = 200, $lockfor = 60, $persession = true, $perip = false ){
+        public function ratevalid( $persecond = 5, $perminute = 200, $lockfor = 60, $persession = true, $perip = false, $mono = true ){
 
             $now = time();
             $prefix  = $persession ? ( 's' . $this->app->session()->getId() ) : '';
@@ -54,9 +54,19 @@
             $keysecond = md5( $prefix . date( "YmdHis", $now ) );
             $keyminute = md5( $prefix . date( "YmdHi", $now ) );
             $keylock   = md5( $prefix . 'myfwlock' );
+            $keymono   = md5( $prefix . 'myfwmono' );
 
             if( $this->get( $keylock ) === true ){
                 return false;
+            }
+
+            // lock mono for ajax requests only
+            if( $mono /*&& $this->app->request->isAjax() && ( $this->get( $keymono ) === 1 || !$this->add( $keymono, 1, 20 ) )*/ ){
+
+                if(!$this->add($keymono, 1,20)){
+                  usleep(mt_rand(1000,99999));
+                }
+                //return false;
             }
 
             $countersec = $this->get( $keysecond );
@@ -88,5 +98,15 @@
             }
 
             return true;
+        }
+
+        public function ratemonodelete( $persession = true, $perip = false ){
+
+            $prefix  = $persession ? ( 's' . $this->app->session()->getId() ) : '';
+            $prefix .= $perip      ? ( 'i' . $this->app->request->getIp() )  : '';
+
+            $keymono = md5( $prefix . 'myfwmono' );
+
+            return /*$this->app->request->isAjax() ?*/ $this->delete( $keymono/*, 0*/ ) /*: false */;
         }
     }

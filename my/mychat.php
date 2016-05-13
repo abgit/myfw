@@ -19,6 +19,7 @@
         private $keyme;
         private $buttons = array();
         private $windowid;
+        private $channel;
 
         public function __construct( $id ){
             $this->app  = \Slim\Slim::getInstance();
@@ -129,7 +130,12 @@
 
         public function & pusher( $channel, $event ){
             $this->app->ajax()->pusher( $this->app->pusher()->getPKey(), $channel, $event, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box' );
+            $this->channel = $channel;
             return $this;
+        }
+        
+        public function getChannel(){
+            return $this->channel;
         }
         
         public function & pusherAdd( $channel, $event, $values ){

@@ -617,114 +617,6 @@
         ]
     },
     {
-        "name": "auth0/auth0-php",
-        "version": "2.1.2",
-        "version_normalized": "2.1.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/auth0/auth0-PHP.git",
-            "reference": "92dacca4a4812c8b8d15680d3d8c5e3143d2c79e"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/auth0/auth0-PHP/zipball/92dacca4a4812c8b8d15680d3d8c5e3143d2c79e",
-            "reference": "92dacca4a4812c8b8d15680d3d8c5e3143d2c79e",
-            "shasum": ""
-        },
-        "require": {
-            "adoy/oauth2": "^1.3",
-            "ext-json": "*",
-            "firebase/php-jwt": "^3.0",
-            "guzzlehttp/guzzle": "^6.1",
-            "php": ">=5.4.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "4.6.*"
-        },
-        "time": "2016-01-14 14:46:53",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Auth0\\SDK\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Auth0",
-                "email": "support@auth0.com",
-                "homepage": "http://www.auth0.com/"
-            }
-        ],
-        "description": "Auth0 PHP SDK."
-    },
-    {
-        "name": "symfony/event-dispatcher",
-        "version": "v2.8.4",
-        "version_normalized": "2.8.4.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/event-dispatcher.git",
-            "reference": "47d2d8cade9b1c3987573d2943bb9352536cdb87"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/47d2d8cade9b1c3987573d2943bb9352536cdb87",
-            "reference": "47d2d8cade9b1c3987573d2943bb9352536cdb87",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.9"
-        },
-        "require-dev": {
-            "psr/log": "~1.0",
-            "symfony/config": "~2.0,>=2.0.5|~3.0.0",
-            "symfony/dependency-injection": "~2.6|~3.0.0",
-            "symfony/expression-language": "~2.6|~3.0.0",
-            "symfony/stopwatch": "~2.3|~3.0.0"
-        },
-        "suggest": {
-            "symfony/dependency-injection": "",
-            "symfony/http-kernel": ""
-        },
-        "time": "2016-03-07 14:04:32",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.8-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\EventDispatcher\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony EventDispatcher Component",
-        "homepage": "https://symfony.com"
-    },
-    {
         "name": "guzzle/guzzle",
         "version": "v3.9.3",
         "version_normalized": "3.9.3.0",
@@ -904,110 +796,6 @@
         ]
     },
     {
-        "name": "coinbase/coinbase",
-        "version": "2.3.0",
-        "version_normalized": "2.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/coinbase/coinbase-php.git",
-            "reference": "be56862202010baf64ab16963e8a16a42707beeb"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/coinbase/coinbase-php/zipball/be56862202010baf64ab16963e8a16a42707beeb",
-            "reference": "be56862202010baf64ab16963e8a16a42707beeb",
-            "shasum": ""
-        },
-        "require": {
-            "guzzlehttp/guzzle": "^6.0",
-            "php": ">=5.5.0",
-            "psr/http-message": "^1.0",
-            "psr/log": "^1.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^4.7"
-        },
-        "time": "2016-03-07 20:11:33",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Coinbase\\Wallet\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "Coinbase API library",
-        "homepage": "http://coinbase.com",
-        "keywords": [
-            "bitcoin",
-            "coinbase"
-        ]
-    },
-    {
-        "name": "christian-riesen/base32",
-        "version": "1.3.0",
-        "version_normalized": "1.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/ChristianRiesen/base32.git",
-            "reference": "fde061a370b0a97fdcd33d9d5f7b1b70ce1f79d4"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/fde061a370b0a97fdcd33d9d5f7b1b70ce1f79d4",
-            "reference": "fde061a370b0a97fdcd33d9d5f7b1b70ce1f79d4",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "4.*",
-            "satooshi/php-coveralls": "0.*"
-        },
-        "time": "2016-04-07 07:45:31",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.1.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Base32\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Christian Riesen",
-                "email": "chris.riesen@gmail.com",
-                "homepage": "http://christianriesen.com",
-                "role": "Developer"
-            }
-        ],
-        "description": "Base32 encoder/decoder according to RFC 4648",
-        "homepage": "https://github.com/ChristianRiesen/base32",
-        "keywords": [
-            "base32",
-            "decode",
-            "encode",
-            "rfc4648"
-        ]
-    },
-    {
         "name": "guzzlehttp/psr7",
         "version": "1.3.0",
         "version_normalized": "1.3.0.0",
@@ -1066,5 +854,217 @@
             "stream",
             "uri"
         ]
+    },
+    {
+        "name": "coinbase/coinbase",
+        "version": "2.4.0",
+        "version_normalized": "2.4.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/coinbase/coinbase-php.git",
+            "reference": "6ca3f9d3b8ffc21e51ba90f49d6fbb84197dd148"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/coinbase/coinbase-php/zipball/6ca3f9d3b8ffc21e51ba90f49d6fbb84197dd148",
+            "reference": "6ca3f9d3b8ffc21e51ba90f49d6fbb84197dd148",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/guzzle": "^6.0",
+            "php": ">=5.5.0",
+            "psr/http-message": "^1.0",
+            "psr/log": "^1.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^4.7"
+        },
+        "time": "2016-04-15 17:09:15",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Coinbase\\Wallet\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Coinbase API library",
+        "homepage": "http://coinbase.com",
+        "keywords": [
+            "bitcoin",
+            "coinbase"
+        ]
+    },
+    {
+        "name": "auth0/auth0-php",
+        "version": "2.2.3",
+        "version_normalized": "2.2.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auth0/auth0-PHP.git",
+            "reference": "0f521dc9a116921f01a279f411437dc0aae266b7"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/auth0/auth0-PHP/zipball/0f521dc9a116921f01a279f411437dc0aae266b7",
+            "reference": "0f521dc9a116921f01a279f411437dc0aae266b7",
+            "shasum": ""
+        },
+        "require": {
+            "adoy/oauth2": "^1.3",
+            "ext-json": "*",
+            "firebase/php-jwt": "^3.0",
+            "guzzlehttp/guzzle": "^6.1",
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "4.6.*"
+        },
+        "time": "2016-05-10 20:59:56",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Auth0\\SDK\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Auth0",
+                "email": "support@auth0.com",
+                "homepage": "http://www.auth0.com/"
+            }
+        ],
+        "description": "Auth0 PHP SDK."
+    },
+    {
+        "name": "christian-riesen/base32",
+        "version": "1.3.1",
+        "version_normalized": "1.3.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/ChristianRiesen/base32.git",
+            "reference": "0a31e50c0fa9b1692d077c86ac188eecdcbaf7fa"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/0a31e50c0fa9b1692d077c86ac188eecdcbaf7fa",
+            "reference": "0a31e50c0fa9b1692d077c86ac188eecdcbaf7fa",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "4.*",
+            "satooshi/php-coveralls": "0.*"
+        },
+        "time": "2016-05-05 11:49:03",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Base32\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Riesen",
+                "email": "chris.riesen@gmail.com",
+                "homepage": "http://christianriesen.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "Base32 encoder/decoder according to RFC 4648",
+        "homepage": "https://github.com/ChristianRiesen/base32",
+        "keywords": [
+            "base32",
+            "decode",
+            "encode",
+            "rfc4648"
+        ]
+    },
+    {
+        "name": "symfony/event-dispatcher",
+        "version": "v2.8.6",
+        "version_normalized": "2.8.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/event-dispatcher.git",
+            "reference": "a158f13992a3147d466af7a23b564ac719a4ddd8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/a158f13992a3147d466af7a23b564ac719a4ddd8",
+            "reference": "a158f13992a3147d466af7a23b564ac719a4ddd8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.9"
+        },
+        "require-dev": {
+            "psr/log": "~1.0",
+            "symfony/config": "~2.0,>=2.0.5|~3.0.0",
+            "symfony/dependency-injection": "~2.6|~3.0.0",
+            "symfony/expression-language": "~2.6|~3.0.0",
+            "symfony/stopwatch": "~2.3|~3.0.0"
+        },
+        "suggest": {
+            "symfony/dependency-injection": "",
+            "symfony/http-kernel": ""
+        },
+        "time": "2016-05-03 18:59:18",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.8-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\EventDispatcher\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "https://symfony.com"
     }
 ]

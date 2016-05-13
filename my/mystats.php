@@ -96,6 +96,19 @@ class mystats{
         return $this;
     }
 
+    public function &updateAjaxValue( $key, $value, $valuepre = null, $valuepos = null ){
+
+        $this->app->ajax()->text( '#st' . $key, $value );
+
+        if( !is_null( $valuepre ) )
+            $this->app->ajax()->text( '#st' . $key . 'lpre', $valuepre );
+
+        if( !is_null( $valuepos ) )
+            $this->app->ajax()->text( '#st' . $key . 'lpos', $valuepos );
+
+        return $this;
+    }
+
     public function & changeValues( $values, $mode ){
         $mode == 1 ? $this->setValues( $values ) : $this->updateAjaxValues( $values );
         return $this;

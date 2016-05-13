@@ -298,7 +298,7 @@ class Client
     public function createAccountAddress(Account $account, Address $address, array $params = [])
     {
         $data = $this->mapper->fromAddress($address);
-        return $this->postAndMap($account->getResourcePath().'/addresses', $data + $params, 'toAddress', $address);
+        $this->postAndMap($account->getResourcePath().'/addresses', $data + $params, 'toAddress', $address);
     }
 
     // transactions

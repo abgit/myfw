@@ -38,6 +38,7 @@ class Auth0 {
         'api'           => 'https://{domain}/api/',
         'authorize'     => 'https://{domain}/authorize/',
         'token'         => 'https://{domain}/oauth/token/',
+        'user_info'     => 'https://{domain}/userinfo/',
     );
 
     /**
@@ -257,11 +258,9 @@ class Auth0 {
         $this->setAccessToken($access_token);
         $this->setIdToken($id_token);
 
-        $token = Auth0JWT::decode($id_token, $this->client_id, $this->client_secret);
-
-        $user = ApiUsers::get($this->domain, $id_token, $token->sub);
-
-        $this->setUser($user);
+        $userinfo_url = $this->generateUrl('user_info');
+        $user = $this->oauth_client->fetch($userinfo_url);
+        $this->setUser($user["result"]);
 
         return true;
     }
@@ -435,13 +434,13 @@ class Auth0 {
     }
 
     /**
-     * If debug mode is set, sends $info to debugger \Closure.
+     * If debug mode is set, sends $info to debugger Closure.
      *
      * @param  mixed $info  Info to debug. It will be converted to string.
      */
     public function debugInfo($info)
     {
-        if ($this->debug_mode && (is_object($this->debugger) && ($this->debugger instanceof \Closure))) {
+        if ($this->debug_mode && (is_object($this->debugger) && ($this->debugger instanceof Closure))) {
             list(, $caller) = debug_backtrace(false);
 
             $caller_function = $caller['function'];
@@ -589,7 +588,7 @@ class Auth0 {
      *
      * @return Auth0\SDK\BaseAuth0
      */
-    final public function setDebugger(\Closure $debugger)
+    final public function setDebugger(Closure $debugger)
     {
         $this->debugger = $debugger;
 
