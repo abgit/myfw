@@ -109,7 +109,7 @@
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s") }}</span>
 
                                                         {% elseif td.type == 'description' %}
-            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|nl2space|t(36) }}</span>
+            				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|nl2space|t(36) }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'info' %}
                                                             <span>{% if td.title %}<strong>{{ td.title }}</strong>{% endif %}{{ addonpre|raw }}{{ value|t(50) }}{{ addonpos|raw }}</span>

@@ -101,11 +101,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addDescription( $key, $kval, $label = '', $align = '' ){
+    public function & addDescription( $key, $kval, $label = '', $align = '', $inline = false ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'description');
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'description', 'inline' => $inline );
         return $this;
     }
 
@@ -215,6 +215,10 @@ class mygrid{
         return $this;
     }
 
+    public function getMenu(){
+        return $this->menuhtml;
+    }
+
     public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'center' ){
         $key = 'm' . $this->menu++;
         if( !isset( $this->labels[ $key ] ) ){
@@ -311,9 +315,9 @@ class mygrid{
 
     public function & refreshAjaxValues( $values ){
 
-        if( !is_array( $values ) )
-            return $this;
-
+        if( is_string( $values ) )
+            $values = json_decode( $values, true );
+        
         foreach( $values as $row ){
             if( isset( $row[ $this->key ] ) )
                 $this->app->ajax()->replacewith( '#' . $row[ $this->key ], $this->render( array( $row ) ) );

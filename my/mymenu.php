@@ -11,13 +11,13 @@ class mymenu{
         $this->app = \Slim\Slim::getInstance();
     }
 
-    public function & addButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $class = '' ){
-        $this->elements[] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'class' => $class );
+    public function & addButton( $id, $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $class = '' ){
+        $this->elements[] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'class' => $class, 'id' => $id );
         return $this;
     }
 
-    public function & addMenu( $options, $icon = 'icon-cog4', $label = '' ){
-        $this->elements[] = array( 'type' => 1, 'icon' => $icon, 'options' => $options, 'label' => $label );
+    public function & addMenu( $id, $options, $icon = 'icon-cog4', $label = '' ){
+        $this->elements[] = array( 'type' => 1, 'icon' => $icon, 'options' => $options, 'label' => $label, 'id' => $id );
         return $this;
     }
 
@@ -49,10 +49,15 @@ class mymenu{
         return $this;
     }
 
-    public function & setMenuLabel( $label, $ctxmenuid = '' ){
+/*    public function & setMenuLabel( $label, $ctxmenuid = '' ){
         $ctxmenuid = empty( $ctxmenuid ) ? $this->name . 'sel' : $ctxmenuid;
         
         $this->app->ajax()->text( '#menbl' . $ctxmenuid, $label );
+        return $this;
+    }*/
+
+    public function & ajaxButtonLabel( $id, $value ){
+        $this->app->ajax()->html( '#menulab' . $this->name . $id, $value );
         return $this;
     }
 
