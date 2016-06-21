@@ -37,12 +37,12 @@
             return $this->pdo;
         }
         
-        public function & msg( $msgs = null ){
+        public function & msg( $msgs = null, $headers = null ){
 
             if( is_array( $msgs ) ){
                 $errcode = $this->app->db()->errorCode();
                 if( isset( $msgs[ $errcode ] ) ){
-                    $this->app->ajax()->msgError( $msgs[ $errcode ] );
+                    $this->app->ajax()->msgError( $msgs[ $errcode ], isset( $headers[ $errcode ] ) ? $headers[ $errcode ] : null );
                     return $this;
                 }
             }

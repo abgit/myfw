@@ -20,6 +20,8 @@ class mygrid{
     private $orderby  = false;
     private $orderbya = null;
     private $menuhtml = null;
+    private $rowclass = false;
+    private $rowclassdepends = false;
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
@@ -133,11 +135,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addAgo( $key, $kval, $label, $dateonly = false, $align = '' ){
+    public function & addAgo( $key, $kval, $label, $dateonly = false, $keycustomdate = '' ){
         if( !isset( $this->labels[ $key ] ) ){
-            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'ago', 'dateonly' => $dateonly );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'ago', 'dateonly' => $dateonly, 'keycustomdate' => $keycustomdate );
         return $this;
     }
 
@@ -270,6 +272,12 @@ class mygrid{
         return $this;
     }
 
+    public function & setClassDepends( $class, $depends ){
+        $this->rowclass = $class;
+        $this->rowclassdepends = $depends;
+        return $this;
+    }
+
     public function & setRowClass( $key, $kval, $class, $default, $dependkey = false ){
 
         if( isset( $this->cols[ $key ] ) ){
@@ -324,6 +332,21 @@ class mygrid{
         }
 
         return $this;
+    }
+
+    public function & ajaxAddReplaceValues( $values ){
+
+        if( is_string( $values ) )
+            $values = json_decode( $values, true );
+
+        $this->app->ajax()->hide( '#' . $this->name . 'empty' );
+
+        foreach( $values as $row ){
+            if( isset( $row[ $this->key ] ) )
+                $this->app->ajax()->addreplacewith( '#' . $row[ $this->key ], $this->render( array( $row ) ), '#' . $this->name );
+        }
+
+        return $this;    
     }
 
     public function & deleteAjaxValue( $key ){
@@ -416,6 +439,8 @@ class mygrid{
                                                         'orderby'  => $this->orderby,
                                                         'orderbya' => $this->orderbya,
                                                         'menuhtml' => $this->menuhtml,
+                                                        'rowclass' => $this->rowclass,
+                                                        'rowclassdepends' => $this->rowclassdepends,
                                                         'cols'     => $this->cols ), null, null, 0, false, false );        
     }
 }

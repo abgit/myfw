@@ -227,12 +227,24 @@ class myform{
     }
 
     public function & addCustom( $name, $obj  ){
-        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => method_exists( $obj, 'setID' ) ? $obj->setID( $this->formname . $name ) : $obj, 'rules' => array(), 'filters' => array() );
+        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => /*method_exists( $obj, 'setID' ) ? $obj->setID( $this->formname . $name ) :*/ $obj, 'rules' => array(), 'filters' => array() );
         return $this;
     }
 
     public function & addEmail( $name, $label = 'Email' ){
         $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array( 'email' => 'Email is not valid' ), 'filters' => array() );
+        return $this;
+    }
+
+    public function & addCameraTag( $name, $label = 'Video' ){
+        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'array', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ) );
+
+        $this->app->ajax()->cameraTag();
+        return $this;
+    }
+
+    public function & addCameraTagVideo( $name, $label = 'Video' ){
+        $this->elements[ $name ] = array( 'type' => 'cameratagvideo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
         return $this;
     }
 
@@ -277,6 +289,9 @@ class myform{
             switch( $optionsFilter[ 'type' ] ){
                 case 'implode': foreach( $options as $o => $arr )
                                     $res[ $o ] = implode( ' ', $arr );
+                                break;
+                case 'reverse': foreach( $options as $k => $v )
+                                    $res[ $v ] = $k;
                                 break;
                 case 'explode': $res = isset( $optionsFilter[ 'delimiter' ] ) ? explode( $optionsFilter[ 'delimiter' ], $options ) : array();
                                 break;
@@ -758,7 +773,7 @@ class myform{
         return false;
     }
 
-    public function & hide(){
+    public function & hide( $messageok = null ){
 
         if( $this->isajax ){
             $this->app->ajax()->setFormReset( $this->formname );
@@ -767,6 +782,9 @@ class myform{
                 $modal = $this->modal;
                 $this->app->ajax()->modalHide( $modal[ 'id' ] );
             }
+            
+            if( !empty( $messageok ) )
+                $this->app->ajax()->msgOk( $messageok );
         }
 
         $this->hide = true;
@@ -966,6 +984,8 @@ class myform{
                                     break;
                 case 'multiple':    $values[ $n ] = ( isset( $_POST[ $this->formname . $n ] ) && is_array( $_POST[ $this->formname . $n ] ) ) ? implode( ';', $_POST[ $this->formname . $n ] ) : ''; 
                                     break;
+                case 'array':       $values[ $n ] = ( isset( $_POST[ $this->formname . $n ] ) && is_array( $_POST[ $this->formname . $n ] ) ) ? $_POST[ $this->formname . $n ] : array();
+                                    break;
                 case 'group':       if( $ungroup ){
                                         foreach( $el['options'] as $o => $val )
                                             if( isset( $_POST[ $this->formname . $n . $o ] ) && $_POST[ $this->formname . $n . $o ] == 'on' )
@@ -986,7 +1006,7 @@ class myform{
                 default:            continue;
             }
 
-            if( $applyFilters && is_array( $el[ 'filters' ] ) )
+            if( $applyFilters && isset( $el[ 'filters' ] ) && is_array( $el[ 'filters' ] ) )
                 foreach( $el[ 'filters' ] as $f )
                     if( is_callable( array( 'myfilters', $f ) ) )
                         $values[ $n ] = call_user_func( array( 'myfilters', $f ), $values[ $n ] );

@@ -75,6 +75,11 @@ class myinfo{
         return $this;
     }
 
+    public function & setProfileText( $key, $prefix = '', $sufix = '', $default = '' ){
+        $this->profile[ 'text' ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'default' => $default );
+        return $this;
+    }
+
     public function & setProfileDescriptionImage( $key, $cdn, $sufix, $width, $height ){
         $this->profile[ 'descimg' ] = array( 'key' => $key, 'cdn' => $cdn, 'sufix' => $sufix, 'width' => $width, 'height' => $height );
         return $this;
@@ -82,6 +87,11 @@ class myinfo{
 
     public function & addProfileIcon( $icon, $href, $key, $prefix, $sufix, $hrefkey = false, $depends = false ){
         $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'hrefkey' => $hrefkey, 'depends' => $depends );
+        return $this;
+    }
+
+    public function & addProfileCameraTag( $key ){
+        $this->elements[] = array( 'type' => 'cameratag', 'key' => $key, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
         return $this;
     }
 

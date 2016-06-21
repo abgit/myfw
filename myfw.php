@@ -139,6 +139,10 @@
                 }
             } elseif (func_num_args() === 1) {
                 if( isset( $this->container['settings'][$name] ) ){
+
+                    if( !is_string( $this->container['settings'][$name] ) )
+                        return $this->container['settings'][$name];
+
                     switch( $this->container['settings'][$name]{0} ){
                         case '@': return getenv( substr( $this->container['settings'][$name], 1 ) );
                         case '#': return $this->configdecrypt( getenv( substr( $this->container['settings'][$name], 1 ) ) );

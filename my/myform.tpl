@@ -154,6 +154,18 @@
 			{% elseif el.type == 'hidden' %}
             	<input {{el.disabled ? 'disabled="disabled" '}}name="{{ el.name }}" type="hidden" value="{{el.value}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 
+			{% elseif el.type == 'cameratag' %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+            	<div style="width:321px;height:241px;"><camera name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}"></div>
+                {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+			{% elseif el.type == 'cameratagvideo' %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                <div style="width:321px;height:241px;">
+                    <video width="100%" controls poster="{{ el.appcdn }}{{ el.value }}_qvga_thumb.png" style="width:100%;height:auto;" id="{{name ~ el.name}}">
+                        <source src="{{ el.appcdn }}{{ el.value }}_qvga.mp4" type="video/mp4">
+                    </video>
+                </div>
 			{% elseif el.type == 'checkboxgroup' %}
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 

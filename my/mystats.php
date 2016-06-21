@@ -27,7 +27,7 @@ class mystats{
         return $this;
     }
 
-    public function & addElement( $key, $label, $icon = false, $type = '', $onclick = '', $href = '', $percentage = 100, $class = '', $islabel = false, $typekey = false, $percentagetype = 1, $percentagekey = false, $keytype = 1 ){
+    public function & addElement( $key, $label, $icon = false, $type = '', $onclick = '', $href = '', $percentage = '', $class = '', $islabel = false, $typekey = false, $percentagetype = 1, $percentagekey = false, $keytype = 1 ){
         $this->elements[ $key ] = array( 'key' => $key, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'type' => $type, 'percentage' => $percentage, 'class' => $class, 'islabel' => $islabel, 'typekey' => $typekey, 'percentagetype' => $percentagetype, 'percentagekey' => $percentagekey, 'keytype' => $keytype );
         return $this;
     }
@@ -60,16 +60,20 @@ class mystats{
         return $this;
     }
 
-    public function & addAddonLabel( $name, $value, $prefix = true, $key = false ){
+    public function & addAddonLabel( $name, $value, $prefix = true, $key = false, $keydefault = '' ){
         if( isset( $this->elements[ $name ] ) ){
             if( $prefix ){
                     $this->elements[ $name ][ 'addonlabelpre' ] = $value;
-                    if( is_string( $key ) )
+                    if( is_string( $key ) ){
                         $this->elements[ $name ][ 'addonlabelprekey' ] = $key;
+                        $this->elements[ $name ][ 'addonlabelprekeydefault' ] = $keydefault;
+                    }
             }else{
                     $this->elements[ $name ][ 'addonlabelpos' ] = $value;
-                    if( is_string( $key ) )
+                    if( is_string( $key ) ){
                         $this->elements[ $name ][ 'addonlabelposkey' ] = $key;
+                        $this->elements[ $name ][ 'addonlabelposkeydefault' ] = $keydefault;
+                    }
             }
         }
         return $this;

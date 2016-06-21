@@ -8,7 +8,7 @@
                                 {% if values[ profile.thumb.key ] %}
 						    	    <div class="thumb">
                                         {% if profile.thumb.onclick %}
-                                        <a onClick="{{ profile.thumb.onclick }}">
+                                            <a onClick="{{ profile.thumb.onclick }}">
                                         {% endif %}
                                     
     									<img src="{{ profile.thumb.cdn }}{{ values[ profile.thumb.key ] }}" alt="" style="max-width:{{ profile.thumb.size|default(150) }}px" width="{{ profile.thumb.size|default(150) }}" height="{{ profile.thumb.size|default(150) }}">
@@ -28,6 +28,10 @@
                                     {% endif %}
                                     
                                     {{ values[ profile.desc.keysubtitle ] }}</small></h6>
+
+                                    {% if profile.text %}
+                                        <small>{{ profile.text.prefix|raw }}<span id="profiletk{{ profile.text.key }}">{{ values[ profile.text.key ]|default( profile.text.default ) }}</span>{{ profile.text.sufix|raw }}</small>
+                                    {% endif %}
 
                                     {% if profile.icons %}
     					    			<div class="icons-group">
@@ -79,6 +83,14 @@
 
     {% elseif el.type == 'ti' %}
         <h6 class="heading-hr"><i class="{{ el.icon }}"></i> {{ el.label }}</h6>
+
+    {% elseif el.type == 'cameratag' %}
+        <div>
+            <br />
+            <video width="320" height="240" controls poster="{{ el.appcdn }}{{ val }}_qvga_thumb.png">
+                <source src="{{ el.appcdn }}{{ val }}_qvga.mp4" type="video/mp4">
+            </video>
+        </div>
 
     {% elseif el.type == 'list' %}
         <div class="row block-inner">

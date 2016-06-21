@@ -64,6 +64,11 @@ class myajax{
         return $this;
     }
 
+    public function & cameraTag(){
+        $this->out[ 'ct' ] = 1;
+        return $this;
+    }
+
     public function & focus( $element ){
         $this->out[ 'fu' ] = array( 'e' => $element );
         return $this;
@@ -116,6 +121,11 @@ class myajax{
 
     public function & replacewith( $el, $html ){
         $this->out[ 'rp' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+        return $this;
+    }
+
+    public function & addreplacewith( $el, $html, $grid ){
+        $this->out[ 'ar' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'g' => $grid );
         return $this;
     }
 

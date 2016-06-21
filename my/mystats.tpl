@@ -53,14 +53,14 @@
             {% endif %}
         </div>
         {% if stat.percentagetype %}
-            {% set pervalue = ( stat.percentagekey ? values[ stat.percentagekey ] : stat.percentage )|default(100) %}
+            {% set pervalue = ( stat.percentagekey ? values[ stat.percentagekey ] : stat.percentage )|default(0) %}
             <div class="progress {% if stat.percentagetype == 1 %}progress-micro{% endif %}">
-                <div style="width:{{ pervalue|round(0, 'ceil') }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{ pervalue|round }}" role="progressbar" class="progress-bar progress-bar-{{ type }}">
-                    <span class="sr-only">{{ pervalue }}%</span>
+                <div style="width:{{ pervalue|default(0)|round(0, 'ceil') }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{ pervalue|default(0)|round }}" role="progressbar" class="progress-bar progress-bar-{{ type }}">
+                    <span class="sr-only">{{ pervalue|default(0) }}%</span>
                 </div>
             </div>
         {% endif %}
-        <span>{{ stat.addonlabelpre|raw }}<span id="st{{ stat.key}}lpre">{{ stat.addonlabelprekey ? values[ stat.addonlabelprekey ]|raw }}</span>{{ stat.label|raw }}<span id="st{{ stat.key}}lpos">{{ stat.addonlabelposkey ? values[ stat.addonlabelposkey ]|raw }}</span>{{ stat.addonlabelpos|raw }}</span>
+        <span>{{ stat.addonlabelpre|raw }}<span id="st{{ stat.key}}lpre">{{ stat.addonlabelprekey ? values[ stat.addonlabelprekey ]|default( stat.addonlabelprekeydefault )|raw }}</span>{{ stat.label|raw }}<span id="st{{ stat.key}}lpos">{{ stat.addonlabelposkey ? values[ stat.addonlabelposkey ]|default( stat.addonlabelposkeydefault )|raw }}</span>{{ stat.addonlabelpos|raw }}</span>
     </li>
 {% endfor %}
 </ul>

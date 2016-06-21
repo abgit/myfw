@@ -32,7 +32,7 @@
 {% endif %}
 
                                 		{% for val in values %}
-                                        <tr{% if val[ key ] %} id="{{ val[ key ] }}"{% endif %}>
+                                        <tr{% if val[ key ] %} id="{{ val[ key ] }}"{% endif %}{% if rowclass and val[ rowclassdepends ] %} class="{{ rowclass }}"{% endif %}>
 
                                     		{% for col in labels %}
                                             
@@ -106,7 +106,7 @@
 
                                                         {% elseif td.type == 'ago' %}
                                                             <i class="icon-clock"></i> {{ value|ago }}
-            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ value|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s") }}</span>
+            				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ ( td.keycustomdate ? val[ td.keycustomdate ] : value )|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s" ) }}</span>
 
                                                         {% elseif td.type == 'description' %}
             				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|nl2space|t(36) }}{{ addonpos|raw }}</span>

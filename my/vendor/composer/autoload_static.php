@@ -135,6 +135,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         ),
         'M' => 
         array (
+            'Michelf' => 
+            array (
+                0 => __DIR__ . '/..' . '/michelf/php-markdown',
+            ),
             'Mailgun\\Tests' => 
             array (
                 0 => __DIR__ . '/..' . '/mailgun/mailgun-php/tests',
