@@ -22,7 +22,7 @@ class myfilters{
         return nl2br( $string );
     }
 
-    public static function zeroempty( $string ){
+    public static function nozero( $string ){
         return empty( $string ) ? '' : $string;
     }
 
@@ -40,8 +40,12 @@ class myfilters{
         return $vals;
     }
 
+    public static function toround( $value ){
+        return rtrim( rtrim( $value, "0"), "." );
+    }
+
     public static function satoshi( $amount ){
-        return round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) );
+        return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
     public static function toBTC($satoshi) {

@@ -75,8 +75,8 @@ class myinfo{
         return $this;
     }
 
-    public function & setProfileText( $key, $prefix = '', $sufix = '', $default = '' ){
-        $this->profile[ 'text' ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'default' => $default );
+    public function & setProfileText( $key, $prefix = '', $sufix = '', $default = '', $sufixsingular = '' ){
+        $this->profile[ 'text' ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'default' => $default, 'sufixsingular' => $sufixsingular );
         return $this;
     }
 

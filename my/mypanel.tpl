@@ -181,7 +181,7 @@
                                                             {% set statusdisplay = 1 %}
                                                         {% endif %}
 
-                                                        <i id="pani{{ value[ key ] }}{{ status.key }}" {{ statusdisplay != 1 ? 'style="display:none"' }} class="{{ iconval }}"></i>
+                                                        <i id="pani{{ value[ key ] }}{{ status.key }}" {{ statusdisplay != 1 ? 'style="display:none"' }} class="{{ iconval }}{{ status.keyclass ? ' panicon' ~ value[ status.keyclass ] }}"></i>
                                                     {% elseif status.type == 0 %}
                                                         <span>{{ status.sep }}</span>
 
@@ -243,9 +243,9 @@
                                                                     {% set submenudisplay = 1 %}
                                                                 {% endif %}
                                                             
-                                                                {% set optiondisabled = ( submenu.disabled and ( submenu.disableddepends == true or value[ submenu.disableddepends ] ) ) %}
-                                                            
-                                                                <li {{ optiondisabled ? 'class="disabled"' }} id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href and not optiondisabled %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick and not optiondisabled %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
+                                                                {% set optiondisabled = ( submenu.disabled or ( submenu.disableddepends and value[ submenu.disableddepends ] ) ) %}
+
+                                                                <li class="{{ optiondisabled ? 'disabled' }}{{ submenu.keyclass ? ' panmc' ~ submenu.id ~ value[ submenu.keyclass ] }}" id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href and not optiondisabled %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick and not optiondisabled %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </li>

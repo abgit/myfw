@@ -30,7 +30,7 @@
                                     {{ values[ profile.desc.keysubtitle ] }}</small></h6>
 
                                     {% if profile.text %}
-                                        <small>{{ profile.text.prefix|raw }}<span id="profiletk{{ profile.text.key }}">{{ values[ profile.text.key ]|default( profile.text.default ) }}</span>{{ profile.text.sufix|raw }}</small>
+                                        <small>{{ profile.text.prefix|raw }}<span id="profiletk{{ profile.text.key }}">{{ values[ profile.text.key ]|default( profile.text.default ) }}</span>{{ ( profile.text.sufixsingular and values[ profile.text.key ] == 1 ) ? profile.text.sufixsingular : profile.text.sufix|raw }}</small>
                                     {% endif %}
 
                                     {% if profile.icons %}

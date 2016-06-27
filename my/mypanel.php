@@ -142,8 +142,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addStatusIcon( $key, $icons, $depends = false ){
-        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 2, 'icons' => $icons, 'icon' => is_string( $icons ) ? $icons : false, 'depends' => $depends );
+    public function & addStatusIcon( $key, $icons, $depends = false, $keyclass = '' ){
+        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 2, 'icons' => $icons, 'icon' => is_string( $icons ) ? $icons : false, 'depends' => $depends, 'keyclass' => $keyclass );
         return $this;
     }
 
@@ -159,6 +159,11 @@ class mypanel{
 
     public function & ajaxStatusIconShow( $key, $id, $operation = true ){
         $this->app->ajax()->css( '#pani' . $id . $key, 'display', $operation ? 'inline' : 'none' );
+        return $this;
+    }
+
+    public function & ajaxStatusIconShowClass( $classname, $operation = true ){
+        $this->app->ajax()->css( '.panicon' . $classname, 'display', $operation ? 'inline' : 'none' );
         return $this;
     }
 
@@ -185,6 +190,11 @@ class mypanel{
         return $this;
     }
 
+    public function & ajaxMenuShowClass( $index, $class, $operation = true ){
+        $this->app->ajax()->css( '.panmc' . $index . $class, 'display', $operation ? 'block' : 'none' );
+        return $this;
+    }
+
     public function & addStatusSeparator( $sep = '|' ){
         $this->elements[ 'status' ][] = array( 'type' => 0, 'sep' => $sep );
         return $this;
@@ -206,8 +216,6 @@ class mypanel{
             $this->elements[ 'menu' ][ $menuindex ][ 'options' ][ $subindex ] += array( 'disabled' => true, 'disableddepends' => $depends );
         return $this;
     }
-
-
 
     public function & addToolbarButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $class = '' ){
         $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'class' => $class );

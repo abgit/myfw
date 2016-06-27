@@ -64,6 +64,9 @@
             $this->values = array();
 
             foreach( is_array( $values ) ? $values : json_decode( $values, true ) as $x ){
+                if( !isset( $x[ $this->keyid ] ) || !isset( $x[ $this->keydate ] ) )
+                    continue;
+
                 $val = array( 'id'    => $x[ $this->keyid ],
                               'title' => $this->addonpre . $x[ $this->keytitle ] . $this->addonpos,
                               'start' => $x[ $this->keydate ] );

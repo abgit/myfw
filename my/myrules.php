@@ -147,6 +147,22 @@ class myrules{
         return ( is_numeric( $value ) && $value > 0.01 && $value < 2000 );
     }
 
+    public static function cameratag( $value, $options = '', $input = array() ){
+        if( isset( $value[ 'video_uuid' ] ) ){
+            if( strlen( $value[ 'video_uuid' ] ) < 20 )
+                return false;
+
+            $app = \Slim\Slim::getInstance();
+
+            $json = file_get_contents( 'https://cameratag.com/api/v8/videos/' . $value[ 'video_uuid' ] . '.json?api_key=' . $app->config( 'cameratag.key' ) );
+            $json = json_decode( $json, true );
+
+            return ( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && $json[ 'uuid' ] == $value[ 'video_uuid' ] && $json[ 'app_uuid' ] == $app->config( 'cameratag.appid' ) );
+        }
+
+        return false;
+    }
+
     public static function captcha( $value, $options = '', $input = array() ){
         return( isset( $_SESSION['captcha_string'] ) && strtolower($value) === strtolower( $_SESSION['captcha_string'] ) );
     }

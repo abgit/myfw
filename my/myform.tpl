@@ -94,11 +94,11 @@
 
                         <div class="input-group">
                             <span class="input-group-addon">&#3647;</span>
-                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value}}">
+                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC|toround|nozero}}">
                         </div>
                         <span class="label label-block label-primary text-center">
                             {% for cur in el.currencies %}
-                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.rate }}">{{ cur.symbol }} {{ ( cur.rate * el.value )|number_format(2, '.', '') }}</span>
+                                <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.rate }}">{{ cur.symbol }} {{ ( cur.rate * el.value|toBTC )|number_format(2, '.', '') }}</span>
                                 {% if not loop.last %}
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 {% endif %}

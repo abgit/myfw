@@ -34,6 +34,12 @@
                 $html = $text;
             }
 
+            // global replace
+            if( ( $replace = $this->app->config( 'email.replace' ) ) && is_array( $replace ) ){
+                $html = str_replace( array_keys( $replace ), array_values( $replace ), $html );
+                $text = str_replace( array_keys( $replace ), array_values( $replace ), $text );
+            }
+
             // comput mailgun email header
             $email = array( 'from' => $from, 'to' => $to, 'subject' => $subject, 'text' => is_string( $text ) ? $text : '', 'html' => $html ) + $mailgunoptions;
 
