@@ -41,7 +41,7 @@
 
                                                     {% set value = val[ td.kval ] %}
 
-                                                    {% if value is not empty or td.type == 'menu' or td.type == 'br' or td.type == 'space'  %}
+                                                    {% if value is not empty or td.type == 'menu' or td.type == 'br' or td.type == 'space' or td.default %}
 
                                                         {% if td.replace %}
                                                             {% set value = value|replace( td.replace ) %}
@@ -83,7 +83,7 @@
                 				                            	<a onclick="{{ td.onclick|replace({ (keyhtml): val[ key ] }) }}">
                                                             {% endif %}
 
-                                                            <img src="{{ td.cdn }}{{ value }}" alt="" class="user-face">
+                                                            <img src="{{ value|default( td.default ) }}" alt="" class="user-face">
 
                                                             {% if td.onclick %}
                 				                            	</a>

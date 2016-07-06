@@ -1,56 +1,5 @@
 [
     {
-        "name": "transloadit/php-sdk",
-        "version": "v2.0.0",
-        "version_normalized": "2.0.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/transloadit/php-sdk.git",
-            "reference": "9067c60d062d5da64711251f0f83008d9a079cad"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/transloadit/php-sdk/zipball/9067c60d062d5da64711251f0f83008d9a079cad",
-            "reference": "9067c60d062d5da64711251f0f83008d9a079cad",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "3.7.*",
-            "satooshi/php-coveralls": "dev-master"
-        },
-        "time": "2014-01-23 14:15:05",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "transloadit": "lib"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "Transloadit SDK",
-        "homepage": "https://github.com/transloadit/php-sdk",
-        "keywords": [
-            "Thumbnails",
-            "audio",
-            "document",
-            "encoding",
-            "file",
-            "image",
-            "processing",
-            "resizing",
-            "transloadit",
-            "uploading",
-            "video",
-            "waveform"
-        ]
-    },
-    {
         "name": "slim/slim",
         "version": "2.6.2",
         "version_normalized": "2.6.2.0",
@@ -549,7 +498,8 @@
             "http client",
             "rest",
             "web service"
-        ]
+        ],
+        "abandoned": "guzzlehttp/guzzle"
     },
     {
         "name": "mailgun/mailgun-php",
@@ -847,52 +797,6 @@
         ]
     },
     {
-        "name": "pusher/pusher-php-server",
-        "version": "v2.4.1",
-        "version_normalized": "2.4.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/pusher/pusher-http-php.git",
-            "reference": "b3984a9f6fd65e39b7d6de9bb7d67656ff286f0f"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/b3984a9f6fd65e39b7d6de9bb7d67656ff286f0f",
-            "reference": "b3984a9f6fd65e39b7d6de9bb7d67656ff286f0f",
-            "shasum": ""
-        },
-        "require": {
-            "ext-curl": "*",
-            "php": ">=5.2"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "~4"
-        },
-        "time": "2016-05-27 08:42:18",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "lib/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "Library for interacting with the Pusher REST API",
-        "homepage": "https://github.com/pusher/pusher-php-server",
-        "keywords": [
-            "events",
-            "php-pusher-server",
-            "publish",
-            "pusher",
-            "realtime",
-            "rest",
-            "trigger"
-        ]
-    },
-    {
         "name": "guzzlehttp/promises",
         "version": "1.2.0",
         "version_normalized": "1.2.0.0",
@@ -944,68 +848,6 @@
         "keywords": [
             "promise"
         ]
-    },
-    {
-        "name": "symfony/event-dispatcher",
-        "version": "v2.8.7",
-        "version_normalized": "2.8.7.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/event-dispatcher.git",
-            "reference": "2a6b8713f8bdb582058cfda463527f195b066110"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/2a6b8713f8bdb582058cfda463527f195b066110",
-            "reference": "2a6b8713f8bdb582058cfda463527f195b066110",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.9"
-        },
-        "require-dev": {
-            "psr/log": "~1.0",
-            "symfony/config": "~2.0,>=2.0.5|~3.0.0",
-            "symfony/dependency-injection": "~2.6|~3.0.0",
-            "symfony/expression-language": "~2.6|~3.0.0",
-            "symfony/stopwatch": "~2.3|~3.0.0"
-        },
-        "suggest": {
-            "symfony/dependency-injection": "",
-            "symfony/http-kernel": ""
-        },
-        "time": "2016-06-06 11:11:27",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.8-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\EventDispatcher\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony EventDispatcher Component",
-        "homepage": "https://symfony.com"
     },
     {
         "name": "michelf/php-markdown",
@@ -1167,6 +1009,165 @@
             "message",
             "stream",
             "uri"
+        ]
+    },
+    {
+        "name": "transloadit/php-sdk",
+        "version": "v2.1.0",
+        "version_normalized": "2.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/transloadit/php-sdk.git",
+            "reference": "b6f3740567a9ab8b5e993c4ffdae79567d5b3046"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/transloadit/php-sdk/zipball/b6f3740567a9ab8b5e993c4ffdae79567d5b3046",
+            "reference": "b6f3740567a9ab8b5e993c4ffdae79567d5b3046",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*",
+            "satooshi/php-coveralls": "0.7.0"
+        },
+        "time": "2016-06-28 17:19:40",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "transloadit": "lib"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Transloadit SDK",
+        "homepage": "https://github.com/transloadit/php-sdk",
+        "keywords": [
+            "Thumbnails",
+            "audio",
+            "document",
+            "encoding",
+            "file",
+            "image",
+            "processing",
+            "resizing",
+            "transloadit",
+            "uploading",
+            "video",
+            "waveform"
+        ]
+    },
+    {
+        "name": "symfony/event-dispatcher",
+        "version": "v2.8.8",
+        "version_normalized": "2.8.8.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/event-dispatcher.git",
+            "reference": "b180b70439dca70049b6b9b7e21d75e6e5d7aca9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/b180b70439dca70049b6b9b7e21d75e6e5d7aca9",
+            "reference": "b180b70439dca70049b6b9b7e21d75e6e5d7aca9",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.9"
+        },
+        "require-dev": {
+            "psr/log": "~1.0",
+            "symfony/config": "~2.0,>=2.0.5|~3.0.0",
+            "symfony/dependency-injection": "~2.6|~3.0.0",
+            "symfony/expression-language": "~2.6|~3.0.0",
+            "symfony/stopwatch": "~2.3|~3.0.0"
+        },
+        "suggest": {
+            "symfony/dependency-injection": "",
+            "symfony/http-kernel": ""
+        },
+        "time": "2016-06-29 05:29:29",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.8-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\EventDispatcher\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "pusher/pusher-php-server",
+        "version": "v2.4.2",
+        "version_normalized": "2.4.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pusher/pusher-http-php.git",
+            "reference": "1120029fa16bfc92da06971df4a370a1b69c74c1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/1120029fa16bfc92da06971df4a370a1b69c74c1",
+            "reference": "1120029fa16bfc92da06971df4a370a1b69c74c1",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": ">=5.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4"
+        },
+        "time": "2016-07-04 13:08:05",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "lib/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Library for interacting with the Pusher REST API",
+        "homepage": "https://github.com/pusher/pusher-php-server",
+        "keywords": [
+            "events",
+            "php-pusher-server",
+            "publish",
+            "pusher",
+            "realtime",
+            "rest",
+            "trigger"
         ]
     }
 ]

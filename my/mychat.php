@@ -15,11 +15,12 @@
         private $keyowner;
         private $keydate;
         private $keythumb;
-        private $keythumbcdn;
+        private $keythumbdefault;
         private $keyme;
         private $buttons = array();
         private $windowid;
         private $channel;
+        private $filestack;
 
         public function __construct( $id ){
             $this->app  = \Slim\Slim::getInstance();
@@ -85,9 +86,9 @@
             return $this;
         }
 
-        public function & setThumb( $key, $cdn = '' ){
-            $this->keythumb    = $key;
-            $this->keythumbcdn = $cdn;
+        public function & setThumb( $key, $default = '' ){
+            $this->keythumb        = $key;
+            $this->keythumbdefault = $default;
             return $this;
         }
 
@@ -119,6 +120,14 @@
             return ( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && $this->app->rules()->md5( $_POST[ 'img' ] ) ) ? $_POST[ 'img' ] : false;
         }
 
+        public function getFilestackImage(){
+            return ( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) ) ? $_POST[ 'img' ] : false;
+        }
+
+        public function getFilestackMovie(){
+            return ( isset( $_POST[ 'mov' ] ) && is_string( $_POST[ 'mov' ] ) ) ? $_POST[ 'mov' ] : false;
+        }
+
         public function addAjax( $values ){
             $this->init   = false;
             $this->values = $values;
@@ -148,6 +157,12 @@
 
         public function & ajaxClearTextarea(){
             $this->app->ajax()->val( '#' . $this->id . 'msg', '' );
+            return $this;
+        }
+
+        public function & setFilestack( $urlimage, $urlvideo ){
+            $this->filestack[ 'urlimage' ] = $urlimage;
+            $this->filestack[ 'urlvideo' ] = $urlvideo;
             return $this;
         }
 
@@ -190,11 +205,15 @@
             return $this;
         }
 
+        public function getTransloadit(){
+            return is_array( $this->transloadit ) ? 1 : 0;
+        }
 
         public function obj(){
             return array( 'values'      => $this->values,
                           'message'     => $this->message,
                           'transloadit' => $this->transloadit,
+                          'filestack'   => $this->filestack,
                           'windowid'    => $this->windowid,
                           'urlimage'    => $this->urlimage,
                           'formname'    => $this->formname,
@@ -203,7 +222,7 @@
                           'keyowner'    => $this->keyowner,
                           'keydate'     => $this->keydate,
                           'keythumb'    => $this->keythumb,
-                          'keythumbcdn' => $this->keythumbcdn,
+                          'keythumbdefault' => $this->keythumbdefault,
                           'keyme'       => $this->keyme,
                           'cdn'         => $this->cdn,
                           'id'          => $this->id,

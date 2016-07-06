@@ -127,11 +127,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addThumb( $key, $kval, $kvals, $label = '', $onclick = '', $cdn = '' ){
+    public function & addThumb( $key, $kval, /*$kvals,*/ $label = '', $onclick = '', $default = '' /*$cdn = ''*/ ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => ( !empty( $kvals ) && $this->app->ishttps() ) ? $kvals : $kval, 'type' => 'thumb', 'onclick' => $onclick, 'cdn' => $cdn );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => /*( !empty( $kvals ) && $this->app->ishttps() ) ? $kvals :*/ $kval, 'type' => 'thumb', 'onclick' => $onclick, 'default' => $default );
         return $this;
     }
 

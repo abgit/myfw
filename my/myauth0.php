@@ -5,42 +5,32 @@
     class myauth0{
 
 	    private $auth0;
-        private $params;
     
         public function __construct(){
             $this->app = \Slim\Slim::getInstance();
 
             if( $this->app->config( 'auth0.driver' ) === 'heroku' ){
-                $this->params = array(
-                    'domain'        => getenv( 'AUTH0_DOMAIN' ),
-                    'client_id'     => getenv( 'AUTH0_CLIENT_ID' ),
-                    'client_secret' => getenv( 'AUTH0_CLIENT_SECRET' ),
-                    'redirect_uri'  => getenv( 'AUTH0_CALLBACK_URL' ),
-                    'persist_access_token' => true
-                );
+                    $this->app->config( 'auth0.domain',       '@AUTH0_DOMAIN' );
+                    $this->app->config( 'auth0.clientid',     '@AUTH0_CLIENT_ID' );
+                    $this->app->config( 'auth0.clientsecret', '@AUTH0_CLIENT_SECRET' );
+                    $this->app->config( 'auth0.redirecturi',  '@AUTH0_CALLBACK_URL' );
+
             }elseif( $this->app->config( 'auth0.driver' ) === 'fortrabbit' ){
-                $this->params = array(
-                    'domain'        => getenv( 'AUTH0_DOMAIN' ),
-                    'client_id'     => getenv( 'AUTH0_CLIENT_ID' ),
-                    'client_secret' => $this->app->configdecrypt( getenv( 'AUTH0_CLIENT_SECRET' ) ),
-                    'redirect_uri'  => getenv( 'AUTH0_CALLBACK_URL' ),
-                    'persist_access_token' => true
-                );
-            }else{
-                $this->params = array(
+                    $this->app->config( 'auth0.domain',       '@AUTH0_DOMAIN' );
+                    $this->app->config( 'auth0.clientid',     '@AUTH0_CLIENT_ID' );
+                    $this->app->config( 'auth0.clientsecret', '#AUTH0_CLIENT_SECRET' );
+                    $this->app->config( 'auth0.redirecturi',  '@AUTH0_CALLBACK_URL' );
+            }
+
+            $this->auth0 = new Auth0( array(
                     'domain'        => $this->app->config( 'auth0.domain' ),
                     'client_id'     => $this->app->config( 'auth0.clientid' ),
                     'client_secret' => $this->app->config( 'auth0.clientsecret' ),
                     'redirect_uri'  => $this->app->config( 'auth0.redirecturi' ),
                     'persist_access_token' => true
-                );
-            }
+                ) );
 
-            $this->auth0 = new Auth0( $this->params );
-        }
-
-        public function getParams( $key ){
-            return isset( $this->params[ $key ] ) ? $this->params[ $key ] : '';
+            $this->app->config( 'auth0.accesstoken', $this->auth0->getAccessToken() );
         }
 
         public function islogged(){
@@ -74,14 +64,13 @@
         
         public function logoutURL( $global = false ){
 
-            $cid = $global ? '' : ( '&client_id=' . $this->params[ 'client_id' ] );
+            $cid = $global ? '' : ( '&client_id=' . $this->app->config( 'auth0.clientid' ) );
 
             if( $this->app->client[ 'provider' ] == 'facebook' ){
-                return 'https://' . $this->params[ 'domain' ] . '/logout?access_token=' . $this->app->client[ 'identities' ][0][ 'access_token' ] . '&returnTo=' . urlencode( 'https://' . $this->params[ 'domain' ]. '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid );
+                return 'https://' . $this->app->config( 'auth0.domain' ) . '/logout?access_token=' . $this->app->client[ 'identities' ][0][ 'access_token' ] . '&returnTo=' . urlencode( 'https://' . $this->app->config( 'auth0.domain' ). '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid );
             }else{
-                return 'https://' . $this->params[ 'domain' ] . '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid;
+                return 'https://' . $this->app->config( 'auth0.domain' ) . '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid;
             }
         }
 
     }
-?>

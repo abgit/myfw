@@ -369,6 +369,32 @@ class myform{
         return $this;
     }
 
+    public function & addFilestack( $name, $keythumb, $label, $width = 100, $height = 100, $options = array(), $help = '' ){
+
+        $secret    = $this->app->config( 'filestack.secret' );
+        $policy    = '{"expiry":' . ( time() + 3600 ) . ',"call":["pick","store"]}';
+        $policy64  = base64_encode( $policy );
+        $signature = hash_hmac( 'sha256', $policy64, $secret );
+        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'keythumb' => $keythumb, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'security' => $security );
+
+        $this->addRule( function() use ( $name ){
+            return ( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 /*|| $_POST[ $this->formname . $name ] === $this->app->config( 'filestack.default' )*/ ) ) ? true : 'Invalid image';
+        });
+        return $this;
+    }
+
+    public function & addFilestackWebcam( $name, $label, $width = 320, $height = 240, $options = array(), $help = '' ){
+
+        $this->elements[ $name ] = array( 'type' => 'filestackwebcam', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.defaultcam' ), 'help' => $help );
+
+        $this->addRule( function() use ( $name ){
+            return ( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 /*|| $_POST[ $this->formname . $name ] === $this->app->config( 'filestack.default' )*/ ) ) ? true : 'Invalid recording';
+        });
+        return $this;
+    }
+    
     public function & addSeparator(){
         $this->elements[ 'sep' . $this->counter++ ] = array( 'type' => 'separator', 'rules' => array(), 'filters' => array() );
         return $this;
@@ -713,18 +739,23 @@ class myform{
 
             $csrfname = $this->csrfname;
             $csrf     = $this->app->session()->get( $csrfname, '' );
-            $csrfnew  = $this->getRandom( 8 );
 
             $this->addRule( function() use( $csrf, $csrfname ){
                 return ( is_string( $csrf ) && !empty( $csrf ) && isset( $_POST[ $csrfname ] ) && $csrf === $_POST[ $csrfname ] ) ? true : 'csrf protection';
             });
 
-
-            $this->app->session()->set( $csrfname, $csrfnew );
             $this->csrfinit = true;
-		
-            // add csrf to ajax
-            $this->app->ajax()->addFormCsrf( $csrfname, $csrfnew );
+
+            // overwrite csrf if form is not submitted only
+            if( !$this->isSubmitted() ){
+
+                $csrfnew = $this->getRandom( 8 );
+
+                $this->app->session()->set( $csrfname, $csrfnew );
+
+                // add csrf to ajax
+                $this->app->ajax()->addFormCsrf( $csrfname, $csrfnew );
+            }
         }
 
     }
@@ -800,9 +831,10 @@ class myform{
         foreach( $this->elements as $n => $el ){
             if( $el[ 'type' ] == 'transloadit' ){
                 $transloadit = 1;
+                d( $el );
             }
             if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
-                $transloadit   = 1;
+                $transloadit   = $el[ 'obj' ]->getTransloadit();
                 $chatscroll    = '#' . $el[ 'obj' ]->getWindowId();
                 $pusherchannel = $el[ 'obj' ]->getChannel();
             }
@@ -811,6 +843,8 @@ class myform{
         // if modal undefined, create one
         if( ! isset( $this->modal['id'] ) )
             $this->setModal();
+
+//        $this->applyCsrf();
 
         $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel );
         return $this;

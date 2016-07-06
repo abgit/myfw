@@ -5,13 +5,13 @@
     <div class="col-lg-{{ meta.size|default( 4 ) }}">
 
 							<div class="thumbnail">
-                                {% if values[ profile.thumb.key ] %}
+                                {% if values[ profile.thumb.key ] or profile.thumb.default %}
 						    	    <div class="thumb">
                                         {% if profile.thumb.onclick %}
                                             <a onClick="{{ profile.thumb.onclick }}">
                                         {% endif %}
                                     
-    									<img src="{{ profile.thumb.cdn }}{{ values[ profile.thumb.key ] }}" alt="" style="max-width:{{ profile.thumb.size|default(150) }}px" width="{{ profile.thumb.size|default(150) }}" height="{{ profile.thumb.size|default(150) }}">
+    									<img width="{{ profile.thumb.size }}" height="{{ profile.thumb.size }}" src="{{ profile.thumb.cdn }}{{ values[ profile.thumb.key ]|default( profile.thumb.default ) }}">
 
                                         {% if profile.thumb.onclick %}
                                         </a>

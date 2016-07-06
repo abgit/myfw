@@ -75,6 +75,8 @@
         private $pusher      = null;
         private $memcached   = null;
 
+        public  $onDBError   = null;
+
         public function __construct( $arr = array() ){
             parent::__construct( $arr );
             $this->hook( 'slim.before.dispatch', function(){
@@ -113,13 +115,14 @@
 
                     if( isset( $route[0] ) ){
                         $this->session()->set( $h . 'confirm', 1 );
-                        
+
                         if( isset( $obj[ 'postvars' ] ) )
                             $_POST = $obj[ 'postvars' ];
-                        
+
                         return $route[0]->dispatch();
                     }
                 }
+
                 $this->notFound();
 
             })->name( 'myfwconfirm' )->conditions( array( 'h' => 'cf[a-f0-9]{32}' ) );
@@ -487,6 +490,10 @@
             $this->on2Fcall = $callback;
         }
 
+        public function onDBError( $callback ){
+            $this->onDBError = $callback;
+        }
+
         public function before2Factor( $callback ){
             $this->bef2Fcall = $callback;
         }
@@ -521,6 +528,10 @@
 
                 $env->addFunction( new Twig_SimpleFunction( '_n', '_n' ) );
                 $env->addFunction( new Twig_SimpleFunction( 'd', 'var_export' ) );
+
+                $env->addFunction( new Twig_SimpleFunction( 'c', function( $value ) {
+                    return $this->config( $value );
+                }, array( 'is_safe' => array( 'html' ) ) ) );
 
                 $env->addFilter( new Twig_SimpleFilter( 'cdn', array( 'myfilters', 'cdn' )
                 , array( 'is_safe' => array( 'html' ) ) ) );
@@ -680,7 +691,7 @@
 //                    $app->ajax()->login()->render();
 //                }
 //            }
-                $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $app->config( 'app.logouturl' ) )->render() : $app->redirect( $app->config( 'app.logouturl' ) );
+                $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $app->config( 'app.logouturl' ) )->render() : $app->redirect( $app->config( 'app.logouturl' ) );
                 $app->stop();
         }
     }

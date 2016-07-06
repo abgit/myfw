@@ -67,8 +67,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '', $classkey = '' ){
-        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick, 'classkey' => $classkey );
+    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '', $classkey = '', $default = '' ){
+        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick, 'classkey' => $classkey, 'default' => $default );
         return $this;
     }
     
@@ -137,8 +137,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addStatus( $key, $prefix = '', $sufix = '' ){
-        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1, 'prefix' => $prefix, 'sufix' => $sufix );
+    public function & addStatus( $key, $prefix = '', $sufix = '', $sufixsingular = '' ){
+        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1, 'prefix' => $prefix, 'sufix' => $sufix, 'sufixsingular' => $sufixsingular );
         return $this;
     }
 
@@ -168,7 +168,7 @@ class mypanel{
     }
 
     public function & ajaxThumbChange( $src, $class ){
-        $this->app->ajax()->attr( '.pt' . $class, 'src', $src );
+        $this->app->ajax()->attr( '.pt' . $class, 'src', ( is_string( $src ) && strlen( $src ) ) ? $src : ( isset( $this->elements[ 'thumb' ][ 'default' ] ) ? $this->elements[ 'thumb' ][ 'default' ] : '' ) );
         return $this;
     }
 

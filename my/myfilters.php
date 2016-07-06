@@ -48,6 +48,22 @@ class myfilters{
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
+    public static function filestack( $url ){
+
+        $url = substr( $url, 33 );
+
+        if( empty( $url ) )
+            return '';
+
+        $secret    = \Slim\Slim::getInstance()->config( 'filestack.secret' );
+        $policy    = '{"expiry":' . ( time() + 3600 ) . ',"call":"read"}';
+        $policy64  = base64_encode( $policy );
+        $signature = hash_hmac( 'sha256', $policy64, $secret );
+        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+
+        return 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $url;
+    }
+
     public static function toBTC($satoshi) {
         return bcdiv((int)(string)$satoshi, 100000000, 8);
     }

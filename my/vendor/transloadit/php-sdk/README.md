@@ -12,7 +12,7 @@ If you are on `v0.10.0` or below, just pull-updating to the latest `v1.x.x `will
 ## Purpose
 
 This is the official PHP SDK for the
-[transloadit.com](http://transloadit.com/) API.
+[transloadit.com](https://transloadit.com/) API.
 
 You can use it to setup file upload forms for your users, or to upload
 existing files from your server.
@@ -24,17 +24,17 @@ existing files from your server.
 Step 1. Create a new project and install Composer
 
 ```bash
-mkdir transloadit-client && cd $_
-curl -s http://getcomposer.org/installer | php
+mkdir my-app && cd $_
+curl -sSL http://getcomposer.org/installer | php
 ```
 
 Step 2. Create composer file:
 
 ```bash
-$EDITOR composer.json
+${EDITOR} composer.json
 ```
 
-Step 3. Add the Transloadit PHP SDK as a dependency
+Step 3. Add the Transloadit PHP SDK as a dependency. Consider switching 'dev-master' with the latest version in order to pin your dependencies:
 
 ```json
 {
@@ -44,7 +44,7 @@ Step 3. Add the Transloadit PHP SDK as a dependency
 }
 ```
 
-Step 4. Install the composer dependency, this downloads the sdk for you
+Step 4. Install the composer dependency, this downloads the SDK for you
 
 ```bash
 php composer.phar install --dev
@@ -75,11 +75,12 @@ Transloadit instance like this
 <?php
 use transloadit\Transloadit;
 $transloadit = new Transloadit(array(
-  'key' => 'your-key',
+  'key'    => 'your-key',
   'secret' => 'your-secret',
 ));
 
 // Example code goes here!
+?>
 ```
 
 **Note:** All of the examples below can be found and run from within the
@@ -231,6 +232,47 @@ document.write(unescape("%3Cscript src='" + tlProtocol + "assets.transloadit.com
 </form>
 
 ```
+
+### 4. Fetch the assembly status JSON
+
+You can just use the TransloaditRequest class to get the job done easily.
+
+```php
+<?php
+$assemblyId = 'YOUR_ASSEMBLY_ID';
+
+$req = new transloadit\TransloaditRequest();
+$req->path = 'assemblies/' . $assemblyId;
+$response = $req->execute();
+
+echo '<pre>';
+print_r($response);
+echo '</pre>';
+
+```
+
+### 5. Signature Authentication
+
+... is done by the PHP SDK by default and internally. You do not need to worry about this at all. :)
+
+```php
+<?php
+
+// There is no need to supply a signature field here or anything.
+$response = $transloadit->createAssembly(array(
+  'files' => array(dirname(__FILE__).'/fixture/straw-apple.jpg'),
+  'params' => array(
+    'steps' => array(
+      'resize' => array(
+        'robot' => '/image/resize',
+        'width' => 200,
+        'height' => 100,
+      )
+    )
+  ),
+));
+
+```
 <!-- End of generated doc section -->
 
 ## API
@@ -271,7 +313,7 @@ you to set custom form attributes. For example:
 ```php
 $Transloadit->createAssemblyForm(array(
   'attributes' => array(
-    'id' => 'my_great_upload_form',
+    'id'    => 'my_great_upload_form',
     'class' => 'transloadit_form',
   ),
 ));
@@ -293,11 +335,11 @@ your server.
 
 There are two kinds of notifications this method handles:
 
-* When using the `"redirect_url"` parameter, and Transloadit redirects
+- When using the `redirect_url` parameter, and Transloadit redirects
   back to your site, a `$_GET['assembly_url']` query parameter gets added.
   This method detects the presence of this parameter and fetches the current
   assembly status from that url and returns it as a `TransloaditResponse`.
-* When using the `"notify_url"` parameter, Transloadit sends a
+- When using the `notify_url` parameter, Transloadit sends a
   `$_POST['transloadit']` parameter. This method detects this, and parses
   the notification JSON into a `TransloaditResponse` object for you.
 
@@ -397,9 +439,9 @@ Returns `false` or a string containing an explanation of what went wrong.
 
 All of the following will cause an error string to be returned:
 
-* Network issues of any kind
-* The Transloadit response JSON contains an `{"error": "..."}` key
-* A malformed response was received
+- Network issues of any kind
+- The Transloadit response JSON contains an `{"error": "..."}` key
+- A malformed response was received
 
 ## Contributing
 
@@ -417,20 +459,27 @@ Releases will be numbered with the following format:
 
 And constructed with the following guidelines:
 
-* Breaking backward compatibility bumps the major (and resets the minor and patch)
-* New additions without breaking backward compatibility bumps the minor (and resets the patch)
-* Bug fixes and misc changes bumps the patch
+- Breaking backward compatibility bumps the major (and resets the minor and patch)
+- New additions without breaking backward compatibility bumps the minor (and resets the patch)
+- Bug fixes and misc changes bumps the patch
 
 For more information on SemVer, please visit http://semver.org/.
 
 ## Versions
 
-
-
 ### [master](https://github.com/transloadit/php-sdk/tree/master)
 
-diff: https://github.com/transloadit/php-sdk/compare/v1.0.1...master
+diff: https://github.com/transloadit/php-sdk/compare/v2.1.0...master
 
+### [v2.1.0](https://github.com/transloadit/php-sdk/tree/v2.1.0)
+
+ - Fix for CURL deprecated functions (thanks @ABerkhout)
+ - CI improvements (phpunit, travis, composer)
+ - Add example for fetching the assembly status
+ - Add ability to set additional curl_setopt (thanks @michaelkasper)
+
+diff: https://github.com/transloadit/php-sdk/compare/v2.0.0...2.1.0
+ 
 ### [v2.0.0](https://github.com/transloadit/php-sdk/tree/v2.0.0)
 
  - Retire host + protocol in favor of one endpoint property,
@@ -494,8 +543,3 @@ diff: https://github.com/transloadit/php-sdk/compare/v0.1...v0.2
 ### [v0.1](https://github.com/transloadit/php-sdk/tree/v0.1)
 
 The very first version
-
-
-
-
-

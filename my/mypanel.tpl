@@ -45,7 +45,7 @@
                                 <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ cdn }}{{ value[ elements.back.key ] }}){% endif %}">
 									<div class="with-padding"{% if action %} onclick="{{ action|replaceurl( value, tags ) }}" style="margin: 0px;cursor:pointer;min-height:150px"{% else %} style="min-height:150px"{% endif %}>
 
-                                        {% if elements.thumb.static or value[ elements.thumb.key ] %}
+                                        {% if elements.thumb.static or value[ elements.thumb.key ] or elements.thumb.default %}
 
     										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
                                                 
@@ -53,7 +53,7 @@
                                                     <a onclick="{{ elements.thumb.onclick|replaceurl( value, tags ) }}">
                                                 {% endif %}
 
-                                                <img class="pt{{ value[ elements.thumb.classkey ] }}" style="margin-top:10px;margin-left:-10px" src="{{ cdn }}{% if elements.thumb.static %}{{ elements.thumb.key|raw }}{% else %}{{ value[ elements.thumb.key ] }}{% endif %}">
+                                                <img class="pt{{ value[ elements.thumb.classkey ] }}" style="margin-top:10px;margin-left:-10px" src="{% if elements.thumb.static %}{{ cdn }}{{ elements.thumb.key|raw }}{% else %}{{ cdn }}{{ value[ elements.thumb.key ]|default( elements.thumb.default ) }}{% endif %}">
 
                                                 {% if elements.thumb.onclick %}
                                                     </a>
@@ -166,7 +166,7 @@
                                                     <span>
                                             {% for status in elements.status %}
                                                     {% if status.type == 1 %}
-                                                        <span>{{ status.prefix|raw }}{{ value[ status.key ]|t(90)}}{{ status.sufix|raw }}</span>
+                                                        <span>{{ status.prefix|raw }}{{ value[ status.key ]|t(90)}}{{ ( status.sufixsingular and value[ status.key ] == 1 ) ? status.sufixsingular|raw : status.sufix|raw }}</span>
                                                     {% elseif status.type == 2 %}
                                                     
                                                         {% if status.icon %}

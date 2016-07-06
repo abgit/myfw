@@ -65,8 +65,8 @@ class myinfo{
         return $this;
     }
 
-    public function & setProfileThumb( $key, $size = 150, $cdn = '', $onclick = '' ){
-        $this->profile[ 'thumb' ] = array( 'key' => $key, 'size' => $size, 'cdn' => $cdn, 'onclick' => $onclick );
+    public function & setProfileThumb( $key, $size = 150, $default = '', $cdn = '', $onclick = '' ){
+        $this->profile[ 'thumb' ] = array( 'key' => $key, 'size' => $size, 'default' => $default, 'cdn' => $cdn, 'onclick' => $onclick );
         return $this;
     }
 

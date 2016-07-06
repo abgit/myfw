@@ -39,15 +39,15 @@
         
         public function & msg( $msgs = null, $headers = null ){
 
+            $errcode = $this->app->db()->errorCode();
+
             if( is_array( $msgs ) ){
-                $errcode = $this->app->db()->errorCode();
                 if( isset( $msgs[ $errcode ] ) ){
-                    $this->app->ajax()->msgError( $msgs[ $errcode ], isset( $headers[ $errcode ] ) ? $headers[ $errcode ] : null );
+                    $this->app->ajax()->msgError( $msgs[ $errcode ], isset( $headers[ $errcode ] ) ? $headers[ $errcode ] : ( is_string( $headers ) ? $headers : null ) );
                     return $this;
                 }
             }
 
-            $this->app->ajax()->msgWarning( $this->app->config( 'db.debug' ) === true ? $this->errorInfo() : 'Database error' );
             return $this;
         }
 
@@ -111,7 +111,7 @@
                         case 'str' :
                         case 'varchar' :
                         default :           $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, ( isset( $args[2] ) ? $args[2] : 0 ) ) : null;
+                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) ) ? substr( $values[ $column_name ], 0, ( isset( $args[2] ) ? $args[2] : 0 ) ) : null;
                     }
 
                     // add elements
@@ -132,12 +132,23 @@
             return $this->stmt;
         }
 
+        private function getErrorResult(){
+
+            if( is_callable( array( $this->app, 'onDBError' ) ) )
+                call_user_func( $this->app->onDBError, $this->errorCode() );
+
+            if( $this->app->config( 'db.debug' ) === true )
+                $this->app->request->isAjax() ? $this->app->ajax()->msgWarning( $this->errorInfo(), 'Debug' ) : d( $this->errorCode() . $this->errorInfo() );
+
+            return is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
+        }
+
         public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){
 
             try{
                 $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );		
             }catch( ErrorException $e ){
-                $result = is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
+                $result = $this->getErrorResult();
                 return false;
             }
             return ( count( $result ) > 0 );
@@ -170,7 +181,7 @@
             try{
                 $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
             }catch( ErrorException $e ){
-                $result = is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
+                $result = $this->getErrorResult();
                 return false;
             }
 
@@ -191,7 +202,7 @@
             try{
                 $result = $this->query( $procedure, $args )->fetchAll();
             }catch( ErrorException $e ){
-                $result = is_null( $this->stmt ) ? 0 : intval( $this->stmt->errorCode() );
+                $result = $this->getErrorResult();
                 return false;
             }
             
