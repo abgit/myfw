@@ -92,6 +92,21 @@
             </video>
         </div>
 
+    {% elseif el.type == 'filestackmovie' %}
+
+        {% if val %}
+            {% set mp4 = ( val|filestackmovie( 'mp4' ) ) %}
+            {% if mp4 %}        
+                <div>
+                    <br />
+                    <video width="{{ val|filestackmovie( 'width' ) }}" height="{{ val|filestackmovie( 'height' ) }}" controls poster="{{ val|filestackmovie( 'poster' ) }}">
+                        <source src="{{ mp4 }}" type="video/mp4">
+                    </video>
+                </div>
+            {% endif %}
+        {% endif %}
+
+
     {% elseif el.type == 'list' %}
         <div class="row block-inner">
             <div class="col-sm-12">

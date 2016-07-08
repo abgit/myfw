@@ -95,6 +95,11 @@ class myinfo{
         return $this;
     }
 
+    public function & addProfileFileStackMovie( $key ){
+        $this->elements[] = array( 'type' => 'filestackmovie', 'key' => $key );
+        return $this;
+    }
+
     public function & addList( $key, $options ){
         $this->elements[] = array( 'key' => $key, 'options' => $options, 'type' => 'list' );
         return $this;

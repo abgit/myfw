@@ -10,11 +10,14 @@
                                 {% if keythumb %}
                                     <img class="message-img" width="40" height="40" src="{{ msg[ keythumb ]|default( keythumbdefault ) }}">
                                 {% endif %}
-                                <div class="message-body">
+
+                                <div class="message-body chatadmin">
                                     {% if msg[ message.key ] %}
                                         {{ msg[ message.key ]|t(15000)|nl2br }}
+
                                     {% elseif msg[ message.imgkey ] %}
                                         <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" class="img-responsive" width="{{ msg[ message.imgwidth ] }}" height="{{ msg[ message.imgheight ] }}" />
+
                                     {% elseif msg[ message.moviekeythumb ] %}
                                         <video poster="{{ cdn }}{{ msg[ message.moviekeythumb ] }}" width="{{ msg[ message.moviekeywidth ] }}" height="{{ msg[ message.moviekeyheight ] }}" controls>
                                           {% if message.moviekeymp4 %}<source src="{{ cdn }}{{ msg[ message.moviekeymp4 ] }}" type="video/mp4">{% endif %}
@@ -26,7 +29,7 @@
                                     
                                     {% if keyowner or keydate %}
                                     <span class="attribution">
-                                        {{msg[ keyowner ]|t(40)}}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}
+                                        {{msg[ keyowner ]|t(40)}}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}{% if message.label and msg[ message.labeldepends ] %}, <b>{{ message.label }}</b>{% endif %}
                                     </span>
                                     {% endif %}
 
@@ -64,8 +67,8 @@
                         {% endif %}
 
                         {% if filestack %}
-                            &nbsp;<button onClick="filepicker.pick({mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},function(Blob){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blob.url}); });" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
-                            &nbsp;<button onClick="filepicker.pick({mimetype:'video/*',services:['COMPUTER']},function(Blob){ myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blob.url}); });" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
+                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
+                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
                         {% endif %}
 
                         {% if message %}

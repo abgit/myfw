@@ -48,20 +48,51 @@ class myfilters{
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
-    public static function filestack( $url ){
+    public static function filestack( $url, $call = 'read', $custom = '' ){
 
         $url = substr( $url, 33 );
 
         if( empty( $url ) )
             return '';
 
+        if( !empty( $custom ) )
+            $custom .= '/';
+
         $secret    = \Slim\Slim::getInstance()->config( 'filestack.secret' );
-        $policy    = '{"expiry":' . ( time() + 3600 ) . ',"call":"read"}';
+        $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":"' . $call . '"}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
         $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
 
-        return 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $url;
+
+        return 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . $url;
+    }
+
+    public static function filestackmovie( $url, $part ){
+
+        $app  = \Slim\Slim::getInstance();
+        $hash = 'fs' . md5( $url );
+        
+        $json = $app->memcached()->get( $hash );
+
+        if( $json === false ){
+            $url = myfilters::filestack( $url, 'convert', 'video_convert=width:320,height:240,aspect_mode:constrain' );
+
+            if( !empty( $url ) ){
+                $json = file_get_contents( $url );
+                $json = json_decode( $json, true );
+                $app->memcached()->set( $hash, isset( $json[ 'data' ] ) ? $json : array(), 604800 );
+            }
+        }
+
+        switch( $part ){
+            case 'poster': return isset( $json[ 'data' ][ 'thumb' ] ) ? myfilters::filestack( $json[ 'data' ][ 'thumb' ] ) : '';
+            case 'mp4':    return isset( $json[ 'data' ][ 'url' ] )   ? myfilters::filestack( $json[ 'data' ][ 'url' ] )   : '';
+            case 'width':  return isset( $json[ 'metadata' ][ 'result' ][ 'width' ] ) ?  $json[ 'metadata' ][ 'result' ][ 'width' ] : '';
+            case 'height': return isset( $json[ 'metadata' ][ 'result' ][ 'height' ] ) ? $json[ 'metadata' ][ 'result' ][ 'height' ] : '';
+        }
+        
+        return '';
     }
 
     public static function toBTC($satoshi) {

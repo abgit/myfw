@@ -189,6 +189,11 @@ class myajax{
         return $this;
     }
 
+    public function & load( $el ){
+        $this->out[ 'ld' ][] = array( 'e' => $el );
+        return $this;
+    }
+
     public function & display( $el, $bool = true ){
         $this->out[ 'di' ][] = array( 'e' => $el, 'b' => $bool );
         return $this;

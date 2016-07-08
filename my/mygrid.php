@@ -278,12 +278,12 @@ class mygrid{
         return $this;
     }
 
-    public function & setRowClass( $key, $kval, $class, $default, $dependkey = false ){
+    public function & setRowClass( $key, $kval, $class, $dependkey = false ){
 
         if( isset( $this->cols[ $key ] ) ){
             foreach( $this->cols[ $key ] as $index => $subrow ){
                 if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
-                    $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey, 'default' => $default );
+                    $this->cols[ $key ][ $index ][ 'class' ] = array( 'list' => $class, 'key' => $dependkey );
             }
         }
         return $this;

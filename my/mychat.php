@@ -59,12 +59,20 @@
             return $this;
         }
 
-        public function & setImage( $key, $width = '', $height = ''){
+        public function & setImage( $key, $width, $height ){
             if( !is_array( $this->message ) )
                 $this->message = array();
             $this->message[ 'imgkey' ]    = $key;
             $this->message[ 'imgwidth' ]  = $width;
             $this->message[ 'imgheight' ] = $height;
+            return $this;
+        }
+
+        public function & setLabel( $label, $depends ){
+            if( !is_array( $this->message ) )
+                $this->message = array();
+            $this->message[ 'label' ]        = $label;
+            $this->message[ 'labeldepends' ] = $depends;
             return $this;
         }
 
@@ -161,6 +169,14 @@
         }
 
         public function & setFilestack( $urlimage, $urlvideo ){
+
+        $secret    = $this->app->config( 'filestack.secret' );
+        $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":["pick","store"]}';
+        $policy64  = base64_encode( $policy );
+        $signature = hash_hmac( 'sha256', $policy64, $secret );
+        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+
+            $this->filestack[ 'security' ] = $security;
             $this->filestack[ 'urlimage' ] = $urlimage;
             $this->filestack[ 'urlvideo' ] = $urlvideo;
             return $this;

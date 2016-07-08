@@ -369,15 +369,15 @@ class myform{
         return $this;
     }
 
-    public function & addFilestack( $name, $keythumb, $label, $width = 100, $height = 100, $options = array(), $help = '' ){
+    public function & addFilestack( $name, $label, $width, $height, $processing, $help = '' ){
 
         $secret    = $this->app->config( 'filestack.secret' );
-        $policy    = '{"expiry":' . ( time() + 3600 ) . ',"call":["pick","store"]}';
+        $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":["pick","store"]}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
         $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
 
-        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'keythumb' => $keythumb, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'security' => $security );
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'security' => $security, 'processing' => $processing );
 
         $this->addRule( function() use ( $name ){
             return ( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 /*|| $_POST[ $this->formname . $name ] === $this->app->config( 'filestack.default' )*/ ) ) ? true : 'Invalid image';
@@ -385,9 +385,15 @@ class myform{
         return $this;
     }
 
-    public function & addFilestackWebcam( $name, $label, $width = 320, $height = 240, $options = array(), $help = '' ){
+    public function & addFilestackWebcam( $name, $label, $width, $height, $urlvideo, $help = '' ){
 
-        $this->elements[ $name ] = array( 'type' => 'filestackwebcam', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.defaultcam' ), 'help' => $help );
+        $secret    = $this->app->config( 'filestack.secret' );
+        $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":["pick","store"]}';
+        $policy64  = base64_encode( $policy );
+        $signature = hash_hmac( 'sha256', $policy64, $secret );
+        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+
+        $this->elements[ $name ] = array( 'type' => 'filestackwebcam', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.defaultcam' ), 'security' => $security, 'urlvideo' => $urlvideo, 'help' => $help );
 
         $this->addRule( function() use ( $name ){
             return ( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 /*|| $_POST[ $this->formname . $name ] === $this->app->config( 'filestack.default' )*/ ) ) ? true : 'Invalid recording';
