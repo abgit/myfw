@@ -332,7 +332,7 @@
                     <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                 </div>
                 <div class="col-xs-5" style="padding:0px;">
-                    <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url});$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                    <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url});$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                 </div>
             </div>
 
@@ -348,7 +348,7 @@
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                     </div>
                     <div class="col-xs-4" style="padding:0px;">
-                        <button onClick="filepicker.pickAndStore({multiple:false,{{ el.security }}services:['VIDEO']},{},function(Blobs){myfwsubmit('{{ el.urlvideo }}','Processing ...',{mov:Blobs[0].url});$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-camera5"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}').show();$('#filestackh{{ name ~ el.name }}').val('');$('#filestackv{{ name ~ el.name }}').hide()" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick="filepicker.pickAndStore({multiple:false,{{ el.security }}services:['VIDEO']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.urlvideo }}','Processing ...',{mov:Blobs[0].url});$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-camera5"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}').show();$('#filestackh{{ name ~ el.name }}').val('');$('#filestackv{{ name ~ el.name }}').hide()" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     </div>
                 </div>
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}

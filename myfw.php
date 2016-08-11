@@ -147,9 +147,18 @@
                         return $this->container['settings'][$name];
 
                     switch( $this->container['settings'][$name]{0} ){
-                        case '@': return getenv( substr( $this->container['settings'][$name], 1 ) );
-                        case '#': return $this->configdecrypt( getenv( substr( $this->container['settings'][$name], 1 ) ) );
-                        case '!': return $this->configdecrypt( substr( $this->container['settings'][$name], 1 ) );
+                        case '@': list( $all, $variable, $sufix ) = $this->configparse( $name );
+                                  return getenv( $variable ) . $sufix;
+
+                        case '#': list( $all, $variable, $sufix ) = $this->configparse( $name );
+                                  return $this->configdecrypt( getenv( $variable ) ) . $sufix;
+
+                        case '!': list( $all, $variable, $sufix ) = $this->configparse( $name );
+                                  return $this->configdecrypt( $variable ) . $sufix;
+
+                        case '$': list( $all, $variable, $sufix ) = $this->configparse( $name );
+                                  return $this->session()->get( $variable ) . $sufix;
+
                         default: return $this->container['settings'][$name];
                     }
                 }
@@ -159,6 +168,11 @@
                 $settings[$name] = $value;
                 $this->container['settings'] = $settings;
             }
+        }
+
+        private function configparse( $name ){
+            preg_match("/([a-zA-Z0-9_]+)(.*)/", substr( $this->container['settings'][$name], 1 ), $vars );
+            return $vars;
         }
 
         public function configencrypt( $plain, $key = null ) {

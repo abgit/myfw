@@ -236,19 +236,19 @@ $rates = $client->getExchangeRates();
 **Buy price**
 
 ```php
-$buyPrice = $client->getBuyPrice();
+$buyPrice = $client->getBuyPrice('BTC-USD');
 ```
 
 **Sell price**
 
 ```php
-$sellPrice = $client->getSellPrice();
+$sellPrice = $client->getSellPrice('BTC-USD');
 ```
 
 **Spot price**
 
 ```php
-$spotPrice = $client->getSpotPrice();
+$spotPrice = $client->getSpotPrice('BTC-USD');
 ```
 
 **Current server time**
@@ -348,7 +348,7 @@ $addresses = $client->getAccountAddresses($account);
 $address = $client->getAccountAddress($account, $addressId);
 ```
 
-**List transactiona for address**
+**List transactions for address**
 
 ```php
 $transactions = $client->getAddressTransactions($address);
@@ -672,6 +672,8 @@ $checkouts = $client->getCheckouts();
 #### Create checkout
 
 ```php
+use Coinbase\Wallet\Resource\Checkout;
+
 $params = array(
     'name'               => 'My Order',
     'amount'             => new Money(100, 'USD'),
@@ -681,7 +683,13 @@ $params = array(
 $checkout = new Checkout($params);
 $client->createCheckout($checkout);
 $code = $checkout->getEmbedCode();
-$redirect_url = "https://www.coinbase.com/checkouts/$code";
+$redirect_url = "https://www.coinbase.com/checkouts/$code"; 
+```
+
+Note : If you use sandbox mode then you should use the sandbox url like this:
+
+```php
+$redirect_url = "https://sandbox.coinbase.com/checkouts/$code"; 
 ```
 
 #### Get checkout
@@ -702,9 +710,9 @@ $orders = $client->getCheckoutOrders($checkout);
 $order = $client->createNewCheckoutOrder($checkout);
 ```
 
-### [Verifying merchant callbacks](https://developers.coinbase.com/docs/merchants/callbacks)
+### [Notifications webhook and verification](https://developers.coinbase.com/docs/wallet/notifications)
 
-Note: Only production callbacks can be verified. Callbacks issued by the sandbox will always return false below.
+Note: Only production notifications can be verified. Notifications issued by the sandbox will always return false below.
 
 ```php
 $raw_body = file_get_contents('php://input');

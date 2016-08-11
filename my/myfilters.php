@@ -48,15 +48,12 @@ class myfilters{
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
-    public static function filestack( $url, $call = 'read', $custom = '' ){
+    public static function filestack( $url, $call = 'read', $custom = '', $process = true ){
 
         $url = substr( $url, 33 );
 
         if( empty( $url ) )
             return '';
-
-        if( !empty( $custom ) )
-            $custom .= '/';
 
         $secret    = \Slim\Slim::getInstance()->config( 'filestack.secret' );
         $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":"' . $call . '"}';
@@ -64,8 +61,7 @@ class myfilters{
         $signature = hash_hmac( 'sha256', $policy64, $secret );
         $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
 
-
-        return 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . $url;
+        return $process ? 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . ( empty( $custom ) ? '' : '/' ) . $url : 'https://www.filestackapi.com/api/file/' . $url . ( empty( $custom ) ? '' : '/' ) . $custom . '?signature=' . $signature . '&policy=' . $policy64;
     }
 
     public static function filestackmovie( $url, $part ){
@@ -73,15 +69,22 @@ class myfilters{
         $app  = \Slim\Slim::getInstance();
         $hash = 'fs' . md5( $url );
         
-        $json = $app->memcached()->get( $hash );
+        $json = class_exists( 'Memcached' ) ? $app->memcached()->get( $hash ) : false;
 
         if( $json === false ){
             $url = myfilters::filestack( $url, 'convert', 'video_convert=width:320,height:240,aspect_mode:constrain' );
 
             if( !empty( $url ) ){
-                $json = file_get_contents( $url );
-                $json = json_decode( $json, true );
-                $app->memcached()->set( $hash, isset( $json[ 'data' ] ) ? $json : array(), 604800 );
+                
+                try{
+
+                    $json = file_get_contents( $url );
+                    $json = json_decode( $json, true );
+
+                    if( class_exists( 'Memcached' ) )
+                        $app->memcached()->set( $hash, isset( $json[ 'data' ] ) ? $json : array(), 604800 );
+
+                }catch( Exception $e ){}
             }
         }
 

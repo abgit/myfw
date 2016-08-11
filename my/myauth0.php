@@ -66,11 +66,11 @@
 
             $cid = $global ? '' : ( '&client_id=' . $this->app->config( 'auth0.clientid' ) );
 
-            if( $this->app->client[ 'provider' ] == 'facebook' ){
-                return 'https://' . $this->app->config( 'auth0.domain' ) . '/logout?access_token=' . $this->app->client[ 'identities' ][0][ 'access_token' ] . '&returnTo=' . urlencode( 'https://' . $this->app->config( 'auth0.domain' ). '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid );
-            }else{
+//            if( $this->app->client[ 'provider' ] == 'facebook' ){
+//                return 'https://' . $this->app->config( 'auth0.domain' ) . '/logout?access_token=' . $this->app->client[ 'identities' ][0][ 'access_token' ] . '&returnTo=' . urlencode( 'https://' . $this->app->config( 'auth0.domain' ). '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid );
+//            }else{
                 return 'https://' . $this->app->config( 'auth0.domain' ) . '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . $cid;
-            }
+//            }
         }
 
     }

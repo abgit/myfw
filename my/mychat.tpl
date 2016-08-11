@@ -29,7 +29,7 @@
                                     
                                     {% if keyowner or keydate %}
                                     <span class="attribution">
-                                        {{msg[ keyowner ]|t(40)}}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}{% if message.label and msg[ message.labeldepends ] %}, <b>{{ message.label }}</b>{% endif %}
+                                        {{msg[ keyowner ]|t(40)}}{% if message.label and msg[ message.labeldepends ] %} (<b>{{ message.label }}</b>){% endif %}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}
                                     </span>
                                     {% endif %}
 
@@ -67,8 +67,8 @@
                         {% endif %}
 
                         {% if filestack %}
-                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
-                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
+                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{{ filestack.fsoptions|json_encode }},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
+                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{{ filestack.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
                         {% endif %}
 
                         {% if message %}

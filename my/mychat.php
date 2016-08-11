@@ -129,11 +129,29 @@
         }
 
         public function getFilestackImage(){
-            return ( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) ) ? $_POST[ 'img' ] : false;
+
+            if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && ( empty( $_POST[ 'img' ] ) || strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
+
+                $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ 'img' ], 'read', 'metadata', false ) ), true );
+
+                if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'image' ) !== false )
+                    return true;
+            }
+            
+            return false;
         }
 
         public function getFilestackMovie(){
-            return ( isset( $_POST[ 'mov' ] ) && is_string( $_POST[ 'mov' ] ) ) ? $_POST[ 'mov' ] : false;
+
+            if( isset( $_POST[ 'mov' ] ) && is_string( $_POST[ 'mov' ] ) && ( empty( $_POST[ 'mov' ] ) || strpos( $_POST[ 'mov' ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
+
+                $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ 'mov' ], 'read', 'metadata', false ) ), true );
+
+                if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'video' ) !== false )
+                    return true;
+            }
+
+            return false;
         }
 
         public function addAjax( $values ){
@@ -170,15 +188,27 @@
 
         public function & setFilestack( $urlimage, $urlvideo ){
 
-        $secret    = $this->app->config( 'filestack.secret' );
-        $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":["pick","store"]}';
-        $policy64  = base64_encode( $policy );
-        $signature = hash_hmac( 'sha256', $policy64, $secret );
-        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+            $secret    = $this->app->config( 'filestack.secret' );
+            $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
+            $policy64  = base64_encode( $policy );
+            $signature = hash_hmac( 'sha256', $policy64, $secret );
+            $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
 
-            $this->filestack[ 'security' ] = $security;
-            $this->filestack[ 'urlimage' ] = $urlimage;
-            $this->filestack[ 'urlvideo' ] = $urlvideo;
+            $fsoptions = new stdClass();
+        
+            $location = $this->app->config( 'filestack.location' );
+            $path     = $this->app->config( 'filestack.path' );
+        
+            if( $location )
+                $fsoptions->location = $location;
+
+            if( $path )
+                $fsoptions->path = $path;
+
+            $this->filestack[ 'security' ]  = $security;
+            $this->filestack[ 'urlimage' ]  = $urlimage;
+            $this->filestack[ 'urlvideo' ]  = $urlvideo;
+            $this->filestack[ 'fsoptions' ] = $fsoptions;
             return $this;
         }
 
