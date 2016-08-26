@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'transloadit' => array($vendorDir . '/transloadit/php-sdk/lib'),
+    'Ziggeo' => array($vendorDir . '/ziggeo/ziggeophpsdk'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Slim' => array($vendorDir . '/slim/slim'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),

@@ -6,7 +6,7 @@
 
     {% endif %}
     					{% for msg in values %}
-                            <div class="message{{ ( keyme and msg[ keyme ] ) ? ' reversed' }}">
+                            <div class="message{{ ( init and keyme and msg[ keyme ] ) ? ' reversed' }}{{ ( init == false and selfid ) ? ' ' ~ selfid }}">
                                 {% if keythumb %}
                                     <img class="message-img" width="40" height="40" src="{{ msg[ keythumb ]|default( keythumbdefault ) }}">
                                 {% endif %}
@@ -67,8 +67,12 @@
                         {% endif %}
 
                         {% if filestack %}
-                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{{ filestack.fsoptions|json_encode }},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
-                            &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{{ filestack.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blobs[0].url});});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
+                            {% if filestack.urlimage %}
+                                &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{{ filestack.fsoptions|json_encode }},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blobs[0].url},false,'info');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
+                            {% endif %}
+                            {% if filestack.urlvideo %}
+                                &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{{ filestack.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blobs[0].url},false,'info');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
+                            {% endif %}
                         {% endif %}
 
                         {% if message %}

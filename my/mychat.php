@@ -10,7 +10,7 @@
         private $message;
         private $transloadit;
         private $wait;
-        private $init;
+        private $init = false;
         private $cdn;
         private $keyowner;
         private $keydate;
@@ -19,8 +19,10 @@
         private $keyme;
         private $buttons = array();
         private $windowid;
-        private $channel;
+        private $pchannel;
+        private $pevent;
         private $filestack;
+        private $selfid;
 
         public function __construct( $id ){
             $this->app  = \Slim\Slim::getInstance();
@@ -130,12 +132,12 @@
 
         public function getFilestackImage(){
 
-            if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && ( empty( $_POST[ 'img' ] ) || strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
+            if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
 
                 $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ 'img' ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'image' ) !== false )
-                    return true;
+                    return $_POST[ 'img' ];
             }
             
             return false;
@@ -143,12 +145,12 @@
 
         public function getFilestackMovie(){
 
-            if( isset( $_POST[ 'mov' ] ) && is_string( $_POST[ 'mov' ] ) && ( empty( $_POST[ 'mov' ] ) || strpos( $_POST[ 'mov' ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
+            if( isset( $_POST[ 'mov' ] ) && is_string( $_POST[ 'mov' ] ) && strpos( $_POST[ 'mov' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
 
                 $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ 'mov' ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'video' ) !== false )
-                    return true;
+                    return $_POST[ 'mov' ];
             }
 
             return false;
@@ -163,21 +165,35 @@
             $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $values ) ? 0 : $this->values[count($values) - 1][ 'id' ] );
         }
 
-        public function & pusher( $channel, $event ){
-            $this->app->ajax()->pusher( $this->app->pusher()->getPKey(), $channel, $event, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box' );
-            $this->channel = $channel;
+        public function & setSelfId( $selfid ){
+            $this->selfid = $selfid;
+            return $this;
+        }
+
+        public function & pusherChannel( $channel, $event ){
+            $this->pchannel = $channel;
+            $this->pevent   = $event;
+            return $this;
+        }
+
+        public function getPusherChannel(){
+            return $this->pchannel;
+        }
+
+        public function & pusherSubscribe(){
+//            $this->app->ajax()->pusherSubscribe( $this->app->pusher()->getPKey(), $channel, $event, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box', $this->selfid );
+            $this->app->pusher()->ajaxSubscribe( $this->pchannel, $this->pevent/*, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box', $this->selfid*/, $this->selfid, 'reversed' );
+
+//            $this->channel = $channel;
             return $this;
         }
         
-        public function getChannel(){
-            return $this->channel;
-        }
-        
-        public function & pusherAdd( $channel, $event, $values ){
+        public function & pusherAdd( $values ){
             $this->init   = false;
             $this->values = $values;
 
-            $this->app->pusher()->trigger( $channel, $event, $this->app->ajax()->filter( $this->__toString() ) );
+            $this->app->pusher()->chatAdd( '#' . $this->id . 'msgs', $this->__toString(), '#' . $this->id . 'box' )->send( $this->pchannel, $this->pevent );
+//            $this->app->pusher()->trigger( $channel, $event, $this->app->ajax()->filter( $this->__toString() ) );
             return $this;
         }
 
@@ -186,7 +202,7 @@
             return $this;
         }
 
-        public function & setFilestack( $urlimage, $urlvideo ){
+        public function & setFilestack( $urlimage, $urlvideo = false ){
 
             $secret    = $this->app->config( 'filestack.secret' );
             $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
@@ -272,6 +288,7 @@
                           'keyme'       => $this->keyme,
                           'cdn'         => $this->cdn,
                           'id'          => $this->id,
+                          'selfid'      => $this->selfid,
                           'init'        => $this->init );
         }
         

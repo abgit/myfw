@@ -85,12 +85,14 @@
         <h6 class="heading-hr"><i class="{{ el.icon }}"></i> {{ el.label }}</h6>
 
     {% elseif el.type == 'cameratag' %}
+        {% if val %}
         <div>
             <br />
-            <video width="320" height="240" controls poster="{{ el.appcdn }}{{ val }}_qvga_thumb.png">
-                <source src="{{ el.appcdn }}{{ val }}_qvga.mp4" type="video/mp4">
+            <video width="320" height="240" controls poster="{{ el.appcdn }}{{ val }}/qvga/thumb.png">
+                <source src="{{ el.appcdn }}{{ val }}/qvga/mp4.mp4" type="video/mp4">
             </video>
         </div>
+        {% endif %}
 
     {% elseif el.type == 'filestackmovie' %}
 

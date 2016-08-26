@@ -2,7 +2,7 @@
 
 class myajax{
     
-    private $out = array();
+    protected $out = array();
     
     public function & msg( $msg, $header = null, $args = array() ){
 
@@ -44,8 +44,8 @@ class myajax{
         return $this;
     }
     
-    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0 ){
-        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll, 'p' => $pusher );
+    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0, $webcameratag = 0 ){
+        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll, 'p' => $pusher, 'w' => $webcameratag );
         return $this;
     }
     
@@ -59,13 +59,23 @@ class myajax{
         return $this;
     }
 
-    public function & pusher( $key, $channel, $event, $element, $encryption, $region, $htmlbox ){
-        $this->out[ 'pu' ] = array( 'k' => $key, 'c' => $channel, 'v' => $event, 'e' => $element, 'i' => $encryption, 'r' => $region, 'h' => $htmlbox );
+    public function & pusherSubscribe( $key, $channel, $event, $encryption, $region, $replace, $replaceWith ){
+        $this->out[ 'pu' ] = array( 'k' => $key, 'c' => $channel, 'v' => $event, 'y' => $encryption, 'r' => $region, 's' => $replace, 'w' => $replaceWith );
+        return $this;
+    }
+
+    public function & chatAdd( $element, $message, $boxScroll ){
+        $this->out[ 'ch' ][] = array( 'e' => $element, 'm' => $this->filter( $message ), 'h' => $boxScroll );
         return $this;
     }
 
     public function & cameraTag(){
         $this->out[ 'ct' ] = 1;
+        return $this;
+    }
+
+    public function & Ziggeo( $hidden, $div ){
+        $this->out[ 'zi' ][] = array( 'h' => $hidden, 'd' => $div );
         return $this;
     }
 

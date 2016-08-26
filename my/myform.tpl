@@ -162,10 +162,16 @@
 			{% elseif el.type == 'cameratagvideo' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                 <div style="width:321px;height:241px;">
-                    <video width="100%" controls poster="{{ el.appcdn }}{{ el.value }}_qvga_thumb.png" style="width:100%;height:auto;" id="{{name ~ el.name}}">
-                        <source src="{{ el.appcdn }}{{ el.value }}_qvga.mp4" type="video/mp4">
-                    </video>
+                    <video width="100%" controls style="width:100%;height:auto;" id="{{name ~ el.name}}" data-uuid="{{ el.value }}"></video>
                 </div>
+
+			{% elseif el.type == 'ziggeo' %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+            	<div style="width:321px;height:241px;" id="{{ name ~ el.name }}d"></div>
+                <input type="hidden" name="{{ name ~ el.name }}" id="{{ name ~ el.name }}">
+                {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+
 			{% elseif el.type == 'checkboxgroup' %}
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 
@@ -328,11 +334,11 @@
 			{% elseif el.type == 'filestack' %}
             <div class="row">
                 <div class="col-xs-7">
-                    <img id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestack|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                    <img onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info');$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestack|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
                     <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                 </div>
                 <div class="col-xs-5" style="padding:0px;">
-                    <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url});$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                    <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info');$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                 </div>
             </div>
 
@@ -341,14 +347,14 @@
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                 <div class="row">
                     <div class="col-xs-8">
-                        <img id="filestacki{{ name ~ el.name }}" style="{{ el.value ? 'display:none;' }}height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.default }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <img onClick="filepicker.pickAndStore({multiple:false,{{ el.security }}services:['VIDEO']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.urlvideo }}','Processing ...',{mov:Blobs[0].url},false,'info');$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="{{ el.value ? 'display:none;' }}height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.default }}" width="{{ el.width }}" height="{{ el.height }}" />
 
                         <video {{ not el.value ? 'style="display:none"' }} controls id="filestackv{{ name ~ el.name }}" width="{{ el.width }}" height="{{ el.height }}" style="width:100%;height:auto;"><source src="{{ el.value }}" type="video/mp4"></video>
 
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                     </div>
                     <div class="col-xs-4" style="padding:0px;">
-                        <button onClick="filepicker.pickAndStore({multiple:false,{{ el.security }}services:['VIDEO']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.urlvideo }}','Processing ...',{mov:Blobs[0].url});$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-camera5"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}').show();$('#filestackh{{ name ~ el.name }}').val('');$('#filestackv{{ name ~ el.name }}').hide()" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick="filepicker.pickAndStore({multiple:false,{{ el.security }}services:['VIDEO']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.urlvideo }}','Processing ...',{mov:Blobs[0].url},false,'info');$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-camera5"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}').show();$('#filestackh{{ name ~ el.name }}').val('');$('#filestackv{{ name ~ el.name }}').hide()" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     </div>
                 </div>
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}

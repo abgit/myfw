@@ -40,6 +40,7 @@
     <div class="row" id="{{name}}">
 {% endif %}
 
+    {% if values %}
         {% for value in values %}
 						  <div class="col-md-{{ size }}{%if sizeoffset %} col-md-offset-{{sizeoffset}}{% endif %}" id="{{ name }}{{ value[ key ] }}">
                                 <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ cdn }}{{ value[ elements.back.key ] }}){% endif %}">
@@ -72,7 +73,7 @@
                                                     {% endif %}
 
     										        {% if elements.title %}
-                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(45) }}{% endif %}</span>
+                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(30) }}{% endif %}</span>
     										        {% endif %}
 
                                                     {% if elements.title.onclick %}
@@ -80,7 +81,7 @@
                                                     {% endif %}
 
     										        {% if elements.reference %}
-                                                        <span class="text-success" style="font-size:10px">{{ value[ elements.reference.key ]|t(40) }}</span>
+                                                        <span class="text-success" style="font-size:10px">{{ value[ elements.reference.key ]|t(30) }}</span>
     										        {% endif %}
 
                                                     {% if elements.description.onclick %}
@@ -98,7 +99,7 @@
                                             
                                             {% if elements.info %}
     										<div class="col-sm-3 task-panel">
-    											<div class="task-info" style="margin-top:10px">
+    											<div class="task-info" style="margin-top:6px;font-size:14px">
 
                                                     {% for info in elements.info %}
 
@@ -260,10 +261,17 @@
                           </div>
     {% endfor %}
 
-{% if allitems %}
+    {% else %}
+      <div style="margin: 0px 20%" class="callout callout-info fade in">
+        <h5 id="t">Info</h5>
+        <p id="m">{{ emptymsg }}</p>
+      </div>
+    {% endif %}
+
+    {% if allitems %}
     </div>
                                 {% if more and values|length == perpage %}
                                     <input type="hidden" value="{{ offset }}" id="{{ name }}moreos">
                                     <button id="{{ name }}more" style="margin:0px 0px 0px 3px; float:right" onclick="myfwsubmit('{{ more.to }}','Loading',{os:$('#{{ name }}moreos').val()})" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
                                 {% endif %}
-{% endif %}
+    {% endif %}

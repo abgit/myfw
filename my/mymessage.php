@@ -19,11 +19,6 @@ class mymessage{
         $this->app = \Slim\Slim::getInstance();
     }
 
-    public function & setID( $id ){
-        $this->id = $id;
-        return $this;
-    }
-
     public function & setClass( $class ){
         $this->classname = $class;
         return $this;
@@ -60,7 +55,7 @@ class mymessage{
     }
     
     public function & ajaxUpdateTitle( $title ){
-        $this->app->ajax()->text( '#' . $this->id . 't', $this->app->ajax()->filter( $title ) );
+        $this->app->ajax()->text( '#msg' . $this->name . 't', $this->app->ajax()->filter( $title ) );
         return $this;
     }
 
@@ -99,7 +94,7 @@ class mymessage{
     }
 
     public function & ajaxUpdateMessage( $message ){
-        $this->app->ajax()->text( '#' . $this->id . 'm', $this->app->ajax()->filter( $message ) );
+        $this->app->ajax()->text( '#msg' . $this->name . 'm', $this->app->ajax()->filter( $message ) );
         return $this;
     }
 
@@ -113,6 +108,25 @@ class mymessage{
         return $this;
     }
 
+    public function & pusherHide( $channel = false, $event = false ){
+        $this->app->pusher()->remove( '#msg' . $this->name )->send( $channel, $event );
+        return $this;
+    }
+
+    public function & pusherShow( $div, $channel = false, $event = false ){
+        $this->app->pusher()->append( $div, $this->__toString() )->send( $channel, $event );
+        return $this;
+    }
+
+    public function & ajaxHide(){
+        $this->app->ajax()->remove( '#msg' . $this->name );
+        return $this;
+    }
+
+    public function & ajaxShow( $div ){
+        $this->app->ajax()->append( $div, $this->__toString() );
+        return $this;
+    }
 
     public function __toString(){
         return $this->render();
@@ -120,7 +134,6 @@ class mymessage{
 
     private function render( $values = null ){
         return $this->app->render( '@my/mymessage', array( 'name'            => $this->name,
-                                                           'id'              => $this->id,
                                                            'classname'       => $this->classname,
                                                            'customheader'    => $this->customheader,
                                                            'customsubheader' => $this->customsubheader,

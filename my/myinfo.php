@@ -92,6 +92,8 @@ class myinfo{
 
     public function & addProfileCameraTag( $key ){
         $this->elements[] = array( 'type' => 'cameratag', 'key' => $key, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
+
+//        $this->app->ajax()->cameraTag();
         return $this;
     }
 

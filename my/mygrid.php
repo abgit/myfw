@@ -111,11 +111,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addH4( $key, $kval, $label, $align = '' ){
+    public function & addH4( $key, $kval, $label, $align = '', $open = true, $close = true ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'h4');
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'h4', 'open' => $open, 'close' => $close );
         return $this;
     }
 

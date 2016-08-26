@@ -237,16 +237,50 @@ class myform{
     }
 
     public function & addCameraTag( $name, $label = 'Video' ){
-        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'array', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ) );
+        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ) );
 
         $this->app->ajax()->cameraTag();
+
+        $this->addRule( function() use ( $name ){
+
+            if( isset( $_POST[ $this->formname . $name ][ 'video_uuid' ] ) && is_string( $_POST[ $this->formname . $name ][ 'video_uuid' ] ) ){
+
+                if( empty( $_POST[ $this->formname . $name ][ 'video_uuid' ] ) )
+                    return true;
+
+                try{ 
+                    $json = file_get_contents( 'https://cameratag.com/api/v8/videos/' . $_POST[ $this->formname . $name ][ 'video_uuid' ] . '.json?api_key=' . $this->app->config( 'cameratag.key' ) );
+                    $json = json_decode( $json, true );
+
+                } catch (Exception $e ){
+                    return 'Invalid video';
+                }
+
+                if( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && $json[ 'uuid' ] == $_POST[ $this->formname . $name ][ 'video_uuid' ] && $json[ 'app_uuid' ] == $this->app->config( 'cameratag.appid' ) )
+                    return true;
+            }
+
+            return 'Invalid recording';
+        });
+
         return $this;
     }
 
     public function & addCameraTagVideo( $name, $label = 'Video' ){
         $this->elements[ $name ] = array( 'type' => 'cameratagvideo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
+
+        $this->app->ajax()->cameraTag();
+
         return $this;
     }
+
+    public function & addZiggeo( $name, $label = 'Video' ){
+        $this->elements[ $name ] = array( 'type' => 'ziggeo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label );
+
+        $this->app->ajax()->Ziggeo( $this->formname . $name, '#' . $this->formname . $name . 'd' );
+        return $this;
+    }
+
 
     public function & addMonth( $name, $label ){
         $options = array();
@@ -394,6 +428,9 @@ class myform{
 
             if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
 
+                if( empty( $_POST[ $this->formname . $name ] ) )
+                    return true;
+
                 $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) )
@@ -429,6 +466,9 @@ class myform{
         $this->addRule( function() use ( $name ){
 
             if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
+
+                if( empty( $_POST[ $this->formname . $name ] ) )
+                    return true;
 
                 $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
 
@@ -874,15 +914,18 @@ class myform{
         $transloadit   = 0;
         $chatscroll    = 0;
         $pusherchannel = 0;
+        $cameratag     = 0;
         foreach( $this->elements as $n => $el ){
             if( $el[ 'type' ] == 'transloadit' ){
                 $transloadit = 1;
-                d( $el );
+            }
+            if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagvideo' ){
+                $cameratag = $this->formname . $el[ 'name' ];
             }
             if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
                 $transloadit   = $el[ 'obj' ]->getTransloadit();
                 $chatscroll    = '#' . $el[ 'obj' ]->getWindowId();
-                $pusherchannel = $el[ 'obj' ]->getChannel();
+                $pusherchannel = $el[ 'obj' ]->getPusherChannel();
             }
         }
 
@@ -892,7 +935,7 @@ class myform{
 
 //        $this->applyCsrf();
 
-        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel );
+        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag );
         return $this;
     }
 
@@ -1081,6 +1124,10 @@ class myform{
                 case 'transloadit': if( isset( $_POST[ $this->formname . $n ] ) ){
                                         $this->app->transloadit()->requestAssembly( $res, $_POST[ $this->formname . $n ] );
                                         $values[ $n ] = $res;
+                                    }
+                                    break;
+                case 'cameratag': if( isset( $_POST[ $this->formname . $n ][ 'video_uuid' ] ) && is_string( $_POST[ $this->formname . $n ][ 'video_uuid' ] ) ){
+                                        $values[ $n ] = $_POST[ $this->formname . $n ][ 'video_uuid' ];
                                     }
                                     break;
                 default:            continue;

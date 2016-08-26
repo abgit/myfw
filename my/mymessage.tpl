@@ -37,7 +37,7 @@
         <div class="row"><div class="col-md-{{ 12 - offset - offset }} col-md-offset-{{ offset }}">
     {% endif %}
 
-<div{% if id %} id="{{ id }}"{% endif %} class="callout callout-{{ classname|default( 'info' ) }} fade in" style="margin-bottom:0px">
+<div id="msg{{ name }}" class="callout callout-{{ classname|default( 'info' ) }} fade in" style="margin-bottom:0px">
 
     {% if closebutton %}
         <button type="button" class="close" data-dismiss="alert" onclick="{{ closebutton.onclick }}">×</button>
@@ -47,10 +47,10 @@
     {% for el in elements %}
 
         {% if el.type == 'title' %}
-            <h5 id="{{ id }}t">{{ el.text }}</h5>        
+            <h5 id="msg{{ name }}t">{{ el.text }}</h5>        
         
         {% elseif el.type == 'message' %}
-            <p id="{{ id }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ el.text }}</p>
+            <p id="msg{{ name }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ el.text }}</p>
 
         {% elseif el.type == 'small' %}
             <small style="color:#999">{{ el.text }}</small>

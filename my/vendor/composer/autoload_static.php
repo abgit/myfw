@@ -10,9 +10,14 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'p' => 
+        array (
+            'phpseclib\\' => 10,
+        ),
         'S' => 
         array (
             'Symfony\\Component\\EventDispatcher\\' => 34,
@@ -51,6 +56,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
     );
 
     public static $prefixDirsPsr4 = array (
+        'phpseclib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
+        ),
         'Symfony\\Component\\EventDispatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
@@ -103,6 +112,13 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'transloadit' => 
             array (
                 0 => __DIR__ . '/..' . '/transloadit/php-sdk/lib',
+            ),
+        ),
+        'Z' => 
+        array (
+            'Ziggeo' => 
+            array (
+                0 => __DIR__ . '/..' . '/ziggeo/ziggeophpsdk',
             ),
         ),
         'T' => 

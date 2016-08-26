@@ -342,6 +342,11 @@ class mypanel{
         return $this;
     }
 
+    public function & ajaxRemove( $tag ){
+        $this->app->ajax()->hide( '#' . $this->name . $tag );
+        return $this;
+    }
+
     public function & updateAjaxValues( $values ){
 
         if( !is_array( $values ) )

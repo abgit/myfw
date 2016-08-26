@@ -648,9 +648,14 @@
 		}
 
         public function run(){
-            return APP_WEBMODE ? parent::run() : false;
+            
+            if( APP_WEBMODE )
+                parent::run();
+            
+            if( !is_null( $this->pusher ) )
+                $this->pusher->sendall();
         }
-        
+
         public function redirectjs( $url, $close = false ){
             $this->render( '@my/jsredir', array( 'url' => $url, 'winclose' => $close ) );
             $this->stop();
