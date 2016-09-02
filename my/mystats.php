@@ -86,9 +86,17 @@ class mystats{
     }
 
     public function &updateAjaxValues( $values ){
+
+        if( !is_array( $values ) )
+            $values = json_decode( $values, true );
+
         foreach( $this->elements as $name => $el ){
             if( isset( $values[ $el[ 'key' ] ] ) )
                 $this->app->ajax()->text( '#st' . $el[ 'key' ], $values[ $el[ 'key' ] ] );
+
+            if( isset( $el[ 'percentagekey' ] ) && !empty( $el[ 'percentagekey' ] ) )
+                $this->app->ajax()->css( '#stp' . $el[ 'key' ], 'width', $values[ $el[ 'key' ] ] . '%' );
+
 
             if( isset( $values[ $el[ 'key' ] ] ) && isset( $el[ 'addonlabelprekey' ] ) )
                 $this->app->ajax()->text( '#st' . $el[ 'key' ] . 'lpre', $values[ $el[ 'addonlabelprekey' ] ] );
@@ -113,10 +121,12 @@ class mystats{
         return $this;
     }
 
+/*
     public function & changeValues( $values, $mode ){
         $mode == 1 ? $this->setValues( $values ) : $this->updateAjaxValues( $values );
         return $this;
     }
+*/
 
     public function __toString(){
         return $this->render();

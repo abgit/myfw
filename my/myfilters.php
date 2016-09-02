@@ -99,7 +99,7 @@ class myfilters{
     }
 
     public static function toBTC($satoshi) {
-        return bcdiv((int)(string)$satoshi, 100000000, 8);
+        return bcdiv((float)(string)$satoshi, 100000000, 8);
     }
 
     public static function toBTCString($satoshi) {
@@ -111,7 +111,7 @@ class myfilters{
     }
 
     public static function toSatoshi($btc) {
-        return (int)self::toSatoshiString($btc);
+        return (float)self::toSatoshiString($btc);
     }
     
     public static function nl2space( $string ){

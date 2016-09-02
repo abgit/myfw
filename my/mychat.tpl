@@ -29,7 +29,16 @@
                                     
                                     {% if keyowner or keydate %}
                                     <span class="attribution">
-                                        {{msg[ keyowner ]|t(40)}}{% if message.label and msg[ message.labeldepends ] %} (<b>{{ message.label }}</b>){% endif %}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}
+                                    
+                                        {% set labels = [] %}
+
+                                        {% for it in message.labels if ( it.label and msg[ it.labeldepends ] ) %}
+                                            {% set labels = labels|merge([it.label]) %}
+                                        {% endfor %}
+                                        
+                                        
+
+                                        {{msg[ keyowner ]|t(40)}}{{ labels is not empty ? ' (' }}{% for label in labels %}<b>{{ label }}</b>{{ loop.revindex0 ? ', ' }}{% endfor %}{{ labels is not empty  ? ')' }}{% if keyowner and keydate %}, {% endif %}{{msg[ keydate ]|ago}}
                                     </span>
                                     {% endif %}
 

@@ -207,16 +207,10 @@ class myform{
         $this->elements[ 'smm' . $this->counter++ ] = array( 'type' => 'staticmessage', 'message' => $message, 'title' => $title, 'icon' => $icon, 'date' => $date, 'rules' => array(), 'filters' => array() );
         return $this;
     }    
-
+/*
     public function & addGrid( $obj ){
         $name = is_string( $obj ) ? $obj : ( 'gri' . $this->counter++ );
         $this->elements[ $name ] = array( 'type' => 'grid', 'obj' => $obj );
-        return $this;
-    }    
-
-    public function & addStatistics( $name, $obj ){
-//        $name = is_string( $obj ) ? $obj : ( 'sts' . $this->counter++ );
-        $this->elements[ $name ] = array( 'type' => 'statistics', 'obj' => $obj );
         return $this;
     }    
 
@@ -225,10 +219,14 @@ class myform{
             $this->elements[ $name ] = $obj;
         return $this;
     }
-
-    public function & addCustom( $name, $obj  ){
-        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => /*method_exists( $obj, 'setID' ) ? $obj->setID( $this->formname . $name ) :*/ $obj, 'rules' => array(), 'filters' => array() );
+*/
+    public function & addCustom( $name, $obj ){
+        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
         return $this;
+    }
+
+    public function & getCustom( $name){
+        return isset( $this->elements[ $name ][ 'obj' ] ) ? $this->elements[ $name ][ 'obj' ] : null;
     }
 
     public function & addEmail( $name, $label = 'Email' ){
@@ -238,8 +236,6 @@ class myform{
 
     public function & addCameraTag( $name, $label = 'Video' ){
         $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ) );
-
-        $this->app->ajax()->cameraTag();
 
         $this->addRule( function() use ( $name ){
 
@@ -932,8 +928,6 @@ class myform{
         // if modal undefined, create one
         if( ! isset( $this->modal['id'] ) )
             $this->setModal();
-
-//        $this->applyCsrf();
 
         $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag );
         return $this;

@@ -45,7 +45,7 @@
         }
 
 
-        public function ratevalid( $persecond = 5, $perminute = 200, $lockfor = 60, $persession = true, $perip = false, $mono = true ){
+        public function ratevalid( $persecond = 3, $perminute = 200, $lockfor = 60, $persession = true, $perip = false, $mono = true ){
 
             $now = time();
             $prefix  = $persession ? ( 's' . $this->app->session()->getId() ) : '';
@@ -56,18 +56,11 @@
             $keylock   = md5( $prefix . 'myfwlock' );
             $keymono   = md5( $prefix . 'myfwmono' );
 
-            if( $this->get( $keylock ) === true ){
+            if( $this->get( $keylock ) === true )
                 return false;
-            }
 
-            // lock mono for ajax requests only
-            if( $mono /*&& $this->app->request->isAjax() && ( $this->get( $keymono ) === 1 || !$this->add( $keymono, 1, 20 ) )*/ ){
-
-                if(!$this->add($keymono, 1,20)){
-                  usleep(mt_rand(1000,99999));
-                }
-                //return false;
-            }
+            if( $mono && !$this->add( $keymono, 1,20 ) )
+                usleep( 100000 );
 
             $countersec = $this->get( $keysecond );
             if( $this->getResultCode() !== Memcached::RES_SUCCESS )
@@ -82,17 +75,18 @@
                 $this->delete( $keysecond );
                 $this->delete( $keyminute );
                 $this->set( $keylock, true, $lockfor );
+                $this->set( $keylock . 't', time() + $lockfor, $lockfor );
                 return false;
             }
 
             if( $countersec === 0 ){
-                $this->set( $keysecond, 1, 1 );
+                $this->set( $keysecond, 1, 3 );
             }else{
                 $this->increment( $keysecond );
             }
 
             if( $countermin === 0 ){
-                $this->set( $keyminute, 1, 60 );
+                $this->set( $keyminute, 1, 63 );
             }else{
                 $this->increment( $keyminute );
             }
@@ -107,6 +101,19 @@
 
             $keymono = md5( $prefix . 'myfwmono' );
 
-            return /*$this->app->request->isAjax() ?*/ $this->delete( $keymono/*, 0*/ ) /*: false */;
+            return $this->delete( $keymono );
+        }
+        
+        public function ratelocktimeout( $persession = true, $perip = false ){
+
+            $prefix  = $persession ? ( 's' . $this->app->session()->getId() ) : '';
+            $prefix .= $perip      ? ( 'i' . $this->app->request->getIp() )  : '';
+
+            $keylock = md5( $prefix . 'myfwlock' );
+
+            $now = time();
+            $t = $this->get( $keylock . 't' );
+
+            return ( $this->getResultCode() !== Memcached::RES_SUCCESS ) ? 0 : ( $t - $now );
         }
     }

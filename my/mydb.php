@@ -84,7 +84,7 @@
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d H:i:s", strtotime( $values[ $column_name ] ) ) : null;
                                             break;
                         case 'bigint' :     $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? strval( $values[ $column_name ] ) : null;
+                                            $column_value = ( isset( $values[ $column_name ] ) && preg_match('/^[0-9]+$/', strval($values[ $column_name ] ) ) ) ? $values[ $column_name ]: null;
                                             break;
                         case 'text' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 65535 ) : null;

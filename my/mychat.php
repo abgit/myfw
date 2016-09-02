@@ -73,8 +73,9 @@
         public function & setLabel( $label, $depends ){
             if( !is_array( $this->message ) )
                 $this->message = array();
-            $this->message[ 'label' ]        = $label;
-            $this->message[ 'labeldepends' ] = $depends;
+            $this->message[ 'labels' ][]  = array( 'label' => $label, 'labeldepends' => $depends );
+//            $this->message[ 'label' ]        = $label;
+//            $this->message[ 'labeldepends' ] = $depends;
             return $this;
         }
 

@@ -83,8 +83,8 @@
                 $this->cacheable = null;
             });
             $this->hook( 'slim.after.dispatch', function(){
-                if( $this->config( 'app.israte' ) !== false )
-                    $this->memcached()->ratemonodelete();
+//                if( $this->config( 'app.israte' ) !== false )
+//                    $this->memcached()->ratemonodelete();
 
                 if( $this->isajaxmode === true )
                     $this->ajax()->render();
@@ -761,11 +761,10 @@
 
     function israte() {
         $app = \Slim\Slim::getInstance();
-//        $app->setratemonomode();
 
         if( $app->config( 'app.israte' ) !== false && !$app->memcached()->ratevalid() ){
             if( $app->request->isAjax() ){
-                $app->ajax()->msgWarning( 'Too much calls. Please wait and retry. ', 'Rate limit protection' )->render();
+                $app->ajax()->msgWarning( 'Too much requests. Please wait ' . $app->memcached()->ratelocktimeout() . 's and try again.', 'Rate limit protection' )->render();
             }
             $app->stop();
         }

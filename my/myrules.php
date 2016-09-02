@@ -98,6 +98,15 @@ class myrules{
         return ( intval( $value ) >= intval( $opts ) );
     }
 
+    public static function isdate( $value ){
+        if( is_string( $value ) && myrules::regex( $value, '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/' ) ){
+            $d = DateTime::createFromFormat( 'Y-m-d', $value );        
+            return ( $d && $d->format( 'Y-m-d' ) === $value );
+        }
+
+        return false;
+    }
+
     public static function minoptions( $value, $options = '', $input = array() ){
 
         $options = intval( $options );

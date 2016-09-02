@@ -18,6 +18,7 @@ class mynotify{
     private $counter = null;
     private $emptymsg = 'No elements to display';
     private $unreadkey = false;
+    private $allitems = true;
 
     public function __construct( $name = 'n' ){
         $this->name = $name;
@@ -55,19 +56,13 @@ class mynotify{
         return $this;
     }
 
-    public function & setCounter( $i ){
-        $this->counter = $i;
-        return $this;
-    }
+    public function & setValues( $values, $counter ){
 
-    public function & setValues( $values ){
+        if( !is_array( $values ) )
+            $this->values = json_decode( $values, true );
 
-        if( is_array( $values ) ){
-            $this->values = $values;
+       $this->counter = $counter;
 
-            if( is_null( $this->counter ) )
-                $this->counter = count( $values );
-        }
         return $this;
     }
 
@@ -111,18 +106,23 @@ class mynotify{
         return $this;
     }
 
-    public function & ajaxClearCounter(){
-        $this->ajaxUpdateCounter(0);
+    public function & ajaxUpdate( $values, $counter ){
+
+        $this->allitems = false;
+
+        $this->setValues( $values, $counter );
+
+        $this->app->ajax()->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter );
         return $this;
     }
 
-    public function & ajaxUpdateCounter( $c ){
-        $c = intval( $c );
-        $this->app->ajax()->text( '#' . $this->name . 'counter', $c ? $c : '' );
+    public function & pusherUpdate( $values, $counter, $channel = null, $event = null ){
 
-        if( !$c )
-            $this->app->ajax()->removeClass( '.' . $this->name . 'msg', 'unread' );
+        $this->allitems = false;
 
+        $this->setValues( $values, $counter );
+
+        $this->app->pusher()->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter )->send( is_null( $channel ) ? $this->app->config( 'pusher.channel' ) : $channel, is_null( $event ) ? $this->app->config( 'pusher.event' ) : $event );
         return $this;
     }
 
@@ -147,7 +147,8 @@ class mynotify{
                                                           'itemmore'        => $this->itemmore,
                                                           'counter'         => $this->counter,
                                                           'emptymsg'        => $this->emptymsg,
-                                                          'unreadkey'       => $this->unreadkey
+                                                          'unreadkey'       => $this->unreadkey,
+                                                          'allitems'        => $this->allitems
                                                          ), null, null, null, false, false );
 
     }

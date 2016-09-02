@@ -55,7 +55,7 @@
         {% if stat.percentagetype %}
             {% set pervalue = ( stat.percentagekey ? values[ stat.percentagekey ] : stat.percentage )|default(0) %}
             <div class="progress {% if stat.percentagetype == 1 %}progress-micro{% endif %}">
-                <div style="width:{{ pervalue|default(0)|round(0, 'ceil') }}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{ pervalue|default(0)|round }}" role="progressbar" class="progress-bar progress-bar-{{ type }}">
+                <div id="stp{{ stat.key }}" style="width:{{ pervalue|default(0)|round(0, 'ceil') }}%;" role="progressbar" class="progress-bar progress-bar-{{ type }}">
                     <span class="sr-only">{{ pervalue|default(0) }}%</span>
                 </div>
             </div>

@@ -119,6 +119,26 @@ class myajax{
         return $this;
     }
 
+    public function & calendarEventAdd( $el, $event_title, $event_start, $event_end, $event_id, $event_color ){
+        $this->out[ 'ci' ][] = array( 'e' => $el, 't' => $event_title, 's' => $event_start, 'f' => $event_end, 'i' => $event_id, 'c' => $event_color );
+        return $this;
+    }
+
+    public function & calendarEventRemove( $el, $event_id ){
+        $this->out[ 'cx' ][] = array( 'e' => $el, 'i' => $event_id );
+        return $this;
+    }
+
+    public function & calendarRefresh( $el ){
+        $this->out[ 'cf' ][] = array( 'e' => $el );
+        return $this;
+    }
+
+    public function & notifyUpdate( $el, $html, $counter ){
+        $this->out[ 'nu' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'c' => intval( $counter ) );
+        return $this;
+    }
+
     public function & prependTextArea( $el, $html ){
         $this->out[ 'tp' ][] = array( 'e' => $el, 'h' => $html );
         return $this;
@@ -134,8 +154,8 @@ class myajax{
         return $this;
     }
 
-    public function & addreplacewith( $el, $html, $grid ){
-        $this->out[ 'ar' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'g' => $grid );
+    public function & addreplacewith( $el, $html, $grid, $prepend = true  ){
+        $this->out[ 'ar' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'g' => $grid, 'p' => $prepend );
         return $this;
     }
 

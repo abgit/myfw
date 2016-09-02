@@ -55,13 +55,9 @@
                                                             {{ value|nl2space|t( td.truncate|default( 60 ) ) }}
 
                                                         {% elseif td.type == 'h4' %}
-                                                            {% if td.open %}
                                                                 <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>
-                                                            {% endif %}
-                                                            {{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}
-                                                            {% if td.close %}                                                            
+                                                                    {{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ td.prefix2|raw }}{{ val[ td.kval2 ] }}{{ addonpos|raw }}
                                                                 </h4>
-                                                            {% endif %}
 
                                                         {% elseif td.type == 'h6' %}
                                                             <h6{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>{{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}</h6>
