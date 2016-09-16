@@ -105,7 +105,7 @@
                             {% endfor %}
                         </span>
 
-                        {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
+                        {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|raw|nl2br}}</span>{% endif %}
                     {% endif %}
     
         	{% elseif el.type == 'password' %}
@@ -156,7 +156,7 @@
 
 			{% elseif el.type == 'cameratag' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-            	<div style="width:321px;height:241px;"><camera name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}"></div>
+            	<div style="width:321px;height:241px;"><camera name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-maxlength="{{ el.maxlength|default(30) }}"></div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'cameratagvideo' %}
@@ -244,7 +244,7 @@
                 <div class="callout callout-{{ el.css }} fade in">
 				    {% if el.title %}<h5>{{el.title}}</h5>{% endif %}
 				    {% if el.description %}
-                        <p>{{el.description|nl2br}}</p>
+                        <p>{{el.description|raw|nl2br}}</p>
                     {% endif %}
                     {% if el.buttonlabel %}
                         <a type="button" class="btn btn-{{el.buttoncss|default(el.css)}}" style="margin-top:4px;"{% if el.buttononclick %} onclick="{{el.buttononclick}}"{% endif %}{% if el.buttonhref %} href="{{el.buttonhref}}"{% endif %}>

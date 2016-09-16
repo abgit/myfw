@@ -112,6 +112,7 @@ class myform{
     public function & addBitcoin( $name, $label = '', $help = '', $currencies = array() ){
         $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies );
         $this->addFilter( $name, 'satoshi' );
+        $this->addRule( $name, 'Invalid bitcoin amount', 'bitcoin' );
         return $this;
     }
 
@@ -234,8 +235,8 @@ class myform{
         return $this;
     }
 
-    public function & addCameraTag( $name, $label = 'Video' ){
-        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ) );
+    public function & addCameraTag( $name, $label = 'Video', $maxlength = null ){
+        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'maxlength' => $maxlength );
 
         $this->addRule( function() use ( $name ){
 

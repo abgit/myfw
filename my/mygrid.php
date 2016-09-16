@@ -350,7 +350,7 @@ class mygrid{
     }
 
     public function & deleteAjaxValue( $key ){
-        $this->app->ajax()->hideTableRow( '#' . $key, '#' . $this->name . 'table', '#' . $this->name . 'empty' );
+        $this->app->ajax()->hideTableRow( '#' . $key, '#' . $this->name /*. 'table', '#' . $this->name . 'empty'*/ );
         return $this;
     }
 
@@ -417,7 +417,7 @@ class mygrid{
             return $this->app->form( $this->modal[ 'formid' ] )
                              ->addAjax()
                              ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
-                             ->addGrid( $this )
+                             ->addCustom( $this->name, $this )
                              ->show();
         }
         $this->app->ajax()->html( $htmlid, $this->render() );

@@ -44,6 +44,7 @@
         {% for value in values %}
 						  <div class="col-md-{{ size }}{%if sizeoffset %} col-md-offset-{{sizeoffset}}{% endif %}" id="{{ name }}{{ value[ key ] }}">
                                 <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ cdn }}{{ value[ elements.back.key ] }}){% endif %}">
+                                  <div style="margin:0px" class="row">
 									<div class="with-padding"{% if action %} onclick="{{ action|replaceurl( value, tags ) }}" style="margin: 0px;cursor:pointer;min-height:150px"{% else %} style="min-height:150px"{% endif %}>
 
                                         {% if elements.thumb.static or value[ elements.thumb.key ] or elements.thumb.default %}
@@ -73,7 +74,7 @@
                                                     {% endif %}
 
     										        {% if elements.title %}
-                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t(30) }}{% endif %}</span>
+                                            		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t( elements.title.maxsize|default( 30 ) ) }}{% endif %}</span>
     										        {% endif %}
 
                                                     {% if elements.title.onclick %}
@@ -89,7 +90,7 @@
                                                     {% endif %}
 
     										        {% if elements.description %}
-    												    <span>{% if elements.description.static %}{{ elements.description.key|raw }}{% else %}{{ value[ elements.description.key ]|t(150) }}{% endif %}</span>
+    												    <span>{% if elements.description.static %}{{ elements.description.key|raw }}{% else %}{{ value[ elements.description.key ]|t( elements.description.maxsize|default( 200 ) ) }}{% endif %}</span>
     										        {% endif %}
 
                                                     {% if elements.description.onclick %}
@@ -107,7 +108,7 @@
 
                                                             {% if value[ info.key ] is defined %}
 
-                                                                <span id="pi{{ info.key }}{{ value[ key ] }}" {{ ( info.depends and not value[ info.depends ] ) ? 'class="hide"' }}>
+                                                                <span id="pi{{ info.key }}{{ value[ key ] }}" class="{{ ( info.depends and not value[ info.depends ] ) ? 'hide ' }}{{ info.iclass }}">
             												    {% if info.class %}
                                                                     <span id="pic{{ info.key }}{{ value[ key ] }}" class="label {{ info.classreplacekey ? ( value[ info.classreplacekey ]|replaceonly( info.class )|default( info.defaultclass ) ) : info.class }}">
                                                                 {% endif %}
@@ -160,14 +161,20 @@
     											</div>
     										</div>
                                             {% endif %}
-									</div>
+									  </div>
+                                    </div>
+
+                                    {% if elements.progress %}
+                                    <div style="height:14px;" class="progress"><div id="ppb{{ value[ key ] }}" class="progress-bar progress-bar-success" role="progressbar" style="width:{{ value[ elements.progress.key ]|default(0) }}%;"></div></div>
+                                    {% endif %}
+
 									<div class="panel-footer" style="min-height:38px">
                                         {% if elements.status %}
                                             <div class="pull-left">
                                                     <span>
                                             {% for status in elements.status %}
                                                     {% if status.type == 1 %}
-                                                        <span>{{ status.prefix|raw }}{{ value[ status.key ]|t(90)}}{{ ( status.sufixsingular and value[ status.key ] == 1 ) ? status.sufixsingular|raw : status.sufix|raw }}</span>
+                                                         {% if status.prefix %}<span id="psip{{ value[ key ] }}{{ status.key }}">{{ status.prefix|raw }}</span>{% endif %}<span id="psiv{{ value[ key ] }}{{ status.key }}">{{ value[ status.key ]|t(90)}}{{ status.sufix|label( value[ status.key ] )|raw }}</span>
                                                     {% elseif status.type == 2 %}
                                                     
                                                         {% if status.icon %}

@@ -148,10 +148,12 @@
 
                     switch( $this->container['settings'][$name]{0} ){
                         case '@': list( $all, $variable, $sufix ) = $this->configparse( $name );
-                                  return getenv( $variable ) . $sufix;
+                                  $var = $this->getenvconfigvar( $variable );
+                                  return is_null( $var ) ? null : ( $var . $sufix );
 
                         case '#': list( $all, $variable, $sufix ) = $this->configparse( $name );
-                                  return $this->configdecrypt( getenv( $variable ) ) . $sufix;
+                                  $var = $this->getenvconfigvar( $variable );
+                                  return is_null( $var ) ? null : ( $this->configdecrypt( $var ) . $sufix );
 
                         case '!': list( $all, $variable, $sufix ) = $this->configparse( $name );
                                   return $this->configdecrypt( $variable ) . $sufix;
@@ -173,6 +175,12 @@
         private function configparse( $name ){
             preg_match("/([a-zA-Z0-9_]+)(.*)/", substr( $this->container['settings'][$name], 1 ), $vars );
             return $vars;
+        }
+
+        private function getenvconfigvar( $name ){
+
+            $var = getenv( $name );
+            return $var === false ? null : $var;
         }
 
         public function configencrypt( $plain, $key = null ) {
@@ -462,10 +470,10 @@
         }
 
         public function confirmSMS( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation' ){
-            return $this->confirm( $msg, $help, $title, 1, false, true );
+            return $this->confirm( $msg, $help, $title, '', 1, false, true );
         }
 
-        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $mode = 1, $twofactor = false, $sms = false ){
+        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $description = '', $mode = 1, $twofactor = false, $sms = false ){
 
             $route = $this->router->getCurrentRoute();
             $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) ) );
@@ -496,7 +504,7 @@
             }
 
             $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
-            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $help, $mode, $pin, $pinlabel, $pinhelp )->render();
+            $this->ajax()->confirm( $this->urlfor( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $pin, $pinlabel, $pinhelp )->render();
             $this->stop();
         }
 
@@ -641,10 +649,17 @@
 			return $filesaved;
 		}
 		
-		public function cron( $match, $callback ){
+		public function cron( $match, $callback = '' ){
 			global $argv;
 
-			return ( is_array( $argv ) && isset( $argv[1] ) && is_string( $argv[1] ) && is_string( $match ) && $argv[1] === $match ) ? call_user_func( $callback ) : false;
+            if( ! is_array( $argv ) )
+                return false;
+
+			if( is_string( $match ) && isset( $argv[1] ) && is_string( $argv[1] ) && $argv[1] === $match && is_callable( $callback ) )
+                return call_user_func( $callback );
+
+            if( is_callable( $match ) )
+                return call_user_func( $match );
 		}
 
         public function run(){
@@ -690,6 +705,14 @@
 
         return call_user_func_array( 'sprintf', $arr );
     }        
+
+    function vksprintf( $string = '', $vars = array() ) {
+        if ( is_string( $string ) && is_array( $vars ) && count( $vars ) ) {
+            foreach( $vars as $key => $value )
+                $string = str_replace( '#' . $key, $value, $string );
+        }
+        return $string;
+    }
 
     // set session authentication
     function islogged() {

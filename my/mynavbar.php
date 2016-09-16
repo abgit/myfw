@@ -23,8 +23,8 @@ class mynavbar{
         return $this;
     }
 
-    public function & setText( $message, $icon ){
-        $this->text = array( 'message' => $message, 'icon' => $icon );
+    public function & setText( $message, $icon = null, $thumb = null, $thumbclass = null ){
+        $this->text = array( 'message' => $message, 'icon' => $icon, 'thumb' => $thumb, 'thumbclass' => $thumbclass );
         return $this;
     }
 
@@ -40,6 +40,12 @@ class mynavbar{
 
     public function & addMenu( $label, $options ){
         $this->elements[] = array( 'type' => 'menu', 'label' => $label, 'options' => $options );
+        return $this;
+    }
+
+    public function & ajaxThumbChange( $thumb ){
+        
+        $this->app->ajax()->attr( '#navbarimg', 'src', $thumb );
         return $this;
     }
 

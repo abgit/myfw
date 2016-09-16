@@ -73,11 +73,15 @@ class mymessage{
     public function & setValues( $values ){
 
         if( is_string( $values ) )
-            $values = json_decode( $values, true );
+            $val = json_decode( $values, true );
 
-        if( isset( $values[ $this->relmessagekey ] ) )
+        if( json_last_error() !== JSON_ERROR_NONE ){
+            $this->addMessage( $values );
+
+        }elseif( isset( $val[ $this->relmessagekey ] ) ){
             $this->addTitle( $this->reltitle )
-                 ->addMessage( $values[ $this->relmessagekey ] );
+                 ->addMessage( $val[ $this->relmessagekey ] );
+        }
 
         return $this;
     }

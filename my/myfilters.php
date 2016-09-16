@@ -118,6 +118,18 @@ class myfilters{
         return preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", " ", $string );
     }
 
+    public static function label( $string, $number ){
+        $exp = explode( '!', $string );
+
+        if( count( $exp ) < 2 || strlen( $exp[1] ) == 0 )
+            return $string;
+
+        if( intval( $number ) === 1 )
+            return $exp[1];
+
+        return $exp[0];
+    }
+
     public static function floatval( $string ){
         return is_array($string) ? array_map( 'floatval', $string ) : floatval( $string );
     }
@@ -244,10 +256,6 @@ class myfilters{
         $b = new mybcloud();
         $b = $b->getCategoriesList();
         return isset( $b[$string] ) ? $b[$string][0] : 'unknown';
-    }
-
-    public static function auth0config( $string ){
-        return $string === 'access_token' ? \Slim\Slim::getInstance()->auth0()->getAccessToken() : \Slim\Slim::getInstance()->auth0()->getParams( $string );
     }
 
     public static function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){

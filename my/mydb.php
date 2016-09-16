@@ -97,7 +97,7 @@
                                             break;
                         case 'numeric' :
                         case 'double' :     $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? strval( round( floatval( str_replace( ',', '.', $values[ $column_name] ) ), 2 ) ) : 0;
+                                            $column_value = isset( $values[ $column_name ] ) ? floatval( str_replace( ',', '.', $values[ $column_name] ) ) : 0;
                                             break;
                         case 'uuid' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 40 ) : null;

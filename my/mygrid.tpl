@@ -41,7 +41,7 @@
 
                                                     {% set value = val[ td.kval ] %}
 
-                                                    {% if value is not empty or td.type == 'menu' or td.type == 'br' or td.type == 'space' or td.default %}
+                                                    {% if value is not empty or td.type == 'menu' or td.type == 'br' or td.type == 'space' or td.type == 'fixed' or td.default %}
 
                                                         {% if td.replace %}
                                                             {% set value = value|replace( td.replace ) %}

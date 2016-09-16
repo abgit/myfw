@@ -31,7 +31,7 @@ class myrules{
     }
 
     public static function bitcoin( $value, $opts='', $formelement = null){
-        return myrules::regex( strval( $value ), '/^([1-9]?[0-9]([\.\,][0-9]{1,4})?)$/' );
+        return myrules::regex( strval( $value ), '/^([1-9]{0,3}[0-9]([\.\,][0-9]{1,8})?)$/' );
     }
 
     public static function unsigned( $value, $opts='', $formelement = null){
@@ -92,6 +92,11 @@ class myrules{
 
     public static function maxvalue( $value, $opts, $formelement = null ) {
         return ( intval( $value ) <= intval( $opts ) );
+    }
+
+    public static function maxdecimal( $value, $opts, $formelement = null ) {
+        $x = explode( '.', strval( $value ) );
+        return ( is_array( $x ) && ( ( count( $x ) === 1 && isset( $x[0] ) && is_numeric( $x[0] ) ) || ( count( $x ) === 2 && isset( $x[0] ) && is_numeric( $x[0] ) && isset( $x[1] ) && is_numeric( $x[1] ) && strlen( $x[1] ) <= intval( $opts ) ) ) );
     }
 
     public static function minvalue( $value, $opts, $formelement = null ) {

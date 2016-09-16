@@ -85,26 +85,30 @@ class mystats{
         return $this;
     }
 
-    public function &updateAjaxValues( $values ){
+    public function &updateAjaxValues( $values, $pusherChannel = false ){
 
         if( !is_array( $values ) )
             $values = json_decode( $values, true );
 
+        $obj = $pusherChannel ? $this->app->pusher() : $this->app->ajax();
+
         foreach( $this->elements as $name => $el ){
             if( isset( $values[ $el[ 'key' ] ] ) )
-                $this->app->ajax()->text( '#st' . $el[ 'key' ], $values[ $el[ 'key' ] ] );
+                $obj->text( '#st' . $el[ 'key' ], $values[ $el[ 'key' ] ] );
 
             if( isset( $el[ 'percentagekey' ] ) && !empty( $el[ 'percentagekey' ] ) )
-                $this->app->ajax()->css( '#stp' . $el[ 'key' ], 'width', $values[ $el[ 'key' ] ] . '%' );
-
+                $obj->css( '#stp' . $el[ 'key' ], 'width', $values[ $el[ 'key' ] ] . '%' );
 
             if( isset( $values[ $el[ 'key' ] ] ) && isset( $el[ 'addonlabelprekey' ] ) )
-                $this->app->ajax()->text( '#st' . $el[ 'key' ] . 'lpre', $values[ $el[ 'addonlabelprekey' ] ] );
+                $obj->text( '#st' . $el[ 'key' ] . 'lpre', $values[ $el[ 'addonlabelprekey' ] ] );
 
             if( isset( $values[ $el[ 'key' ] ] ) && isset( $el[ 'addonlabelposkey' ] ) )
-                $this->app->ajax()->text( '#st' . $el[ 'key' ] . 'lpos', $values[ $el[ 'addonlabelposkey' ] ] );
-
+                $obj->text( '#st' . $el[ 'key' ] . 'lpos', $values[ $el[ 'addonlabelposkey' ] ] );
         }
+        
+        if( $pusherChannel )
+            $obj->send( $pusherChannel, null );
+
         return $this;
     }
 

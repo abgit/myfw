@@ -84,8 +84,8 @@ class myajax{
         return $this;
     }
 
-    public function & confirm( $url, $msg, $title, $help, $mode, $requirepin, $pinLabel, $pinHelp ){
-        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => intval( $requirepin ), 'l' => $pinLabel, 'p' => $pinHelp );
+    public function & confirm( $url, $msg, $title, $description, $help, $mode, $requirepin, $pinLabel, $pinHelp ){
+        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 'd' => $description, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => intval( $requirepin ), 'l' => $pinLabel, 'p' => $pinHelp );
         return $this;
     }
 
@@ -209,8 +209,8 @@ class myajax{
         return $this;
     }
 
-    public function & hideTableRow( $el, $table, $emptymsg ){
-        $this->out[ 'hr' ][] = array( 'e' => $el, 't' => $table, 'm' => $emptymsg );
+    public function & hideTableRow( $el, $table/*, $emptymsg*/ ){
+        $this->out[ 'hr' ][] = array( 'e' => $el, 't' => $table/*, 'm' => $emptymsg*/ );
         return $this;
     }
 

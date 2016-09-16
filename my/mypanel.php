@@ -77,8 +77,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addTitle( $key, $static = false, $onclick = '' ){
-        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick );
+    public function & addTitle( $key, $static = false, $onclick = '', $maxsize = '' ){
+        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick, 'maxsize' => $maxsize );
         return $this;
     }
 
@@ -87,8 +87,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addDescription( $key, $static = false, $onclick = '' ){
-        $this->elements[ 'description' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick );
+    public function & addDescription( $key, $static = false, $onclick = '', $maxsize = '' ){
+        $this->elements[ 'description' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick, 'maxsize' => $maxsize );
         return $this;
     }
 
@@ -97,8 +97,28 @@ class mypanel{
         return $this;
     }
 
-    public function & addInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $depends = false ){
-        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix, 'depends' => $depends );
+    public function & addInfo( $key, $prefix = '', $sufix = '', $iclass = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $depends = false ){
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'iclass' => $iclass, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix, 'depends' => $depends );
+        return $this;
+    }
+
+    public function & addProgress( $key ){
+        $this->elements[ 'progress' ] = array( 'key' => $key );
+        return $this;
+    }
+
+    public function & ajaxUpdateProgress( $key, $value ){
+        $this->app->ajax()->css( '#ppb' . $key, 'width', $value . '%' );
+        return $this;
+    }
+
+    public function & ajaxUpdateStatus( $key, $statuskey, $value ){
+
+        if( isset( $this->elements[ 'status' ] ) )
+            foreach( $this->elements[ 'status' ] as $el )
+                if( isset( $el[ 'key' ] ) && $el[ 'key' ] == $statuskey && isset( $el[ 'type' ] ) && $el[ 'type' ] == 1 && isset( $el[ 'sufix' ] ) )
+                    $this->app->ajax()->text( '#psiv' . $key . $statuskey, $value . myfilters::label( $el[ 'sufix' ], $value ) );
+
         return $this;
     }
 
@@ -137,8 +157,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addStatus( $key, $prefix = '', $sufix = '', $sufixsingular = '' ){
-        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1, 'prefix' => $prefix, 'sufix' => $sufix, 'sufixsingular' => $sufixsingular );
+    public function & addStatus( $key, $prefix = '', $sufix = '' ){
+        $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1, 'prefix' => $prefix, 'sufix' => $sufix );
         return $this;
     }
 
