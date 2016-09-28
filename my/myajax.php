@@ -104,8 +104,8 @@ class myajax{
         return $this;
     }
 
-    public function & append( $el, $html ){
-        $this->out[ 'ap' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+    public function & append( $el, $html, $removefirst = false ){
+        $this->out[ 'ap' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'r' => $removefirst );
         return $this;
     }
 
@@ -144,8 +144,8 @@ class myajax{
         return $this;
     }
 
-    public function & prepend( $el, $html ){
-        $this->out[ 'pp' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+    public function & prepend( $el, $html, $removelast = false ){
+        $this->out[ 'pp' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'r' => $removelast );
         return $this;
     }
 
@@ -154,13 +154,13 @@ class myajax{
         return $this;
     }
 
-    public function & addreplacewith( $el, $html, $grid, $prepend = true  ){
-        $this->out[ 'ar' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'g' => $grid, 'p' => $prepend );
+    public function & addreplacewith( $el, $html, $grid, $prepend = true, $removelast = true ){
+        $this->out[ 'ar' ][] = array( 'e' => $el, 'h' => $this->filter( $html ), 'g' => $grid, 'p' => $prepend, 'r' => $removelast );
         return $this;
     }
 
-    public function & html( $el, $html ){
-        $this->out[ 'ht' ][] = array( 'e' => $el, 'h' => $this->filter( $html ) );
+    public function & html( $el, $html, $escape = false ){
+        $this->out[ 'ht' ][] = array( 'e' => $el, 'h' => $this->filter( $html, $escape ) );
         return $this;
     }
 
@@ -244,8 +244,8 @@ class myajax{
         return $this;
     }
 
-    public function filter( $s ){
-        return trim( preg_replace( "@( )*[\r\n\t]+( )*@", "", $s ) );
+    public function filter( $s, $escape = false ){
+        return trim( preg_replace( "@( )*[\r\n\t]+( )*@", " ", $escape === false ? $s : htmlspecialchars( $s ) ) );
     }
 
     public function & timeout( $action, $ms, $mode = 0 ){
@@ -271,6 +271,11 @@ class myajax{
     public function & login(){
         $this->out[ 'lo' ] = array();
         return $this;
+    }
+
+    public function & drift( $id, $name, $avatar, $custom = array() ){
+        $this->out[ 'df' ] = array( 'i' => $id, 'a' => array( 'name' => $this->filter( $name, true ), 'avatarUrl' => $avatar ) + $custom );
+        return $this;    
     }
 
     public function render(){

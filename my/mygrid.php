@@ -22,6 +22,7 @@ class mygrid{
     private $menuhtml = null;
     private $rowclass = false;
     private $rowclassdepends = false;
+    private $perpage  = 10;
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
@@ -127,11 +128,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addThumb( $key, $kval, /*$kvals,*/ $label = '', $onclick = '', $default = '' /*$cdn = ''*/ ){
+    public function & addThumb( $key, $kval, $label = '', $onclick = '', $default = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => /*( !empty( $kvals ) && $this->app->ishttps() ) ? $kvals :*/ $kval, 'type' => 'thumb', 'onclick' => $onclick, 'default' => $default );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'thumb', 'onclick' => $onclick, 'default' => $default );
         return $this;
     }
 
@@ -256,6 +257,8 @@ class mygrid{
     public function & setValues( $values ){
         $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
+        $this->app->session()->set( $this->name . 'gridinit', false );
+
         return $this;
     }
 
@@ -318,6 +321,10 @@ class mygrid{
     }
 
     public function & refreshAjaxValue( $value ){
+
+        if( is_string( $value ) )
+            $value = json_decode( $value, true );
+
         return $this->refreshAjaxValues( array( $value ) );
     }
 
@@ -350,7 +357,7 @@ class mygrid{
     }
 
     public function & deleteAjaxValue( $key ){
-        $this->app->ajax()->hideTableRow( '#' . $key, '#' . $this->name /*. 'table', '#' . $this->name . 'empty'*/ );
+        $this->app->ajax()->hideTableRow( '#' . $key, '#' . $this->name );
         return $this;
     }
 
@@ -367,39 +374,67 @@ class mygrid{
 
         if( $counter ){
             $append ? $this->app->ajax()->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax()->prepend( '#' . $this->name, $this->render( $values ) );
+
+            $this->app->ajax()->hide( '#' . $this->name . 'empty' );
         }
 
-        if( $counter )
-            $this->app->ajax()->hide( '#' . $this->name . 'empty' );
-
-        if( $this->getPerPage() > $counter )
+        if( $this->perpage > $counter )
             $this->app->ajax()->remove( '#' . $this->name . 'more' );
 
         return $this;
     }
 
-    public function & setMore( $onclick, $perpage = 10, $offset = 0, $label = 'more' ){
-        
-        // reset counter
-        $this->app->session()->set( $this->name . 'perpage', $perpage );
-        $this->app->session()->set( $this->name . 'offset',  $offset );
-        
+    public function & addAjaxPage( $values ){
+        $this->addAjaxValues( $values );
+        if( !empty( $values ) )
+            $this->pageIncrement();
+    
+        return $this;
+    }
+
+    private function pageIncrement(){
+        $this->app->session()->set( $this->name . 'gridinit', false );
+
+        $g = $this->app->session()->get( $this->name . 'gridpage' );
+
+        $this->app->session()->set( $this->name . 'gridpage', 1 + $g );
+    }
+
+    public function & setMore( $onclick, $perpage = 10, $label = 'more' ){
+
         $this->more = array( 'onclick' => $onclick, 'label' => $label );
+        $this->perpage = $perpage;
 
         return $this;
     }
 
-    public function getPerPage(){
-        return intval( $this->app->session()->get( $this->name . 'perpage', 10 ) );
+    public function getPage(){
+
+        if( $this->app->session()->get( $this->name . 'gridinit', true ) === true ){
+            return 0;
+        }
+        return 1 + $this->app->session()->get( $this->name . 'gridpage', 0 );
     }
 
-    public function getOffset( $increase = false ){
+    public function getLimit(){
 
-        $newoffset = intval( $this->app->session()->get( $this->name . 'offset', 0 ) ) + $this->getPerPage();
+        if( $this->app->session()->get( $this->name . 'gridinit' ) === true ){
 
-        $this->app->session()->set( $this->name . 'offset', $newoffset );
+            $resetall = $this->app->session()->get( $this->name . 'gridresetall' );
+            return ( $resetall === true ) ? $this->perpage : ( $this->perpage + $this->perpage * $this->app->session()->get( $this->name . 'gridpage' ) );
+        }
 
-        return $newoffset;
+        return $this->perpage;
+    }
+
+    public function getOffset(){
+        return $this->getPage() * $this->getLimit();
+    }
+
+    public function & pageReset( $resetall = true ){
+        $this->app->session()->set( $this->name . 'gridinit',     true );
+        $this->app->session()->set( $this->name . 'gridresetall', $resetall );
+        return $this;
     }
 
     public function __toString(){
@@ -423,24 +458,29 @@ class mygrid{
         $this->app->ajax()->html( $htmlid, $this->render() );
     }
 
-    private function render( $values = null ){
-        return $this->app->render( '@my/mygrid', array( 'name'     => $this->name,
-                                                        'key'      => $this->key,
-                                                        'keyhtml'  => $this->keyhtml,
-                                                        'tags'     => $this->tags,
-                                                        'labels'   => $this->labels,
-                                                        'allitems' => is_null( $values ),
-                                                        'values'   => is_null( $values ) ? $this->values : $values,
-                                                        'more'     => $this->more,
-                                                        'title'    => $this->title,
-                                                        'emptymsg' => $this->emptymsg,
-                                                        'buttons'  => $this->buttons,
-                                                        'perpage'  => $this->getPerPage(),
-                                                        'orderby'  => $this->orderby,
-                                                        'orderbya' => $this->orderbya,
-                                                        'menuhtml' => $this->menuhtml,
-                                                        'rowclass' => $this->rowclass,
+    private function render( $customvalues = null ){
+
+        $values      = is_null( $customvalues ) ? $this->values : $customvalues;
+        $valuestotal = count( $values );
+
+        return $this->app->render( '@my/mygrid', array( 'name'            => $this->name,
+                                                        'key'             => $this->key,
+                                                        'keyhtml'         => $this->keyhtml,
+                                                        'tags'            => $this->tags,
+                                                        'labels'          => $this->labels,
+                                                        'allitems'        => is_null( $customvalues ),
+                                                        'values'          => $values,
+                                                        'more'            => $this->more,
+                                                        'moreshow'        => ( $valuestotal > 0 && !myrules::isdecimal( $valuestotal / $this->perpage ) ),
+                                                        'title'           => $this->title,
+                                                        'emptymsg'        => $this->emptymsg,
+                                                        'buttons'         => $this->buttons,
+                                                        'perpage'         => $this->perpage,
+                                                        'orderby'         => $this->orderby,
+                                                        'orderbya'        => $this->orderbya,
+                                                        'menuhtml'        => $this->menuhtml,
+                                                        'rowclass'        => $this->rowclass,
                                                         'rowclassdepends' => $this->rowclassdepends,
-                                                        'cols'     => $this->cols ), null, null, 0, false, false );        
+                                                        'cols'            => $this->cols ), null, null, 0, false, false );        
     }
 }

@@ -10,7 +10,6 @@ return array(
     'Ziggeo' => array($vendorDir . '/ziggeo/ziggeophpsdk'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Slim' => array($vendorDir . '/slim/slim'),
-    'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'PHPQRCode' => array($vendorDir . '/aferrandini/phpqrcode/lib'),
     'Otp' => array($vendorDir . '/christian-riesen/otp/src'),
     'OAuth2' => array($vendorDir . '/adoy/oauth2/src'),

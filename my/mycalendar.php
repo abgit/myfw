@@ -33,7 +33,11 @@
             return $this;
         }
 
-        public function & setOnClick( $onclick, $onclickloadingmsg = '' ){
+        public function getID(){
+            return ( isset( $_POST[ 'id' ] ) && is_string( $_POST[ 'id' ] ) && myrules::isdate( $_POST[ 'id' ] ) ) ? $_POST[ 'id' ] : null;
+        }
+
+        public function & setOnClick( $onclick, $onclickmsg = '' ){
             $this->onclick    = $onclick;
             $this->onclickmsg = $onclickmsg;
             return $this;

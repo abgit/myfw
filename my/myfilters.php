@@ -64,6 +64,10 @@ class myfilters{
         return $process ? 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . ( empty( $custom ) ? '' : '/' ) . $url : 'https://www.filestackapi.com/api/file/' . $url . ( empty( $custom ) ? '' : '/' ) . $custom . '?signature=' . $signature . '&policy=' . $policy64;
     }
 
+    public static function filestackresize( $url, $w, $h = null ){
+        return myfilters::filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) );
+    }
+
     public static function filestackmovie( $url, $part ){
 
         $app  = \Slim\Slim::getInstance();

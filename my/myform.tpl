@@ -257,7 +257,7 @@
 			{% elseif el.type == 'static' %}
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
-                {% if el.showvalue %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value|default( 'unknown' ) }}</p>{% endif %}
+                {% if el.showvalue %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value|default( 'unknown' )|nl2br }}</p>{% endif %}
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'button' %}
@@ -332,9 +332,10 @@
                 <span class="help-block">Please confirm 5 character code (letters only) and click on image if you want to see a different code</span>
 
 			{% elseif el.type == 'filestack' %}
+            <label>{{ el.label|raw }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
             <div class="row">
-                <div class="col-xs-7">
-                    <img onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info');$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestack|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                <div class="col-xs-7" style="min-height:{{ el.height }}px">
+                    <img onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info');$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
                     <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                 </div>
                 <div class="col-xs-5" style="padding:0px;">

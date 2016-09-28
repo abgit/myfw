@@ -235,10 +235,11 @@
 
                                                     {% if menu.type == 0 %}
                                                     
-                                                        <li id="pm{{ menu.id }}{{ value[ key ] }}"><a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"> </i>
-                                                        
-                                                            <span id="pms{{ value[ key ] }}">{% if menu.depends and not value[ menu.depends ] %}{{ menu.label }}{% else %}{{menu.dependsLabelPrefix|raw }}{{ value[ menu.dependsValueKey ] }}{{ menu.dependsLabelSufix|raw }}{% endif %}</span>
-                                                        </a></li>
+                                                        <li id="pm{{ menu.id }}{{ value[ key ] }}" {{ ( menu.showdepends is defined and menu.showdepends is not empty and value[ menu.showdepends ] is defined and not value[ menu.showdepends ] ) ? 'class="hide"' }}>
+                                                            <a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"> </i>
+                                                                <span id="pms{{ value[ key ] }}">{% if menu.depends and not value[ menu.depends ] %}{{ menu.label }}{% else %}{{menu.dependsLabelPrefix|raw }}{{ value[ menu.dependsValueKey ] }}{{ menu.dependsLabelSufix|raw }}{% endif %}</span>
+                                                            </a>
+                                                        </li>
 
                                                     {% elseif menu.type == 1 %}
                                                     <li class="dropup"><a style="font-size:12px;" href="#" class="dropdown-toggle" data-toggle="dropdown">{{ menu.label }} <i class="{{ menu.icon|default('icon-arrow-up2') }}"></i></a>

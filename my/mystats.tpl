@@ -41,7 +41,7 @@
                         {% set value = value|replaceonly( stat.replace )|default( stat.replacedefault ) %}
                     {% endif %}
 
-                    <span id="st{{ stat.key }}"{% if stat.islabel %} class="label label-stats label-{{ type }}"{% endif %}>{{ value|t(15) }}</span>
+                    <span id="st{{ stat.key }}"{% if stat.islabel %} class="label label-stats label-{{ type }}"{% endif %}>{{ value|t(20) }}</span>
 
                     {% if stat.onclick %}
                         </a>

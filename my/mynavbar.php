@@ -27,6 +27,11 @@ class mynavbar{
         $this->text = array( 'message' => $message, 'icon' => $icon, 'thumb' => $thumb, 'thumbclass' => $thumbclass );
         return $this;
     }
+    
+    public function & ajaxUpdateText( $message ){
+        $this->app->ajax()->html( '#navbartxt', $message, true );
+        return $this;
+    }
 
     public function & addItem( $text, $onclick = '', $href = '', $class = '', $style = '' ){
         $this->elements[] = array( 'type' => 'item', 'text' => $text, 'onclick' => $onclick, 'href' => $href, 'class' => $class, 'style' => $style );

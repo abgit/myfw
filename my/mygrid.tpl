@@ -140,7 +140,7 @@
     						                                    <button data-toggle="dropdown" class="btn btn-icon dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon }}"></i></button>
     													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
                                                                 {% for option in td.options %}
-                                                                    {% set optiondisabled = ( option.disabled and val[ option.disableddepends ] ) %}
+                                                                    {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
             														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}><i class="{{ option.icon }}"></i> {{ option.label }}</a></li>
     		                                                    {% endfor %}
                 		    									</ul>
@@ -172,7 +172,7 @@
                                     {% endfor %}
                                 {% endif %}
 
-                                {% if more and values|length == perpage %}
+                                {% if more and moreshow %}
                                     <button id="{{ name }}more" style="margin-left:3px;margin-top:3px" onclick="{{ more.onclick }}" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
                                 {% endif %}
                               </div>

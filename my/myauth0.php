@@ -43,7 +43,6 @@
 
                 // custom properties
                 $client[ 'auth0uuid' ] = md5( $client[ 'user_id' ] );
-                $client[ 'fullname' ]  = isset( $client[ 'nickname' ] ) ? $client[ 'nickname' ] : ( $client[ 'given_name' ] . ' ' . $app->client[ 'family_name' ] );
                 $client[ 'loginmode' ] = $client[ 'provider' ] == 'auth0' ? 'username & password' : $client[ 'provider' ];
 
                 $this->app->client = $client;

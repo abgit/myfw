@@ -51,7 +51,7 @@
             {% if text %}
             <div id="navbar-text" class="nav navbar-nav navbar-right collapse in hidden-sm hidden-xs">
 			  <p class="navbar-text {{ text.thumbclass }}">
-                {% if text.icon %}<i class="{{ text.icon }}"></i>{% endif %}{% if text.thumb %}<img id="navbarimg" width="40" height="40" src="{{ text.thumb }}" style="margin-right:4px">{% endif %} {{ text.message|t(60) }}
+                {% if text.icon %}<i class="{{ text.icon }}"></i>{% endif %}{% if text.thumb %}<img id="navbarimg" width="40" height="40" src="{{ text.thumb }}" style="margin-right:4px">{% endif %}<span id="navbartxt">{{ text.message|t(60) }}</span>
               </p>
             </div>
             {% endif %}

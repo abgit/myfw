@@ -74,6 +74,7 @@
         private $menu        = null;
         private $pusher      = null;
         private $memcached   = null;
+        private $intercom    = null;
 
         public  $onDBError   = null;
 
@@ -431,6 +432,12 @@
 			if( is_null( $this->memcached ) )
 				$this->memcached = new mymemcached();
 			return $this->memcached;
+		}
+
+		public function intercom(){
+			if( is_null( $this->intercom ) )
+				$this->intercom = new myintercom();
+			return $this->intercom;
 		}
 
 		public function session(){

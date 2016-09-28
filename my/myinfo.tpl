@@ -70,7 +70,11 @@
         {% if el.keyt %}
             <h6>{{ values[ el.keyt ] }}</h6>
         {% endif %}
-    {{ val|trim|nl2br }}
+        {% if val|trim is empty %}
+            <i>{{ el.defaulttext|raw }}</i>
+        {% else %}
+            {{ val|nl2br }}
+        {% endif %}
 
     {% elseif el.type == 'custom' %}
         {% if el.title %}<h6>{{ el.title }}</h6>{% endif %}{{el.obj|raw}}

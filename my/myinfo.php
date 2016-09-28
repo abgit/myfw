@@ -55,8 +55,8 @@ class myinfo{
         return $this;
     }
 
-    public function & addTextImage( $key, $keytitle, $keyimage, $keyimagesec, $imagewidth = 200, $imageheight = 150 ){
-        $this->elements[] = array( 'key' => $key, 'keyt' => $keytitle, 'keyi' => $this->app->ishttps() ? $keyimagesec : $keyimage, 'type' => 'textimage', 'imagewidth' => $imagewidth, 'imageheight' => $imageheight );
+    public function & addTextImage( $key, $keytitle, $keyimage = '', $imagewidth = 200, $imageheight = 150, $defaulttext = '' ){
+        $this->elements[] = array( 'key' => $key, 'keyt' => $keytitle, 'keyi' => $keyimage, 'type' => 'textimage', 'imagewidth' => $imagewidth, 'imageheight' => $imageheight, 'defaulttext' => $defaulttext );
         return $this;
     }
 

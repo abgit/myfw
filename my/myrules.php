@@ -30,6 +30,10 @@ class myrules{
         return myrules::regex( strval( $value ), '/^([0-9]{1,5}([\.\,][0-9]{1,8})?)$/' );
     }
 
+   public static function isdecimal( $value, $opts='', $formelement = null){
+        return is_numeric( $value ) && ( floor( $value ) != $value );
+    }
+
     public static function bitcoin( $value, $opts='', $formelement = null){
         return myrules::regex( strval( $value ), '/^([1-9]{0,3}[0-9]([\.\,][0-9]{1,8})?)$/' );
     }

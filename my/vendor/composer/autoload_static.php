@@ -25,6 +25,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         ),
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
         ),
         'I' => 
@@ -67,6 +68,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'Slim\\Views\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/views',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -137,10 +142,6 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         ),
         'P' => 
         array (
-            'Psr\\Log\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/psr/log',
-            ),
             'PHPQRCode' => 
             array (
                 0 => __DIR__ . '/..' . '/aferrandini/phpqrcode/lib',
