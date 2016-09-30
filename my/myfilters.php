@@ -1,8 +1,5 @@
 <?php
 
-    use \Michelf\Markdown;
-    use \Michelf\MarkdownExtra;
-
 class myfilters{
 
 
@@ -311,7 +308,7 @@ class myfilters{
     }
  
     public static function markdown( $data ){
-        $parser = new MarkdownExtra();
+        $parser = new mymarkdown();
         $parser->no_markup = true;
         $parser->no_entities = true;
         return $parser->transform($data);

@@ -51,7 +51,7 @@ class myrules{
     }
 
     public static function bitcoinaddress( $value, $opts='', $formelement = null ) {
-        return myrules::regex( strval( $value ), '/^([13][a-km-zA-HJ-NP-Z0-9]{26,33})$/' );
+        return mybtc::validBitcoinAddress( trim( strval( $value ) ) );
     }
 
     public static function tag( $value, $opts='', $formelement = null ) {

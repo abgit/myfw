@@ -257,7 +257,7 @@
 			{% elseif el.type == 'static' %}
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
-                {% if el.showvalue %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value|default( 'unknown' )|nl2br }}</p>{% endif %}
+                {% if el.showvalue|default( true ) %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value ? el.prefix|raw }}{{ el.value|default( 'unknown' )|nl2br }}{{ el.value ? el.sufix|raw }}</p>{% endif %}
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'button' %}

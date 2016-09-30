@@ -119,7 +119,7 @@
                                                         {% elseif td.type == 'fixed' %}
                                                             {% set fixedfilldefault = true %}
                                                             
-                                                            {% for option in td.options if ( option.value is defined and option.value == value ) %}
+                                                            {% for option in td.options if ( option.value is defined and option.value is same as(value)  ) %}
                                                                 <span{% if option.type %} class="label label-{{ option.type }}"{% endif %}>{{ option.label ? option.label : value }}</span>
                                                                 {% set fixedfilldefault = false %}
                                                             {% endfor %}
@@ -131,8 +131,8 @@
                                                                 {% set break = 1 %}
                                                             {% endfor %}
 
-                                                            {% if fixedfilldefault and td.default.type %}
-                                                                <span{% if td.default.type %} class="label label-{{ td.default.type }}"{% endif %}>{{ td.default.label ? td.default.label : value }}</span>
+                                                            {% if fixedfilldefault %}
+                                                                <span class="label label-{{ td.default.type|default( 'default' ) }}">{% if td.default.label %}{{ td.default.label }}{% elseif value is not empty %}{{ value }}{% else %} &nbsp;&nbsp;&nbsp; {% endif %}</span>
                                                             {% endif %}
 
                                                         {% elseif td.type == 'menu' %}

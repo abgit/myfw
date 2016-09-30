@@ -28,6 +28,11 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
         ),
+        'J' => 
+        array (
+            'JaycoDesign\\Decimal\\' => 20,
+            'JaycoDesign\\BTCHelper\\' => 22,
+        ),
         'I' => 
         array (
             'Intercom\\' => 9,
@@ -76,6 +81,14 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'JaycoDesign\\Decimal\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jaycodesign/decimal/src',
+        ),
+        'JaycoDesign\\BTCHelper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jaycodesign/btchelper/src',
         ),
         'Intercom\\' => 
         array (

@@ -95,18 +95,20 @@
             print json_encode( $this->values, JSON_UNESCAPED_SLASHES );
         }
         
-        public function & ajaxRemoveEvent( $event_id ){
-            $this->app->ajax()->calendarEventRemove( '#cal' . $this->id, $event_id );
+        public function & ajaxRemoveEvent( $event_id = null ){
+            $this->app->ajax()->calendarEventRemove( '#cal' . $this->id, is_null( $event_id ) ? date( "Y-m-d", time() ) : $event_id );
             return $this;
         }
 
-        public function & ajaxAddEvent( $event_id, $event_title, $event_start = null, $event_end = null, $event_color = null ){
+        public function & ajaxAddEvent( $event_title, $event_id = null, $event_start = null, $event_end = null, $event_color = null ){
             if( is_null( $event_start ) )
                 $event_start = time();
             if( is_null( $event_end ) )
                 $event_end = $event_start;
             if( is_null( $event_color ) )
                 $event_color = $this->colordefault;
+            if( is_null( $event_id ) )
+                $event_id = date( "Y-m-d", time() );
 
             $event_start = date( "Y-m-d", is_string( $event_start ) ? strtotime( $event_start ) : intval( $event_start ) );
             $event_end   = date( "Y-m-d", is_string( $event_end )   ? strtotime( $event_end )   : intval( $event_end ) );

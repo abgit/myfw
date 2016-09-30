@@ -34,7 +34,7 @@
             $this->app->ajax()->pusherSubscribe( $this->pkey, $channel, $event, true, $this->pcluster, $replace, $replaceWith );
         }
 
-        public function send( $channel, $event ){
+        public function send( $channel, $event = null ){
 
             if( empty( $channel ) )
                 $channel = $this->app->config( 'pusher.channel' );

@@ -223,7 +223,7 @@ class mygrid{
     }
 
     public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'center' ){
-        $key = 'm' . $this->menu++;
+        $key = 'menutools';
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
         }
@@ -243,8 +243,17 @@ class mygrid{
         return $this;
     }
 
-    public function & ajaxSetMenuItemDisabled( $key, $index ){
-        $this->app->ajax()->attr( '#' . $key . 'm' . $index, 'class', 'disabled' );
+    public function & ajaxSetMenuItemDisabled( $key, $id, $menu = 'menutools' ){
+
+        if( isset( $this->cols[ $menu ][0][ 'options' ] ) ){
+            foreach( $this->cols[ $menu ][0][ 'options' ] as $i => $options ){
+                if( isset( $options[ 'id' ] ) && $options[ 'id' ] == $id ){
+                    $this->app->ajax()->attr( '#' . $key . 'm' . $i, 'class', 'disabled' );
+                    return $this;
+                }
+            }
+        }
+
         return $this;
     }
 

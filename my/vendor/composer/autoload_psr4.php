@@ -11,6 +11,8 @@ return array(
     'Slim\\Views\\' => array($vendorDir . '/slim/views'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
+    'JaycoDesign\\Decimal\\' => array($vendorDir . '/jaycodesign/decimal/src'),
+    'JaycoDesign\\BTCHelper\\' => array($vendorDir . '/jaycodesign/btchelper/src'),
     'Intercom\\' => array($vendorDir . '/intercom/intercom-php/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
     'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
