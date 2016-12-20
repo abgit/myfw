@@ -10,7 +10,7 @@ class mygrid{
     private $values   = null;
     private $keyhtml  = null;
     private $menu     = 0;
-    private $title    = null;
+    private $title    = array();
     private $emptymsg = 'No elements to display';
     private $buttons  = array();
     private $classes  = array();
@@ -23,6 +23,7 @@ class mygrid{
     private $rowclass = false;
     private $rowclassdepends = false;
     private $perpage  = 10;
+    private $titlekey = false;
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
@@ -53,7 +54,13 @@ class mygrid{
     }
 
     public function & setTitle( $label, $icon = 'icon-stack' ){
-        $this->title = array( 'label' => $label, 'icon' => $icon );
+        $this->title[ 'label' ] = $label;
+        $this->title[ 'icon' ]  = $icon;
+        return $this;
+    }
+
+    public function & setTitleKey( $key ){
+        $this->titlekey = $key;
         return $this;
     }
 
@@ -266,6 +273,9 @@ class mygrid{
     public function & setValues( $values ){
         $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
+        if( is_string( $this->titlekey ) && isset( $values[ $this->titlekey ] ) )
+            $this->title[ 'labelkey' ] = $values[ $this->titlekey ];
+
         $this->app->session()->set( $this->name . 'gridinit', false );
 
         return $this;
@@ -344,7 +354,7 @@ class mygrid{
         
         foreach( $values as $row ){
             if( isset( $row[ $this->key ] ) )
-                $this->app->ajax()->replacewith( '#' . $row[ $this->key ], $this->render( array( $row ) ) );
+                $this->app->ajax()->replacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ) );
         }
 
         return $this;
@@ -359,14 +369,14 @@ class mygrid{
 
         foreach( $values as $row ){
             if( isset( $row[ $this->key ] ) )
-                $this->app->ajax()->addreplacewith( '#' . $row[ $this->key ], $this->render( array( $row ) ), '#' . $this->name );
+                $this->app->ajax()->addreplacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ), '#' . $this->name );
         }
 
         return $this;    
     }
 
     public function & deleteAjaxValue( $key ){
-        $this->app->ajax()->hideTableRow( '#' . $key, '#' . $this->name );
+        $this->app->ajax()->hideTableRow( '#' . $this->name . $key, '#' . $this->name );
         return $this;
     }
 

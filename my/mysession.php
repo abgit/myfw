@@ -41,6 +41,7 @@
         }
 
         public function set( $key, $value ){
+
             if( ! $this->sessionactive )
                 return false;
 

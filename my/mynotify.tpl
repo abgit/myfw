@@ -1,6 +1,6 @@
 {% if allitems %}
  <li class="dropdown">
-    <a data-toggle="dropdown" class="dropdown-toggle">
+    <a data-toggle="dropdown" class="dropdown-toggle"{% if onshow %} onClick="if($('#nfcounter').text().trim()){setTimeout(function(){ {{ onshow }} },1000);}"{% endif %}>
         <i class="{{ icon }}">
         </i>
         <span class="label label-danger" style="background-color:rgba(255,0,0,1.00)" id="{{ name }}counter">{{ counter ? counter }}</span>
@@ -34,7 +34,7 @@
                 <a {%if itemaction.href %} href="{{ itemaction.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{%if itemaction.onclick %} onclick="{{ itemaction.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}>
                     
                     {% if itemthumb.key and val[ itemthumb.key ] %}
-                    <img class="user-face" alt="" src="{{ val[ itemthumb.key ] }}">
+                    <img class="user-face notifthumb{{ val[ itemthumb.classkey ] }}" alt="" src="{{ val[ itemthumb.key ] }}">
                     {% endif %}
 
                     {% set title = val[ itemtitle.key ] %}
@@ -42,7 +42,7 @@
                         {% set title = val[ itemtitle.key ]|replace( itemtitle.replace ) %}
                     {% endif %}
 
-                    <strong style="padding-right:0px;">{{title|t(30) }} {% if itemlabel and val[ itemlabel.key ] %}<span style="float:right"><span class="label label-info">{{itemlabel.prefix ? itemlabel.prefix}}{{ val[ itemlabel.key ]|t(8) }}{{itemlabel.sufix ? itemlabel.sufix}}</span></span>{% endif %}</strong><span>{{val[ itemdescription.key ]|t(35) }}</span>
+                    <strong style="padding-right:0px;">{{title|t(30) }} {% if itemlabel and val[ itemlabel.key ] %}<span style="float:right"><span class="label label-info">{{ itemlabel.prefix ? itemlabel.prefix|raw }}{{ val[ itemlabel.key ]|t(8) }}{{ itemlabel.sufix ? itemlabel.sufix|raw }}</span></span>{% endif %}</strong><span>{{val[ itemdescription.key ]|t(35) }}</span>
                 </a>
                 </li>
                 {% endfor %}

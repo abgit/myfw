@@ -235,8 +235,12 @@ class myform{
         return $this;
     }
 
-    public function & addCameraTag( $name, $label = 'Video', $maxlength = null ){
-        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'maxlength' => $maxlength );
+    public function & addCameraTag( $name, $label = 'Video', $maxlength = null, $sources = '' ){
+        
+        $expiration = time() + 1800;
+        $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
+
+        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'maxlength' => $maxlength, 'appexpiration' => $expiration, 'appsignature' => $signature, 'sources' => $sources );
 
         $this->addRule( function() use ( $name ){
 
@@ -815,30 +819,44 @@ class myform{
         return $this;
     }
 
+    private function csrfreset(){
+
+        $csrfnew = $this->getRandom( 8 );
+
+        $this->app->session()->set( $this->csrfname, $csrfnew );
+
+        // add csrf to ajax
+        $this->app->ajax()->addFormCsrf( $this->csrfname, $csrfnew );
+    
+        return $csrfnew;
+    }
+
     private function applyCsrf(){
 
         // csrf protection
         if( !$this->csrfinit ){
 
-            $csrfname = $this->csrfname;
-            $csrf     = $this->app->session()->get( $csrfname, '' );
+            // create csrf if not exists
+            if( empty( $this->app->session()->get( $this->csrfname ) ) )
+                $this->csrfreset();
 
-            $this->addRule( function() use( $csrf, $csrfname ){
-                return ( is_string( $csrf ) && !empty( $csrf ) && isset( $_POST[ $csrfname ] ) && $csrf === $_POST[ $csrfname ] ) ? true : 'csrf protection';
+            $this->addRule( function(){
+
+                $csrf = $this->app->session()->get( $this->csrfname, '' );
+
+                if( is_string( $csrf ) && !empty( $csrf ) && isset( $_POST[ $this->csrfname ] ) && $csrf === $_POST[ $this->csrfname ] ){
+
+                    // update post for app::confirm
+                    $_POST[ $this->csrfname ] = $this->csrfreset();
+
+                    return true;
+                }else{
+                    $this->csrfreset();
+                    return 'csrf protection';
+                }
             });
 
             $this->csrfinit = true;
-
-            // overwrite csrf if form is not submitted only
-            if( !$this->isSubmitted() ){
-
-                $csrfnew = $this->getRandom( 8 );
-
-                $this->app->session()->set( $csrfname, $csrfnew );
-
-                // add csrf to ajax
-                $this->app->ajax()->addFormCsrf( $csrfname, $csrfnew );
-            }
         }
 
     }

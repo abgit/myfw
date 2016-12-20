@@ -17,11 +17,11 @@
 
             }elseif( $this->driver === 'heroku' ){
                 $url       = parse_url( getenv( 'DATABASE_URL' ) );
-                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ) ), $url[ 'user' ], $url[ 'pass' ] );
+                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s;port=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
 
             }elseif( $this->driver === 'fortrabbit' ){
                 $url       = parse_url( $this->app->configdecrypt( getenv( 'DATABASE_URL' ) ) );
-                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ) ), $url[ 'user' ], $url[ 'pass' ] );
+                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s;port=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
 
             }else{
                 d( 'db invalid driver' );
@@ -29,8 +29,8 @@
 
             $this->stmt = null;
 
-            if( $this->app->config( 'db.debug' ) )
-                $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+//            if( $this->app->config( 'db.debug' ) )
+            $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
         }
 
         public function & pdo(){
@@ -132,10 +132,10 @@
             return $this->stmt;
         }
 
-        private function getErrorResult(){
+        private function getErrorResult( $procedure, $args ){
 
             if( is_callable( array( $this->app, 'onDBError' ) ) )
-                call_user_func( $this->app->onDBError, $this->errorCode() );
+                call_user_func( $this->app->onDBError, $this->errorCode(), $this->errorInfo(), $procedure, $args );
 
             if( $this->app->config( 'db.debug' ) === true )
                 $this->app->request->isAjax() ? $this->app->ajax()->msgWarning( $this->errorInfo(), 'Debug' ) : d( $this->errorCode() . $this->errorInfo() );
@@ -148,7 +148,7 @@
             try{
                 $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );		
             }catch( ErrorException $e ){
-                $result = $this->getErrorResult();
+                $result = $this->getErrorResult( $procedure, $args );
                 return false;
             }
             return ( count( $result ) > 0 );
@@ -181,7 +181,7 @@
             try{
                 $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
             }catch( ErrorException $e ){
-                $result = $this->getErrorResult();
+                $result = $this->getErrorResult( $procedure, $args );
                 return false;
             }
 
@@ -202,7 +202,7 @@
             try{
                 $result = $this->query( $procedure, $args )->fetchAll();
             }catch( ErrorException $e ){
-                $result = $this->getErrorResult();
+                $result = $this->getErrorResult( $procedure, $args );
                 return false;
             }
             

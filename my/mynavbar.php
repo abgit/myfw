@@ -7,6 +7,7 @@ class mynavbar{
     private $elements = array();
     private $header   = array();
     private $cdn      = false;
+    private $text     = '';
 
     public function __construct( $name ){
         $this->name = $name;
@@ -28,8 +29,8 @@ class mynavbar{
         return $this;
     }
     
-    public function & ajaxUpdateText( $message ){
-        $this->app->ajax()->html( '#navbartxt', $message, true );
+    public function & ajaxUpdateText( $message, $htmlid = 'navbartxt' ){
+        $this->app->ajax()->html( '#' . $htmlid, $message, true );
         return $this;
     }
 
@@ -43,14 +44,14 @@ class mynavbar{
         return $this;
     }
 
-    public function & addMenu( $label, $options ){
-        $this->elements[] = array( 'type' => 'menu', 'label' => $label, 'options' => $options );
+    public function & addMenu( $label, $options, $thumb = '', $htmlid = '', $thumbid = '' ){
+        $this->elements[] = array( 'type' => 'menu', 'label' => $label, 'options' => $options, 'thumb' => $thumb, 'htmlid' => $htmlid, 'thumbid' => $thumbid );
         return $this;
     }
 
-    public function & ajaxThumbChange( $thumb ){
+    public function & ajaxThumbChange( $thumb, $htmlid = 'navbarimg' ){
         
-        $this->app->ajax()->attr( '#navbarimg', 'src', $thumb );
+        $this->app->ajax()->attr( '#' . $htmlid, 'src', $thumb );
         return $this;
     }
 
@@ -58,7 +59,7 @@ class mynavbar{
         return $this->render();
     }
 
-    private function render( $values = null ){
+    public function render( $values = null ){
         return $this->app->render( '@my/mynavbar', array( 'values'   => is_null( $values ) ? $this->values : $values,
                                                           'name'     => $this->name,
                                                           'header'   => $this->header,

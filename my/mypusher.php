@@ -33,6 +33,19 @@
         public function ajaxSubscribe( $channel, $event, $replace = false, $replaceWith = false ){
             $this->app->ajax()->pusherSubscribe( $this->pkey, $channel, $event, true, $this->pcluster, $replace, $replaceWith );
         }
+        
+        public function checkendpoint( $channel ){
+ 
+            if( isset( $_POST['channel_name'] ) && is_string( $_POST['channel_name'] ) && $_POST['channel_name'] === $channel ){
+                echo $this->pusherObj->socket_auth($_POST['channel_name'], $_POST['socket_id']);
+            
+                return true;
+            }
+            
+            header('', true, 403);
+            echo "Forbidden";
+            return false;
+        }
 
         public function send( $channel, $event = null ){
 

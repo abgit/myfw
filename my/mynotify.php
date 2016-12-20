@@ -19,6 +19,7 @@ class mynotify{
     private $emptymsg = 'No elements to display';
     private $unreadkey = false;
     private $allitems = true;
+    private $onshow;
 
     public function __construct( $name = 'n' ){
         $this->name = $name;
@@ -56,6 +57,11 @@ class mynotify{
         return $this;
     }
 
+    public function & setOnShow( $action ){
+        $this->onshow = $action;
+        return $this;
+    }
+
     public function & setValues( $values, $counter ){
 
         if( !is_array( $values ) )
@@ -86,8 +92,8 @@ class mynotify{
         return $this;
     }
 
-    public function & setItemThumb( $key, $keyhttps ){
-        $this->itemthumb = array( 'key' => $this->app->ishttps() ? $keyhttps : $key );
+    public function & setItemThumb( $key, $classkey = '' ){
+        $this->itemthumb = array( 'key' => $key, 'classkey' => $classkey );
         return $this;
     }
 
@@ -115,6 +121,13 @@ class mynotify{
         $this->app->ajax()->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter );
         return $this;
     }
+
+
+    public function & ajaxUpdateThumb( $class, $value ){
+        $this->app->ajax()->attr( '.notifthumb' . $class, 'src', $value );
+        return $this;
+    }
+
 
     public function & pusherUpdate( $values, $counter, $channel = null, $event = null ){
 
@@ -148,6 +161,7 @@ class mynotify{
                                                           'counter'         => $this->counter,
                                                           'emptymsg'        => $this->emptymsg,
                                                           'unreadkey'       => $this->unreadkey,
+                                                          'onshow'          => $this->onshow,
                                                           'allitems'        => $this->allitems
                                                          ), null, null, null, false, false );
 

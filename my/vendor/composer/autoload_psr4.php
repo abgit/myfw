@@ -6,19 +6,25 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'phpseclib\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
-    'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'Slim\\Views\\' => array($vendorDir . '/slim/views'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
     'JaycoDesign\\Decimal\\' => array($vendorDir . '/jaycodesign/decimal/src'),
     'JaycoDesign\\BTCHelper\\' => array($vendorDir . '/jaycodesign/btchelper/src'),
-    'Intercom\\' => array($vendorDir . '/intercom/intercom-php/src'),
+    'Http\\Promise\\' => array($vendorDir . '/php-http/promise/src'),
+    'Http\\Message\\MultipartStream\\' => array($vendorDir . '/php-http/multipart-stream-builder/src'),
+    'Http\\Message\\' => array($vendorDir . '/php-http/message-factory/src', $vendorDir . '/php-http/message/src'),
+    'Http\\Discovery\\' => array($vendorDir . '/php-http/discovery/src'),
+    'Http\\Client\\Curl\\' => array($vendorDir . '/php-http/curl-client/src'),
+    'Http\\Client\\' => array($vendorDir . '/php-http/httplug/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
     'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
+    'Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
     'Coinbase\\Wallet\\' => array($vendorDir . '/coinbase/coinbase/src'),
+    'Clue\\StreamFilter\\' => array($vendorDir . '/clue/stream-filter/src'),
+    'Bugsnag\\' => array($vendorDir . '/bugsnag/bugsnag/src'),
     'Base32\\' => array($vendorDir . '/christian-riesen/base32/src'),
     'Auth0\\SDK\\' => array($vendorDir . '/auth0/auth0-php/src'),
 );

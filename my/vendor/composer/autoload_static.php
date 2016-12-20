@@ -7,20 +7,16 @@ namespace Composer\Autoload;
 class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
 {
     public static $files = array (
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        'ddc0a4d7e61c0286f0f8593b1903e894' => __DIR__ . '/..' . '/clue/stream-filter/src/functions.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-        'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'p' => 
-        array (
-            'phpseclib\\' => 10,
-        ),
         'S' => 
         array (
-            'Symfony\\Component\\EventDispatcher\\' => 34,
             'Slim\\Views\\' => 11,
         ),
         'P' => 
@@ -33,9 +29,14 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'JaycoDesign\\Decimal\\' => 20,
             'JaycoDesign\\BTCHelper\\' => 22,
         ),
-        'I' => 
+        'H' => 
         array (
-            'Intercom\\' => 9,
+            'Http\\Promise\\' => 13,
+            'Http\\Message\\MultipartStream\\' => 29,
+            'Http\\Message\\' => 13,
+            'Http\\Discovery\\' => 15,
+            'Http\\Client\\Curl\\' => 17,
+            'Http\\Client\\' => 12,
         ),
         'G' => 
         array (
@@ -49,10 +50,13 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         ),
         'C' => 
         array (
+            'Composer\\CaBundle\\' => 18,
             'Coinbase\\Wallet\\' => 16,
+            'Clue\\StreamFilter\\' => 18,
         ),
         'B' => 
         array (
+            'Bugsnag\\' => 8,
             'Base32\\' => 7,
         ),
         'A' => 
@@ -62,14 +66,6 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
     );
 
     public static $prefixDirsPsr4 = array (
-        'phpseclib\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
-        ),
-        'Symfony\\Component\\EventDispatcher\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
-        ),
         'Slim\\Views\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/views',
@@ -90,9 +86,30 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             0 => __DIR__ . '/..' . '/jaycodesign/btchelper/src',
         ),
-        'Intercom\\' => 
+        'Http\\Promise\\' => 
         array (
-            0 => __DIR__ . '/..' . '/intercom/intercom-php/src',
+            0 => __DIR__ . '/..' . '/php-http/promise/src',
+        ),
+        'Http\\Message\\MultipartStream\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/multipart-stream-builder/src',
+        ),
+        'Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/message-factory/src',
+            1 => __DIR__ . '/..' . '/php-http/message/src',
+        ),
+        'Http\\Discovery\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/discovery/src',
+        ),
+        'Http\\Client\\Curl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/curl-client/src',
+        ),
+        'Http\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/httplug/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
@@ -110,9 +127,21 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
+        'Composer\\CaBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
+        ),
         'Coinbase\\Wallet\\' => 
         array (
             0 => __DIR__ . '/..' . '/coinbase/coinbase/src',
+        ),
+        'Clue\\StreamFilter\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/clue/stream-filter/src',
+        ),
+        'Bugsnag\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bugsnag/bugsnag/src',
         ),
         'Base32\\' => 
         array (
@@ -125,20 +154,6 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
     );
 
     public static $prefixesPsr0 = array (
-        't' => 
-        array (
-            'transloadit' => 
-            array (
-                0 => __DIR__ . '/..' . '/transloadit/php-sdk/lib',
-            ),
-        ),
-        'Z' => 
-        array (
-            'Ziggeo' => 
-            array (
-                0 => __DIR__ . '/..' . '/ziggeo/ziggeophpsdk',
-            ),
-        ),
         'T' => 
         array (
             'Twig_' => 
@@ -177,24 +192,9 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             array (
                 0 => __DIR__ . '/..' . '/michelf/php-markdown',
             ),
-            'Mailgun\\Tests' => 
-            array (
-                0 => __DIR__ . '/..' . '/mailgun/mailgun-php/tests',
-            ),
             'Mailgun' => 
             array (
                 0 => __DIR__ . '/..' . '/mailgun/mailgun-php/src',
-            ),
-        ),
-        'G' => 
-        array (
-            'Guzzle\\Tests' => 
-            array (
-                0 => __DIR__ . '/..' . '/guzzle/guzzle/tests',
-            ),
-            'Guzzle' => 
-            array (
-                0 => __DIR__ . '/..' . '/guzzle/guzzle/src',
             ),
         ),
     );

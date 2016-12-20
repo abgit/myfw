@@ -115,8 +115,8 @@ class Pusher
 
             $this->settings['host'] = $host;
 
-            $this->log('Legacy $host parameter provided: '.
-                                    $this->settings['scheme'] + ' host: ' + $this->settings['host']);
+            $this->log('Legacy $host parameter provided: ' .
+                                    $this->settings['scheme'] . ' host: ' . $this->settings['host']);
         }
 
         if (!is_null($port)) {
@@ -700,7 +700,7 @@ class Pusher
 
         $response = $this->exec_curl($ch);
 
-        if ($response['status'] === 200 && $debug === false) {
+        if ($response['status'] === 202 && $debug === false) {
             return true;
         } elseif ($debug === true || $this->settings['debug'] === true) {
             return $response;

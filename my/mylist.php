@@ -415,7 +415,7 @@ class mylist{
         '(UTC+13:00) Nuku\'alofa' => 'Pacific/Tongatapu' );
 
 
-    public static function getAWSips( $zone = null, $service = null ){
+    public static function getAWSips( $zone = 'eu-west-1', $service = 'EC2' ){
     
         $res = array();
         $ips = json_decode( file_get_contents( 'https://ip-ranges.amazonaws.com/ip-ranges.json' ) );

@@ -147,22 +147,31 @@
                     if( !is_string( $this->container['settings'][$name] ) )
                         return $this->container['settings'][$name];
 
-                    switch( $this->container['settings'][$name]{0} ){
-                        case '@': list( $all, $variable, $sufix ) = $this->configparse( $name );
+                    preg_match("/([^$@#][a-zA-Z0-9]+[-]{1})([$@#][a-zA-Z0-9_]+.*)/", $this->container['settings'][$name], $vars );
+                    if( is_array( $vars ) && !empty( $vars ) ){
+                        $setting = $vars[ 2 ];
+                        $prefix  = $vars[ 1 ];
+                    }else{
+                        $setting = $this->container['settings'][$name];
+                        $prefix  = '';
+                    }
+
+                    switch( $setting{0} ){
+                        case '@': list( $all, $variable, $sufix ) = $this->configparse( $setting );
                                   $var = $this->getenvconfigvar( $variable );
-                                  return is_null( $var ) ? null : ( $var . $sufix );
+                                  return is_null( $var ) ? null : ( $prefix . $var . $sufix );
 
-                        case '#': list( $all, $variable, $sufix ) = $this->configparse( $name );
+                        case '#': list( $all, $variable, $sufix ) = $this->configparse( $setting );
                                   $var = $this->getenvconfigvar( $variable );
-                                  return is_null( $var ) ? null : ( $this->configdecrypt( $var ) . $sufix );
+                                  return is_null( $var ) ? null : ( $prefix . $this->configdecrypt( $var ) . $sufix );
 
-                        case '!': list( $all, $variable, $sufix ) = $this->configparse( $name );
-                                  return $this->configdecrypt( $variable ) . $sufix;
+                        case '!': list( $all, $variable, $sufix ) = $this->configparse( $setting );
+                                  return $prefix . $this->configdecrypt( $variable ) . $sufix;
 
-                        case '$': list( $all, $variable, $sufix ) = $this->configparse( $name );
-                                  return $this->session()->get( $variable ) . $sufix;
+                        case '$': list( $all, $variable, $sufix ) = $this->configparse( $setting );
+                                  return $prefix . $this->session()->get( $variable ) . $sufix;
 
-                        default: return $this->container['settings'][$name];
+                        default: return $setting;
                     }
                 }
                 return null;
@@ -174,7 +183,7 @@
         }
 
         private function configparse( $name ){
-            preg_match("/([a-zA-Z0-9_]+)(.*)/", substr( $this->container['settings'][$name], 1 ), $vars );
+            preg_match("/([a-zA-Z0-9_]+)(.*)/", substr( $name, 1 ), $vars );
             return $vars;
         }
 
@@ -482,8 +491,13 @@
 
         public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $description = '', $mode = 1, $twofactor = false, $sms = false ){
 
+            $postvars = ( isset( $_POST ) ? $_POST : array() );
+            foreach( $postvars as $k => $val )
+                if( strpos( $k, 'csrf' ) )
+                    unset( $postvars[ $k ] );
+ 
             $route = $this->router->getCurrentRoute();
-            $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) ) );
+            $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) + $postvars ) );
 
             if( $this->session()->get( $hash . 'confirm', false ) ){
                 $this->session()->delete( $hash . 'confirm' );

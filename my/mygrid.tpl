@@ -2,7 +2,7 @@
 {% if allitems %}
 
     {% if title %}
-        <h6 class="heading-hr"><i class="{{ title.icon }}"></i> {{ title.label }}</h6>
+        <h6 class="heading"><i{% if title.icon %} class="{{ title.icon }}"{% endif %}></i> {{ title.label }}{{ title.labelkey }}</h6>
     {% endif %}
 
     {% if buttons is not empty %}
@@ -32,7 +32,7 @@
 {% endif %}
 
                                 		{% for val in values %}
-                                        <tr{% if val[ key ] %} id="{{ val[ key ] }}"{% endif %}{% if rowclass and val[ rowclassdepends ] %} class="{{ rowclass }}"{% endif %}>
+                                        <tr{% if val[ key ] %} id="{{ name }}{{ val[ key ] }}"{% endif %}{% if rowclass and val[ rowclassdepends ] %} class="{{ rowclass }}"{% endif %}>
 
                                     		{% for col in labels %}
                                             

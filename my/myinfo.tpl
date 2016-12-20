@@ -21,6 +21,8 @@
 							    {% endif %}						    
 
 						    	<div class="caption text-center">
+						    		{% if profile.head.key %}<h6>{{ values[ profile.head.key ] }}</h6>{% endif %}
+
 						    		<h6>{{ profile.desc.keytitle ? values[ profile.desc.keytitle ] }}<small>
                                     
                                     {% if values[ profile.descimg.key ] %}
@@ -30,7 +32,7 @@
                                     {{ values[ profile.desc.keysubtitle ] }}</small></h6>
 
                                     {% if profile.text %}
-                                        <small>{{ profile.text.prefix|raw }}<span id="profiletk{{ profile.text.key }}">{{ values[ profile.text.key ]|default( profile.text.default ) }}</span>{{ ( profile.text.sufixsingular and values[ profile.text.key ] == 1 ) ? profile.text.sufixsingular : profile.text.sufix|raw }}</small>
+                                        <h6><small>{{ profile.text.prefix|raw }}<span id="profiletk{{ profile.text.key }}">{{ values[ profile.text.key ]|default( profile.text.default ) }}</span>{{ ( profile.text.sufixsingular and values[ profile.text.key ] == 1 ) ? profile.text.sufixsingular : profile.text.sufix|raw }}</small></h6>
                                     {% endif %}
 
                                     {% if profile.icons %}

@@ -75,6 +75,11 @@ class myinfo{
         return $this;
     }
 
+    public function & setProfileHead( $key ){
+        $this->profile[ 'head' ] = array( 'key' => $key );
+        return $this;
+    }
+
     public function & setProfileText( $key, $prefix = '', $sufix = '', $default = '', $sufixsingular = '' ){
         $this->profile[ 'text' ] = array( 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'default' => $default, 'sufixsingular' => $sufixsingular );
         return $this;
