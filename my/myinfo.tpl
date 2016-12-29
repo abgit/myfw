@@ -94,8 +94,8 @@
         {% if val %}
         <div>
             <br />
-            <video width="320" height="240" controls poster="{{ el.appcdn }}{{ val }}/qvga/thumb.png">
-                <source src="{{ el.appcdn }}{{ val }}/qvga/mp4.mp4" type="video/mp4">
+            <video width="320" height="240" controls poster="{% if el.appcdn %}{{ el.appcdn }}{{ val }}_qvga.jpg{% else %}//cameratag.com/downloads/{{ val }}/qvga/thumb.png{% endif %}">
+                <source src="{% if el.appcdn %}{{ el.appcdn }}{{ val }}_qvga.mp4{% else %}//cameratag.com/downloads/{{ val }}/qvga/mp4.mp4" type="video/mp4{% endif %}">
             </video>
         </div>
         {% endif %}

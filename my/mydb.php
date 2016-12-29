@@ -77,6 +77,9 @@
                         case 'int' :        $column_type  = PDO::PARAM_INT;
                                             $column_value = isset( $args[2] ) ? intval( $args[2] ) : ( ( isset( $values[ $column_name ] ) && ( is_numeric( $values[ $column_name ] ) || is_bool( $values[ $column_name ] ) ) ) ? intval( $values[ $column_name ] ) : null );
                                             break;
+                        case 'bool' :       $column_type  = PDO::PARAM_BOOL;
+                                            $column_value = isset( $values[ $column_name] ) ? !empty( $values[ $column_name ] ) : ( isset( $args[2] ) ? ( $args[2] === 'true' ? true : ( $args[2] === 'false' ? false : null ) ) : null );
+                                            break;
                         case 'datetime' :   $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? substr( $values[ $column_name ], 0, 19 ) : null;
                                             break;

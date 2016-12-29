@@ -175,11 +175,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addInfo( $key, $kval, $label = '', $title = '', $align = 'left' ){
+    public function & addInfo( $key, $kval, $label = '', $title = '', $align = 'left', $depends = false, $dependsnot = false ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'info', 'title' => $title );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'info', 'title' => $title, 'depends' => $depends, 'dependsnot' => $dependsnot );
         return $this;
     }
 
@@ -375,6 +375,19 @@ class mygrid{
         return $this;    
     }
 
+    public function & ajaxRefresh( $values ){
+
+        if( is_string( $values ) )
+            $values = json_decode( $values, true );
+
+        if( empty( $values ) )
+            $values = array();
+        
+        $this->app->ajax()->html( '#' . $this->name, $this->render( $values, true ) );
+
+        return $this;    
+    }
+
     public function & deleteAjaxValue( $key ){
         $this->app->ajax()->hideTableRow( '#' . $this->name . $key, '#' . $this->name );
         return $this;
@@ -477,7 +490,7 @@ class mygrid{
         $this->app->ajax()->html( $htmlid, $this->render() );
     }
 
-    private function render( $customvalues = null ){
+    private function render( $customvalues = null, $renderempty = false ){
 
         $values      = is_null( $customvalues ) ? $this->values : $customvalues;
         $valuestotal = count( $values );
@@ -488,6 +501,7 @@ class mygrid{
                                                         'tags'            => $this->tags,
                                                         'labels'          => $this->labels,
                                                         'allitems'        => is_null( $customvalues ),
+                                                        'emptyitem'       => ( is_null( $customvalues ) || ( $renderempty && empty( $customvalues ) ) ),
                                                         'values'          => $values,
                                                         'more'            => $this->more,
                                                         'moreshow'        => ( $valuestotal > 0 && !myrules::isdecimal( $valuestotal / $this->perpage ) ),

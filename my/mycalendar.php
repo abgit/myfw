@@ -72,21 +72,26 @@
 
         public function & setValues( $values ){
             $this->values = array();
+    
+            if( !is_array( $values ) )
+                $values = json_decode( $values, true );
 
-            foreach( is_array( $values ) ? $values : json_decode( $values, true ) as $x ){
-                if( !isset( $x[ $this->keyid ] ) || !isset( $x[ $this->keydate ] ) )
-                    continue;
+            if( is_array( $values ) ){
+                foreach( $values as $x ){
+                    if( !isset( $x[ $this->keyid ] ) || !isset( $x[ $this->keydate ] ) )
+                        continue;
 
-                $val = array( 'id'    => $x[ $this->keyid ],
-                              'title' => $this->addonpre . $x[ $this->keytitle ] . $this->addonpos,
-                              'start' => $x[ $this->keydate ] );
+                    $val = array( 'id'    => $x[ $this->keyid ],
+                                  'title' => $this->addonpre . $x[ $this->keytitle ] . $this->addonpos,
+                                  'start' => $x[ $this->keydate ] );
 
-                if( !is_null( $this->keycolor ) && isset( $x[ $this->keycolor ] ) ){
-                    $val[ 'color' ] = empty( $this->colorfilter ) ? $x[ $this->keycolor ] : $this->app->filters()->replaceonly( $x[ $this->keycolor ], $this->colorfilter );
-                }else{
-                    $val[ 'color' ] = $this->colordefault;
-                }
-                $this->values[] = $val;
+                    if( !is_null( $this->keycolor ) && isset( $x[ $this->keycolor ] ) ){
+                        $val[ 'color' ] = empty( $this->colorfilter ) ? $x[ $this->keycolor ] : $this->app->filters()->replaceonly( $x[ $this->keycolor ], $this->colorfilter );
+                    }else{
+                        $val[ 'color' ] = $this->colordefault;
+                    }
+                    $this->values[] = $val;
+                };
             };
             return $this;
         }
@@ -97,6 +102,11 @@
         
         public function & ajaxRemoveEvent( $event_id = null ){
             $this->app->ajax()->calendarEventRemove( '#cal' . $this->id, is_null( $event_id ) ? date( "Y-m-d", time() ) : $event_id );
+            return $this;
+        }
+
+        public function & ajaxRefresh(){
+            $this->app->ajax()->calendarRefresh( '#cal' . $this->id );
             return $this;
         }
 

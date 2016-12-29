@@ -28,6 +28,9 @@
                                         </tr>
 				                    </thead>
 				                <tbody id="{{ name }}">
+{% endif %}
+
+{% if allitems or emptyitem %}
                                     <tr{% if values is not empty %} style="display:none"{% endif %} class="odd" id="{{ name }}empty"><td colspan="{{labels|length}}" align="center">{{ emptymsg }}</td></tr>
 {% endif %}
 
@@ -114,7 +117,10 @@
             				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|nl2space|t(36) }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'info' %}
-                                                            <span>{% if td.title %}<strong>{{ td.title }}</strong>{% endif %}{{ addonpre|raw }}{{ value|t(50) }}{{ addonpos|raw }}</span>
+
+                                                            {% if ( not td.depends and not td.dependsnot ) or ( td.depends and val[ td.depends ] ) or ( td.dependsnot and not val[ td.dependsnot ] ) %}
+                                                                <span>{% if td.title %}<strong>{{ td.title }}</strong>{% endif %}{{ addonpre|raw }}{{ value|t(50) }}{{ addonpos|raw }}</span>
+                                                            {% endif %}
 
                                                         {% elseif td.type == 'fixed' %}
                                                             {% set fixedfilldefault = true %}

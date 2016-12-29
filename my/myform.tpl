@@ -148,7 +148,7 @@
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'checkbox' %}
-				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" {{el.value == 'on' ? 'checked '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{el.label|raw}}
+				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" {{el.value == 'on' ? 'checked '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}> <label for="{{name ~ el.name}}">{{el.label|raw}}</label>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'hidden' %}
@@ -156,7 +156,12 @@
 
 			{% elseif el.type == 'cameratag' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-            	<div style="width:321px;height:241px;"><camera name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-sources="{{ el.sources|default('record,upload,sms') }}" data-maxlength="{{ el.maxlength|default(30) }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
+            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px;"><camera name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-sources="{{ el.sources|default('record,upload,sms') }}" data-maxlength="{{ el.maxlength|default(30) }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
+                {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+			{% elseif el.type == 'cameratagphoto' %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px;margin-bottom:20px;"><photobooth name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'cameratagvideo' %}

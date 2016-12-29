@@ -485,11 +485,19 @@
             return $this->otp;
         }
 
-        public function confirmSMS( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation' ){
-            return $this->confirm( $msg, $help, $title, '', 1, false, true );
+        public function confirmSMS( $msg = null, $help = null, $title = null, $confirmByDefault = false ){
+            return $this->confirm( $msg, $help, $title, '', 1, false, true, $confirmByDefault );
         }
 
-        public function confirm( $msg = 'Do you confirm your action ?', $help = '', $title = 'Confirmation', $description = '', $mode = 1, $twofactor = false, $sms = false ){
+        public function confirmToken( $msg = null, $help = null, $title = null, $confirmByDefault = false ){
+            return $this->confirm( $msg, $help, $title, '', 1, true, false, $confirmByDefault );
+        }
+
+        public function confirm( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $sms = false, $confirmByDefault = false ){
+
+            if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';
+            if( empty( $help ) )  $help  = '';
+            if( empty( $title ) ) $title = 'Confirmation';
 
             $postvars = ( isset( $_POST ) ? $_POST : array() );
             foreach( $postvars as $k => $val )
@@ -499,13 +507,21 @@
             $route = $this->router->getCurrentRoute();
             $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getParams() ) + $postvars ) );
 
-            if( $this->session()->get( $hash . 'confirm', false ) ){
+            if( $this->session()->get( $hash . 'confirm', false ) === 1 ){
                 $this->session()->delete( $hash . 'confirm' );
                 $this->session()->delete( $hash );
                 return true;
             }
-            
-            if( $twofactor && ( is_null( $this->bef2Fcall ) or !call_user_func( $this->bef2Fcall ) ) ){
+
+            $call = ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall ) ) ? call_user_func( $this->bef2Fcall ) : null;
+
+            if( $confirmByDefault === true && $call === false ){
+                $this->session()->delete( $hash . 'confirm' );
+                $this->session()->delete( $hash );
+                return true;
+            }
+
+            if( $twofactor && ( $call === false || is_null( $call ) ) ){
                 $twofactor = false;
             }
 
@@ -593,7 +609,7 @@
                 $env->addFunction( new Twig_SimpleFunction( 'urlFor',
                     function( $action, $params = array() ){
                         try{
-                            return \Slim\Slim::getInstance()->urlFor( $action, is_array( $params ) ? $params : array( $params ) );
+                            return $this->urlFor( $action, is_array( $params ) ? $params : array( $params ) );
                         }catch( RuntimeException $e ){
                             return '';
                         };

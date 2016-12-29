@@ -123,8 +123,8 @@ class myform{
         return $this;
     }
 
-    public function & addCheckbox( $name, $label ){
-        $this->elements[ $name ] = array( 'type' => 'checkbox', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );	
+    public function & addCheckbox( $name, $label, $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'checkbox', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );	
         return $this;
     }
 
@@ -250,22 +250,59 @@ class myform{
                     return true;
 
                 try{ 
-                    $json = file_get_contents( 'https://cameratag.com/api/v8/videos/' . $_POST[ $this->formname . $name ][ 'video_uuid' ] . '.json?api_key=' . $this->app->config( 'cameratag.key' ) );
+                    $json = file_get_contents( 'https://cameratag.com/api/v10/videos/' . $_POST[ $this->formname . $name ][ 'video_uuid' ] . '.json?api_key=' . $this->app->config( 'cameratag.key' ) );
                     $json = json_decode( $json, true );
 
                 } catch (Exception $e ){
                     return 'Invalid video';
                 }
 
-                if( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && $json[ 'uuid' ] == $_POST[ $this->formname . $name ][ 'video_uuid' ] && $json[ 'app_uuid' ] == $this->app->config( 'cameratag.appid' ) )
+                if( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && isset( $json[ 'type' ] ) && $json[ 'type' ] == 'Video' && $json[ 'uuid' ] == $_POST[ $this->formname . $name ][ 'video_uuid' ] && $json[ 'app_uuid' ] == $this->app->config( 'cameratag.appid' ) )
                     return true;
             }
 
-            return 'Invalid recording';
+            return 'Invalid recording. Record another video.';
         });
 
         return $this;
     }
+
+
+    public function & addCameraTagPhoto( $name, $label = 'Photo', $appid = null ){
+        
+        if( is_null( $appid ) )
+            $appid = $this->app->config( 'cameratag.appid' );
+
+        $expiration = time() + 1800;
+        $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
+
+        $this->elements[ $name ] = array( 'type' => 'cameratagphoto', 'valuetype' => 'cameratagphoto', 'name' => $name, 'label' => $label, 'appid' => $appid, 'appexpiration' => $expiration, 'appsignature' => $signature );
+
+        $this->addRule( function() use ( $name, $appid ){
+
+            if( isset( $_POST[ $this->formname . $name . '_uuid' ] ) && is_string( $_POST[ $this->formname . $name . '_uuid' ] ) ){
+
+                if( empty( $_POST[ $this->formname . $name . '_uuid' ] ) )
+                    return true;
+
+                try{ 
+                    $json = file_get_contents( 'https://cameratag.com/api/v10/photos/' . $_POST[ $this->formname . $name . '_uuid' ] . '.json?api_key=' . $this->app->config( 'cameratag.key' ) );
+                    $json = json_decode( $json, true );
+
+                } catch (Exception $e ){
+                    return 'Invalid photo';
+                }
+
+                if( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && isset( $json[ 'type' ] ) && $json[ 'type' ] == 'Photo' && $json[ 'uuid' ] == $_POST[ $this->formname . $name . '_uuid' ] && $json[ 'app_uuid' ] == $appid )
+                    return true;
+            }
+
+            return 'Invalid recording. Retry with another photo.';
+        });
+
+        return $this;
+    }
+
 
     public function & addCameraTagVideo( $name, $label = 'Video' ){
         $this->elements[ $name ] = array( 'type' => 'cameratagvideo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
@@ -914,7 +951,7 @@ class myform{
                 $modal = $this->modal;
                 $this->app->ajax()->modalHide( $modal[ 'id' ] );
             }
-            
+
             if( !empty( $messageok ) )
                 $this->app->ajax()->msgOk( $messageok );
         }
@@ -929,13 +966,13 @@ class myform{
         $transloadit   = 0;
         $chatscroll    = 0;
         $pusherchannel = 0;
-        $cameratag     = 0;
+        $cameratag     = array();
         foreach( $this->elements as $n => $el ){
             if( $el[ 'type' ] == 'transloadit' ){
                 $transloadit = 1;
             }
-            if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagvideo' ){
-                $cameratag = $this->formname . $el[ 'name' ];
+            if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagphoto' || $el[ 'type' ] == 'cameratagvideo' ){
+                $cameratag[] = $this->formname . $el[ 'name' ];
             }
             if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
                 $transloadit   = $el[ 'obj' ]->getTransloadit();
@@ -1141,6 +1178,10 @@ class myform{
                                     break;
                 case 'cameratag': if( isset( $_POST[ $this->formname . $n ][ 'video_uuid' ] ) && is_string( $_POST[ $this->formname . $n ][ 'video_uuid' ] ) ){
                                         $values[ $n ] = $_POST[ $this->formname . $n ][ 'video_uuid' ];
+                                    }
+                                    break;
+                case 'cameratagphoto': if( isset( $_POST[ $this->formname . $n . '_uuid' ] ) && is_string( $_POST[ $this->formname . $n . '_uuid' ] ) ){
+                                        $values[ $n ] = $_POST[ $this->formname . $n . '_uuid' ];
                                     }
                                     break;
                 default:            continue;

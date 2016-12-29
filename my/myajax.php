@@ -44,13 +44,13 @@ class myajax{
         return $this;
     }
     
-    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0, $webcameratag = 0 ){
-        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll, 'p' => $pusher, 'w' => $webcameratag );
+    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0, $webcameratag = array() ){
+        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll, 'p' => $pusher, 'w' => empty( $webcameratag ) ? false : $webcameratag );
         return $this;
     }
     
     public function & modalHide( $id ){
-        $this->out[ 'mh' ] = array( 'i' => $id );
+        $this->out[ 'mh' ][] = array( 'i' => $id );
         return $this;
     }
     
