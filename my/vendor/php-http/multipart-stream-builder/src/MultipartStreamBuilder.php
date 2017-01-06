@@ -230,6 +230,19 @@ class MultipartStreamBuilder
     }
 
     /**
+     * Reset and clear all stored data. This allows you to use builder for a subsequent request.
+     *
+     * @return MultipartStreamBuilder
+     */
+    public function reset()
+    {
+        $this->data = [];
+        $this->boundary = null;
+
+        return $this;
+    }
+
+    /**
      * Gets the filename from a given path.
      *
      * PHP's basename() does not properly support streams or filenames beginning with a non-US-ASCII character.
@@ -247,10 +260,11 @@ class MultipartStreamBuilder
             // For Windows OS add special separator.
             $separators .= DIRECTORY_SEPARATOR;
         }
-        // Remove right-most slashes when $uri points to directory.
+
+        // Remove right-most slashes when $path points to directory.
         $path = rtrim($path, $separators);
-        // Returns the trailing part of the $uri starting after one of the directory
-        // separators.
+
+        // Returns the trailing part of the $path starting after one of the directory separators.
         $filename = preg_match('@[^'.preg_quote($separators, '@').']+$@', $path, $matches) ? $matches[0] : '';
 
         return $filename;

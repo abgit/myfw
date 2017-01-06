@@ -3,8 +3,7 @@
 class mynotify{
 
     private $name;
-    private $key = '';
-    private $keyhtml = ' ';
+    private $keys = array();
     private $title;
     private $icon = 'icon-paragraph-justify2';
     private $values = array();
@@ -31,9 +30,8 @@ class mynotify{
         return $this;
     }
     
-    public function & setKey( $key, $keyhtml = 'KEY' ){
-        $this->key     = $key;
-        $this->keyhtml = $keyhtml;
+    public function & setKeys( $keys ){
+        $this->keys = $keys;
         return $this;
     }
 
@@ -102,8 +100,8 @@ class mynotify{
         return $this;
     }
 
-    public function & setItemAction( $onclick, $href = '' ){
-        $this->itemaction = array( 'onclick' => $onclick, 'href' => $href );
+    public function & setItemAction( $onclick ){
+        $this->itemaction = array( 'onclick' => $onclick );
         return $this;
     }
 
@@ -146,8 +144,7 @@ class mynotify{
     private function render( $values = null ){
         return $this->app->render( '@my/mynotify', array( 'values'          => is_null( $values ) ? $this->values : $values,
                                                           'name'            => $this->name,
-                                                          'key'             => $this->key,
-                                                          'keyhtml'         => $this->keyhtml,
+                                                          'keys'            => $this->keys,
                                                           'title'           => $this->title,
                                                           'icon'            => $this->icon,
                                                           'buttonright'     => $this->buttonright,

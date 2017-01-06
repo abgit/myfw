@@ -615,6 +615,8 @@
                         };
                 }));
 
+                $env->addExtension( new Twig_Extension_StringLoader() );
+
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
 
@@ -657,9 +659,12 @@
             return "myfwsubmit('" . $this->urlFor( $action, $options ) . "'" . ( is_string( $msg ) ? ( ",'" . $msg . "'" ) : '' ) . ")";
         }
 
-        public function urlForAjaxForm( $formobj, $submitbutton, $action, $options = array(), $msg = '' ){
-            if( is_a( $formobj, 'myform' ) )
-                return "myfwformsubmit('" . $formobj->getName() . "','','','" . $formobj->getName() . $submitbutton . "','" . $msg . "','" . $this->urlFor( $action, $options ) . "')";
+        public function urlForAjaxActions( $urls, $code, $keys, $default ){
+            return array( 'type' => 'ajaxactions', 'urls' => $urls, 'code' => $code, 'keys' => $keys, 'default' => $default );
+        }
+
+        public function urlForAjaxForm( $formname, $action, $submitbutton = '', $msg = 'Loading ...' ){
+            return "myfwformsubmit('" . $formname . "','','','" . $formname . $submitbutton . "','" . $msg . "','" . $action . "')";
         }
 
         public function urlForWindow( $action, $options = array() ){
@@ -751,27 +756,43 @@
         return $string;
     }
 
+    function ip_in_range( $ip, $range ) {
+        if ( strpos( $range, '/' ) == false ){
+            $range .= '/32';
+        }
+
+        // $range is in IP/CIDR format eg 127.0.0.1/24
+        list( $range, $netmask ) = explode( '/', $range, 2 );
+        $range_decimal = ip2long( $range );
+        $ip_decimal = ip2long( $ip );
+        $wildcard_decimal = pow( 2, ( 32 - $netmask ) ) - 1;
+        $netmask_decimal = ~ $wildcard_decimal;
+        return ( ( $ip_decimal & $netmask_decimal ) == ( $range_decimal & $netmask_decimal ) );
+    }
+
+    function ip_in_rangelist( $ip, $rangelist ){
+        foreach( explode( ';', $rangelist ) as $range ){
+            if( ip_in_range( $ip, $range ) ){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function iscidr(){
+        $app = \Slim\Slim::getInstance();
+
+        if( !ip_in_rangelist( $app->request->getIp(), $app->config( 'app.cidr' ) ) )
+            $app->pass();
+    }
+
     // set session authentication
     function islogged() {
         $app = \Slim\Slim::getInstance();
 
-//            $func = $this->onlogincall;
-//            $func = call_user_func( $func );
-
-
         if( !$app->isLogged() ){
-//            $url = $app->getuserredir();
-//            if( is_string( $url ) ){
-//                if( !$app->request->isAjax() ){
-//                    $app->redirect( $url );
-//                }else/*if( strlen( $url ) )*/{
-//                    $app->ajax()->msgWarning( 'Redirecting to login ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $url )->render();
-//                }else{
-//                    $app->ajax()->login()->render();
-//                }
-//            }
-                $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $app->config( 'app.logouturl' ) )->render() : $app->redirect( $app->config( 'app.logouturl' ) );
-                $app->stop();
+            $app->request->isAjax() ? $app->ajax()->msgWarning( 'Redirecting ...', 'Session expired', array( 'openDuration' => 0, 'sticky' => true ) )->redirect( $app->config( 'app.logouturl' ) )->render() : $app->redirect( $app->config( 'app.logouturl' ) );
+            $app->stop();
         }
     }
 

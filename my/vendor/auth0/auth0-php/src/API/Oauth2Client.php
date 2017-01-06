@@ -237,10 +237,15 @@ class Oauth2Client {
      * @return Boolean Whether it exchanged the code or not correctly
      */
     public function exchangeCode() {
-        if (!isset($_REQUEST['code'])) {
+
+        $code = isset($_GET['code'])
+                    ? $_GET['code']
+                    : ( isset($_POST['code']) ? $_POST['code'] : null );
+
+        if (!isset($code)) {
+            $this->debugInfo("No code found in _GET or _POST params.");
             return false;
         }
-        $code = $_REQUEST['code'];
 
         $this->debugInfo("Code: ".$code);
 
@@ -256,7 +261,7 @@ class Oauth2Client {
 
         $auth0_response = $response['result'];
 
-        if ($response['code'] !== 200) { 
+        if ($response['code'] !== 200) {
             if (isset($auth0_response['error'])) {
                 throw new ApiException($auth0_response['error'] . ': '. $auth0_response['error_description']);
             } else {

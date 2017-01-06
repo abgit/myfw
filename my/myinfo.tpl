@@ -42,6 +42,8 @@
     			                    	    {% endfor %}
                                         </div>
                                     {% endif %}
+
+						    		{% if profile.string.key %}<h6>{{ values[ profile.string.key ] }}</h6>{% endif %}
 						    	</div>
 					    	</div>
     </div>

@@ -11,37 +11,25 @@
             $this->domain = $this->app->config( 'email.mailgundomain' );
         }
 
-        public function sendinternal( $message, $subject = null ){
-            return $this->send( $this->app->config( 'email.from' ), $this->app->config( 'email.to' ), is_null( $subject ) ? $this->app->config( 'email.subject' ) : $subject, $message );
+        public function sendinternal( $message, $subject = null, $templatestring = '', $vars = array() ){
+            return $this->send( $this->app->config( 'email.from' ), $this->app->config( 'email.to' ), is_null( $subject ) ? $this->app->config( 'email.subject' ) : $subject, $message, $templatestring, $vars );
         }
 
-        public function sendsystem( $to, $subject, $message, $mailgunoptions = array() ){
-            return $this->send( $this->app->config( 'email.from' ), $to, $subject, $message, $mailgunoptions );
+        public function sendsystem( $to, $subject, $message, $templatestring = '', $vars = array() ){
+            return $this->send( $this->app->config( 'email.from' ), $to, $subject, $message, $templatestring, $vars );
         }
 
-        public function send( $from, $to, $subject, $text, $mailgunoptions = array() ){
+        public function send( $from, $to, $subject, $html, $templatestring = '', $vars = array() ){
 
-            // log
-            $this->app->log()->debug( "mymailer::send,to:" . $to . ',subject:' . $subject );
+            if( is_array( $html ) )
+                $html = json_encode( $html );
 
             // if we use a template file, assign text and optional vars to template and get render result
-            if( $template = $this->app->config( 'email.template' ) ){
-                if( !($tag = $this->app->config( 'email.templatetag' ) ) ){
-                    $tag = 'content';
-                }
-                $html = $this->app->render( $template, is_array( $text ) ? $text : array( $tag => $text ), null, null, 0, false, false );    
-            }else{
-                $html = $text;
-            }
-
-            // global replace
-            if( ( $replace = $this->app->config( 'email.replace' ) ) && is_array( $replace ) ){
-                $html = str_replace( array_keys( $replace ), array_values( $replace ), $html );
-                $text = str_replace( array_keys( $replace ), array_values( $replace ), $text );
-            }
+            if( $template = $this->app->config( 'email.template' ) )
+                $html = $this->app->render( $template, array( 'content' => $html, 'templatestring' => $templatestring ) + $vars, null, null, 0, false, false );    
 
             // comput mailgun email header
-            $email = array( 'from' => $from, 'to' => $to, 'subject' => $subject, 'text' => is_string( $text ) ? $text : '', 'html' => $html ) + $mailgunoptions;
+            $email = array( 'from' => $from, 'to' => $to, 'subject' => $subject, 'html' => $html );
 
             // check if we have custom additional header variables
             if( ( $headers = $this->app->config( 'email.headers' ) ) && is_array( $headers ) )

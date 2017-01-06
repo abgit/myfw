@@ -47,9 +47,15 @@
 
         {% if el.type == 'title' %}
             <h5 id="msg{{ name }}t">{{ el.text }}</h5>        
-        
+
+        {% elseif el.type == 'custom' %}
+        <div class="well myfwstatsmsg">{{ el.obj|raw }}</div>
+
         {% elseif el.type == 'message' %}
             <p id="msg{{ name }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ el.text }}</p>
+
+        {% elseif el.type == 'messagetemplate' %}
+            <p id="msg{{ name }}t">{{ include( template_from_string( el.message ) ) }}</p>
 
         {% elseif el.type == 'small' %}
             <small style="color:#999">{{ el.text }}</small>
@@ -58,10 +64,17 @@
             <br>
 
         {% elseif el.type == 'button' %}
-            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn {{el.class ? 'btn-' ~ el.class}}" {%if el.onclick %}onclick="{{ el.onclick }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
+            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}" {%if el.onclick %}onclick="{{ el.onclick }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
+
+        {% elseif el.type == 'labelslist' %}
+        {% if el.header %}<p class="myfwlabellisthead">{{ el.header|raw }}{% endif %}
+        <div class="well myfwlabellist">
+            {% for lab in el.list %}
+                <p class="text-{{ lab.class }}"><span class="label label-{{ lab.class }}">{{ lab.label }}</span> {{ lab.description|raw }}</p>
+            {% endfor %}
+        </div>
 
         {% endif %}
-
     {% endfor %}
 </div>
 

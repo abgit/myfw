@@ -16,7 +16,6 @@ class mygrid{
     private $classes  = array();
     private $actions  = array();
     private $modal    = null;
-    private $tags     = array();
     private $orderby  = false;
     private $orderbya = null;
     private $menuhtml = null;
@@ -47,11 +46,6 @@ class mygrid{
         return $this;
     }
 
-    public function & addKey( $key, $keyhtml ){
-        $this->tags[0][] = $key;
-        $this->tags[1][] = $keyhtml;
-        return $this;
-    }
 
     public function & setTitle( $label, $icon = 'icon-stack' ){
         $this->title[ 'label' ] = $label;
@@ -191,22 +185,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addLabel( $key, $kval, $label = '' ){
+    public function & addLabel( $key, $kval, $label = '', $default = '', $replace = array(), $customkey = false ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label' );
-        return $this;
-    }
-
-    public function & setLabelClass( $key, $kval, $replace, $default, $customkey = false ){
-        foreach( $this->cols[ $key ] as $index => $subrow ){
-            if( $this->cols[ $key ][ $index ][ 'kval' ] == $kval ){
-                $this->cols[ $key ][ $index ][ 'classreplace' ] = $replace;
-                $this->cols[ $key ][ $index ][ 'classreplacedefault' ] = $default;
-                $this->cols[ $key ][ $index ][ 'classreplacekey' ] = $customkey;
-            }
-        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label', 'classreplace' => $replace, 'classreplacedefault' => $default, 'classreplacekey' => $customkey );
         return $this;
     }
 
@@ -498,7 +481,6 @@ class mygrid{
         return $this->app->render( '@my/mygrid', array( 'name'            => $this->name,
                                                         'key'             => $this->key,
                                                         'keyhtml'         => $this->keyhtml,
-                                                        'tags'            => $this->tags,
                                                         'labels'          => $this->labels,
                                                         'allitems'        => is_null( $customvalues ),
                                                         'emptyitem'       => ( is_null( $customvalues ) || ( $renderempty && empty( $customvalues ) ) ),

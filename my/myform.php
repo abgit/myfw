@@ -109,8 +109,8 @@ class myform{
         return $this;
     }
 
-    public function & addBitcoin( $name, $label = '', $help = '', $currencies = array() ){
-        $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies );
+    public function & addBitcoin( $name, $label = '', $help = '', $currencies = array(), $onchange = '', $decimal = 8 ){
+        $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies, 'onchange' => $onchange, 'decimal' => $decimal );
         $this->addFilter( $name, 'satoshi' );
         $this->addRule( $name, 'Invalid bitcoin amount', 'bitcoin' );
         return $this;
@@ -199,8 +199,8 @@ class myform{
         return $this;
     }    
 
-    public function & addStatic( $name, $label = '', $help = '', $showvalue = '', $prefix = '', $sufix = '' ){
-        $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue, 'prefix' => $prefix, 'sufix' => $sufix );
+    public function & addStatic( $name, $label = '', $help = '', $showvalue = '', $prefix = '', $sufix = '', $replacelist = false ){
+        $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue, 'prefix' => $prefix, 'sufix' => $sufix, 'replacelist' => $replacelist );
         return $this;
     }    
 
@@ -235,12 +235,12 @@ class myform{
         return $this;
     }
 
-    public function & addCameraTag( $name, $label = 'Video', $maxlength = null, $sources = '' ){
+    public function & addCameraTag( $name, $label = 'Video', $maxlength = null, $sources = '', $help = '' ){
         
         $expiration = time() + 1800;
         $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
 
-        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'maxlength' => $maxlength, 'appexpiration' => $expiration, 'appsignature' => $signature, 'sources' => $sources );
+        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'maxlength' => $maxlength, 'appexpiration' => $expiration, 'appsignature' => $signature, 'sources' => $sources, 'help' => $help );
 
         $this->addRule( function() use ( $name ){
 
@@ -268,7 +268,7 @@ class myform{
     }
 
 
-    public function & addCameraTagPhoto( $name, $label = 'Photo', $appid = null ){
+    public function & addCameraTagPhoto( $name, $label = 'Photo', $appid = null, $help = '' ){
         
         if( is_null( $appid ) )
             $appid = $this->app->config( 'cameratag.appid' );
@@ -276,7 +276,7 @@ class myform{
         $expiration = time() + 1800;
         $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
 
-        $this->elements[ $name ] = array( 'type' => 'cameratagphoto', 'valuetype' => 'cameratagphoto', 'name' => $name, 'label' => $label, 'appid' => $appid, 'appexpiration' => $expiration, 'appsignature' => $signature );
+        $this->elements[ $name ] = array( 'type' => 'cameratagphoto', 'valuetype' => 'cameratagphoto', 'name' => $name, 'label' => $label, 'appid' => $appid, 'appexpiration' => $expiration, 'appsignature' => $signature, 'help' => $help );
 
         $this->addRule( function() use ( $name, $appid ){
 
@@ -306,9 +306,11 @@ class myform{
 
     public function & addCameraTagVideo( $name, $label = 'Video' ){
         $this->elements[ $name ] = array( 'type' => 'cameratagvideo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
+        return $this;
+    }
 
-        $this->app->ajax()->cameraTag();
-
+    public function & addCameraTagImage( $name, $label = 'Image' ){
+        $this->elements[ $name ] = array( 'type' => 'cameratagimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
         return $this;
     }
 
@@ -441,7 +443,7 @@ class myform{
         return $this;
     }
 
-    public function & addFilestack( $name, $label, $width, $height, $processing, $help = '' ){
+    public function & addFilestack( $name, $label, $width = '', $height = '', $processing = '', $fsservices = array( 'COMPUTER', 'CONVERT' ), $help = '' ){
 
         $secret    = $this->app->config( 'filestack.secret' );
         $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
@@ -453,14 +455,14 @@ class myform{
         
         $location = $this->app->config( 'filestack.location' );
         $path     = $this->app->config( 'filestack.path' );
-        
+
         if( $location )
             $fsoptions->location = $location;
 
         if( $path )
             $fsoptions->path = $path;
 
-        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'security' => $security, 'processing' => $processing, 'fsoptions' => $fsoptions );
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'security' => $security, 'processing' => $processing, 'fsoptions' => $fsoptions, 'fsservices' => $fsservices );
 
         $this->addRule( function() use ( $name ){
 
@@ -971,7 +973,7 @@ class myform{
             if( $el[ 'type' ] == 'transloadit' ){
                 $transloadit = 1;
             }
-            if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagphoto' || $el[ 'type' ] == 'cameratagvideo' ){
+            if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagphoto' || $el[ 'type' ] == 'cameratagvideo' || $el[ 'type' ] == 'cameratagimage' ){
                 $cameratag[] = $this->formname . $el[ 'name' ];
             }
             if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
@@ -1096,7 +1098,10 @@ class myform{
                         continue;
 
                     if( ! is_callable( array( 'myrules', $rulename ) ) || ! call_user_func( array( 'myrules', $rulename ), $value, $ruleoptions, $values, $el ) ){
-                        $this->errors[ $n ] = $rulemessage;
+
+                        // add error message if message is not null
+                        if( !is_null( $rulemessage ) )
+                            $this->errors[ $n ] = $rulemessage;
                         break;
                     }
                 }

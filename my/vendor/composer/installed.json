@@ -433,54 +433,6 @@
         ]
     },
     {
-        "name": "auth0/auth0-php",
-        "version": "4.0.8",
-        "version_normalized": "4.0.8.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/auth0/auth0-PHP.git",
-            "reference": "561db79b253220ba4f5b76f0d69f19e6c9681147"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/auth0/auth0-PHP/zipball/561db79b253220ba4f5b76f0d69f19e6c9681147",
-            "reference": "561db79b253220ba4f5b76f0d69f19e6c9681147",
-            "shasum": ""
-        },
-        "require": {
-            "adoy/oauth2": "^1.3",
-            "ext-json": "*",
-            "firebase/php-jwt": "^3.0",
-            "guzzlehttp/guzzle": "^6.1",
-            "php": ">=5.5"
-        },
-        "require-dev": {
-            "codeclimate/php-test-reporter": "^0.2.0",
-            "josegonzalez/dotenv": "^2.0",
-            "phpunit/phpunit": "4.6.*"
-        },
-        "time": "2016-12-05T15:46:30+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Auth0\\SDK\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Auth0",
-                "email": "support@auth0.com",
-                "homepage": "http://www.auth0.com/"
-            }
-        ],
-        "description": "Auth0 PHP SDK."
-    },
-    {
         "name": "clue/stream-filter",
         "version": "v1.3.0",
         "version_normalized": "1.3.0.0",
@@ -1252,64 +1204,6 @@
         ]
     },
     {
-        "name": "php-http/curl-client",
-        "version": "v1.6.1",
-        "version_normalized": "1.6.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/php-http/curl-client.git",
-            "reference": "38c5e38311839eef4e5f68cb2a0c9c6a49fc1dc8"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/php-http/curl-client/zipball/38c5e38311839eef4e5f68cb2a0c9c6a49fc1dc8",
-            "reference": "38c5e38311839eef4e5f68cb2a0c9c6a49fc1dc8",
-            "shasum": ""
-        },
-        "require": {
-            "ext-curl": "*",
-            "php": "^5.5 || ^7.0",
-            "php-http/discovery": "^1.0",
-            "php-http/httplug": "^1.0",
-            "php-http/message": "^1.2",
-            "php-http/message-factory": "^1.0.2"
-        },
-        "provide": {
-            "php-http/async-client-implementation": "1.0",
-            "php-http/client-implementation": "1.0"
-        },
-        "require-dev": {
-            "guzzlehttp/psr7": "^1.0",
-            "php-http/client-integration-tests": "^0.5.1",
-            "phpunit/phpunit": "^4.8.27",
-            "zendframework/zend-diactoros": "^1.0"
-        },
-        "time": "2016-11-11T12:44:28+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Http\\Client\\Curl\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Михаил Красильников",
-                "email": "m.krasilnikov@yandex.ru"
-            }
-        ],
-        "description": "cURL client for PHP-HTTP",
-        "homepage": "http://php-http.org",
-        "keywords": [
-            "curl",
-            "http"
-        ]
-    },
-    {
         "name": "php-http/message",
         "version": "v1.4.1",
         "version_normalized": "1.4.1.0",
@@ -1480,65 +1374,6 @@
         ]
     },
     {
-        "name": "php-http/multipart-stream-builder",
-        "version": "0.1.3",
-        "version_normalized": "0.1.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/php-http/multipart-stream-builder.git",
-            "reference": "617eb901e04638617f504a963d02e81f8128077e"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/php-http/multipart-stream-builder/zipball/617eb901e04638617f504a963d02e81f8128077e",
-            "reference": "617eb901e04638617f504a963d02e81f8128077e",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^5.5 || ^7.0",
-            "php-http/discovery": "^1.0",
-            "php-http/message-factory": "^1.0.2",
-            "psr/http-message": "^1.0"
-        },
-        "require-dev": {
-            "php-http/message": "^1.0",
-            "phpunit/phpunit": "^4.8 || ^5.4",
-            "zendframework/zend-diactoros": "^1.3.5"
-        },
-        "time": "2016-12-22T14:32:52+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "0.2-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Http\\Message\\MultipartStream\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Tobias Nyholm",
-                "email": "tobias.nyholm@gmail.com"
-            }
-        ],
-        "description": "A builder class that help you create a multipart stream",
-        "homepage": "http://php-http.org",
-        "keywords": [
-            "factory",
-            "http",
-            "message",
-            "multipart stream",
-            "stream"
-        ]
-    },
-    {
         "name": "twig/twig",
         "version": "v1.30.0",
         "version_normalized": "1.30.0.0",
@@ -1599,6 +1434,171 @@
         "homepage": "http://twig.sensiolabs.org",
         "keywords": [
             "templating"
+        ]
+    },
+    {
+        "name": "auth0/auth0-php",
+        "version": "4.0.11",
+        "version_normalized": "4.0.11.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auth0/auth0-PHP.git",
+            "reference": "d02f46240abddf1d0f4f667e1aab78d7737c4eff"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/auth0/auth0-PHP/zipball/d02f46240abddf1d0f4f667e1aab78d7737c4eff",
+            "reference": "d02f46240abddf1d0f4f667e1aab78d7737c4eff",
+            "shasum": ""
+        },
+        "require": {
+            "adoy/oauth2": "^1.3",
+            "ext-json": "*",
+            "firebase/php-jwt": "^3.0",
+            "guzzlehttp/guzzle": "^6.1",
+            "php": ">=5.5"
+        },
+        "require-dev": {
+            "codeclimate/php-test-reporter": "^0.2.0",
+            "josegonzalez/dotenv": "^2.0",
+            "phpunit/phpunit": "4.6.*"
+        },
+        "time": "2016-12-30T21:39:54+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Auth0\\SDK\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Auth0",
+                "email": "support@auth0.com",
+                "homepage": "http://www.auth0.com/"
+            }
+        ],
+        "description": "Auth0 PHP SDK."
+    },
+    {
+        "name": "php-http/multipart-stream-builder",
+        "version": "0.1.4",
+        "version_normalized": "0.1.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-http/multipart-stream-builder.git",
+            "reference": "5e02c79d98517da758a8ac1045be332a27d3809f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-http/multipart-stream-builder/zipball/5e02c79d98517da758a8ac1045be332a27d3809f",
+            "reference": "5e02c79d98517da758a8ac1045be332a27d3809f",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.5 || ^7.0",
+            "php-http/discovery": "^1.0",
+            "php-http/message-factory": "^1.0.2",
+            "psr/http-message": "^1.0"
+        },
+        "require-dev": {
+            "php-http/message": "^1.0",
+            "phpunit/phpunit": "^4.8 || ^5.4",
+            "zendframework/zend-diactoros": "^1.3.5"
+        },
+        "time": "2016-12-30T23:19:15+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "0.2-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Http\\Message\\MultipartStream\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias.nyholm@gmail.com"
+            }
+        ],
+        "description": "A builder class that help you create a multipart stream",
+        "homepage": "http://php-http.org",
+        "keywords": [
+            "factory",
+            "http",
+            "message",
+            "multipart stream",
+            "stream"
+        ]
+    },
+    {
+        "name": "php-http/curl-client",
+        "version": "v1.6.2",
+        "version_normalized": "1.6.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-http/curl-client.git",
+            "reference": "3f9ff1ffbe2496ed793734a9ab92b784a05d277a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-http/curl-client/zipball/3f9ff1ffbe2496ed793734a9ab92b784a05d277a",
+            "reference": "3f9ff1ffbe2496ed793734a9ab92b784a05d277a",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": "^5.5 || ^7.0",
+            "php-http/discovery": "^1.0",
+            "php-http/httplug": "^1.0",
+            "php-http/message": "^1.2",
+            "php-http/message-factory": "^1.0.2"
+        },
+        "provide": {
+            "php-http/async-client-implementation": "1.0",
+            "php-http/client-implementation": "1.0"
+        },
+        "require-dev": {
+            "guzzlehttp/psr7": "^1.0",
+            "php-http/client-integration-tests": "^0.5.1",
+            "phpunit/phpunit": "^4.8.27",
+            "zendframework/zend-diactoros": "^1.0"
+        },
+        "time": "2017-01-02T15:39:30+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Http\\Client\\Curl\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Михаил Красильников",
+                "email": "m.krasilnikov@yandex.ru"
+            }
+        ],
+        "description": "cURL client for PHP-HTTP",
+        "homepage": "http://php-http.org",
+        "keywords": [
+            "curl",
+            "http"
         ]
     }
 ]

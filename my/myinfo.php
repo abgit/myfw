@@ -85,6 +85,11 @@ class myinfo{
         return $this;
     }
 
+    public function & setProfileString( $key ){
+        $this->profile[ 'string' ] = array( 'key' => $key );
+        return $this;
+    }
+    
     public function & setProfileDescriptionImage( $key, $cdn, $sufix, $width, $height ){
         $this->profile[ 'descimg' ] = array( 'key' => $key, 'cdn' => $cdn, 'sufix' => $sufix, 'width' => $width, 'height' => $height );
         return $this;

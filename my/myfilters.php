@@ -99,8 +99,8 @@ class myfilters{
         return '';
     }
 
-    public static function toBTC($satoshi) {
-        return bcdiv((float)(string)$satoshi, 100000000, 8);
+    public static function toBTC( $satoshi, $decimal = 8 ) {
+        return bcdiv((float)(string)$satoshi, 100000000, $decimal );
     }
 
     public static function toBTCString($satoshi) {
@@ -191,12 +191,45 @@ class myfilters{
     }
 
     public static function replaceonly( $string, $array ){
+        
+        if( empty( $array ) )
+            $array = array();
+
         foreach( $array as $k => $v ){
             if( strval( $string ) === strval( $k ) ){
                 return $v;
             }
         }
         return '';
+    }
+
+    public static function link( $url, $values, $keys = array() ){
+
+        if( is_array( $url ) ){
+            $keys               = $url[ 'keys' ];
+            $urlmultiplekey     = $url[ 'code' ];
+            $urlmultipledefault = $url[ 'default' ];
+            $url                = $url[ 'urls' ];
+
+            if( isset( $values[ $urlmultiplekey ] ) ){
+                foreach( $url as $i => $string ){
+                    if( strval( $i ) === strval( $values[ $urlmultiplekey ] ) ){
+                        $url = $string;
+                        break;
+                    }
+                }
+            }
+
+            if( is_array( $url ) )
+                $url = is_string( $urlmultipledefault ) ? $urlmultipledefault : '';
+        }
+
+        foreach( $keys as $label => $k ){
+            if( isset( $values[ $k ] ) ){
+                $url = str_replace( $label, $values[ $k ], $url );
+            }
+        }
+        return $url;
     }
 
     public static function inarray( $string, $array, $default = 'unknown' ){
@@ -230,8 +263,8 @@ class myfilters{
         return $returnOriginal ? $string . $sufix : $sufix;
     }
 
-    public static function t( $string, $chars=10, $rep='...' ){
-        return $chars < strlen($string) ? substr( $string, 0, $chars ) . $rep : $string;
+    public static function t( $string, $chars = 10, $rep = '...', $right = true ){
+        return $chars < strlen($string) ? ( $right ? ( substr( $string, 0, $chars ) . $rep ) : ( $rep . substr( $string, strlen( $string ) - $chars ) ) ) : $string;
     }
 
     public static function m( $string, $showSymbol = true ){

@@ -94,7 +94,7 @@
 
                         <div class="input-group">
                             <span class="input-group-addon">&#3647;</span>
-                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC|toround|nozero}}">
+                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });{{ el.onchange }}" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
                         </div>
                         <span class="label label-block label-primary text-center btchelper">
                             {% for cur in el.currencies %}
@@ -161,13 +161,19 @@
 
 			{% elseif el.type == 'cameratagphoto' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px;margin-bottom:20px;"><photobooth name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
-                {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px{% if not el.help %};margin-bottom:20px{% endif %}"><photobooth name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
+                {% if el.help %}<span class="help-block" style="margin-bottom:20px">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'cameratagvideo' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                 <div style="width:321px;height:241px;">
                     <video width="100%" controls style="width:100%;height:auto;" id="{{name ~ el.name}}" data-uuid="{{ el.value }}"></video>
+                </div>
+
+			{% elseif el.type == 'cameratagimage' %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                <div style="width:641px;height:481px;">
+                    <photo id="{{name ~ el.name}}" data-uuid="{{ el.value }}"></photo>
                 </div>
 
 			{% elseif el.type == 'ziggeo' %}
@@ -262,7 +268,10 @@
 			{% elseif el.type == 'static' %}
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
-                {% if el.showvalue|default( true ) %}<p class="form-control-static" id="{{name ~ el.name}}">{{ el.value ? el.prefix|raw }}{{ el.value|default( 'unknown' )|nl2br }}{{ el.value ? el.sufix|raw }}</p>{% endif %}
+
+                {% set value = el.replacelist ? el.value|replaceonly( el.replacelist ) : el.value %}
+
+                {% if el.showvalue|default( true ) %}<p class="form-control-static" id="{{name ~ el.name}}">{{ value ? el.prefix|raw }}{{ value|default( 'unknown' )|nl2br }}{{ value ? el.sufix|raw }}</p>{% endif %}
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'button' %}
@@ -338,15 +347,27 @@
 
 			{% elseif el.type == 'filestack' %}
             <label>{{ el.label|raw }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-            <div class="row">
-                <div class="col-xs-7" style="min-height:{{ el.height }}px">
-                    <img onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
-                    <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
+
+            {% if width is not empty %}
+                <div class="row">
+                    <div class="col-xs-7" style="min-height:{{ el.height }}px">
+                        <img onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
+                    </div>
+                    <div class="col-xs-5" style="padding:0px;">
+                        <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                    </div>
                 </div>
-                <div class="col-xs-5" style="padding:0px;">
-                    <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+            {% else %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
+                        <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:{{ el.fsservices|json_encode }},conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);$('#filestacks{{ name ~ el.name }}').text(myfwt(Blobs[0].filename,25)).addClass('label-success');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <span id="filestacks{{ name ~ el.name }}" class="label {%if el.value %}label-success{%endif%}" style="margin-top:4px;display:block">{% if el.value %}{{ el.value|t( 20, '...', false ) }}{% else %}&nbsp;{% endif %}</span>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
+            {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 
 			{% elseif el.type == 'filestackwebcam' %}

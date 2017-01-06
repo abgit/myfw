@@ -13,6 +13,7 @@ class mymessage{
     private $offset;
     private $reltitle;
     private $relmessagekey;
+    private $messagevars = array();
 
     public function __construct( $name ){
         $this->name = $name;
@@ -59,8 +60,28 @@ class mymessage{
         return $this;
     }
 
-    public function & addMessage( $message, $thumb = false, $thumbhttps = false ){
-        $this->elements[] = array( 'type' => 'message', 'text' => $message, 'thumb' => $this->app->ishttps() ? $thumbhttps : $thumb );
+    public function & addMessage( $message, $thumb = false ){
+        $this->elements[] = array( 'type' => 'message', 'text' => $message, 'thumb' => $thumb );
+        return $this;
+    }
+
+    public function & addMessageTemplate( $message ){
+        $this->elements[] = array( 'type' => 'messagetemplate', 'message' => $message );
+        return $this;
+    }
+
+    public function & addVariables( $vars ){
+        $this->messagevars = $this->messagevars + $vars;
+        return $this;
+    }
+
+    public function & addCustom( $name, $obj ){
+        $this->elements[] = array( 'type' => 'custom' , 'obj' => $obj, 'name' => $name );
+        return $this;
+    }
+
+    public function & addLabelsList( $list, $header = '' ){
+        $this->elements[] = array( 'type' => 'labelslist', 'list' => $list, 'header' => $header );
         return $this;
     }
 
@@ -82,6 +103,10 @@ class mymessage{
             $this->addTitle( $this->reltitle )
                  ->addMessage( $val[ $this->relmessagekey ] );
         }
+
+        foreach( $this->elements as $el )
+            if( $el[ 'type' ] == 'custom' )
+                $el[ 'obj' ]->setValues( $values );
 
         return $this;
     }
@@ -108,7 +133,7 @@ class mymessage{
     }
 
     public function & addButton( $label, $icon, $onclick, $class = '', $color = false, $colorbackground = false ){
-        $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'onclick' => $onclick, 'class' => empty( $class ) ? $this->classname : $class, 'color' => $color, 'colorbackground' => $colorbackground );
+        $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'onclick' => $onclick, 'class' => $class, 'color' => $color, 'colorbackground' => $colorbackground );
         return $this;
     }
 
@@ -137,6 +162,11 @@ class mymessage{
         return $this;
     }
 
+    public function & ajaxRefresh(){
+        $this->app->ajax()->replacewith( '#msg' . $this->name, $this->__toString() );
+        return $this;
+    }
+    
     public function __toString(){
         return $this->render();
     }
@@ -150,7 +180,7 @@ class mymessage{
                                                            'elements'        => $this->elements,
                                                            'closebutton'     => $this->closebutton,
                                                            'offset'          => $this->offset
-                                                         ), null, null, null, false, false );
+                                                         ) + $this->messagevars, null, null, null, false, false );
     }
 
 }

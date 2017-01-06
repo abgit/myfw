@@ -55,7 +55,7 @@
                                                         {% set addonpos = ( td.addonposorder ? value|order(false) ) ~ ( value == 1 ? td.addonpossing : td.addonpos ) %}
 
                                                         {% if td.type == 'simple' %}
-                                                            {{ value|nl2space|t( td.truncate|default( 60 ) ) }}
+                                                            {{ value|t( td.truncate|default( 60 ) ) }}
 
                                                         {% elseif td.type == 'h4' %}
                                                                 <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>
@@ -83,9 +83,9 @@
                                                             </div>
 
                                                         {% elseif td.type == 'thumb' %}
-                                                        
+
                                                             {% if td.onclick %}
-                				                            	<a onclick="{{ td.onclick|replace({ (keyhtml): val[ key ] }) }}">
+                				                            	<a onclick="{{ td.onclick|link( val, { (keyhtml) : key }) }}">
                                                             {% endif %}
 
                                                             <img src="{{ value|default( td.default ) }}" alt="" class="user-face">
@@ -98,10 +98,10 @@
                                                             <img height="{{ td.height }}" width="{{ td.width }}" src="{{ td.cdn }}{{ value }}{{ td.sufix }}">
 
                                                         {% elseif td.type == 'label' %}
-                                                            <span class="label label-mini label-{{ ( td.class.key ? val[ td.class.key ] : value )|replaceonly( td.class.list ? td.class.list : [] )|default( td.class.default ? td.class.default : 'default' ) }}">{{ value|t(20) }}</span>
+                                                            <span class="label label-mini label-{{ ( td.classreplacekey ? val[ td.classreplacekey ] : value )|replaceonly( td.classreplace )|default( td.classreplacedefault ? td.classreplacedefault : 'default' ) }}">{{ value|t(20) }}</span>
 
                                                         {% elseif td.type == 'url' %}
-            				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|replaceurl( val, tags ) }}"{% else %} href="{{ value|replaceurl( val, tags ) }}" target="_blank"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 60 ) ) }}</a>
+            				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|link( val, { (keyhtml) : key } ) }}"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 60 ) ) }}</a>
 
                                                         {% elseif td.type == 'br' %}
                                                             <br />

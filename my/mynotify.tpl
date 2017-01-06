@@ -30,20 +30,20 @@
 {% endif %}
             {% if values %}
                 {% for val in values %}
-                <li id="{{name}}msg" class="{{name}}msg {{ ( unreadkey and val[ unreadkey ] ) ? 'unread' }}">
-                <a {%if itemaction.href %} href="{{ itemaction.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{%if itemaction.onclick %} onclick="{{ itemaction.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}>
-                    
-                    {% if itemthumb.key and val[ itemthumb.key ] %}
-                    <img class="user-face notifthumb{{ val[ itemthumb.classkey ] }}" alt="" src="{{ val[ itemthumb.key ] }}">
-                    {% endif %}
+                <li class="{{ ( unreadkey and val[ unreadkey ] ) ? 'unread' }}">
+                
+                    <a {% if itemaction.onclick or itemaction.onclickdefault %}onclick="{{ itemaction.onclick|link( val ) }}"{% endif %}>
+                        {% if itemthumb.key and val[ itemthumb.key ] %}
+                            <img class="user-face notifthumb{{ val[ itemthumb.classkey ] }}" alt="" src="{{ val[ itemthumb.key ] }}">
+                        {% endif %}
 
-                    {% set title = val[ itemtitle.key ] %}
-                    {% if itemtitle.replace %}
-                        {% set title = val[ itemtitle.key ]|replace( itemtitle.replace ) %}
-                    {% endif %}
+                        {% set title = val[ itemtitle.key ] %}
+                        {% if itemtitle.replace %}
+                            {% set title = val[ itemtitle.key ]|replace( itemtitle.replace ) %}
+                        {% endif %}
 
-                    <strong style="padding-right:0px;">{{title|t(30) }} {% if itemlabel and val[ itemlabel.key ] %}<span style="float:right"><span class="label label-info">{{ itemlabel.prefix ? itemlabel.prefix|raw }}{{ val[ itemlabel.key ]|t(8) }}{{ itemlabel.sufix ? itemlabel.sufix|raw }}</span></span>{% endif %}</strong><span>{{val[ itemdescription.key ]|t(35) }}</span>
-                </a>
+                        <strong style="padding-right:0px;">{{title|t(30) }} {% if itemlabel and val[ itemlabel.key ] %}<span style="float:right"><span class="label label-info">{{ itemlabel.prefix ? itemlabel.prefix|raw }}{{ val[ itemlabel.key ]|t(8) }}{{ itemlabel.sufix ? itemlabel.sufix|raw }}</span></span>{% endif %}</strong><span>{{val[ itemdescription.key ]|t(35) }}</span>
+                    </a>
                 </li>
                 {% endfor %}
 

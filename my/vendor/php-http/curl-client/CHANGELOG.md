@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.6.2 - 2017-01-02
+
+### Fixed
+
+- #29: Request not using CURLOPT_POSTFIELDS have content-length set to 
+
+### Changed
+
+- Use binary mode to create response body stream.
+
+
 ## 1.6.1 - 2016-11-11
 
 ### Fixed
