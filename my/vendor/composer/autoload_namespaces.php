@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Ulrichsg\\' => array($vendorDir . '/ulrichsg/getopt-php/src'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Slim' => array($vendorDir . '/slim/slim'),
     'PHPQRCode' => array($vendorDir . '/aferrandini/phpqrcode/lib'),
@@ -13,4 +14,7 @@ return array(
     'OAuth2' => array($vendorDir . '/adoy/oauth2/src'),
     'Michelf' => array($vendorDir . '/michelf/php-markdown'),
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
+    'Evenement' => array($vendorDir . '/evenement/evenement/src'),
+    'Devristo\\Phpws\\' => array($vendorDir . '/devristo/phpws/src'),
+    'Aptoma' => array($vendorDir . '/aptoma/twig-markdown/src'),
 );

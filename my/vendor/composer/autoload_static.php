@@ -7,17 +7,41 @@ namespace Composer\Autoload;
 class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
 {
     public static $files = array (
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         'ddc0a4d7e61c0286f0f8593b1903e894' => __DIR__ . '/..' . '/clue/stream-filter/src/functions.php',
-        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
+        'd45d087767e66b9914075f6f6efd1435' => __DIR__ . '/..' . '/blackfire/php-sdk/src/autostart.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'Z' => 
+        array (
+            'Zend\\Validator\\' => 15,
+            'Zend\\Uri\\' => 9,
+            'Zend\\Stdlib\\' => 12,
+            'Zend\\ServiceManager\\' => 20,
+            'Zend\\Log\\' => 9,
+            'Zend\\Loader\\' => 12,
+            'Zend\\Http\\' => 10,
+            'Zend\\Escaper\\' => 13,
+        ),
         'S' => 
         array (
             'Slim\\Views\\' => 11,
+            'Slack\\' => 6,
+        ),
+        'R' => 
+        array (
+            'React\\Stream\\' => 13,
+            'React\\Socket\\' => 13,
+            'React\\SocketClient\\' => 19,
+            'React\\Promise\\' => 14,
+            'React\\EventLoop\\' => 16,
+            'React\\Dns\\' => 10,
+            'React\\Cache\\' => 12,
         ),
         'P' => 
         array (
@@ -28,6 +52,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             'JaycoDesign\\Decimal\\' => 20,
             'JaycoDesign\\BTCHelper\\' => 22,
+        ),
+        'I' => 
+        array (
+            'Interop\\Container\\' => 18,
         ),
         'H' => 
         array (
@@ -57,6 +85,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'B' => 
         array (
             'Bugsnag\\' => 8,
+            'Blackfire\\' => 10,
             'Base32\\' => 7,
         ),
         'A' => 
@@ -66,9 +95,73 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
     );
 
     public static $prefixDirsPsr4 = array (
+        'Zend\\Validator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-validator/src',
+        ),
+        'Zend\\Uri\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-uri/src',
+        ),
+        'Zend\\Stdlib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-stdlib/src',
+        ),
+        'Zend\\ServiceManager\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-servicemanager/src',
+        ),
+        'Zend\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-log/src',
+        ),
+        'Zend\\Loader\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-loader/src',
+        ),
+        'Zend\\Http\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-http/src',
+        ),
+        'Zend\\Escaper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',
+        ),
         'Slim\\Views\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/views',
+        ),
+        'Slack\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/coderstephen/slack-client/src',
+        ),
+        'React\\Stream\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/stream/src',
+        ),
+        'React\\Socket\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/socket/src',
+        ),
+        'React\\SocketClient\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/socket-client/src',
+        ),
+        'React\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/promise/src',
+        ),
+        'React\\EventLoop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/event-loop/src',
+        ),
+        'React\\Dns\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/dns/src',
+        ),
+        'React\\Cache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/cache/src',
         ),
         'Psr\\Log\\' => 
         array (
@@ -85,6 +178,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'JaycoDesign\\BTCHelper\\' => 
         array (
             0 => __DIR__ . '/..' . '/jaycodesign/btchelper/src',
+        ),
+        'Interop\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
         ),
         'Http\\Promise\\' => 
         array (
@@ -143,6 +240,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             0 => __DIR__ . '/..' . '/bugsnag/bugsnag/src',
         ),
+        'Blackfire\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/blackfire/php-sdk/src/Blackfire',
+        ),
         'Base32\\' => 
         array (
             0 => __DIR__ . '/..' . '/christian-riesen/base32/src',
@@ -154,6 +255,13 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
     );
 
     public static $prefixesPsr0 = array (
+        'U' => 
+        array (
+            'Ulrichsg\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/ulrichsg/getopt-php/src',
+            ),
+        ),
         'T' => 
         array (
             'Twig_' => 
@@ -195,6 +303,27 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Mailgun' => 
             array (
                 0 => __DIR__ . '/..' . '/mailgun/mailgun-php/src',
+            ),
+        ),
+        'E' => 
+        array (
+            'Evenement' => 
+            array (
+                0 => __DIR__ . '/..' . '/evenement/evenement/src',
+            ),
+        ),
+        'D' => 
+        array (
+            'Devristo\\Phpws\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/devristo/phpws/src',
+            ),
+        ),
+        'A' => 
+        array (
+            'Aptoma' => 
+            array (
+                0 => __DIR__ . '/..' . '/aptoma/twig-markdown/src',
             ),
         ),
     );

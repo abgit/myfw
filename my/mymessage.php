@@ -14,6 +14,8 @@ class mymessage{
     private $reltitle;
     private $relmessagekey;
     private $messagevars = array();
+    private $messageprefix;
+    private $messagesufix;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -62,6 +64,12 @@ class mymessage{
 
     public function & addMessage( $message, $thumb = false ){
         $this->elements[] = array( 'type' => 'message', 'text' => $message, 'thumb' => $thumb );
+        return $this;
+    }
+
+    public function & setMessageAddon( $prefix, $sufix = '' ){
+        $this->messageprefix = $prefix;
+        $this->messagesufix  = $sufix;
         return $this;
     }
 
@@ -178,6 +186,8 @@ class mymessage{
                                                            'customsubheader' => $this->customsubheader,
                                                            'video'           => $this->video,
                                                            'elements'        => $this->elements,
+                                                           'messageprefix'   => $this->messageprefix,
+                                                           'messagesufix'    => $this->messagesufix,
                                                            'closebutton'     => $this->closebutton,
                                                            'offset'          => $this->offset
                                                          ) + $this->messagevars, null, null, null, false, false );

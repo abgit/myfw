@@ -52,7 +52,7 @@
     <div class="col-lg-12">
 {% endif %}
 
-<div class="">
+<div class="myfwinfo">
 
 {% for el in elements %}
 
@@ -77,7 +77,7 @@
         {% if val|trim is empty %}
             <i>{{ el.defaulttext|raw }}</i>
         {% else %}
-            {{ val|nl2br }}
+            {{ val|nl2br|markdown }}
         {% endif %}
 
     {% elseif el.type == 'custom' %}

@@ -67,8 +67,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '', $classkey = '', $default = '' ){
-        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick, 'classkey' => $classkey, 'default' => $default );
+    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '', $classkey = '', $default = '', $href = '' ){
+        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick, 'classkey' => $classkey, 'default' => $default, 'href' => $href );
         return $this;
     }
     

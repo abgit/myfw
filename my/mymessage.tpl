@@ -52,10 +52,10 @@
         <div class="well myfwstatsmsg">{{ el.obj|raw }}</div>
 
         {% elseif el.type == 'message' %}
-            <p id="msg{{ name }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ el.text }}</p>
+            <p id="msg{{ name }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ messageprefix }}{{ el.text }}{{ messagesufix }}</p>
 
         {% elseif el.type == 'messagetemplate' %}
-            <p id="msg{{ name }}t">{{ include( template_from_string( el.message ) ) }}</p>
+            <p id="msg{{ name }}t">{{ messageprefix }}{{ include( template_from_string( el.message ) ) }}{{ messagesufix }}</p>
 
         {% elseif el.type == 'small' %}
             <small style="color:#999">{{ el.text }}</small>

@@ -185,11 +185,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addLabel( $key, $kval, $label = '', $default = '', $replace = array(), $customkey = false ){
+    public function & addLabel( $key, $kval, $label = '', $classreplacedefault = '', $classreplace = array(), $customkey = false, $replaceval = false ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label', 'classreplace' => $replace, 'classreplacedefault' => $default, 'classreplacekey' => $customkey );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label', 'replaceval' => $replaceval, 'classreplace' => $classreplace, 'classreplacedefault' => $classreplacedefault, 'classreplacekey' => $customkey );
         return $this;
     }
 

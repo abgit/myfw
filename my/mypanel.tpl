@@ -52,7 +52,7 @@
     										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
                                                 
                                                 {% if elements.thumb.onclick %}
-                                                    <a onclick="{{ elements.thumb.onclick|replaceurl( value, tags ) }}">
+                                                    <a onclick="{{ elements.thumb.onclick|replaceurl( value, tags ) }}" href="{{ elements.thumb.href|replaceurl( value, tags ) }}">
                                                 {% endif %}
 
                                                 <img class="pt{{ value[ elements.thumb.classkey ] }}" style="margin-top:10px;margin-left:-10px" src="{% if elements.thumb.static %}{{ cdn }}{{ elements.thumb.key|raw }}{% else %}{{ cdn }}{{ value[ elements.thumb.key ]|default( elements.thumb.default ) }}{% endif %}">

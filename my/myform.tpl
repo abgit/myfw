@@ -49,7 +49,7 @@
         {% set formgroup = -1 %}
 
 
-		{% for el in elements %}
+		{% for el in elements if el.type is defined %}
     
 
         	{% if el.type == 'formgroup' %}
@@ -94,10 +94,11 @@
 
                         <div class="input-group">
                             <span class="input-group-addon">&#3647;</span>
-                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });{{ el.onchange }}" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
+                            <input onkeypress="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });{{ el.onchange }}" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
                         </div>
                         <span class="label label-block label-primary text-center btchelper">
-                            {% for cur in el.currencies %}
+                            {% set currencies = el.currencies is iterable ? el.currencies : valuesdefault[ el.currencies ]|jsondecode %}
+                            {% for cur in currencies %}
                                 <span class="aux{{name ~ el.name}}" data-symb="{{ cur.symbol }}" data-val="{{ cur.rate }}">{{ cur.symbol }} {{ ( cur.rate * el.value|toBTC )|number_format(2, '.', '') }}</span>
                                 {% if not loop.last %}
                                 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -116,6 +117,11 @@
 			{% elseif el.type == 'textarea' %}
                     <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                 	<textarea class="form-control" {{el.disabled ? 'disabled="disabled" '}}{{el.readonly ? 'readonly="readonly" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" cols="1" rows="{{ el.rows }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>{{ isajax ? el.value|replace({"\n\r": "%0DMYFW", "\n": "%0DMYFW", "\r": "%0DMYFW"}) : el.value }}</textarea>
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+			{% elseif el.type == 'markdown' %}
+                    <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                	<textarea data-pickeroptions="{{el.pickeroptions}}" data-storeoptions="{{el.storeoptions}}" data-processing="{{el.processing}}" class="markdown" name="{{name ~ el.name}}" id="{{name ~ el.name}}"  style="width:100%; height:100px" >{{ isajax ? el.value|replace({"\n\r": "%0DMYFW", "\n": "%0DMYFW", "\r": "%0DMYFW"}) : el.value }}</textarea>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'select' %}
@@ -348,21 +354,21 @@
 			{% elseif el.type == 'filestack' %}
             <label>{{ el.label|raw }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
 
-            {% if width is not empty %}
+            {% if el.width is not empty %}
                 <div class="row">
                     <div class="col-xs-7" style="min-height:{{ el.height }}px">
-                        <img onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <img onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                     </div>
                     <div class="col-xs-5" style="padding:0px;">
-                        <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:['COMPUTER','CONVERT'],conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     </div>
                 </div>
             {% else %}
                 <div class="row">
                     <div class="col-xs-12">
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
-                        <button onClick="filepicker.pickAndStore({multiple:false,mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],cropRatio:1,cropForce:true,{{ el.security }}services:{{ el.fsservices|json_encode }},conversions: ['crop', 'rotate', 'filter']},{{ el.fsoptions|json_encode }},function(Blobs){$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);$('#filestacks{{ name ~ el.name }}').text(myfwt(Blobs[0].filename,25)).addClass('label-success');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);$('#filestacks{{ name ~ el.name }}').text(myfwt(Blobs[0].filename,25)).addClass('label-success');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                         <span id="filestacks{{ name ~ el.name }}" class="label {%if el.value %}label-success{%endif%}" style="margin-top:4px;display:block">{% if el.value %}{{ el.value|t( 20, '...', false ) }}{% else %}&nbsp;{% endif %}</span>
                     </div>
                 </div>

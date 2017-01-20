@@ -113,6 +113,8 @@ class myform{
         $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies, 'onchange' => $onchange, 'decimal' => $decimal );
         $this->addFilter( $name, 'satoshi' );
         $this->addRule( $name, 'Invalid bitcoin amount', 'bitcoin' );
+        if( is_string( $currencies ) && !empty( $currencies ) )
+            $this->elements[ $currencies ] = array();
         return $this;
     }
 
@@ -130,6 +132,36 @@ class myform{
 
     public function & addTextarea( $name, $label, $help = '', $rows = 2 ){
         $this->elements[ $name ] = array( 'type' => 'textarea', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rows' => $rows, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
+        return $this;
+    }
+
+    public function & addMarkdown( $name, $label, $picker_options, $store_options, $processing ){
+
+        if( is_null( $picker_options ) )
+            $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
+
+        $secret    = $this->app->config( 'filestack.secret' );
+        $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
+        $policy64  = base64_encode( $policy );
+        $signature = hash_hmac( 'sha256', $policy64, $secret );
+
+        // add security
+        $picker_options[ 'policy' ]    = $policy64;
+        $picker_options[ 'signature' ] = $signature;
+
+        if( is_null( $store_options ) ){
+            $store_options = array();
+            $location = $this->app->config( 'filestack.location' );
+            $path     = $this->app->config( 'filestack.path' );
+
+            if( $location )
+                $store_options[ 'location' ] = $location;
+
+            if( $path )
+                $store_options[ 'path' ] = $path;
+        }
+
+        $this->elements[ $name ] = array( 'type' => 'markdown', 'valuetype' => 'simple', 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ), 'processing' => $processing, 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
         return $this;
     }
 
@@ -443,26 +475,33 @@ class myform{
         return $this;
     }
 
-    public function & addFilestack( $name, $label, $width = '', $height = '', $processing = '', $fsservices = array( 'COMPUTER', 'CONVERT' ), $help = '' ){
+    public function & addFilestack( $name, $label, $width = '', $height = '', $processing = '', $picker_options = null, $store_options = null, $help = '' ){
+
+        if( is_null( $picker_options ) )
+            $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
 
         $secret    = $this->app->config( 'filestack.secret' );
         $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
-        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
 
-        $fsoptions = new stdClass();
-        
-        $location = $this->app->config( 'filestack.location' );
-        $path     = $this->app->config( 'filestack.path' );
+        // add security
+        $picker_options[ 'policy' ]    = $policy64;
+        $picker_options[ 'signature' ] = $signature;
 
-        if( $location )
-            $fsoptions->location = $location;
+        if( is_null( $store_options ) ){
+            $store_options = array();
+            $location = $this->app->config( 'filestack.location' );
+            $path     = $this->app->config( 'filestack.path' );
 
-        if( $path )
-            $fsoptions->path = $path;
+            if( $location )
+                $store_options[ 'location' ] = $location;
 
-        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'security' => $security, 'processing' => $processing, 'fsoptions' => $fsoptions, 'fsservices' => $fsservices );
+            if( $path )
+                $store_options[ 'path' ] = $path;
+        }
+
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ) );
 
         $this->addRule( function() use ( $name ){
 
@@ -938,7 +977,7 @@ class myform{
     public function isSubmitted( $button = '' ){
 
         foreach( $this->elements as $n => $el ){
-            if( ( $el[ 'type' ] == 'submit' || $el[ 'type' ] == 'ajax' ) && isset( $_POST[ $this->formname . $n ] ) && ( empty( $button ) || $n == $button ) )
+            if( isset( $el[ 'type' ] ) && ( $el[ 'type' ] == 'submit' || $el[ 'type' ] == 'ajax' ) && isset( $_POST[ $this->formname . $n ] ) && ( empty( $button ) || $n == $button ) )
                 return true;
         }
         return false;
@@ -970,16 +1009,18 @@ class myform{
         $pusherchannel = 0;
         $cameratag     = array();
         foreach( $this->elements as $n => $el ){
-            if( $el[ 'type' ] == 'transloadit' ){
-                $transloadit = 1;
-            }
-            if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagphoto' || $el[ 'type' ] == 'cameratagvideo' || $el[ 'type' ] == 'cameratagimage' ){
-                $cameratag[] = $this->formname . $el[ 'name' ];
-            }
-            if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
-                $transloadit   = $el[ 'obj' ]->getTransloadit();
-                $chatscroll    = '#' . $el[ 'obj' ]->getWindowId();
-                $pusherchannel = $el[ 'obj' ]->getPusherChannel();
+            if( isset( $el[ 'type' ] ) ){
+                if( $el[ 'type' ] == 'transloadit' ){
+                    $transloadit = 1;
+                }
+                if( $el[ 'type' ] == 'cameratag' || $el[ 'type' ] == 'cameratagphoto' || $el[ 'type' ] == 'cameratagvideo' || $el[ 'type' ] == 'cameratagimage' ){
+                    $cameratag[] = $this->formname . $el[ 'name' ];
+                }
+                if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
+                    $transloadit   = $el[ 'obj' ]->getTransloadit();
+                    $chatscroll    = '#' . $el[ 'obj' ]->getWindowId();
+                    $pusherchannel = $el[ 'obj' ]->getPusherChannel();
+                }
             }
         }
 
@@ -1236,7 +1277,7 @@ class myform{
                         $v = call_user_func( array( 'myfilters', $f ), $v );
 
             $this->elements[$n][ 'value' ] = $v;
-            if( $el[ 'type' ] == 'captcha' )
+            if( isset( $el[ 'type' ] ) && $el[ 'type' ] == 'captcha' )
                 $this->initCaptcha();
         }
 
@@ -1247,6 +1288,7 @@ class myform{
                         'warningmsg'    => $this->warningMessage,
                         'preventmsg'    => $this->preventmsg,
                         'errors'        => $this->errors,
+                        'valuesdefault' => $this->valuesdefault,
                         'name'          => $this->formname,
                         'action'        => $this->action,
                         'target'        => $this->target,

@@ -23,6 +23,10 @@ class myfilters{
         return empty( $string ) ? '' : $string;
     }
 
+    public static function jsondecode( $string ){
+        return json_decode( $string, true );
+    }
+
     public static function bitcoinqrcode( $amount, $acc, $size ){
         return \Slim\Slim::getInstance()->blockchain()->qrcode( $amount, '', $acc, $size );
     }

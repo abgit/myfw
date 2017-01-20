@@ -1,5 +1,8 @@
 <?php
 
+    use Aptoma\Twig\Extension\MarkdownExtension;
+    use Aptoma\Twig\Extension\MarkdownEngine;
+
     define( "APP_WEBMODE", isset( $_SERVER['HTTP_HOST'] ) );
 
     // slim warnings on cron
@@ -557,6 +560,10 @@
             $this->bef2Fcall = $callback;
         }
 
+        public function getBefore2Factor(){
+            return call_user_func( $this->bef2Fcall );
+        }
+
         public function onSMS( $callback ){
             $this->onsmscall = $callback;
         }
@@ -617,6 +624,10 @@
 
                 $env->addExtension( new Twig_Extension_StringLoader() );
 
+                $engine = new MarkdownEngine\MichelfMarkdownEngine();
+
+                $env->addExtension(new MarkdownExtension($engine));
+
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
 
@@ -663,8 +674,8 @@
             return array( 'type' => 'ajaxactions', 'urls' => $urls, 'code' => $code, 'keys' => $keys, 'default' => $default );
         }
 
-        public function urlForAjaxForm( $formname, $action, $submitbutton = '', $msg = 'Loading ...' ){
-            return "myfwformsubmit('" . $formname . "','','','" . $formname . $submitbutton . "','" . $msg . "','" . $action . "')";
+        public function urlForAjaxForm( $formname, $action, $submitbutton = '', $msg = 'Loading ...', $delay = 0 ){
+            return "myfwformsubmit('" . $formname . "','','','" . $formname . $submitbutton . "','" . $msg . "','" . $action . "'," . intval( $delay ) .  ")";
         }
 
         public function urlForWindow( $action, $options = array() ){

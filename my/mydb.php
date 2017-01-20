@@ -81,10 +81,10 @@
                                             $column_value = isset( $values[ $column_name] ) ? !empty( $values[ $column_name ] ) : ( isset( $args[2] ) ? ( $args[2] === 'true' ? true : ( $args[2] === 'false' ? false : null ) ) : null );
                                             break;
                         case 'datetime' :   $column_type  = PDO::PARAM_STR;
-                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? substr( $values[ $column_name ], 0, 19 ) : null;
-                                            break;
-                        case 'timestamp' :  $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d H:i:s", strtotime( $values[ $column_name ] ) ) : null;
+                                            break;
+                        case 'date' :       $column_type  = PDO::PARAM_STR;
+                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d 00:00:00", strtotime( $values[ $column_name ] ) ) : null;
                                             break;
                         case 'bigint' :     $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && preg_match('/^[0-9]+$/', strval($values[ $column_name ] ) ) ) ? $values[ $column_name ]: null;
