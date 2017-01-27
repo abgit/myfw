@@ -419,11 +419,14 @@ class myform{
     }
 
     public function & addSelect( $name, $label, $options = array(), $optionsFilter = null, $help = '' ){
-        $options = $this->filterOptions( $options, $optionsFilter );
+        if( !is_null( $optionsFilter ) )
+            $options = $this->filterOptions( $options, $optionsFilter );
+
         $rules[ 'selectvalid' ] = array( $label . ' is not valid', $options );
 
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+
         $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options, 'help' => $help );
         return $this;
     }
@@ -851,15 +854,15 @@ class myform{
         imagestring($img, 5, 10, imagesy($img)-20, $string, $cmtcol);
     }
 
-    public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $href = '' ){
+    public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $href = '', $icon = '' ){
 
-        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'onclick' => $onclick, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href );
+        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'onclick' => $onclick, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'icon' => $icon );
         return $this;
     }
 
-    public function & addAjaxButton( $name, $labelbutton = null, $onclick = '', $href = '', $css = '' ){
+    public function & addAjaxButton( $name, $labelbutton = null, $onclick = '', $href = '', $css = '', $close = false ){
 
-        $this->elements[ $name ] = array( 'type' => 'ajaxbutton', 'isbutton' => true, 'name' => $name, 'onclick' => $onclick, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'css' => $css );
+        $this->elements[ $name ] = array( 'type' => 'ajaxbutton', 'isbutton' => true, 'name' => $name, 'close' => $close, 'onclick' => $onclick, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'css' => $css );
         return $this;
     }
 

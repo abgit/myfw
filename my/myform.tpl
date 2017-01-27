@@ -94,7 +94,7 @@
 
                         <div class="input-group">
                             <span class="input-group-addon">&#3647;</span>
-                            <input onkeypress="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });{{ el.onchange }}" class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
+                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });"{% if el.onchange %} onkeypress="{{ el.onchange }}"{% endif %} class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
                         </div>
                         <span class="label label-block label-primary text-center btchelper">
                             {% set currencies = el.currencies is iterable ? el.currencies : valuesdefault[ el.currencies ]|jsondecode %}
@@ -131,11 +131,19 @@
                         <p class="form-control-static">{{ el.options[ el.value ]|default( preventmsg ) }}</p>
                     {% else %}
 
-                        <select class="form-control" style="width:auto" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
-    					{% for opv, opl in el.options %}
-                            <option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
-    					{% endfor %}
+                        <select class="form-control" style="width:auto;min-width:200px" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}">
+    
+                        {% if el.options is iterable %}
+        					{% for opv, opl in el.options %}
+                                <option {{el.value == opv ? 'selected '}}value="{{ opv }}">{{ opl }}</option>
+        					{% endfor %}
+                        {% else %}
+        					{% for option in valuesdefault[ el.options ]|jsondecode %}
+                                <option {{el.value == option.key ? 'selected '}}value="{{ option.key }}">{{ option.label }}</option>
+        					{% endfor %}
+                        {% endif %}
                         </select>
+
 
                         {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
@@ -284,7 +292,11 @@
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
                 <div>
-                <input type="button" class="btn btn-default" {% if el.onclick %}onClick="{{el.onclick|raw}}"{% endif %} {% if el.href %}href="{{el.href|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
+                {% if el.onclick %}
+                    <button type="button" class="btn btn-default" onClick="{{el.onclick|raw}}" value="{{ el.labelbutton }}"/>
+                {% else %}
+                    <a class="btn btn-default" href="{{el.href|raw}}" target="_blank">{% if el.icon %}<i class="icon-{{ el.icon }}"></i>{% endif %}{{ el.labelbutton }}</a>
+                {% endif %}
                 </div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
@@ -481,7 +493,7 @@
                     {% if el.href %}
                         <a type="button" href="{{ el.href }}" style="margin-left:5px;margin-top:3px;" class="btn btn-default">{{ el.labelbutton }}</a>
                     {% else %}
-                        <input type="button" class="btn {{ el.css|default( 'btn-default' ) }}" style="margin-left:5px;margin-top:3px;"{% if el.onclick %} onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
+                        <input type="button"{% if el.close %} data-dismiss="modal"{% endif %} class="btn {{ el.css|default( 'btn-default' ) }}" style="margin-left:5px;margin-top:3px;"{% if el.onclick %} onClick="{{el.onclick|raw}}"{% endif %} value="{{ el.labelbutton }}"/>
                     {% endif %}
 
                 {% endif %}

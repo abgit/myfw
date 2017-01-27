@@ -398,24 +398,7 @@
         }
         
         public function isLogged(){
-
-//            if( $this->objuserlogg === true )
-//                return true;
-
-//            if( $forceloginifanonimous == false )
-//                return false;
-
-//            $func = $this->onlogincall;
             return call_user_func( $this->onlogincall ) === true;
-
-
-//            if( is_string( $func ) || !$func ){
-//                $this->objuserredir = $func;
-//                return false;
-//            }
-
-//            $this->objuserlogg = true;
-//            return true;
         }
         
         public function getuserredir(){

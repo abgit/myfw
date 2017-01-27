@@ -95,6 +95,9 @@
                         case 'tag' :        $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? substr( preg_replace( "/[^A-Za-z0-9]/", '', $values[ $column_name ] ), 0, 100 ) : null;
                                             break;
+                        case 'checkbox' :   $column_type  = PDO::PARAM_INT; 
+                                            $column_value = isset( $values[ $column_name ] ) && $values[ $column_name ] === 'on' ? 1 : null;
+                                            break;
                         case 'float' :      $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? str_replace( ',', '.', $values[ $column_name] ) : 0;
                                             break;

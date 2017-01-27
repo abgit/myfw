@@ -377,6 +377,9 @@ class mygrid{
     }
 
     public function & addAjaxValue( $value ){
+        if( is_string( $value ) )
+            $value = json_decode( $value, true );
+
         return $this->addAjaxValues( array( $value ), false );
     }
 

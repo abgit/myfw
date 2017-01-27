@@ -157,7 +157,7 @@ class myfilters{
 
     public static function cdn( $html ){
         $app  = \Slim\Slim::getInstance();
-        return preg_replace( '~(href|src|url)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $app->config( 'filter.cdn.ext' ). ')(["\'])~i', '$1$2"' . $app->config( 'filter.cdn.domain' ) . '$5$6"', $html  );
+        return preg_replace( '~(href|src|url|content)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $app->config( 'filter.cdn.ext' ). ')(["\'])~i', '$1$2"' . $app->config( 'filter.cdn.domain' ) . '$5$6"', $html  );
     }
 
     public static function intervalmin( $value, $intervals ){

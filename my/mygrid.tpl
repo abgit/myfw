@@ -138,7 +138,7 @@
                                                                 {% set break = 1 %}
                                                             {% endfor %}
 
-                                                            {% if fixedfilldefault %}
+                                                            {% if fixedfilldefault and td.default is not empty %}
                                                                 <span class="label label-{{ td.default.type|default( 'default' ) }}">{% if td.default.label %}{{ td.default.label }}{% elseif value is not empty %}{{ value }}{% else %} &nbsp;&nbsp;&nbsp; {% endif %}</span>
                                                             {% endif %}
 

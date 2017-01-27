@@ -209,8 +209,8 @@ class myajax{
         return $this;
     }
 
-    public function & hideTableRow( $el, $table/*, $emptymsg*/ ){
-        $this->out[ 'hr' ][] = array( 'e' => $el, 't' => $table/*, 'm' => $emptymsg*/ );
+    public function & hideTableRow( $el, $table ){
+        $this->out[ 'hr' ][] = array( 'e' => $el, 't' => $table );
         return $this;
     }
 
