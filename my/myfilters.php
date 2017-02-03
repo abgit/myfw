@@ -49,11 +49,11 @@ class myfilters{
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
-    public static function filestack( $url, $call = 'read', $custom = '', $process = true ){
+    public static function filestack( $urloriginal, $call = 'read', $custom = '', $process = true ){
 
-        $url = substr( $url, 33 );
+        $url = substr( $urloriginal, 33 );
 
-        if( empty( $url ) )
+        if( empty( $url ) || strpos( $urloriginal, 'https://cdn.filestackcontent.com' ) !== 0 )
             return '';
 
         $secret    = \Slim\Slim::getInstance()->config( 'filestack.secret' );

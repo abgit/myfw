@@ -428,6 +428,10 @@ class myform{
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
 
         $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options, 'help' => $help );
+
+        if( is_string( $options ) )
+            $this->elements[ $options ] = array();
+
         return $this;
     }
 
@@ -521,6 +525,11 @@ class myform{
 
             return 'Invalid recording';
         });
+        return $this;
+    }
+
+    public function & addFilestackImage( $name, $label = '', $width = '', $height = '', $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'filestackimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 

@@ -185,11 +185,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addLabel( $key, $kval, $label = '', $classreplacedefault = '', $classreplace = array(), $customkey = false, $replaceval = false ){
+    public function & addLabel( $key, $kval, $label = '', $classreplacedefault = '', $classreplace = array(), $customkey = false, $replaceval = false, $sufix = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label', 'replaceval' => $replaceval, 'classreplace' => $classreplace, 'classreplacedefault' => $classreplacedefault, 'classreplacekey' => $customkey );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'label', 'replaceval' => $replaceval, 'classreplace' => $classreplace, 'classreplacedefault' => $classreplacedefault, 'classreplacekey' => $customkey, 'sufix' => $sufix );
         return $this;
     }
 
@@ -334,10 +334,12 @@ class mygrid{
 
         if( is_string( $values ) )
             $values = json_decode( $values, true );
-        
-        foreach( $values as $row ){
-            if( isset( $row[ $this->key ] ) )
-                $this->app->ajax()->replacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ) );
+
+        if( is_array( $values ) ){
+            foreach( $values as $row ){
+                if( isset( $row[ $this->key ] ) )
+                    $this->app->ajax()->replacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ) );
+            }
         }
 
         return $this;

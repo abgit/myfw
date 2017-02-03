@@ -99,7 +99,7 @@
 
                                                         {% elseif td.type == 'label' %}
                                                             {% set class = ( td.classreplacekey ? val[ td.classreplacekey ] : value )|replaceonly( td.classreplace )|default( td.classreplacedefault ) %}
-                                                            <span {% if class %}class="label label-mini label-{{ class }}"{% endif %}>{{ td.replaceval ? value|replaceonly( td.replaceval ) : value|t(20) }}</span>
+                                                            <span {% if class %}class="label label-mini label-{{ class }}"{% endif %}>{{ td.replaceval ? value|replaceonly( td.replaceval ) : value|t(20) }}{{ td.sufix|label( value ) }}</span>
 
                                                         {% elseif td.type == 'url' %}
             				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|link( val, { (keyhtml) : key } ) }}"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 60 ) ) }}</a>

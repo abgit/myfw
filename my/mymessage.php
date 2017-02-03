@@ -16,6 +16,7 @@ class mymessage{
     private $messagevars = array();
     private $messageprefix;
     private $messagesufix;
+    private $values = array();
 
     public function __construct( $name ){
         $this->name = $name;
@@ -116,6 +117,8 @@ class mymessage{
             if( $el[ 'type' ] == 'custom' )
                 $el[ 'obj' ]->setValues( $values );
 
+        $this->values = is_string( $values ) ? $val : $values;
+
         return $this;
     }
 
@@ -189,7 +192,8 @@ class mymessage{
                                                            'messageprefix'   => $this->messageprefix,
                                                            'messagesufix'    => $this->messagesufix,
                                                            'closebutton'     => $this->closebutton,
-                                                           'offset'          => $this->offset
+                                                           'offset'          => $this->offset,
+                                                           'values'          => $this->values
                                                          ) + $this->messagevars, null, null, null, false, false );
     }
 

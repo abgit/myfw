@@ -127,11 +127,11 @@
 			{% elseif el.type == 'select' %}
                     {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
 
-                    {% if el.prevent %}
+                    {% if el.prevent and el.options is iterable %}
                         <p class="form-control-static">{{ el.options[ el.value ]|default( preventmsg ) }}</p>
                     {% else %}
 
-                        <select class="form-control" style="width:auto;min-width:200px" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}">
+                        <select class="form-control" style="width:auto;" {{el.disabled ? 'disabled="disabled" '}}name="{{el.name}}">
     
                         {% if el.options is iterable %}
         					{% for opv, opl in el.options %}
@@ -139,11 +139,10 @@
         					{% endfor %}
                         {% else %}
         					{% for option in valuesdefault[ el.options ]|jsondecode %}
-                                <option {{el.value == option.key ? 'selected '}}value="{{ option.key }}">{{ option.label }}</option>
+                                <option {{el.value == option.key ? 'selected '}}value="{{ option.key }}">{{ option.value }}</option>
         					{% endfor %}
                         {% endif %}
                         </select>
-
 
                         {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
@@ -162,7 +161,7 @@
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'checkbox' %}
-				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" {{el.value == 'on' ? 'checked '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}> <label for="{{name ~ el.name}}">{{el.label|raw}}</label>
+				<input {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" {{el.value is not empty ? 'checked="checked" '}}type="checkbox"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}> <label for="{{name ~ el.name}}">{{el.label|raw}}</label>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'hidden' %}
@@ -403,6 +402,20 @@
                     </div>
                 </div>
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+
+        	{% elseif el.type == 'filestackimage' %}
+
+                    {%if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
+                    {% set value = el.value|filestack %}
+                    {% if value %}
+                    <div{%if el.align %} style="text-align:{{ el.align }}"{% endif %}>
+                        <img id="{{ name ~ el.name}}" {% if el.width %}width="{{ el.width }}"{% endif %} {% if el.height %}height="{{ el.height }}"{% endif %} {% if not el.width and not el.height %}style="height:auto;width:100%"{% endif %} src="{{ value }}"/>
+                    </div>
+                    {% else %}
+                        <div>unknown</div>
+                    {% endif %}
+                    {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'transloadit' %}
 
