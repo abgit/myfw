@@ -25,6 +25,7 @@ return array(
     'React\\Cache\\' => array($vendorDir . '/react/cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
+    'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'JaycoDesign\\Decimal\\' => array($vendorDir . '/jaycodesign/decimal/src'),
     'JaycoDesign\\BTCHelper\\' => array($vendorDir . '/jaycodesign/btchelper/src'),
     'Interop\\Container\\' => array($vendorDir . '/container-interop/container-interop/src/Interop/Container'),

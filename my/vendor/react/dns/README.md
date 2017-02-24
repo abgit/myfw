@@ -26,6 +26,8 @@ $dns->resolve('igor.io')->then(function ($ip) {
 $loop->run();
 ```
 
+See also the [first example](examples).
+
 Pending DNS queries can be cancelled by cancelling its pending promise like so:
 
 ```php
@@ -59,7 +61,11 @@ $loop->run();
 ```
 
 If the first call returns before the second, only one query will be executed.
-The second result will be served from cache.
+The second result will be served from an in memory cache.
+This is particularly useful for long running scripts where the same hostnames
+have to be looked up multiple times.
+
+See also the [third example](examples).
 
 ### Custom cache adapter
 
@@ -84,16 +90,10 @@ The recommended way to install this library is [through Composer](http://getcomp
 This will install the latest supported version:
 
 ```bash
-$ composer require react/dns:~0.4.0
+$ composer require react/dns:^0.4.4
 ```
 
-If you care a lot about BC, you may also want to look into supporting legacy versions:
-
-```bash
-$ composer require "react/dns:~0.4.0|~0.3.0"
-```
-
-More details and upgrade guides can be found in the [CHANGELOG](CHANGELOG.md).
+More details about version upgrades can be found in the [CHANGELOG](CHANGELOG.md).
 
 ## License
 

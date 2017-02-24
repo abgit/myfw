@@ -63,6 +63,15 @@ class mygrid{
         return $this;
     }
     
+    public function & setW( $k, $width ){
+        $widths = $this->app->config( 'grid.widths' );
+
+        if( isset( $this->labels[ $k ] ) )
+            $this->labels[ $k ][ 'width' ] = ( isset( $widths[ $width ] ) && !is_numeric( $width ) ) ? $widths[ $width ] : intval( $width );
+
+        return $this;
+    }
+
     public function & setWidth(){
 
         $arg = func_get_args();
@@ -212,12 +221,15 @@ class mygrid{
         return $this->menuhtml;
     }
 
-    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'center' ){
+    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'center', $depends = false ){
         $key = 'menutools';
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'options' => $options );
+        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'options' => $options, 'depends' => $depends );
+
+        $this->setW( $key, 60 );
+
         return $this;
     }
 

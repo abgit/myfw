@@ -121,7 +121,7 @@ class mynotify{
     }
 
 
-    public function & ajaxUpdateThumb( $class, $value ){
+    public function & ajaxThumbChange( $class, $value ){
         $this->app->ajax()->attr( '.notifthumb' . $class, 'src', $value );
         return $this;
     }

@@ -143,6 +143,7 @@
                                                             {% endif %}
 
                                                         {% elseif td.type == 'menu' %}
+                                                            {% if not td.depends or ( td.depends and val[ td.depends ] ) %}
     					                                    <div class="btn-group">
     						                                    <button data-toggle="dropdown" class="btn btn-icon dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon }}"></i></button>
     													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
@@ -152,6 +153,7 @@
     		                                                    {% endfor %}
                 		    									</ul>
     	    				                                </div>
+                                                            {% endif %}
 
                                                         {% endif %}
                                                     {% endif %}

@@ -66,7 +66,7 @@ class myfilters{
     }
 
     public static function filestackresize( $url, $w, $h = null ){
-        return myfilters::filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) );
+        return myfilters::filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) . ',f:max/output=f:jpg' );
     }
 
     public static function filestackmovie( $url, $part ){

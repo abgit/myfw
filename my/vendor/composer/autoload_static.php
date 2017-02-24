@@ -47,6 +47,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Container\\' => 14,
         ),
         'J' => 
         array (
@@ -170,6 +171,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
         ),
         'JaycoDesign\\Decimal\\' => 
         array (
