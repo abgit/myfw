@@ -130,6 +130,11 @@
                 $this->notFound();
 
             })->name( 'myfwconfirm' )->conditions( array( 'h' => 'cf[a-f0-9]{32}' ) );
+
+            $this->post( '/myfwtip/:tip', 'islogged', function( $tip ){
+                if( class_exists( 'Memcached' ) && isset( $this->client[ 'uuid' ] ) && $this->memcached()->get( $tip . md5( $this->client[ 'uuid' ] ) ) === 0 )
+                    $this->memcached()->set( $tip . md5( $this->client[ 'uuid' ] ), 1 );
+            })->name( 'myfwtip' )->conditions( array( 'tip' => 'tip[a-zA-Z0-9]{1,20}' ) );
         }
 
         public function setConditions( $cond ){
@@ -150,7 +155,7 @@
                     if( !is_string( $this->container['settings'][$name] ) )
                         return $this->container['settings'][$name];
 
-                    preg_match("/([^$@#][a-zA-Z0-9]+[-]{1})([$@#][a-zA-Z0-9_]+.*)/", $this->container['settings'][$name], $vars );
+                    preg_match("/([^$!@#][a-zA-Z0-9]+[-]{1})([$!@#][a-zA-Z0-9_]+.*)/", $this->container['settings'][$name], $vars );
                     if( is_array( $vars ) && !empty( $vars ) ){
                         $setting = $vars[ 2 ];
                         $prefix  = $vars[ 1 ];
@@ -186,7 +191,7 @@
         }
 
         private function configparse( $name ){
-            preg_match("/([a-zA-Z0-9_]+)(.*)/", substr( $name, 1 ), $vars );
+            preg_match("/([a-zA-Z0-9_+=\/]+)(.*)/", substr( $name, 1 ), $vars );
             return $vars;
         }
 
@@ -354,7 +359,7 @@
 			return $this->navbar[ $id ];
 		}
 
-		public function message( $id = 'ms' ){
+		public function message( $id ){
 			if( ! isset( $this->message[ $id ] ) )
 				$this->message[ $id ] = new mymessage( $id );
 			return $this->message[ $id ];

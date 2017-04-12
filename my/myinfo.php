@@ -45,8 +45,8 @@ class myinfo{
         return $this;
     }
 
-    public function & addTitle( $label, $icon = 'icon-stack' ){
-        $this->elements[] = array( 'type' => 'ti', 'label' => $label, 'icon' => $icon );
+    public function & addTitle( $key, $label = '', $icon = '' ){
+        $this->elements[] = array( 'type' => 'ti', 'label' => $label, 'key' => $key, 'icon' => $icon );
         return $this;
     }
 

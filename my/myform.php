@@ -875,7 +875,6 @@ class myform{
         return $this;
     }
 
-
     public function & deleteElement( $name ){
         if( isset( $this->elements[ $name ] ) )
             unset( $this->elements[ $name ] );
@@ -995,7 +994,7 @@ class myform{
         return false;
     }
 
-    public function & hide( $messageok = null ){
+    public function & hide( $messageok = null, $messageerror = null ){
 
         if( $this->isajax ){
             $this->app->ajax()->setFormReset( $this->formname );
@@ -1007,6 +1006,9 @@ class myform{
 
             if( !empty( $messageok ) )
                 $this->app->ajax()->msgOk( $messageok );
+
+            if( !empty( $messageerror ) )
+                $this->app->ajax()->msgError( $messageerror );
         }
 
         $this->hide = true;

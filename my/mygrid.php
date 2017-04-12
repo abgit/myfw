@@ -23,6 +23,10 @@ class mygrid{
     private $rowclassdepends = false;
     private $perpage  = 10;
     private $titlekey = false;
+    private $keys     = array();
+    private $keyshtml = array();
+    private $classxs  = null;
+    private $classsm  = null;
     
     public function __construct( $name = 'g' ){
         $this->name = $name;
@@ -43,6 +47,12 @@ class mygrid{
         $this->key     = $key;
         $this->keyhtml = $keyhtml;
         $this->addKey( $key, $keyhtml );
+        return $this;
+    }
+
+    public function & addKey( $key, $keyhtml ){
+        $this->keys[]     = $key;
+        $this->keyshtml[] = $keyhtml;
         return $this;
     }
 
@@ -122,7 +132,7 @@ class mygrid{
         return $this;
     }
 
-    public function & addH4( $key, $kval, $label, $align = '', $kval2 = false, $prefix2 = false ){
+    public function & addH4( $key, $kval, $label = '', $align = '', $kval2 = false, $prefix2 = false ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
@@ -221,14 +231,18 @@ class mygrid{
         return $this->menuhtml;
     }
 
-    public function & addMenu( $options, $label = 'Tools', $icon = 'icon-cog4', $align = 'center', $depends = false ){
+    public function & addMenu( $options, $label = '', $icon = '', $align = '', $depends = false, $buttons = array() ){
         $key = 'menutools';
         if( !isset( $this->labels[ $key ] ) ){
-            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align  );
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => empty( $label ) ? 'Tools' : $label, 'align' => empty( $align ) ? 'center' : $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'options' => $options, 'depends' => $depends );
+        $this->cols[ $key ][] = array( 'key' => $key, 'type' => 'menu', 'icon' => $icon, 'options' => $options, 'depends' => $depends, 'buttons' => $buttons );
 
-        $this->setW( $key, 60 );
+        $buttonsW = 60;
+        foreach( $buttons as $b )
+            $buttonsW += isset( $b[ 'w' ] ) ? intval( $b[ 'w' ] ) : 90;
+
+        $this->setW( $key, $buttonsW );
 
         return $this;
     }
@@ -276,6 +290,38 @@ class mygrid{
         return $this;
     }
 
+    public function & setClassXS( $el ){
+
+        $this->classxs = true;
+
+        if( !is_array( $el ) )
+            $el = array( $el );
+
+        foreach( $this->cols as $k => $e ){
+            if( !in_array( $k, $el ) ){
+                $this->setClass( $k, 'hidden-xs' );
+            }
+        }
+
+        return $this;
+    }
+
+    public function & setClassSM( $el ){
+
+        $this->classsm = true;
+
+        if( !is_array( $el ) )
+            $el = array( $el );
+
+        foreach( $this->cols as $k => $e ){
+            if( !in_array( $k, $el ) ){
+                $this->setClass( $k, 'hidden-sm' );
+            }
+        }
+
+        return $this;
+    }
+
     public function & setClass( $el, $class ){
 
         if( !is_array( $el ) )
@@ -283,7 +329,7 @@ class mygrid{
 
         foreach( $el as $e ){
             if( isset( $this->labels[ $e ] ) ){
-                $this->labels[ $e ][ 'class' ] = $class;
+                $this->labels[ $e ][ 'class' ] = ( isset( $this->labels[ $e ][ 'class' ] ) && strlen( $this->labels[ $e ][ 'class' ] ) ) ? ( $this->labels[ $e ][ 'class' ] . ' ' . $class ) : $class;
             }
         }
         return $this;
@@ -313,6 +359,17 @@ class mygrid{
             foreach( $this->cols[ $key ] as $index => $subrow ){
                 if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
                     $this->cols[ $key ][ $index ][ 'replace' ] = $replace;
+            }
+        }
+        return $this;
+    }
+
+    public function & setTruncate( $key, $kval, $truncate ){
+
+        if( isset( $this->cols[ $key ] ) ){
+            foreach( $this->cols[ $key ] as $index => $subrow ){
+                if( isset( $this->cols[ $key ][ $index ][ 'kval' ] ) && $this->cols[ $key ][ $index ][ 'kval' ] == $kval )
+                    $this->cols[ $key ][ $index ][ 'truncate' ] = $truncate;
             }
         }
         return $this;
@@ -382,6 +439,9 @@ class mygrid{
         
         $this->app->ajax()->html( '#' . $this->name, $this->render( $values, true ) );
 
+        if( myrules::isdecimal( count( $values ) / $this->perpage ) )
+            $this->app->ajax()->remove( '#' . $this->name . 'more' );
+
         return $this;    
     }
 
@@ -424,12 +484,14 @@ class mygrid{
         return $this;
     }
 
-    private function pageIncrement(){
+    public function & pageIncrement(){
         $this->app->session()->set( $this->name . 'gridinit', false );
 
         $g = $this->app->session()->get( $this->name . 'gridpage' );
 
         $this->app->session()->set( $this->name . 'gridpage', 1 + $g );
+
+        return $this;
     }
 
     public function & setMore( $onclick, $perpage = 10, $label = 'more' ){
@@ -450,13 +512,15 @@ class mygrid{
 
     public function getLimit(){
 
+        $resetall = false;
+
         if( $this->app->session()->get( $this->name . 'gridinit' ) === true ){
 
             $resetall = $this->app->session()->get( $this->name . 'gridresetall' );
-            return ( $resetall === true ) ? $this->perpage : ( $this->perpage + $this->perpage * $this->app->session()->get( $this->name . 'gridpage' ) );
         }
 
-        return $this->perpage;
+        return ( $resetall === true ) ? $this->perpage : ( $this->perpage + $this->perpage * $this->app->session()->get( $this->name . 'gridpage' ) );
+//        return $this->perpage;
     }
 
     public function getOffset(){
@@ -478,14 +542,21 @@ class mygrid{
         return $this;
     }
 
-    public function show( $htmlid = null ){
+    public function & hide(){
+        $this->modalform()->hide();
+        return $this;
+    }
 
+    public function modalform(){
+        return $this->app->form( $this->modal[ 'formid' ] )
+                                    ->addAjax()
+                                    ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
+                                    ->addCustom( $this->name, $this );
+    }
+
+    public function show( $htmlid = null ){
         if( is_null( $htmlid ) ){
-            return $this->app->form( $this->modal[ 'formid' ] )
-                             ->addAjax()
-                             ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
-                             ->addCustom( $this->name, $this )
-                             ->show();
+            return $this->modalform()->show();
         }
         $this->app->ajax()->html( $htmlid, $this->render() );
     }
@@ -494,6 +565,12 @@ class mygrid{
 
         $values      = is_null( $customvalues ) ? $this->values : $customvalues;
         $valuestotal = count( $values );
+
+        if( is_null( $this->classxs ) )
+            $this->setClass( array_keys( array_slice( $this->cols, 1, -1 ) ), 'hidden-xs' );
+
+        if( is_null( $this->classsm ) )
+            $this->setClass( array_keys( array_slice( $this->cols, 2, -2 ) ), 'hidden-sm' );
 
         return $this->app->render( '@my/mygrid', array( 'name'            => $this->name,
                                                         'key'             => $this->key,
@@ -513,6 +590,8 @@ class mygrid{
                                                         'menuhtml'        => $this->menuhtml,
                                                         'rowclass'        => $this->rowclass,
                                                         'rowclassdepends' => $this->rowclassdepends,
-                                                        'cols'            => $this->cols ), null, null, 0, false, false );        
+                                                        'cols'            => $this->cols,
+                                                        'tags'            => array( array( $this->key ) + $this->keys, array( $this->keyhtml ) + $this->keyshtml )
+                                                        ), null, null, 0, false, false );        
     }
 }

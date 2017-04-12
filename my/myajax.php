@@ -74,8 +74,18 @@ class myajax{
         return $this;
     }
 
-    public function & Ziggeo( $hidden, $div ){
+    public function & ziggeo( $hidden, $div ){
         $this->out[ 'zi' ][] = array( 'h' => $hidden, 'd' => $div );
+        return $this;
+    }
+
+    public function & mixpanelTrack( $event, $properties = array() ){
+        $this->out[ 'mt' ][] = array( 'e' => $event, 'p' => $properties );
+        return $this;
+    }
+
+    public function & mixpanelSet( $id, $properties ){
+        $this->out[ 'ms' ][] = array( 'i' => $id, 'p' => $properties );
         return $this;
     }
 

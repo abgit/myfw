@@ -64,6 +64,9 @@
     {% elseif el.type == 'h5' %}
         <h5>{{ val }}</h5>
 
+    {% elseif el.type == 'ti' %}
+        <h6>{% if el.icon %}<i class="{{ el.icon }}"></i> {% endif %}{{ el.label }}{{ el.key ? values[ el.key ] }}</h6>
+
     {% elseif el.type == 'text' %}
         <p>{{ val|trim|nl2br }}</p>
 
@@ -77,7 +80,7 @@
         {% if val|trim is empty %}
             <i>{{ el.defaulttext|raw }}</i>
         {% else %}
-            {{ val|nl2br|markdown }}
+            {{ val|trim|nl2br|markdown }}
         {% endif %}
 
     {% elseif el.type == 'custom' %}
@@ -89,13 +92,9 @@
     {% elseif el.type == 'se' %}
         <br />
 
-    {% elseif el.type == 'ti' %}
-        <h6 class="heading-hr"><i class="{{ el.icon }}"></i> {{ el.label }}</h6>
-
     {% elseif el.type == 'cameratag' %}
         {% if val %}
-        <div>
-            <br />
+        <div class="myinfovideo">
             <video width="320" height="240" controls poster="{% if el.appcdn %}{{ el.appcdn }}{{ val }}_qvga.jpg{% else %}//cameratag.com/downloads/{{ val }}/qvga/thumb.png{% endif %}">
                 <source src="{% if el.appcdn %}{{ el.appcdn }}{{ val }}_qvga.mp4{% else %}//cameratag.com/downloads/{{ val }}/qvga/mp4.mp4" type="video/mp4{% endif %}">
             </video>

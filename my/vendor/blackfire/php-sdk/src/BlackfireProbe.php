@@ -361,6 +361,10 @@ class BlackfireProbe
         return $this->box('doDisable', true, true);
     }
 
+    public static function addMarker($label = '')
+    {
+    }
+
     // XXX
     // XXX - END OF PUBLIC API - XXX
     // XXX

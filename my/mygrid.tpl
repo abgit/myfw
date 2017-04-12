@@ -46,16 +46,22 @@
 
                                                     {% if value is not empty or td.type == 'menu' or td.type == 'br' or td.type == 'space' or td.type == 'fixed' or td.default %}
 
+                                                        {% set addonpre = td.addonpre %}
+                                                        {% set addonpos = ( td.addonposorder ? value|order(false) ) ~ ( value == 1 ? td.addonpossing : td.addonpos ) %}
+
+                                                        {% set addonpre = addonpre|label( value ) %}
+                                                        {% set addonpos = addonpos|label( value ) %}
+
                                                         {% if td.replace %}
                                                             {% set value = value|replace( td.replace ) %}
                                                         {% endif %}
-
-                                                        {% set addonpre = td.addonpre %}
-
-                                                        {% set addonpos = ( td.addonposorder ? value|order(false) ) ~ ( value == 1 ? td.addonpossing : td.addonpos ) %}
+                                                        
+                                                        {% if td.truncate %}
+                                                            {% set value = value|t( td.truncate ) %}
+                                                        {% endif %}
 
                                                         {% if td.type == 'simple' %}
-                                                            {{ value|t( td.truncate|default( 60 ) ) }}
+                                                            {{ addonpre|raw }}{{ value|t( td.truncate|default( 60 ) ) }}{{ addonpos|raw }}
 
                                                         {% elseif td.type == 'h4' %}
                                                                 <h4{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %}>
@@ -115,7 +121,10 @@
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ ( td.keycustomdate ? val[ td.keycustomdate ] : value )|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s" ) }}</span>
 
                                                         {% elseif td.type == 'description' %}
-            				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|nl2space|t(36) }}{{ addonpos|raw }}</span>
+                                                            {% if not td.truncate %}
+                                                                {% set value = value|t( 36 ) %}
+                                                            {% endif %}
+            				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|nl2space }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'info' %}
 
@@ -145,13 +154,19 @@
                                                         {% elseif td.type == 'menu' %}
                                                             {% if not td.depends or ( td.depends and val[ td.depends ] ) %}
     					                                    <div class="btn-group">
-    						                                    <button data-toggle="dropdown" class="btn btn-icon dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon }}"></i></button>
-    													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
-                                                                {% for option in td.options %}
-                                                                    {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
-            														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replace({ (keyhtml): val[ key ] }) }}"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replace({ (keyhtml): val[ key ] }) }}"{% endif %}><i class="{{ option.icon }}"></i> {{ option.label }}</a></li>
-    		                                                    {% endfor %}
-                		    									</ul>
+                                                                {% for option in td.buttons %}
+                                                                <a type="button" class="btn btn-primary btn-xs" {% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{{ option.label }}</a>
+    		                                                    {% endfor %}    						                                    
+
+                                                                {% if td.options is not empty %}
+                                                                    <button data-toggle="dropdown" class="btn btn-icon btn-primary dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon|default( 'icon-cog4' ) }}"></i></button>
+        													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
+                                                                    {% for option in td.options %}
+                                                                        {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
+                														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replaceurl( val, tags ) }}"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
+        		                                                    {% endfor %}
+                    		    									</ul>
+                                                                {% endif %}                                                                
     	    				                                </div>
                                                             {% endif %}
 

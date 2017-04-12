@@ -267,7 +267,7 @@ class myfilters{
         return $returnOriginal ? $string . $sufix : $sufix;
     }
 
-    public static function t( $string, $chars = 10, $rep = '...', $right = true ){
+    public static function t( $string, $chars = 10, $rep = '..', $right = true ){
         return $chars < strlen($string) ? ( $right ? ( substr( $string, 0, $chars ) . $rep ) : ( $rep . substr( $string, strlen( $string ) - $chars ) ) ) : $string;
     }
 
@@ -370,9 +370,11 @@ class myfilters{
             }
         }
         if( !$full )
-            $string = array_slice( $string, 0, 1 );
+            $string = array_slice( $string, 0, ( ( isset( $string[ 'y' ] ) && isset( $string[ 'm' ] ) ) || ( isset( $string[ 'm' ] ) && isset( $string[ 'w' ] ) ) ) ? 2 : 1 );
+
+        $ago = strtotime( $datetime ) < time();
         
-        return ( $string ? implode( ', ', $string ) . ( strtotime( $datetime ) < time() ? ' ago' : '' ) : 'just now' ) . ( $includeoriginal ? ( ', ' . $datetime ) : '' );
+        return ( $string ? ( $ago ? '' : 'in ' ) . implode( ', ', $string ) . ( $ago ? ' ago' : '' ) : 'just now' ) . ( $includeoriginal ? ( ', ' . $datetime ) : '' );
     }
 
     public static function xss( $data ){

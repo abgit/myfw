@@ -16,6 +16,10 @@
         private $addonpos = '';
         private $url;
         private $colordefault = '#3B5998';
+        private $idstart;
+        private $idend;
+        private $datestart;
+        private $dateend;
 
         public function __construct( $id = null ){
             $this->app  = \Slim\Slim::getInstance();
@@ -33,8 +37,24 @@
             return $this;
         }
 
+        public function & setIdFormat( $start, $end ){
+            $this->idstart = $start;
+            $this->idend   = $end;
+            return $this;
+        }
+
+        public function & setDateFormat( $start, $end ){
+            $this->datestart = $start;
+            $this->dateend   = $end;
+            return $this;
+        }
+
+        public function getDate(){
+            return ( isset( $_POST[ 'id' ] ) && is_string( $_POST[ 'id' ] ) && strlen( $_POST[ 'id' ] ) >= $this->dateend && myrules::isdate( substr( $_POST[ 'id' ], $this->datestart, $this->dateend ) ) ) ? substr( $_POST[ 'id' ], $this->datestart, $this->dateend ) : null;
+        }
+
         public function getID(){
-            return ( isset( $_POST[ 'id' ] ) && is_string( $_POST[ 'id' ] ) && myrules::isdate( $_POST[ 'id' ] ) ) ? $_POST[ 'id' ] : null;
+            return ( isset( $_POST[ 'id' ] ) && is_string( $_POST[ 'id' ] ) && strlen( $_POST[ 'id' ] ) >= $this->idend ) ? substr( $_POST[ 'id' ], $this->idstart, $this->idend ) : null;
         }
 
         public function & setOnClick( $onclick, $onclickmsg = '' ){

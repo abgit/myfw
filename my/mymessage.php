@@ -6,7 +6,6 @@ class mymessage{
     private $id;
     private $classname;
     private $elements;
-    private $closebutton;
     private $customheader;
     private $customsubheader;
     private $video;
@@ -17,6 +16,7 @@ class mymessage{
     private $messageprefix;
     private $messagesufix;
     private $values = array();
+    private $tip = false;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -28,11 +28,6 @@ class mymessage{
         return $this;
     }
 
-    public function & setCloseButton( $onclick ){
-        $this->closebutton = array( 'onclick' => $onclick );
-        return $this;
-    }
-    
     public function & setHeader( $title, $subtitle = '', $custom = ''){
         $this->customheader = array( 'title' => $title, 'subtitle' => $subtitle, 'custom' => $custom );
         return $this;
@@ -99,6 +94,18 @@ class mymessage{
         $this->relmessagekey = $messagekey;
         return $this;
     }
+
+    public function & setTip(){
+
+        if( isset( $this->app->client[ 'uuid' ] ) ){
+            $this->tip = array( 'id' => 'tip' . $this->name . md5( $this->app->client[ 'uuid' ] ), 'onclick' => $this->app->urlForAjax( 'myfwtip', array( 'tip' => 'tip' . $this->name ), '' ) );
+
+            if( class_exists( 'Memcached' ) && $this->app->memcached()->get( $this->tip[ 'id' ] ) !== 1 )
+                $this->app->memcached()->set( $this->tip[ 'id' ], 0 );
+        }
+
+        return $this;
+    }
     
     public function & setValues( $values ){
 
@@ -118,7 +125,6 @@ class mymessage{
                 $el[ 'obj' ]->setValues( $values );
 
         $this->values = is_string( $values ) ? $val : $values;
-
         return $this;
     }
 
@@ -183,6 +189,10 @@ class mymessage{
     }
 
     private function render( $values = null ){
+
+        if( isset( $this->tip[ 'id' ] ) && class_exists( 'Memcached' ) && $this->app->memcached()->get( $this->tip[ 'id' ] ) === 1 )
+            return '';
+
         return $this->app->render( '@my/mymessage', array( 'name'            => $this->name,
                                                            'classname'       => $this->classname,
                                                            'customheader'    => $this->customheader,
@@ -191,8 +201,8 @@ class mymessage{
                                                            'elements'        => $this->elements,
                                                            'messageprefix'   => $this->messageprefix,
                                                            'messagesufix'    => $this->messagesufix,
-                                                           'closebutton'     => $this->closebutton,
                                                            'offset'          => $this->offset,
+                                                           'tip'             => $this->tip,
                                                            'values'          => $this->values
                                                          ) + $this->messagevars, null, null, null, false, false );
     }

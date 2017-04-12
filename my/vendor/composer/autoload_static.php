@@ -10,10 +10,12 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         'ddc0a4d7e61c0286f0f8593b1903e894' => __DIR__ . '/..' . '/clue/stream-filter/src/functions.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
+        '6b06ce8ccf69c43a60a1e48495a034c9' => __DIR__ . '/..' . '/react/promise-timer/src/functions.php',
         'd45d087767e66b9914075f6f6efd1435' => __DIR__ . '/..' . '/blackfire/php-sdk/src/autostart.php',
+        '1f155afceeab454b94183cdd8d5248a6' => __DIR__ . '/..' . '/mixpanel/mixpanel-php/lib/Mixpanel.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -28,8 +30,13 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Zend\\Http\\' => 10,
             'Zend\\Escaper\\' => 13,
         ),
+        'W' => 
+        array (
+            'Webmozart\\Assert\\' => 17,
+        ),
         'S' => 
         array (
+            'Symfony\\Component\\OptionsResolver\\' => 34,
             'Slim\\Views\\' => 11,
             'Slack\\' => 6,
         ),
@@ -38,6 +45,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'React\\Stream\\' => 13,
             'React\\Socket\\' => 13,
             'React\\SocketClient\\' => 19,
+            'React\\Promise\\Timer\\' => 20,
             'React\\Promise\\' => 14,
             'React\\EventLoop\\' => 16,
             'React\\Dns\\' => 10,
@@ -65,6 +73,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Http\\Message\\' => 13,
             'Http\\Discovery\\' => 15,
             'Http\\Client\\Curl\\' => 17,
+            'Http\\Client\\Common\\' => 19,
             'Http\\Client\\' => 12,
         ),
         'G' => 
@@ -128,6 +137,14 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',
         ),
+        'Webmozart\\Assert\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/webmozart/assert/src',
+        ),
+        'Symfony\\Component\\OptionsResolver\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/options-resolver',
+        ),
         'Slim\\Views\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/views',
@@ -147,6 +164,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'React\\SocketClient\\' => 
         array (
             0 => __DIR__ . '/..' . '/react/socket-client/src',
+        ),
+        'React\\Promise\\Timer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/promise-timer/src',
         ),
         'React\\Promise\\' => 
         array (
@@ -208,6 +229,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'Http\\Client\\Curl\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-http/curl-client/src',
+        ),
+        'Http\\Client\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/client-common/src',
         ),
         'Http\\Client\\' => 
         array (

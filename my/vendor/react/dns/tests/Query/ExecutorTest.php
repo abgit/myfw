@@ -7,39 +7,39 @@ use React\Dns\Query\Query;
 use React\Dns\Model\Message;
 use React\Dns\Model\Record;
 use React\Dns\Protocol\BinaryDumper;
+use React\Tests\Dns\TestCase;
 
-class ExecutorTest extends \PHPUnit_Framework_TestCase
+class ExecutorTest extends TestCase
 {
+    private $loop;
+    private $parser;
+    private $dumper;
+    private $executor;
+
     public function setUp()
     {
-        $this->loop = $this->getMock('React\EventLoop\LoopInterface');
-        $this->parser = $this->getMock('React\Dns\Protocol\Parser');
+        $this->loop = $this->getMockBuilder('React\EventLoop\LoopInterface')->getMock();
+        $this->parser = $this->getMockBuilder('React\Dns\Protocol\Parser')->getMock();
         $this->dumper = new BinaryDumper();
 
         $this->executor = new Executor($this->loop, $this->parser, $this->dumper);
     }
 
     /** @test */
-    public function prepareRequestShouldCreateRequestWithRecursionDesired()
-    {
-        $query = new Query('igor.io', Message::TYPE_A, Message::CLASS_IN, 1345656451);
-        $request = $this->executor->prepareRequest($query);
-
-        $this->assertTrue($request->header->isQuery());
-        $this->assertSame(1, $request->header->get('rd'));
-    }
-
-    /** @test */
     public function queryShouldCreateUdpRequest()
     {
-        $conn = $this->createConnectionMock();
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
+        $this->loop
+            ->expects($this->any())
+            ->method('addTimer')
+            ->will($this->returnValue($timer));
 
         $this->executor = $this->createExecutorMock();
         $this->executor
             ->expects($this->once())
             ->method('createConnection')
             ->with('8.8.8.8:53', 'udp')
-            ->will($this->returnNewConnectionMock());
+            ->will($this->returnNewConnectionMock(false));
 
         $query = new Query('igor.io', Message::TYPE_A, Message::CLASS_IN, 1345656451);
         $this->executor->query('8.8.8.8:53', $query, function () {}, function () {});
@@ -48,14 +48,18 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function resolveShouldCreateTcpRequestIfRequestIsLargerThan512Bytes()
     {
-        $conn = $this->createConnectionMock();
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
+        $this->loop
+            ->expects($this->any())
+            ->method('addTimer')
+            ->will($this->returnValue($timer));
 
         $this->executor = $this->createExecutorMock();
         $this->executor
             ->expects($this->once())
             ->method('createConnection')
             ->with('8.8.8.8:53', 'tcp')
-            ->will($this->returnNewConnectionMock());
+            ->will($this->returnNewConnectionMock(false));
 
         $query = new Query(str_repeat('a', 512).'.igor.io', Message::TYPE_A, Message::CLASS_IN, 1345656451);
         $this->executor->query('8.8.8.8:53', $query, function () {}, function () {});
@@ -64,10 +68,10 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function resolveShouldCloseConnectionWhenCancelled()
     {
-        $conn = $this->createConnectionMock();
+        $conn = $this->createConnectionMock(false);
         $conn->expects($this->once())->method('close');
 
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
         $this->loop
             ->expects($this->any())
             ->method('addTimer')
@@ -99,9 +103,35 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function resolveShouldNotStartOrCancelTimerWhenCancelledWithTimeoutIsNull()
+    {
+        $this->loop
+            ->expects($this->never())
+            ->method('addTimer');
+
+        $this->executor = new Executor($this->loop, $this->parser, $this->dumper, null);
+
+        $query = new Query('igor.io', Message::TYPE_A, Message::CLASS_IN, 1345656451);
+        $promise = $this->executor->query('8.8.8.8:53', $query);
+
+        $promise->cancel();
+
+        $errorback = $this->createCallableMock();
+        $errorback
+            ->expects($this->once())
+            ->method('__invoke')
+            ->with($this->logicalAnd(
+                $this->isInstanceOf('React\Dns\Query\CancellationException'),
+                $this->attribute($this->equalTo('DNS query for igor.io has been cancelled'), 'message')
+            ));
+
+        $promise->then($this->expectCallableNever(), $errorback);
+    }
+
+    /** @test */
     public function resolveShouldRetryWithTcpIfResponseIsTruncated()
     {
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
 
         $this->loop
             ->expects($this->any())
@@ -110,13 +140,11 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->parser
             ->expects($this->at(0))
-            ->method('parseChunk')
-            ->with($this->anything(), $this->isInstanceOf('React\Dns\Model\Message'))
+            ->method('parseMessage')
             ->will($this->returnTruncatedResponse());
         $this->parser
             ->expects($this->at(1))
-            ->method('parseChunk')
-            ->with($this->anything(), $this->isInstanceOf('React\Dns\Model\Message'))
+            ->method('parseMessage')
             ->will($this->returnStandardResponse());
 
         $this->executor = $this->createExecutorMock();
@@ -138,7 +166,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function resolveShouldRetryWithTcpIfUdpThrows()
     {
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
 
         $this->loop
             ->expects($this->once())
@@ -147,8 +175,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->parser
             ->expects($this->once())
-            ->method('parseChunk')
-            ->with($this->anything(), $this->isInstanceOf('React\Dns\Model\Message'))
+            ->method('parseMessage')
             ->will($this->returnStandardResponse());
 
         $this->executor = $this->createExecutorMock();
@@ -170,7 +197,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function resolveShouldFailIfBothUdpAndTcpThrow()
     {
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
 
         $this->loop
             ->expects($this->once())
@@ -179,7 +206,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->parser
             ->expects($this->never())
-            ->method('parseChunk');
+            ->method('parseMessage');
 
         $this->executor = $this->createExecutorMock();
         $this->executor
@@ -211,7 +238,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function resolveShouldFailIfResponseIsTruncatedAfterTcpRequest()
     {
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
 
         $this->loop
             ->expects($this->any())
@@ -220,8 +247,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->parser
             ->expects($this->once())
-            ->method('parseChunk')
-            ->with($this->anything(), $this->isInstanceOf('React\Dns\Model\Message'))
+            ->method('parseMessage')
             ->will($this->returnTruncatedResponse());
 
         $this->executor = $this->createExecutorMock();
@@ -252,8 +278,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->parser
             ->expects($this->once())
-            ->method('parseChunk')
-            ->with($this->anything(), $this->isInstanceOf('React\Dns\Model\Message'))
+            ->method('parseMessage')
             ->will($this->returnStandardResponse());
 
         $this->executor = $this->createExecutorMock();
@@ -264,7 +289,7 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnNewConnectionMock());
 
 
-        $timer = $this->getMock('React\EventLoop\Timer\TimerInterface');
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
         $timer
             ->expects($this->once())
             ->method('cancel');
@@ -287,19 +312,21 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(0))
             ->method('createConnection')
             ->with('8.8.8.8:53', 'udp')
-            ->will($this->returnNewConnectionMock());
+            ->will($this->returnNewConnectionMock(false));
+
+        $timer = $this->getMockBuilder('React\EventLoop\Timer\TimerInterface')->getMock();
+        $timer
+            ->expects($this->never())
+            ->method('cancel');
 
         $this->loop
             ->expects($this->once())
             ->method('addTimer')
             ->with(5, $this->isInstanceOf('Closure'))
-            ->will($this->returnCallback(function ($time, $callback) use (&$timerCallback) {
+            ->will($this->returnCallback(function ($time, $callback) use (&$timerCallback, $timer) {
                 $timerCallback = $callback;
+                return $timer;
             }));
-
-        $this->loop
-            ->expects($this->never())
-            ->method('cancelTimer');
 
         $callback = $this->expectCallableNever();
 
@@ -333,7 +360,8 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
     private function returnTruncatedResponse()
     {
         $that = $this;
-        $callback = function ($data, $response) use ($that) {
+        $callback = function ($data) use ($that) {
+            $response = new Message();
             $that->convertMessageToTruncatedResponse($response);
             return $response;
         };
@@ -360,9 +388,9 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
         return $response;
     }
 
-    private function returnNewConnectionMock()
+    private function returnNewConnectionMock($emitData = true)
     {
-        $conn = $this->createConnectionMock();
+        $conn = $this->createConnectionMock($emitData);
 
         $callback = function () use ($conn) {
             return $conn;
@@ -371,15 +399,15 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
         return $this->returnCallback($callback);
     }
 
-    private function createConnectionMock()
+    private function createConnectionMock($emitData = true)
     {
-        $conn = $this->getMock('React\Socket\ConnectionInterface');
+        $conn = $this->getMockBuilder('React\Socket\ConnectionInterface')->getMock();
         $conn
             ->expects($this->any())
             ->method('on')
             ->with('data', $this->isInstanceOf('Closure'))
-            ->will($this->returnCallback(function ($name, $callback) {
-                $callback(null);
+            ->will($this->returnCallback(function ($name, $callback) use ($emitData) {
+                $emitData && $callback(null);
             }));
 
         return $conn;
@@ -391,20 +419,5 @@ class ExecutorTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs(array($this->loop, $this->parser, $this->dumper))
             ->setMethods(array('createConnection'))
             ->getMock();
-    }
-
-    protected function expectCallableNever()
-    {
-        $mock = $this->createCallableMock();
-        $mock
-            ->expects($this->never())
-            ->method('__invoke');
-
-        return $mock;
-    }
-
-    protected function createCallableMock()
-    {
-        return $this->getMock('React\Tests\Dns\CallableStub');
     }
 }

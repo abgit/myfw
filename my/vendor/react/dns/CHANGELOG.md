@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.4.7 (2017-03-31)
+
+* Feature: Forward compatibility with upcoming Socket v0.6 and v0.7 component
+  (#57 by @clue)
+
+## 0.4.6 (2017-03-11)
+
+* Fix: Fix DNS timeout issues for Windows users and add forward compatibility
+  with Stream v0.5 and upcoming v0.6
+  (#53 by @clue)
+
+* Improve test suite by adding PHPUnit to `require-dev`
+  (#54 by @clue)
+
+## 0.4.5 (2017-03-02)
+
+* Fix: Ensure we ignore the case of the answer
+  (#51 by @WyriHaximus)
+
+* Feature: Add `TimeoutExecutor` and simplify internal APIs to allow internal
+  code re-use for upcoming versions.
+  (#48 and #49 by @clue)
+
 ## 0.4.4 (2017-02-13)
 
 * Fix: Fix handling connection and stream errors

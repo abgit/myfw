@@ -39,8 +39,8 @@
 
 <div id="msg{{ name }}" class="callout callout-{{ classname|default( 'info' ) }} fade in" style="margin-bottom:0px">
 
-    {% if closebutton %}
-        <button type="button" class="close" data-dismiss="alert" onclick="{{ closebutton.onclick }}">×</button>
+    {% if tip.onclick %}
+        <button type="button" class="close" data-dismiss="alert" onclick="$('#msg{{ name }}').hide();{{ tip.onclick }}">×</button>
     {% endif %}
 
     {% for el in elements %}

@@ -100,7 +100,7 @@
                                             
                                             {% if elements.info %}
     										<div class="col-sm-3 task-panel">
-    											<div class="task-info" style="margin-top:6px;font-size:14px">
+    											<div class="task-info" style="font-size:14px">
 
                                                     {% for info in elements.info %}
 
@@ -198,7 +198,7 @@
 
                                                         {% if value[ status.key ] is defined %}
 
-                                                            <span style="vertical-align:middle;margin-right:6px;" class="label label-mini label-{{ status.classreplacekey ? ( value[ status.classreplacekey ]|replaceonly( status.class )|default( status.defaultclass )|default( 'info' ) ) : status.class|default( 'info' ) }}">
+                                                            <span style="vertical-align:middle;" class="label label-mini label-{{ status.classreplacekey ? ( value[ status.classreplacekey ]|replaceonly( status.class )|default( status.defaultclass )|default( 'info' ) ) : status.class|default( 'info' ) }}">
 
                                                             {% set val = value[ status.key ] %}
                                                             {% if status.filter == 'rnumber' %}

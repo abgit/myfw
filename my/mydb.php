@@ -72,7 +72,7 @@
                     // column type & value
                     switch( $column_type ){
                         case 'null' :       $column_type  = PDO::PARAM_NULL; 
-                                            $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : null;
+                                            $column_value = null;
                                             break;
                         case 'int' :        $column_type  = PDO::PARAM_INT;
                                             $column_value = isset( $args[2] ) ? intval( $args[2] ) : ( ( isset( $values[ $column_name ] ) && ( is_numeric( $values[ $column_name ] ) || is_bool( $values[ $column_name ] ) ) ) ? intval( $values[ $column_name ] ) : null );
@@ -144,7 +144,7 @@
                 call_user_func( $this->app->onDBError, $this->errorCode(), $this->errorInfo(), $procedure, $args );
 
             if( $this->app->config( 'db.debug' ) === true )
-                $this->app->request->isAjax() ? $this->app->ajax()->msgWarning( $this->errorInfo(), 'Debug' ) : d( $this->errorCode() . $this->errorInfo() );
+                $this->app->request->isAjax() ? $this->app->ajax()->msgWarning( $this->errorInfo(), 'Debug' ) : print( $this->errorCode() . $this->errorInfo() );
 
             return is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
         }

@@ -1,5 +1,12 @@
 <?PHP
 
+/*
+ * Copyright (C) 2013-2016 Mailgun
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license. See the LICENSE file for details.
+ */
+
 namespace Mailgun\Messages;
 
 use Mailgun\Constants\Api;
@@ -13,7 +20,7 @@ use Mailgun\Messages\Exceptions\TooManyParameters;
  * this class makes the process easier. See the official
  * documentation (link below) for usage instructions.
  *
- * @link https://github.com/mailgun/mailgun-php/blob/master/src/Mailgun/Messages/README.md
+ * @see https://github.com/mailgun/mailgun-php/blob/master/src/Mailgun/Messages/README.md
  */
 class MessageBuilder
 {
@@ -37,15 +44,15 @@ class MessageBuilder
      */
     protected $counters = [
         'recipients' => [
-            'to'  => 0,
-            'cc'  => 0,
+            'to' => 0,
+            'cc' => 0,
             'bcc' => 0,
         ],
         'attributes' => [
-            'attachment'    => 0,
-            'campaign_id'   => 0,
+            'attachment' => 0,
+            'campaign_id' => 0,
             'custom_option' => 0,
-            'tag'           => 0,
+            'tag' => 0,
         ],
     ];
 
@@ -110,10 +117,10 @@ class MessageBuilder
     {
         $compiledAddress = $this->parseAddress($address, $variables);
 
-        if (isset($this->message[$headerName])) {
-            array_push($this->message[$headerName], $compiledAddress);
-        } elseif ($headerName == 'h:reply-to') {
+        if ($headerName === 'h:reply-to') {
             $this->message[$headerName] = $compiledAddress;
+        } elseif (isset($this->message[$headerName])) {
+            array_push($this->message[$headerName], $compiledAddress);
         } else {
             $this->message[$headerName] = [$compiledAddress];
         }
@@ -135,6 +142,9 @@ class MessageBuilder
         if ($this->counters['recipients']['to'] > Api::RECIPIENT_COUNT_LIMIT) {
             throw new TooManyParameters(ExceptionMessages::TOO_MANY_PARAMETERS_RECIPIENT);
         }
+
+        $variables = is_array($variables) ? $variables : [];
+
         $this->addRecipient('to', $address, $variables);
 
         return end($this->message['to']);
@@ -153,6 +163,9 @@ class MessageBuilder
         if ($this->counters['recipients']['cc'] > Api::RECIPIENT_COUNT_LIMIT) {
             throw new TooManyParameters(ExceptionMessages::TOO_MANY_PARAMETERS_RECIPIENT);
         }
+
+        $variables = is_array($variables) ? $variables : [];
+
         $this->addRecipient('cc', $address, $variables);
 
         return end($this->message['cc']);
@@ -171,6 +184,9 @@ class MessageBuilder
         if ($this->counters['recipients']['bcc'] > Api::RECIPIENT_COUNT_LIMIT) {
             throw new TooManyParameters(ExceptionMessages::TOO_MANY_PARAMETERS_RECIPIENT);
         }
+
+        $variables = is_array($variables) ? $variables : [];
+
         $this->addRecipient('bcc', $address, $variables);
 
         return end($this->message['bcc']);
@@ -184,6 +200,8 @@ class MessageBuilder
      */
     public function setFromAddress($address, $variables = null)
     {
+        $variables = is_array($variables) ? $variables : [];
+
         $this->addRecipient('from', $address, $variables);
 
         return $this->message['from'];
@@ -197,6 +215,8 @@ class MessageBuilder
      */
     public function setReplyToAddress($address, $variables = null)
     {
+        $variables = is_array($variables) ? $variables : [];
+
         $this->addRecipient('h:reply-to', $address, $variables);
 
         return $this->message['h:reply-to'];
@@ -228,7 +248,16 @@ class MessageBuilder
         if (!preg_match('/^h:/i', $headerName)) {
             $headerName = 'h:'.$headerName;
         }
-        $this->message[$headerName] = [$headerData];
+
+        if (array_key_exists($headerName, $this->message)) {
+            if (is_array($this->message[$headerName])) {
+                $this->message[$headerName][] = $headerData;
+            } else {
+                $this->message[$headerName] = [$this->message[$headerName], $headerData];
+            }
+        } else {
+            $this->message[$headerName] = $headerData;
+        }
 
         return $this->message[$headerName];
     }
@@ -273,14 +302,14 @@ class MessageBuilder
     {
         if (isset($this->files['attachment'])) {
             $attachment = [
-                'filePath'   => $attachmentPath,
+                'filePath' => $attachmentPath,
                 'remoteName' => $attachmentName,
             ];
             array_push($this->files['attachment'], $attachment);
         } else {
             $this->files['attachment'] = [
                 [
-                    'filePath'   => $attachmentPath,
+                    'filePath' => $attachmentPath,
                     'remoteName' => $attachmentName,
                 ],
             ];
@@ -304,12 +333,11 @@ class MessageBuilder
         }
 
         $this->files['inline'][] = [
-            'filePath'   => $inlineImagePath,
+            'filePath' => $inlineImagePath,
             'remoteName' => $inlineImageName,
         ];
 
         return true;
-
     }
 
     /**
