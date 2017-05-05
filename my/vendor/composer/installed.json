@@ -993,52 +993,6 @@
         "homepage": "http://ulrichsg.github.io/getopt-php"
     },
     {
-        "name": "react/event-loop",
-        "version": "v0.4.2",
-        "version_normalized": "0.4.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/event-loop.git",
-            "reference": "164799f73175e1c80bba92a220ea35df6ca371dd"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/event-loop/zipball/164799f73175e1c80bba92a220ea35df6ca371dd",
-            "reference": "164799f73175e1c80bba92a220ea35df6ca371dd",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.4.0"
-        },
-        "suggest": {
-            "ext-event": "~1.0",
-            "ext-libev": "*",
-            "ext-libevent": ">=0.1.0"
-        },
-        "time": "2016-03-08T02:09:32+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "0.5-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "React\\EventLoop\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "Event loop abstraction layer that libraries can use for evented I/O.",
-        "keywords": [
-            "asynchronous",
-            "event-loop"
-        ]
-    },
-    {
         "name": "evenement/evenement",
         "version": "v2.0.0",
         "version_normalized": "2.0.0.0",
@@ -2184,59 +2138,6 @@
         ]
     },
     {
-        "name": "coderstephen/slack-client",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/sagebind/slack-client.git",
-            "reference": "b57ee366c04d6cf5fd0dce9a0cd0897cbfb08243"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/sagebind/slack-client/zipball/b57ee366c04d6cf5fd0dce9a0cd0897cbfb08243",
-            "reference": "b57ee366c04d6cf5fd0dce9a0cd0897cbfb08243",
-            "shasum": ""
-        },
-        "require": {
-            "devristo/phpws": "dev-master",
-            "evenement/evenement": "2.0.*",
-            "guzzlehttp/guzzle": "~6.0",
-            "php": ">=5.5",
-            "react/event-loop": "^0.4.1",
-            "react/promise": "^2.2"
-        },
-        "require-dev": {
-            "apigen/apigen": "^4.1",
-            "fzaninotto/faker": "~1.4",
-            "phpunit/phpunit": "~4.6"
-        },
-        "time": "2017-02-01T16:53:40+00:00",
-        "type": "library",
-        "installation-source": "source",
-        "autoload": {
-            "psr-4": {
-                "Slack\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Stephen Coakley",
-                "email": "me@stephencoakley.com"
-            }
-        ],
-        "description": "A better Slack client, with RTM API support",
-        "keywords": [
-            "api",
-            "realtime",
-            "slack"
-        ]
-    },
-    {
         "name": "react/promise-timer",
         "version": "v1.1.1",
         "version_normalized": "1.1.1.0",
@@ -2474,70 +2375,6 @@
         ]
     },
     {
-        "name": "twig/twig",
-        "version": "v1.33.0",
-        "version_normalized": "1.33.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/twigphp/Twig.git",
-            "reference": "05cf49921b13f6f01d3cfdf9018cfa7a8086fd5a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/twigphp/Twig/zipball/05cf49921b13f6f01d3cfdf9018cfa7a8086fd5a",
-            "reference": "05cf49921b13f6f01d3cfdf9018cfa7a8086fd5a",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2.7"
-        },
-        "require-dev": {
-            "psr/container": "^1.0",
-            "symfony/debug": "~2.7",
-            "symfony/phpunit-bridge": "~3.3@dev"
-        },
-        "time": "2017-03-22T15:40:09+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.33-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Twig_": "lib/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com",
-                "homepage": "http://fabien.potencier.org",
-                "role": "Lead Developer"
-            },
-            {
-                "name": "Armin Ronacher",
-                "email": "armin.ronacher@active-4.com",
-                "role": "Project Founder"
-            },
-            {
-                "name": "Twig Team",
-                "homepage": "http://twig.sensiolabs.org/contributors",
-                "role": "Contributors"
-            }
-        ],
-        "description": "Twig, the flexible, fast, and secure template language for PHP",
-        "homepage": "http://twig.sensiolabs.org",
-        "keywords": [
-            "templating"
-        ]
-    },
-    {
         "name": "react/promise",
         "version": "v2.5.1",
         "version_normalized": "2.5.1.0",
@@ -2583,50 +2420,6 @@
         "keywords": [
             "promise",
             "promises"
-        ]
-    },
-    {
-        "name": "react/dns",
-        "version": "v0.4.7",
-        "version_normalized": "0.4.7.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/dns.git",
-            "reference": "e09ca286e3e18fea93317315dd7fc59d7963af8a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/dns/zipball/e09ca286e3e18fea93317315dd7fc59d7963af8a",
-            "reference": "e09ca286e3e18fea93317315dd7fc59d7963af8a",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0",
-            "react/cache": "~0.4.0|~0.3.0",
-            "react/promise": "~2.1|~1.2",
-            "react/promise-timer": "~1.1",
-            "react/socket": "^0.7 || ^0.6 || ^0.5 || ^0.4.4",
-            "react/stream": "^0.6 || ^0.5 || ^0.4.5"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^5.0 || ^4.8.10"
-        },
-        "time": "2017-03-31T16:21:48+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "React\\Dns\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "Async DNS resolver for ReactPHP",
-        "keywords": [
-            "dns",
-            "dns-resolver"
         ]
     },
     {
@@ -2788,62 +2581,6 @@
         ]
     },
     {
-        "name": "symfony/options-resolver",
-        "version": "v3.2.7",
-        "version_normalized": "3.2.7.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/options-resolver.git",
-            "reference": "6a19be85237fe8bbd4975f86942b4763bb0da6ca"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/6a19be85237fe8bbd4975f86942b4763bb0da6ca",
-            "reference": "6a19be85237fe8bbd4975f86942b4763bb0da6ca",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.5.9"
-        },
-        "time": "2017-03-21T21:44:32+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "3.2-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\OptionsResolver\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony OptionsResolver Component",
-        "homepage": "https://symfony.com",
-        "keywords": [
-            "config",
-            "configuration",
-            "options"
-        ]
-    },
-    {
         "name": "php-http/client-common",
         "version": "1.5.0",
         "version_normalized": "1.5.0.0",
@@ -2967,17 +2704,17 @@
     },
     {
         "name": "mailgun/mailgun-php",
-        "version": "v2.2.0",
-        "version_normalized": "2.2.0.0",
+        "version": "v2.3.0",
+        "version_normalized": "2.3.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/mailgun/mailgun-php.git",
-            "reference": "7ba99184a0bc5f18911eca510f45b1267174ebb0"
+            "reference": "5df14eb6aab16367ae75b0d1f19868e3c5bddf53"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/7ba99184a0bc5f18911eca510f45b1267174ebb0",
-            "reference": "7ba99184a0bc5f18911eca510f45b1267174ebb0",
+            "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/5df14eb6aab16367ae75b0d1f19868e3c5bddf53",
+            "reference": "5df14eb6aab16367ae75b0d1f19868e3c5bddf53",
             "shasum": ""
         },
         "require": {
@@ -2994,7 +2731,7 @@
             "php-http/guzzle6-adapter": "^1.0",
             "phpunit/phpunit": "~4.8"
         },
-        "time": "2017-04-08T09:52:19+00:00",
+        "time": "2017-04-14T09:15:08+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -3013,5 +2750,266 @@
             }
         ],
         "description": "The Mailgun SDK provides methods for all API functions."
+    },
+    {
+        "name": "twig/twig",
+        "version": "v1.33.2",
+        "version_normalized": "1.33.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/twigphp/Twig.git",
+            "reference": "dd6ca96227917e1e85b41c7c3cc6507b411e0927"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/twigphp/Twig/zipball/dd6ca96227917e1e85b41c7c3cc6507b411e0927",
+            "reference": "dd6ca96227917e1e85b41c7c3cc6507b411e0927",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.7"
+        },
+        "require-dev": {
+            "psr/container": "^1.0",
+            "symfony/debug": "~2.7",
+            "symfony/phpunit-bridge": "~3.3@dev"
+        },
+        "time": "2017-04-20T17:39:48+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.33-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Twig_": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com",
+                "homepage": "http://fabien.potencier.org",
+                "role": "Lead Developer"
+            },
+            {
+                "name": "Armin Ronacher",
+                "email": "armin.ronacher@active-4.com",
+                "role": "Project Founder"
+            },
+            {
+                "name": "Twig Team",
+                "homepage": "http://twig.sensiolabs.org/contributors",
+                "role": "Contributors"
+            }
+        ],
+        "description": "Twig, the flexible, fast, and secure template language for PHP",
+        "homepage": "http://twig.sensiolabs.org",
+        "keywords": [
+            "templating"
+        ]
+    },
+    {
+        "name": "react/event-loop",
+        "version": "v0.4.3",
+        "version_normalized": "0.4.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/reactphp/event-loop.git",
+            "reference": "8bde03488ee897dc6bb3d91e4e17c353f9c5252f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/reactphp/event-loop/zipball/8bde03488ee897dc6bb3d91e4e17c353f9c5252f",
+            "reference": "8bde03488ee897dc6bb3d91e4e17c353f9c5252f",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.8"
+        },
+        "suggest": {
+            "ext-event": "~1.0",
+            "ext-libev": "*",
+            "ext-libevent": ">=0.1.0"
+        },
+        "time": "2017-04-27T10:56:23+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "React\\EventLoop\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Event loop abstraction layer that libraries can use for evented I/O.",
+        "keywords": [
+            "asynchronous",
+            "event-loop"
+        ]
+    },
+    {
+        "name": "react/dns",
+        "version": "v0.4.9",
+        "version_normalized": "0.4.9.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/reactphp/dns.git",
+            "reference": "288b4f36972cdc2f81dae1d1a58a0467e3f625cb"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/reactphp/dns/zipball/288b4f36972cdc2f81dae1d1a58a0467e3f625cb",
+            "reference": "288b4f36972cdc2f81dae1d1a58a0467e3f625cb",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "react/cache": "~0.4.0|~0.3.0",
+            "react/promise": "~2.1|~1.2",
+            "react/promise-timer": "~1.1",
+            "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5 || ^0.4.4",
+            "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.5"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^5.0 || ^4.8.10"
+        },
+        "time": "2017-05-01T17:21:03+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "React\\Dns\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Async DNS resolver for ReactPHP",
+        "keywords": [
+            "dns",
+            "dns-resolver"
+        ]
+    },
+    {
+        "name": "symfony/options-resolver",
+        "version": "v3.2.8",
+        "version_normalized": "3.2.8.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/options-resolver.git",
+            "reference": "8cbb4f23414e2a5e92690cf67680a979a461113c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/8cbb4f23414e2a5e92690cf67680a979a461113c",
+            "reference": "8cbb4f23414e2a5e92690cf67680a979a461113c",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.5.9"
+        },
+        "time": "2017-04-12T14:13:17+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.2-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\OptionsResolver\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony OptionsResolver Component",
+        "homepage": "https://symfony.com",
+        "keywords": [
+            "config",
+            "configuration",
+            "options"
+        ]
+    },
+    {
+        "name": "coderstephen/slack-client",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/sagebind/slack-client.git",
+            "reference": "53e0c2897a5dabf9432e780c9e173872879bc607"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/sagebind/slack-client/zipball/53e0c2897a5dabf9432e780c9e173872879bc607",
+            "reference": "53e0c2897a5dabf9432e780c9e173872879bc607",
+            "shasum": ""
+        },
+        "require": {
+            "devristo/phpws": "dev-master",
+            "evenement/evenement": "2.0.*",
+            "guzzlehttp/guzzle": "~6.0",
+            "php": ">=5.5",
+            "react/event-loop": "^0.4.1",
+            "react/promise": "^2.2"
+        },
+        "require-dev": {
+            "apigen/apigen": "^4.1",
+            "fzaninotto/faker": "~1.4",
+            "phpunit/phpunit": "~4.6"
+        },
+        "time": "2017-04-19T14:21:01+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Slack\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Stephen Coakley",
+                "email": "me@stephencoakley.com"
+            }
+        ],
+        "description": "A better Slack client, with RTM API support",
+        "keywords": [
+            "api",
+            "realtime",
+            "slack"
+        ]
     }
 ]

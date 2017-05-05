@@ -147,6 +147,20 @@
             return $this;
         }
 
+        public function getStart(){
+            if( isset( $_GET[ 'start' ] ) && myrules::isdate( $_GET[ 'start' ] ) && isset( $_GET[ 'end' ] ) && myrules::isdate( $_GET[ 'end' ] ) && ( strtotime( $_GET[ 'start' ] ) < strtotime( $_GET[ 'end' ] ) ) && ( strtotime( $_GET[ 'start' ] ) > ( strtotime( $_GET[ 'end' ] ) - 5184000 ) ) )
+                return $_GET[ 'start' ];
+            
+            return false;
+        }
+
+        public function getEnd(){
+            if( isset( $_GET[ 'start' ] ) && myrules::isdate( $_GET[ 'start' ] ) && isset( $_GET[ 'end' ] ) && myrules::isdate( $_GET[ 'end' ] ) && ( strtotime( $_GET[ 'start' ] ) < strtotime( $_GET[ 'end' ] ) ) && ( strtotime( $_GET[ 'start' ] ) > ( strtotime( $_GET[ 'end' ] ) - 5184000 ) ) )
+                return $_GET[ 'end' ];
+            
+            return false;
+        }
+
         public function obj(){
             
             if( $this->init )

@@ -14,7 +14,11 @@ class myotp{
     public function createSecret(){
         return GoogleAuthenticator::generateRandom();
     }
-    
+
+    public function createKey( $secret ){
+        return (new Otp())->totp(Base32::decode($secret));
+    }
+
     public function verifyCode( $secret, $key ){
         return (new Otp())->checkTotp(Base32::decode($secret), $key);
     }

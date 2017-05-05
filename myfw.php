@@ -476,15 +476,15 @@
             return $this->otp;
         }
 
-        public function confirmSMS( $msg = null, $help = null, $title = null, $confirmByDefault = false ){
-            return $this->confirm( $msg, $help, $title, '', 1, false, true, $confirmByDefault );
+        public function confirmSMS( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
+            return $this->confirm( $msg, $help, $title, '', 1, false, true, $confirmByDefault, $customBefore );
         }
 
-        public function confirmToken( $msg = null, $help = null, $title = null, $confirmByDefault = false ){
-            return $this->confirm( $msg, $help, $title, '', 1, true, false, $confirmByDefault );
+        public function confirmToken( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
+            return $this->confirm( $msg, $help, $title, '', 1, true, false, $confirmByDefault, $customBefore );
         }
 
-        public function confirm( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $sms = false, $confirmByDefault = false ){
+        public function confirm( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $sms = false, $confirmByDefault = false, $customBefore = null ){
 
             if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';
             if( empty( $help ) )  $help  = '';
@@ -504,7 +504,11 @@
                 return true;
             }
 
-            $call = ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall ) ) ? call_user_func( $this->bef2Fcall ) : null;
+            if( !is_null( $customBefore ) && is_callable( $customBefore ) ){
+                $call = ( call_user_func( $customBefore ) === true );
+            }else{
+                $call = ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall ) && call_user_func( $this->bef2Fcall ) === true );
+            }
 
             if( $confirmByDefault === true && $call === false ){
                 $this->session()->delete( $hash . 'confirm' );
@@ -512,7 +516,7 @@
                 return true;
             }
 
-            if( $twofactor && ( $call === false || is_null( $call ) ) ){
+            if( $twofactor && $call === false ){
                 $twofactor = false;
             }
 
@@ -524,11 +528,11 @@
             $pinhelp  = '';
 
             if( $twofactor == true ){
-                $pinlabel = 'Two-factor authentication token';
+                $pinlabel = 'Two-factor authentication code';
                 $pinhelp  = '';
             }elseif( $sms == true ){
                 $pinlabel = 'SMS authentication pin';
-                $pinhelp  = 'This action requires an sms token. An sms was sent.';
+                $pinhelp  = 'This action requires an sms code. An sms was sent.';
             }
 
             $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
@@ -627,17 +631,12 @@
 
             $output = $env->render( $tpl . '.tpl', $vars );
 
-            // optionally add to cache
-//            if( ( !is_null( $cacheid ) || $this->iscacheable() ) && $this->request()->isGet() && !$this->ishttps() && empty( $this->forms ) ){
-//                $this->cache()->set( $cachetype, 'tpl' . $this->request()->getPath() . $cacheid, $output, $cachettl );
-//            }
-
             if( $display == false ){
-                return $output;// . $this->printFooter( $printFooter, 'O' );
+                return $output;
             }
 
             if( $display == true ){
-                echo $output; //, $this->printFooter( $printFooter, 'O' );                    
+                echo $output;
             }
 		}
 

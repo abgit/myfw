@@ -268,7 +268,7 @@
                 <div class="callout callout-{{ el.css }} fade in">
 				    {% if el.title %}<h5>{{el.title}}</h5>{% endif %}
 				    {% if el.description %}
-                        <p>{{el.description|raw|nl2br}}</p>
+                        <p>{{el.description|raw}}</p>
                     {% endif %}
                     {% if el.buttonlabel %}
                         <a type="button" class="btn btn-{{el.buttoncss|default(el.css)}}" style="margin-top:4px;"{% if el.buttononclick %} onclick="{{el.buttononclick}}"{% endif %}{% if el.buttonhref %} href="{{el.buttonhref}}"{% endif %}>
