@@ -10,9 +10,9 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         'ddc0a4d7e61c0286f0f8593b1903e894' => __DIR__ . '/..' . '/clue/stream-filter/src/functions.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
-        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         '6b06ce8ccf69c43a60a1e48495a034c9' => __DIR__ . '/..' . '/react/promise-timer/src/functions.php',
         'd45d087767e66b9914075f6f6efd1435' => __DIR__ . '/..' . '/blackfire/php-sdk/src/autostart.php',
         '1f155afceeab454b94183cdd8d5248a6' => __DIR__ . '/..' . '/mixpanel/mixpanel-php/lib/Mixpanel.php',
@@ -29,6 +29,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Zend\\Loader\\' => 12,
             'Zend\\Http\\' => 10,
             'Zend\\Escaper\\' => 13,
+            'Zend\\Diactoros\\' => 15,
         ),
         'W' => 
         array (
@@ -57,6 +58,14 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
         ),
+        'N' => 
+        array (
+            'Nexmo\\' => 6,
+        ),
+        'L' => 
+        array (
+            'Lcobucci\\JWT\\' => 13,
+        ),
         'J' => 
         array (
             'JaycoDesign\\Decimal\\' => 20,
@@ -75,6 +84,7 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
             'Http\\Client\\Curl\\' => 17,
             'Http\\Client\\Common\\' => 19,
             'Http\\Client\\' => 12,
+            'Http\\Adapter\\Guzzle6\\' => 21,
         ),
         'G' => 
         array (
@@ -137,6 +147,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',
         ),
+        'Zend\\Diactoros\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zendframework/zend-diactoros/src',
+        ),
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
@@ -197,6 +211,14 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
+        'Nexmo\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nexmo/client/src',
+        ),
+        'Lcobucci\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/lcobucci/jwt/src',
+        ),
         'JaycoDesign\\Decimal\\' => 
         array (
             0 => __DIR__ . '/..' . '/jaycodesign/decimal/src',
@@ -237,6 +259,10 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         'Http\\Client\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-http/httplug/src',
+        ),
+        'Http\\Adapter\\Guzzle6\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/php-http/guzzle6-adapter/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (

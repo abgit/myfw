@@ -63,11 +63,7 @@ class myrules{
     }
 
     public static function twofactortoken( $value, $opts='', $formelement = null ) {
-        return myrules::regex( strval( $value ), '/^([0-9]{6})$/' );
-    }
-
-    public static function smspin( $value, $opts='', $formelement = null ) {
-        return myrules::regex( strval( $value ), '/^([0-9]{4})$/' );
+        return myrules::regex( strval( $value ), '/^([0-9]{4}|[0-9]{6})$/' );
     }
 
     public static function lettersonly( $values, $opts='', $formelement = null ) {

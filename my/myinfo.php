@@ -101,7 +101,11 @@ class myinfo{
     }
 
     public function & addProfileCameraTag( $key ){
-        $this->elements[] = array( 'type' => 'cameratag', 'key' => $key, 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
+
+        $expiration = time() + 1800;
+        $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
+
+        $this->elements[] = array( 'type' => 'cameratag', 'key' => $key, 'appcdn' => $this->app->config( 'cameratag.appcdn' ), 'signature' => $signature, 'expiration' => $expiration );
         return $this;
     }
 

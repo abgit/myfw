@@ -49,7 +49,7 @@ class myfilters{
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
-    public static function filestack( $urloriginal, $call = 'read', $custom = '', $process = true ){
+    public static function filestack( $urloriginal, $call = 'read', $custom = '', $process = true, $expiry = null ){
 
         $url = substr( $urloriginal, 33 );
 
@@ -57,7 +57,7 @@ class myfilters{
             return '';
 
         $secret    = \Slim\Slim::getInstance()->config( 'filestack.secret' );
-        $policy    = '{"expiry":' . ( strtotime('tomorrow') + 86400 ) . ',"call":"' . $call . '"}';
+        $policy    = '{"expiry":' . ( is_numeric( $expiry ) ? $expiry : strtotime( 'first day of next month midnight' ) ) . ',"call":"' . $call . '"}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
         $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
@@ -66,7 +66,7 @@ class myfilters{
     }
 
     public static function filestackresize( $url, $w, $h = null ){
-        return myfilters::filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) . ',f:max/output=f:jpg' );
+        return myfilters::filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) . ',f:max/output=f:jpg', true, 4000000000 );
     }
 
     public static function filestackmovie( $url, $part ){

@@ -72,7 +72,6 @@
         private $onsmscall   = null;
         private $chats       = null;
         private $ishttps     = null;
-        private $sms         = null;
         private $calendar    = null;
         private $menu        = null;
         private $pusher      = null;
@@ -104,13 +103,6 @@
                     if( isset( $obj[ '2f' ] ) && $obj[ '2f' ] ){
                         if ( !$this->rules()->twofactortoken( $twotoken ) || call_user_func( $this->on2Fcall, $twotoken ) !== true )
                             return $this->ajax()->msgWarning( 'Token is not valid.' )->render();
-
-                        $this->ajax()->confirmDialogClose();
-                    }
-
-                    if( isset( $obj[ '2s' ] ) && $obj[ '2s' ] ){
-                        if ( !$this->rules()->smspin( $twotoken ) || call_user_func( $this->onsmscall, intval( $twotoken ) ) !== true )
-                            return $this->ajax()->msgWarning( 'Pin is not valid.' )->render();
 
                         $this->ajax()->confirmDialogClose();
                     }
@@ -266,12 +258,6 @@
             if( is_null( $this->auth0 ) )
 				$this->auth0 = new myauth0();
 			return $this->auth0;
-		}
-
-        public function sms(){
-            if( is_null( $this->sms ) )
-				$this->sms = new mysms();
-			return $this->sms;
 		}
 
 		// get form object
@@ -476,15 +462,11 @@
             return $this->otp;
         }
 
-        public function confirmSMS( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
-            return $this->confirm( $msg, $help, $title, '', 1, false, true, $confirmByDefault, $customBefore );
-        }
-
         public function confirmToken( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
-            return $this->confirm( $msg, $help, $title, '', 1, true, false, $confirmByDefault, $customBefore );
+            return $this->confirm( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore );
         }
 
-        public function confirm( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $sms = false, $confirmByDefault = false, $customBefore = null ){
+        public function confirm( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $confirmByDefault = false, $customBefore = null ){
 
             if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';
             if( empty( $help ) )  $help  = '';
@@ -505,9 +487,9 @@
             }
 
             if( !is_null( $customBefore ) && is_callable( $customBefore ) ){
-                $call = ( call_user_func( $customBefore ) === true );
+                $call = call_user_func( $customBefore );
             }else{
-                $call = ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall ) && call_user_func( $this->bef2Fcall ) === true );
+                $call = ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall )  ) ? call_user_func( $this->bef2Fcall, $mode ) : false;
             }
 
             if( $confirmByDefault === true && $call === false ){
@@ -516,23 +498,28 @@
                 return true;
             }
 
-            if( $twofactor && $call === false ){
-                $twofactor = false;
+            if( is_string( $call ) ){
+                $this->ajax()->msgError( $call )->render();
+                $this->stop();
             }
 
             $uri    = $this->request->getResourceUri();
             $method = $this->request->getMethod();
 
+            $sms = ( $call === 2 );
+
             $pin   = ( $twofactor == true or $sms == true );
             $pinlabel = '';
             $pinhelp  = '';
 
-            if( $twofactor == true ){
-                $pinlabel = 'Two-factor authentication code';
-                $pinhelp  = '';
-            }elseif( $sms == true ){
-                $pinlabel = 'SMS authentication pin';
-                $pinhelp  = 'This action requires an sms code. An sms was sent.';
+            if( $sms == true ){
+                $title    = 'Two-factor authentication by sms';
+                $pinlabel = 'Pin';
+                $pinhelp  = 'This action requires a 4-digit pin from a sms. An sms was sent.';
+            }elseif( $twofactor == true ){
+                $title    = 'Two-factor authentication by app';
+                $pinlabel = 'Pin';
+                $pinhelp  = 'Use your two-factor app to generate the 6-digit pin';
             }
 
             $this->session()->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
@@ -544,6 +531,10 @@
             $this->on2Fcall = $callback;
         }
 
+        public function applyOn2Factor( $pin, $token ){
+            return ( isset( $this->on2Fcall ) && is_callable( $this->on2Fcall ) ) ? call_user_func( $this->on2Fcall, $pin, $token ) : false;
+        }
+
         public function onDBError( $callback ){
             $this->onDBError = $callback;
         }
@@ -552,11 +543,11 @@
             $this->bef2Fcall = $callback;
         }
 
-        public function getBefore2Factor(){
-            return call_user_func( $this->bef2Fcall );
+        public function applyBefore2Factor( $mode, $mobile ){
+            return ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall ) ) ? call_user_func( $this->bef2Fcall, $mode, $mobile ) : false;
         }
 
-        public function onSMS( $callback ){
+        public function is2FactorSMS( $callback ){
             $this->onsmscall = $callback;
         }
 

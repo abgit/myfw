@@ -1,4 +1,4 @@
-<?PHP
+<?php
 
 /*
  * Copyright (C) 2013-2016 Mailgun
@@ -67,6 +67,8 @@ class Mailgun
      * @param string              $apiEndpoint
      * @param Hydrator|null       $hydrator
      * @param RequestBuilder|null $requestBuilder
+     *
+     * @internal Use Mailgun::configure or Mailgun::create instead.
      */
     public function __construct(
         $apiKey = null, /* Deprecated, will be removed in 3.0 */

@@ -1,6 +1,6 @@
 {% if allitems %}
  <li class="dropdown">
-    <a data-toggle="dropdown" class="dropdown-toggle"{% if onshow %} onClick="if($('#nfcounter').text().trim()){setTimeout(function(){ {{ onshow }} },1000);}"{% endif %}>
+    <a data-toggle="dropdown" class="dropdown-toggle"{% if onshow %} onClick="if($('#nfcounter').text().trim()){setTimeout(function(){ {{ onshow }} },10);}"{% endif %}>
         <i class="{{ icon }}">
         </i>
         <span class="label label-danger" style="background-color:rgba(255,0,0,1.00)" id="{{ name }}counter">{{ counter ? counter }}</span>
