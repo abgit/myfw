@@ -28,6 +28,11 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $mock);
     }
 
+    public function testEmptyHandlerIsCountable()
+    {
+        $this->assertCount(0, new MockHandler());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -114,6 +119,35 @@ class MockHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($r, $p->wait());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEnsuresOnHeadersIsCallable()
+    {
+        $res = new Response();
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', 'http://example.com');
+        $mock($request, ['on_headers' => 'error!']);
+    }
+
+    /**
+     * @expectedException \GuzzleHttp\Exception\RequestException
+     * @expectedExceptionMessage An error was encountered during the on_headers event
+     * @expectedExceptionMessage test
+     */
+    public function testRejectsPromiseWhenOnHeadersFails()
+    {
+        $res = new Response();
+        $mock = new MockHandler([$res]);
+        $request = new Request('GET', 'http://example.com');
+        $promise = $mock($request, [
+            'on_headers' => function () {
+                throw new \Exception('test');
+            }
+        ]);
+
+        $promise->wait();
+    }
     public function testInvokesOnFulfilled()
     {
         $res = new Response();

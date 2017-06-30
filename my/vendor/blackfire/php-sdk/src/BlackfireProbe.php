@@ -34,6 +34,9 @@ class BlackfireProbe
 {
     protected $options = array(
         'blackfire_yml' => false,
+        'composer_lock' => false,
+        'config' => true,
+        'timespan' => false,
         'server_keys' => array(
             'HTTP_HOST',
             'HTTP_USER_AGENT',
@@ -75,10 +78,12 @@ class BlackfireProbe
     private $isEnabled = false;
     private $responseLine = '';
     private $challenge;
+    private $profileTitle;
+    private $configYml;
     private $signedArgs;
     private $signature;
     private $flags;
-    private $configuration = null;
+    private $configuration;
     private static $nextSeqId = 1;
     private static $probe;
     private static $profilerIsEnabled = false;
@@ -222,6 +227,8 @@ class BlackfireProbe
         $query['BLACKFIRE_LOG_LEVEL'] and $this->logLevel = $query['BLACKFIRE_LOG_LEVEL'];
         $query['BLACKFIRE_LOG_FILE'] and $this->logFile = $query['BLACKFIRE_LOG_FILE'];
         $this->aggregSamples = isset($args['aggreg_samples']) && is_string($args['aggreg_samples']) ? max((int) $args['aggreg_samples'], 1) : 1;
+        isset($args['profile_title']) and $this->profileTitle = $args['profile_title'];
+        isset($args['config_yml']) and $this->configYml = $args['config_yml'];
 
         if ($this->logFile && strpos($this->logFile, '://') === false) {
             $this->logFile = 'file://'.$this->logFile;
@@ -233,6 +240,7 @@ class BlackfireProbe
         empty($args['flag_memory']) or $this->flags |= UPROFILER_FLAGS_MEMORY;
         empty($args['flag_no_builtins']) or $this->flags |= UPROFILER_FLAGS_NO_BUILTINS;
         $this->options['blackfire_yml'] = !empty($args['flag_yml']);
+        $this->options['composer_lock'] = !empty($args['flag_composer']);
         $this->options['timespan'] = !empty($args['flag_timespan']);
 
         if (function_exists('uprofiler_enable')) {
@@ -363,6 +371,7 @@ class BlackfireProbe
 
     public static function addMarker($label = '')
     {
+        $label = ''; // prevent OPcache optimization
     }
 
     // XXX
@@ -558,8 +567,12 @@ class BlackfireProbe
                             // Let's parse what is in "Blackfire-Response: " (20 chars)
                             parse_str(substr($response, 20), $features);
                             if (isset($features['blackfire_yml'])) {
-                                $i = $this->getConfiguration($h);
+                                $i = $this->getConfiguration();
                                 self::fwrite($h, 'Blackfire-Yaml-Size: '.strlen($i)."\n".$i);
+                            }
+                            if (isset($features['composer_lock'])) {
+                                $i = $this->getComposerLock();
+                                self::fwrite($h, 'Composer-Lock-Size: '.strlen($i)."\n".$i);
                             }
 
                             while ('' !== rtrim(fgets($h, 4096))) {
@@ -626,13 +639,21 @@ class BlackfireProbe
         }
         $line = 'signature='.$this->signature.'&aggreg_samples='.$this->aggregSamples;
         isset($this->challenge[0]) and $line = $this->challenge.'&'.$line;
+        isset($this->profileTitle) and $line .= '&profile_title='.$this->profileTitle;
+        isset($this->configYml) and $line .= '&config_yml='.$this->configYml;
         $hello .= 'Blackfire-Query: '.$line."\n";
         $hello .= sprintf('Blackfire-Probe: php-%s', PHP_VERSION);
         if ($this->options['blackfire_yml']) {
             $hello .= ', blackfire_yml';
         }
+        if ($this->options['composer_lock']) {
+            $hello .= ', composer_lock';
+        }
         if ($this->options['timespan']) {
             $hello .= ', timespan';
+        }
+        if ($this->options['config']) {
+            $hello .= ', config';
         }
         if ($noop) {
             $hello .= ', noop';
@@ -648,31 +669,47 @@ class BlackfireProbe
      */
     private function getConfiguration()
     {
-        try {
-            if ($this->configuration !== null) {
-                return $this->configuration;
-            }
+        if ($this->configuration !== null) {
+            return $this->configuration;
+        }
 
+        return $this->getRootFile('.blackfire.yml');
+    }
+
+    /**
+     * @internal
+     */
+    private function getComposerLock()
+    {
+        return $this->getRootFile('composer.lock');
+    }
+
+    /**
+     * @internal
+     */
+    private function getRootFile($file)
+    {
+        try {
             if (PHP_SAPI === 'cli-server') {
                 $baseDir = $_SERVER['DOCUMENT_ROOT'];
             } else {
                 $baseDir = dirname($_SERVER['SCRIPT_FILENAME']);
             }
 
-            if ($yamlDir = realpath($baseDir)) {
+            if ($dir = realpath($baseDir)) {
                 do {
-                    $prevYamlDir = $yamlDir;
-                    $yamlFile = $yamlDir.'/.blackfire.yml';
-                    $yamlDir = dirname($yamlDir);
-                } while (!(file_exists($yamlFile) && is_file($yamlFile)) && $prevYamlDir !== $yamlDir);
+                    $prevDir = $dir;
+                    $rootFile = $dir.DIRECTORY_SEPARATOR.$file;
+                    $dir = dirname($dir);
+                } while (!(file_exists($rootFile) && is_file($rootFile)) && $prevDir !== $dir);
 
-                if ($prevYamlDir !== $yamlDir) {
-                    $this->debug("Found $yamlFile");
+                if ($prevDir !== $dir) {
+                    $this->debug("Found $rootFile");
 
-                    return file_get_contents($yamlFile);
+                    return file_get_contents($rootFile);
                 }
 
-                $this->debug('No .blackfire.yml found');
+                $this->debug(sprintf('No %s found', $file));
             } else {
                 $this->debug('Realpath failed on '.$baseDir);
             }

@@ -169,12 +169,12 @@
 
 			{% elseif el.type == 'cameratag' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px;"><camera name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-sources="{{ el.sources|default('record,upload,sms') }}" data-maxlength="{{ el.maxlength|default(30) }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
+            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px;"><camera data-width="320" data-height="240" name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-sources="{{ el.sources|default('record,upload,sms') }}" data-maxlength="{{ el.maxlength|default(30) }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'cameratagphoto' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px{% if not el.help %};margin-bottom:20px{% endif %}"><photobooth name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
+            	<div name="div{{ name ~ el.name }}" id="div{{ name ~ el.name }}" style="width:321px;height:241px{% if not el.help %};margin-bottom:20px{% endif %}"><photobooth data-width="320" data-height="240" name="{{ name ~ el.name }}" id="{{ name ~ el.name }}" data-app-id="{{ el.appid }}" data-signature="{{ el.appsignature }}" data-signature-expiration="{{ el.appexpiration }}"></div>
                 {% if el.help %}<span class="help-block" style="margin-bottom:20px">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'cameratagvideo' %}
