@@ -14,15 +14,9 @@ class mytransloadit{
         if( $driver === 'heroku' ){
             $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
             $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
-            $this->apiurl    = getenv( 'TRANSLOADIT_URL' );
-        }elseif( $driver === 'fortrabbit' ){
-            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
-            $this->apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
-            $this->apiurl    = getenv( 'TRANSLOADIT_URL' );
         }else{
             $this->apikey    = $this->app->config( 'transloadit.k' );
             $this->apisecret = $this->app->config( 'transloadit.s' );
-            $this->apiurl    = 'http://api2.transloadit.com';
         }        
     }
 
@@ -32,7 +26,7 @@ class mytransloadit{
 
         $tl  = new Transloadit( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
         $res = $tl->createAssembly( $arg );
-        $returndata = $res->error() ? array() : $res->data;
+        $returndata = $res->error() == false ? $res->data : $res->error();
 
         return !$res->error();
     }
@@ -44,12 +38,12 @@ class mytransloadit{
         $tl = new TransloaditRequest( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
         $tl->url = $url;
         $res = $tl->execute();
-        $returndata = $res->error() ? array() : $res->data;
+        $returndata = $res->error() == false ? $res->data : $res->error();
 
         return !$res->error();
     }
     
-    public function requestAssembly( & $returndata, $id, $usecache = true, $encode = true ){
+    public function requestAssembly( & $returndata, $id, $usecache = false, $encode = false ){
 
         if( $usecache && isset( $this->cache[ $id ] ) ){
             $returndata = $this->cache[ $id ];
@@ -64,17 +58,16 @@ class mytransloadit{
         }
 
         $tl = new TransloaditRequest( array( 'key' => $this->apikey, 'secret' => $this->apisecret ) );
-        $tl->url = 'http://api2.transloadit.com/assemblies/' . $id;
+        $tl->path = '/assemblies/' . $id;
         $res = $tl->execute();
 
-        if( $res->error() ){
+        if( $res->error() == false ){
+            $returndata = $encode ? json_encode( $res->data ) : $res->data;
+            $this->cache[ $id ] = $returndata;
+        }else{
             $returndata = '';
             if( isset( $this->cache[ $id ] ) )
                 unset( $this->cache[ $id ] );
-        }else{
-
-            $returndata = $encode ? json_encode( $res->data ) : $this->data;
-            $this->cache[ $id ] = $returndata;
         }
 
         return !$res->error();

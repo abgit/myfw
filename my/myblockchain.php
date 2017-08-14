@@ -15,7 +15,41 @@ class myblockchain{
 
 
     public function exchangebtc(){
-        return $this->load( 'ticker' );
+        $json = $this->load( 'ticker' );
+
+        if( isset( $json[ 'USD' ][ 'buy' ] ) )
+            return array( 'USD' => $json[ 'USD' ][ 'buy' ],
+                          'GBP' => $json[ 'GBP' ][ 'buy' ],
+                          'EUR' => $json[ 'EUR' ][ 'buy' ],
+                          'CNY' => $json[ 'CNY' ][ 'buy' ],
+                          'JPY' => $json[ 'JPY' ][ 'buy' ] );
+
+        return array();
+    }
+
+
+    public function coinbasebtc(){
+        $json = json_decode( file_get_contents( 'http://api.coindesk.com/v1/bpi/currentprice.json' ), true );
+
+        if( isset( $json[ 'bpi' ][ 'USD' ][ 'rate_float' ] ) && isset( $json[ 'bpi' ][ 'GBP' ][ 'rate_float' ] ) && isset( $json[ 'bpi' ][ 'EUR' ][ 'rate_float' ] ) ){
+
+            $jsoncny = json_decode( file_get_contents( 'http://api.coindesk.com/v1/bpi/currentprice/CNY.json' ), true );
+
+            if( isset( $jsoncny[ 'bpi' ][ 'CNY' ][ 'rate_float' ] ) ){
+
+                $jsonjpy = json_decode( file_get_contents( 'http://api.coindesk.com/v1/bpi/currentprice/JPY.json' ), true );
+
+                if( isset( $jsonjpy[ 'bpi' ][ 'JPY' ][ 'rate_float' ] ) ){
+                    return array( 'USD' => $json[ 'bpi' ][ 'USD' ][ 'rate_float' ],
+                                  'GBP' => $json[ 'bpi' ][ 'GBP' ][ 'rate_float' ],
+                                  'EUR' => $json[ 'bpi' ][ 'EUR' ][ 'rate_float' ],
+                                  'CNY' => $jsoncny[ 'bpi' ][ 'CNY' ][ 'rate_float' ],
+                                  'JPY' => $jsonjpy[ 'bpi' ][ 'JPY' ][ 'rate_float' ] );
+                }
+            }
+        }
+
+        return array();
     }
 
 

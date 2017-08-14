@@ -9,24 +9,20 @@
 
             $this->app = \Slim\Slim::getInstance();
 
-            $url = $this->app->config( 'pusher.driver' );
+            $urloriginal = $this->app->config( 'pusher.driver' ) === 'heroku' ? getenv( 'PUSHER_URL' ) : $this->app->config( 'pusher.url' );
 
-            if( $url === 'heroku' ){
-                $url = parse_url( getenv( 'PUSHER_URL' ) );
-            }elseif( $url === 'fortrabbit' ){
-                $url = parse_url( $this->app->configdecrypt( getenv( 'PUSHER_URL' ) ) );
-            }
+            $url = parse_url( $urloriginal );
 
             $path = pathinfo( $url[ 'path' ] );
 
             $this->pkey = $url[ 'user' ];
-            $this->pcluster = substr( strstr( $url[ 'host' ], '.', true ), 4 );
+            $this->pcluster = myfilters::urlregion( $urloriginal );
 
             $this->pusherObj = new Pusher(
                   $this->pkey,
                   $url[ 'pass' ],
                   $path[ 'basename' ],
-                  array( 'host' => $url[ 'host' ], 'encrypted' => true )
+                  array( 'cluster' => $this->pcluster, 'encrypted' => true )
             );
         }
 

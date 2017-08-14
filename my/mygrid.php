@@ -124,11 +124,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addDescription( $key, $kval, $label = '', $align = '', $inline = false ){
+    public function & addDescription( $key, $kval, $label = '', $align = '', $inline = false, $truncate = 36 ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'description', 'inline' => $inline );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'description', 'inline' => $inline, 'truncate' => $truncate );
         return $this;
     }
 

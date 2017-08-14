@@ -40,7 +40,7 @@ class myform{
 
     private $app;
 
-    public function __construct( $name ){
+    public function __construct( $name = '' ){
 
         $this->formname         = $name;
         $this->elements         = array();
@@ -482,7 +482,17 @@ class myform{
         return $this;
     }
 
-    public function & addFilestack( $name, $label, $width = '', $height = '', $processing = '', $picker_options = null, $store_options = null, $help = '' ){
+
+    public function processFilestackThumb( $fsid ){
+    
+        if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
+            $this->app->ajax()->attr( '#filestacki' . $fsid, 'src', myfilters::filestack( $_POST[ 'img' ] ) )
+                              ->render();
+        }
+    }
+
+
+    public function & addFilestack( $name, $label, $width = '', $height = ''/*, $processing = ''*/, $picker_options = null, $store_options = null, $help = '', $thumbdefault = '' ){
 
         if( is_null( $picker_options ) )
             $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
@@ -496,6 +506,8 @@ class myform{
         $picker_options[ 'policy' ]    = $policy64;
         $picker_options[ 'signature' ] = $signature;
 
+        $processing = $this->app->urlFor( 'myfwfilestack', array( 'fsid' => $this->formname . $name ) );
+
         if( is_null( $store_options ) ){
             $store_options = array();
             $location = $this->app->config( 'filestack.location' );
@@ -508,7 +520,7 @@ class myform{
                 $store_options[ 'path' ] = $path;
         }
 
-        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.default' ), 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ) );
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => empty( $thumbdefault ) ? $this->app->config( 'filestack.default' ) : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ) );
 
         $this->addRule( function() use ( $name ){
 

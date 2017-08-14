@@ -15,13 +15,46 @@
                                     {% if msg[ message.key ] %}
                                         {{ msg[ message.key ]|t(15000)|nl2br }}
 
+
+                    					{% for meta in msg.metainfo|jsondecode %}
+
+                                            {% if meta.title is defined %}
+                                                <div class="callout callout-default" style="margin:10px 0px 10px 0px;background-color:white;border-width:4px;">
+
+                                                {% if meta.url %}
+                                                    <a href="{{ meta.url }}" target="_blank">
+                                                {% endif %}
+
+                                                {% if meta.title %}
+                                                    <h5>{{ meta.title }}</h5>
+                                                {% endif %}
+
+                                                {% if meta.description %}
+                                                    <p>{{ meta.description|t( 1000 ) }}</p>
+                                                {% endif %}
+
+                                                {% if meta.image %}
+                                                    <img src="{{ meta.image }}" class="img-responsive" style="max-width:225px;max-height:200px">
+                                                {% endif %}
+
+                                                {% if meta.url %}
+                                                    <span class="attribution" style="color:#777">{{ meta.url|domain }}</span>
+                                                {% endif %}
+
+                                                {% if meta.url %}
+                                                 </a>
+                                                {% endif %}
+
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+
                                     {% elseif msg[ message.imgkey ] %}
                                         <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" class="img-responsive" width="{{ msg[ message.imgwidth ] }}" height="{{ msg[ message.imgheight ] }}" />
 
                                     {% elseif msg[ message.moviekeythumb ] %}
                                         <video poster="{{ cdn }}{{ msg[ message.moviekeythumb ] }}" width="{{ msg[ message.moviekeywidth ] }}" height="{{ msg[ message.moviekeyheight ] }}" controls>
                                           {% if message.moviekeymp4 %}<source src="{{ cdn }}{{ msg[ message.moviekeymp4 ] }}" type="video/mp4">{% endif %}
-                                          {% if message.moviekeyogg %}<source src="{{ cdn }}{{ msg[ message.moviekeyogg ] }}" type="video/ogg">{% endif %}
                                           {% if message.moviekeywebm %}<source src="{{ cdn }}{{ msg[ message.moviekeywebm ] }}" type="video/webm">{% endif %}
                                           Your browser does not support the video tag.
                                         </video>
@@ -76,11 +109,11 @@
                         {% endif %}
 
                         {% if filestack %}
-                            {% if filestack.urlimage %}
-                                &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{{ filestack.fsoptions|json_encode }},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ...',{img:Blobs[0].url},false,'info');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
-                            {% endif %}
                             {% if filestack.urlvideo %}
-                                &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{{ filestack.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ...',{mov:Blobs[0].url},false,'info');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
+                                &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetype:'video/*',services:['COMPUTER']},{{ filestack.fsoptions|json_encode }},function(Blobs){myfwsubmit('{{ filestack.urlvideo }}','Processing ... please wait',{mov:Blobs[0].url},false,'info');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
+                            {% endif %}
+                            {% if filestack.urlimage %}
+                                &nbsp;<button onClick="filepicker.pickAndStore({multiple:false,{{ filestack.security }}mimetypes:['image/jpg','image/jpeg','image/png','image/bmp'],services:['COMPUTER','CONVERT'],conversions:['crop','rotate','filter']},{{ filestack.fsoptions|json_encode }},function(Blobs){ myfwsubmit('{{ filestack.urlimage }}','Processing ... please wait',{img:Blobs[0].url},false,'info');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
                             {% endif %}
                         {% endif %}
 

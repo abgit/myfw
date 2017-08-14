@@ -121,10 +121,7 @@
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ ( td.keycustomdate ? val[ td.keycustomdate ] : value )|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s" ) }}</span>
 
                                                         {% elseif td.type == 'description' %}
-                                                            {% if not td.truncate %}
-                                                                {% set value = value|t( 36 ) %}
-                                                            {% endif %}
-            				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|nl2space }}{{ addonpos|raw }}</span>
+            				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|t( td.truncate|default( 36 ) )|nl2space }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'info' %}
 
@@ -154,7 +151,7 @@
                                                         {% elseif td.type == 'menu' %}
                                                             {% if not td.depends or ( td.depends and val[ td.depends ] ) %}
     					                                    <div class="btn-group">
-                                                                {% for option in td.buttons %}
+                                                                {% for option in td.buttons if ( option.showdepends is not defined or val[ option.showdepends ] ) %}
                                                                 <a type="button" class="btn btn-primary btn-xs" {% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{{ option.label }}</a>
     		                                                    {% endfor %}    						                                    
 
@@ -163,7 +160,7 @@
         													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
                                                                     {% for option in td.options %}
                                                                         {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
-                														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replaceurl( val, tags ) }}"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
+                														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replaceurl( val, tags ) }}" target="_blank"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
         		                                                    {% endfor %}
                     		    									</ul>
                                                                 {% endif %}                                                                

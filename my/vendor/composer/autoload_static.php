@@ -15,9 +15,9 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
-        '6b06ce8ccf69c43a60a1e48495a034c9' => __DIR__ . '/..' . '/react/promise-timer/src/functions.php',
         '7f939cf3886f8168713c84dc1019984a' => __DIR__ . '/..' . '/lastguest/murmurhash/murmurhash3.php',
         'a4ecaeafb8cfb009ad0e052c90355e98' => __DIR__ . '/..' . '/beberlei/assert/lib/Assert/functions.php',
+        '6b06ce8ccf69c43a60a1e48495a034c9' => __DIR__ . '/..' . '/react/promise-timer/src/functions.php',
         '8cd2fca4db21bffce1ad0612f7caeec4' => __DIR__ . '/..' . '/ramsey/array_column/src/array_column.php',
         '8eeb9807d08404c43e7a8d0d87eb404b' => __DIR__ . '/..' . '/rych/hash_pbkdf2-compat/src/hash_pbkdf2_compat.php',
         '7cfce27594bbc1dd0dbf7e3eb5cd4911' => __DIR__ . '/..' . '/bitwasp/bitcoin/src/Script/functions.php',
@@ -401,6 +401,13 @@ class ComposerStaticInit4a37975ecfc47e82ad7fc31b4d467cb4
     );
 
     public static $prefixesPsr0 = array (
+        't' => 
+        array (
+            'transloadit' => 
+            array (
+                0 => __DIR__ . '/..' . '/transloadit/php-sdk/lib',
+            ),
+        ),
         'U' => 
         array (
             'Ulrichsg\\' => 

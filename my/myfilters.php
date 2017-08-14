@@ -24,7 +24,7 @@ class myfilters{
     }
 
     public static function jsondecode( $string ){
-        return json_decode( $string, true );
+        return is_string( $string ) ? json_decode( $string, true ) : $string;
     }
 
     public static function bitcoinqrcode( $amount, $acc, $size ){
@@ -207,6 +207,73 @@ class myfilters{
         return '';
     }
 
+
+    public static function urls( $string, $separator = null ){
+
+        $res = array();
+
+        preg_match_all( '#\b((https?://)|(www.))[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $string, $match );
+
+        if( isset( $match[0] ) ){
+            foreach( $match[0] as $r ){
+                if( !empty( $r ) )
+                    $res[] = $r;
+            }
+        }
+
+        return is_string( $separator ) ? implode( $separator, $res ) : $res;
+    }
+
+
+    public static function meta( $url, $separator = null ){
+
+        $res = array();
+        $dom = new DOMDocument( '1.0', 'UTF-8' );
+
+        if( strtolower( substr( $url, 0, 7 ) ) != 'http://' && strtolower( substr( $url, 0, 8 ) ) != 'https://' )
+            $url = 'http://' . $url;
+
+        try{
+            $content = file_get_contents( $url );
+        }catch( Exception $e ){
+        }
+
+        if( !empty( $content ) ){
+
+            // set error level
+            $internalErrors = libxml_use_internal_errors( true );
+
+            $dom->loadHTML( $content );
+
+            // restore error level
+            libxml_use_internal_errors( $internalErrors );
+
+            foreach( $dom->getElementsByTagName( 'meta' ) as $meta ){
+
+                switch( $meta->getAttribute( 'property' ) ){
+                    case 'twitter:title':
+                    case 'og:title':       $res[ 'title' ]       = $meta->getAttribute( 'content' );
+                                           break;
+
+                    case 'twitter:description':
+                    case 'og:description': $res[ 'description' ] = $meta->getAttribute( 'content' );
+                                       break;
+
+                    case 'twitter:image':
+                    case 'og:image':       $content = $meta->getAttribute( 'content' );
+                                           if( strtolower( substr( $content, 0, 7 ) ) == 'http://' || strtolower( substr( $content, 0, 8 ) ) == 'https://' )
+                                                $res[ 'image' ] = $content;
+                                           break;
+                }
+
+                $res[ 'url' ] = $url;
+            }
+        }
+
+        return is_string( $separator ) ? implode( $separator, $res ) : $res;
+    }
+
+
     public static function link( $url, $values, $keys = array() ){
 
         if( is_array( $url ) ){
@@ -337,20 +404,28 @@ class myfilters{
 
     public static function url( $value ){
         if( ! empty( $value ) )
-            return ( substr( $value, 0, 7 ) != 'http://' && substr( $value, 0, 8 ) != 'https://' ) ? 'http://' . $value : $value;
+            return ( strtolower( substr( $value, 0, 7 ) ) != 'http://' && strtolower( substr( $value, 0, 8 ) ) != 'https://' ) ? 'http://' . $value : $value;
     }
 
     public static function domain( $value ){
-        return parse_url( ( substr( $value, 0, 7 ) != 'http://' && substr( $value, 0, 8 ) != 'https://' ) ? 'http://' . $value : $value, PHP_URL_HOST );
+        return parse_url( ( strtolower( substr( $value, 0, 7 ) ) != 'http://' && strtolower( substr( $value, 0, 8 ) ) != 'https://' ) ? 'http://' . $value : $value, PHP_URL_HOST );
     }
  
+    public static function urlusername( $value ){
+        return parse_url( $value, PHP_URL_USER );
+    }
+
+    public static function urlregion( $value ){
+        return substr( strstr( parse_url( $value,  PHP_URL_HOST ), '.', true ), 4 );
+    }
+
     public static function markdown( $data ){
         $parser = new mymarkdown();
         $parser->no_markup = true;
         $parser->no_entities = true;
         return $parser->transform($data);
     }
-    
+
     public static function ago( $datetime, $full = 0 , $includeoriginal = 0 ){
 
         if( strtotime( $datetime ) < 1 )
@@ -493,4 +568,16 @@ class myfilters{
 
         return $html;
     }
+
+    public static function autolink( $string ){
+
+        return preg_replace_callback( '~\b(?:https?)://\S+~i', function( $v ){
+                    if( preg_match( '~\.jpe?g|\.png|\.gif|\.svg|\.bmp$~i', $v[0] ) ){
+                        return '<img src="' . $v[0] . '">';
+                    }else{
+                        return '<a href="' . $v[0] . '" target="_blank">' . $v[0] . '</a>';
+                    }
+               }, $string );
+    }
+
 }

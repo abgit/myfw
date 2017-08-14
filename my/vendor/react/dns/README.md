@@ -13,6 +13,7 @@ easily be used to create a DNS server.
 * [Basic usage](#basic-usage)
 * [Caching](#caching)
   * [Custom cache adapter](#custom-cache-adapter)
+* [Advanced usage](#advanced-usage)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -92,6 +93,31 @@ $dns = $factory->createCached('8.8.8.8', $loop, $cache);
 
 See also the wiki for possible [cache implementations](https://github.com/reactphp/react/wiki/Users#cache-implementations).
 
+## Advanced Usage
+
+For more advanced usages one can utilize the `React\Dns\Query\Executor` directly.
+The following example looks up the `IPv6` address for `igor.io`.
+
+```php
+$loop = Factory::create();
+
+$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+
+$executor->query(
+    '8.8.8.8:53', 
+    new Query($name, Message::TYPE_AAAA, Message::CLASS_IN, time())
+)->done(function (Message $message) {
+    foreach ($message->answers as $answer) {
+        echo 'IPv6: ' . $answer->data . PHP_EOL;
+    }
+}, 'printf');
+
+$loop->run();
+
+```
+
+See also the [fourth example](examples).
+
 ## Install
 
 The recommended way to install this library is [through Composer](http://getcomposer.org).
@@ -100,18 +126,25 @@ The recommended way to install this library is [through Composer](http://getcomp
 This will install the latest supported version:
 
 ```bash
-$ composer require react/dns:^0.4.9
+$ composer require react/dns:^0.4.10
 ```
 
-More details about version upgrades can be found in the [CHANGELOG](CHANGELOG.md).
+See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
+
+This project aims to run on any platform and thus does not require any PHP
+extensions and supports running on legacy PHP 5.3 through current PHP 7+ and
+HHVM.
+It's *highly recommended to use PHP 7+* for this project.
 
 ## Tests
 
 To run the test suite, you first need to clone this repo and then install all
-dependencies [through Composer](http://getcomposer.org):
+dependencies [through Composer](http://getcomposer.org).
+Because the test suite contains some circular dependencies, you may have to
+manually specify the root package version like this:
 
 ```bash
-$ composer install
+$ COMPOSER_ROOT_VERSION=`git describe --abbrev=0` composer install
 ```
 
 To run the test suite, go to the project root and run:

@@ -127,6 +127,10 @@
                 if( class_exists( 'Memcached' ) && isset( $this->client[ 'uuid' ] ) && $this->memcached()->get( $tip . md5( $this->client[ 'uuid' ] ) ) === 0 )
                     $this->memcached()->set( $tip . md5( $this->client[ 'uuid' ] ), 1 );
             })->name( 'myfwtip' )->conditions( array( 'tip' => 'tip[a-zA-Z0-9]{1,20}' ) );
+
+            $this->post( '/myfw/filestack/:fsid', 'islogged', function( $fsid ){
+                ( new myForm )->processFilestackThumb( $fsid );
+            })->name( 'myfwfilestack' )->conditions( array( 'fsid' => '[a-zA-Z0-9]{1,20}' ) );
         }
 
         public function setConditions( $cond ){

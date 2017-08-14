@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'transloadit' => array($vendorDir . '/transloadit/php-sdk/lib'),
     'Ulrichsg\\' => array($vendorDir . '/ulrichsg/getopt-php/src'),
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Slim' => array($vendorDir . '/slim/slim'),

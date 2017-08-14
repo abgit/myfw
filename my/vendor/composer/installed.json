@@ -1514,77 +1514,6 @@
         ]
     },
     {
-        "name": "php-http/message",
-        "version": "1.5.0",
-        "version_normalized": "1.5.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/php-http/message.git",
-            "reference": "13df8c48f40ca7925303aa336f19be4b80984f01"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/php-http/message/zipball/13df8c48f40ca7925303aa336f19be4b80984f01",
-            "reference": "13df8c48f40ca7925303aa336f19be4b80984f01",
-            "shasum": ""
-        },
-        "require": {
-            "clue/stream-filter": "^1.3",
-            "php": ">=5.4",
-            "php-http/message-factory": "^1.0.2",
-            "psr/http-message": "^1.0"
-        },
-        "require-dev": {
-            "akeneo/phpspec-skip-example-extension": "^1.0",
-            "coduo/phpspec-data-provider-extension": "^1.0",
-            "ext-zlib": "*",
-            "guzzlehttp/psr7": "^1.0",
-            "henrikbjorn/phpspec-code-coverage": "^1.0",
-            "phpspec/phpspec": "^2.4",
-            "slim/slim": "^3.0",
-            "zendframework/zend-diactoros": "^1.0"
-        },
-        "suggest": {
-            "ext-zlib": "Used with compressor/decompressor streams",
-            "guzzlehttp/psr7": "Used with Guzzle PSR-7 Factories",
-            "slim/slim": "Used with Slim Framework PSR-7 implementation",
-            "zendframework/zend-diactoros": "Used with Diactoros Factories"
-        },
-        "time": "2017-02-14T08:58:37+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.6-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-4": {
-                "Http\\Message\\": "src/"
-            },
-            "files": [
-                "src/filters.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Márk Sági-Kazár",
-                "email": "mark.sagikazar@gmail.com"
-            }
-        ],
-        "description": "HTTP Message related tools",
-        "homepage": "http://php-http.org",
-        "keywords": [
-            "http",
-            "message",
-            "psr-7"
-        ]
-    },
-    {
         "name": "psr/container",
         "version": "1.0.0",
         "version_normalized": "1.0.0.0",
@@ -1667,170 +1596,6 @@
         ],
         "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
         "homepage": "https://github.com/container-interop/container-interop"
-    },
-    {
-        "name": "auth0/auth0-php",
-        "version": "4.0.12",
-        "version_normalized": "4.0.12.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/auth0/auth0-PHP.git",
-            "reference": "f5960dffc746089cbddd42f537cc1f89b4f9b6eb"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/auth0/auth0-PHP/zipball/f5960dffc746089cbddd42f537cc1f89b4f9b6eb",
-            "reference": "f5960dffc746089cbddd42f537cc1f89b4f9b6eb",
-            "shasum": ""
-        },
-        "require": {
-            "adoy/oauth2": "^1.3",
-            "ext-json": "*",
-            "firebase/php-jwt": "^3.0",
-            "guzzlehttp/guzzle": "~6.0",
-            "php": ">=5.5"
-        },
-        "require-dev": {
-            "codeclimate/php-test-reporter": "^0.2.0",
-            "josegonzalez/dotenv": "^2.0",
-            "phpunit/phpunit": "4.6.*"
-        },
-        "time": "2017-02-21T12:39:10+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Auth0\\SDK\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Auth0",
-                "email": "support@auth0.com",
-                "homepage": "http://www.auth0.com/"
-            }
-        ],
-        "description": "Auth0 PHP SDK."
-    },
-    {
-        "name": "php-http/discovery",
-        "version": "1.2.1",
-        "version_normalized": "1.2.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/php-http/discovery.git",
-            "reference": "6b33475a3239439bc7ced287d0de0bb82e04d2f0"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/php-http/discovery/zipball/6b33475a3239439bc7ced287d0de0bb82e04d2f0",
-            "reference": "6b33475a3239439bc7ced287d0de0bb82e04d2f0",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^5.5 || ^7.0"
-        },
-        "require-dev": {
-            "henrikbjorn/phpspec-code-coverage": "^2.0.2",
-            "php-http/httplug": "^1.0",
-            "php-http/message-factory": "^1.0",
-            "phpspec/phpspec": "^2.4",
-            "puli/composer-plugin": "1.0.0-beta10"
-        },
-        "suggest": {
-            "php-http/message": "Allow to use Guzzle, Diactoros or Slim Framework factories",
-            "puli/composer-plugin": "Sets up Puli which is recommended for Discovery to work. Check http://docs.php-http.org/en/latest/discovery.html for more details."
-        },
-        "time": "2017-03-02T06:56:00+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.3-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-4": {
-                "Http\\Discovery\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Márk Sági-Kazár",
-                "email": "mark.sagikazar@gmail.com"
-            }
-        ],
-        "description": "Finds installed HTTPlug implementations and PSR-7 message factories",
-        "homepage": "http://php-http.org",
-        "keywords": [
-            "adapter",
-            "client",
-            "discovery",
-            "factory",
-            "http",
-            "message",
-            "psr7"
-        ]
-    },
-    {
-        "name": "react/promise-timer",
-        "version": "v1.1.1",
-        "version_normalized": "1.1.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/promise-timer.git",
-            "reference": "ddedc67bfd7f579fc83e66ff67e3564b179297dd"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/promise-timer/zipball/ddedc67bfd7f579fc83e66ff67e3564b179297dd",
-            "reference": "ddedc67bfd7f579fc83e66ff67e3564b179297dd",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3",
-            "react/event-loop": "~0.4.0|~0.3.0",
-            "react/promise": "~2.1|~1.2"
-        },
-        "time": "2016-12-27T08:12:19+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "React\\Promise\\Timer\\": "src/"
-            },
-            "files": [
-                "src/functions.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Christian Lück",
-                "email": "christian@lueck.tv"
-            }
-        ],
-        "description": "Trivial timeout implementation for Promises",
-        "homepage": "https://github.com/react/promise-timer",
-        "keywords": [
-            "async",
-            "event-loop",
-            "promise",
-            "reactphp",
-            "timeout",
-            "timer"
-        ]
     },
     {
         "name": "composer/ca-bundle",
@@ -2215,50 +1980,6 @@
         ]
     },
     {
-        "name": "react/dns",
-        "version": "v0.4.9",
-        "version_normalized": "0.4.9.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/dns.git",
-            "reference": "288b4f36972cdc2f81dae1d1a58a0467e3f625cb"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/dns/zipball/288b4f36972cdc2f81dae1d1a58a0467e3f625cb",
-            "reference": "288b4f36972cdc2f81dae1d1a58a0467e3f625cb",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0",
-            "react/cache": "~0.4.0|~0.3.0",
-            "react/promise": "~2.1|~1.2",
-            "react/promise-timer": "~1.1",
-            "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5 || ^0.4.4",
-            "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.5"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^5.0 || ^4.8.10"
-        },
-        "time": "2017-05-01T17:21:03+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "React\\Dns\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "description": "Async DNS resolver for ReactPHP",
-        "keywords": [
-            "dns",
-            "dns-resolver"
-        ]
-    },
-    {
         "name": "coderstephen/slack-client",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -2537,62 +2258,6 @@
         "description": "PHP Client for using Nexmo's API."
     },
     {
-        "name": "symfony/options-resolver",
-        "version": "v3.3.2",
-        "version_normalized": "3.3.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/options-resolver.git",
-            "reference": "ff48982d295bcac1fd861f934f041ebc73ae40f0"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/ff48982d295bcac1fd861f934f041ebc73ae40f0",
-            "reference": "ff48982d295bcac1fd861f934f041ebc73ae40f0",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.5.9"
-        },
-        "time": "2017-04-12T14:14:56+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "3.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\OptionsResolver\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony OptionsResolver Component",
-        "homepage": "https://symfony.com",
-        "keywords": [
-            "config",
-            "configuration",
-            "options"
-        ]
-    },
-    {
         "name": "php-http/multipart-stream-builder",
         "version": "1.0.0",
         "version_normalized": "1.0.0.0",
@@ -2652,73 +2317,6 @@
         ]
     },
     {
-        "name": "twig/twig",
-        "version": "v1.34.3",
-        "version_normalized": "1.34.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/twigphp/Twig.git",
-            "reference": "451c6f4197e113e24c1c85bc3fc8c2d77adeff2e"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/twigphp/Twig/zipball/451c6f4197e113e24c1c85bc3fc8c2d77adeff2e",
-            "reference": "451c6f4197e113e24c1c85bc3fc8c2d77adeff2e",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "psr/container": "^1.0",
-            "symfony/debug": "~2.7",
-            "symfony/phpunit-bridge": "~3.3@dev"
-        },
-        "time": "2017-06-07T18:45:17+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.34-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Twig_": "lib/"
-            },
-            "psr-4": {
-                "Twig\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com",
-                "homepage": "http://fabien.potencier.org",
-                "role": "Lead Developer"
-            },
-            {
-                "name": "Armin Ronacher",
-                "email": "armin.ronacher@active-4.com",
-                "role": "Project Founder"
-            },
-            {
-                "name": "Twig Team",
-                "homepage": "http://twig.sensiolabs.org/contributors",
-                "role": "Contributors"
-            }
-        ],
-        "description": "Twig, the flexible, fast, and secure template language for PHP",
-        "homepage": "http://twig.sensiolabs.org",
-        "keywords": [
-            "templating"
-        ]
-    },
-    {
         "name": "pusher/pusher-php-server",
         "version": "2.6.4",
         "version_normalized": "2.6.4.0",
@@ -2762,123 +2360,6 @@
             "realtime",
             "rest",
             "trigger"
-        ]
-    },
-    {
-        "name": "bugsnag/bugsnag",
-        "version": "v3.5.1",
-        "version_normalized": "3.5.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/bugsnag/bugsnag-php.git",
-            "reference": "4df7153905c3676fff119167ca6f30a25bb9698a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/bugsnag/bugsnag-php/zipball/4df7153905c3676fff119167ca6f30a25bb9698a",
-            "reference": "4df7153905c3676fff119167ca6f30a25bb9698a",
-            "shasum": ""
-        },
-        "require": {
-            "composer/ca-bundle": "^1.0",
-            "guzzlehttp/guzzle": "^5.0|^6.0",
-            "php": ">=5.5"
-        },
-        "require-dev": {
-            "mtdowling/burgomaster": "dev-master#72151eddf5f0cf101502b94bf5031f9c53501a04",
-            "php-mock/php-mock-phpunit": "^1.1",
-            "phpunit/phpunit": "^4.8|^5.0"
-        },
-        "time": "2017-06-07T23:48:45+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "3.4-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-4": {
-                "Bugsnag\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "James Smith",
-                "email": "notifiers@bugsnag.com",
-                "homepage": "https://bugsnag.com"
-            }
-        ],
-        "description": "Official Bugsnag notifier for PHP applications.",
-        "homepage": "https://github.com/bugsnag/bugsnag-php",
-        "keywords": [
-            "bugsnag",
-            "errors",
-            "exceptions",
-            "logging",
-            "tracking"
-        ]
-    },
-    {
-        "name": "blackfire/php-sdk",
-        "version": "v1.8.0",
-        "version_normalized": "1.8.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/blackfireio/php-sdk.git",
-            "reference": "0a238130577c9c1b91606cb92795f44b7ec077cc"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/blackfireio/php-sdk/zipball/0a238130577c9c1b91606cb92795f44b7ec077cc",
-            "reference": "0a238130577c9c1b91606cb92795f44b7ec077cc",
-            "shasum": ""
-        },
-        "require": {
-            "composer/ca-bundle": "^1.0",
-            "php": ">=5.2.0"
-        },
-        "suggest": {
-            "ext-blackfire": "The C version of the Blackfire probe",
-            "ext-xhprof": "XHProf is required as a fallback",
-            "ext-zlib": "To push config to remote profiling targets"
-        },
-        "time": "2017-06-15T14:44:12+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.5.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "files": [
-                "src/autostart.php"
-            ],
-            "psr-4": {
-                "Blackfire\\": "src/Blackfire"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Blackfire.io",
-                "email": "support@blackfire.io"
-            }
-        ],
-        "description": "Blackfire.io PHP SDK",
-        "keywords": [
-            "performance",
-            "profiler",
-            "uprofiler",
-            "xhprof"
         ]
     },
     {
@@ -3112,79 +2593,6 @@
         "keywords": [
             "log",
             "logging",
-            "zf2"
-        ]
-    },
-    {
-        "name": "zendframework/zend-validator",
-        "version": "2.9.1",
-        "version_normalized": "2.9.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/zendframework/zend-validator.git",
-            "reference": "c9a8160a0191e34bb98ac1ecd4e453391c424bb3"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/zendframework/zend-validator/zipball/c9a8160a0191e34bb98ac1ecd4e453391c424bb3",
-            "reference": "c9a8160a0191e34bb98ac1ecd4e453391c424bb3",
-            "shasum": ""
-        },
-        "require": {
-            "container-interop/container-interop": "^1.1",
-            "php": "^5.6 || ^7.0",
-            "zendframework/zend-stdlib": "^2.7.6 || ^3.1"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^6.0.8 || ^5.7.15",
-            "zendframework/zend-cache": "^2.6.1",
-            "zendframework/zend-coding-standard": "~1.0.0",
-            "zendframework/zend-config": "^2.6",
-            "zendframework/zend-db": "^2.7",
-            "zendframework/zend-filter": "^2.6",
-            "zendframework/zend-http": "^2.5.4",
-            "zendframework/zend-i18n": "^2.6",
-            "zendframework/zend-math": "^2.6",
-            "zendframework/zend-servicemanager": "^2.7.5 || ^3.0.3",
-            "zendframework/zend-session": "^2.6.2",
-            "zendframework/zend-uri": "^2.5"
-        },
-        "suggest": {
-            "zendframework/zend-db": "Zend\\Db component, required by the (No)RecordExists validator",
-            "zendframework/zend-filter": "Zend\\Filter component, required by the Digits validator",
-            "zendframework/zend-i18n": "Zend\\I18n component to allow translation of validation error messages",
-            "zendframework/zend-i18n-resources": "Translations of validator messages",
-            "zendframework/zend-math": "Zend\\Math component, required by the Csrf validator",
-            "zendframework/zend-servicemanager": "Zend\\ServiceManager component to allow using the ValidatorPluginManager and validator chains",
-            "zendframework/zend-session": "Zend\\Session component, required by the Csrf validator",
-            "zendframework/zend-uri": "Zend\\Uri component, required by the Uri and Sitemap\\Loc validators"
-        },
-        "time": "2017-05-17T22:06:13+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.9-dev",
-                "dev-develop": "2.10-dev"
-            },
-            "zf": {
-                "component": "Zend\\Validator",
-                "config-provider": "Zend\\Validator\\ConfigProvider"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Zend\\Validator\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "description": "provides a set of commonly needed validators",
-        "homepage": "https://github.com/zendframework/zend-validator",
-        "keywords": [
-            "validator",
             "zf2"
         ]
     },
@@ -4242,61 +3650,6 @@
         ]
     },
     {
-        "name": "symfony/http-foundation",
-        "version": "v3.3.2",
-        "version_normalized": "3.3.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/http-foundation.git",
-            "reference": "80eb5a1f968448b77da9e8b2c0827f6e8d767846"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/http-foundation/zipball/80eb5a1f968448b77da9e8b2c0827f6e8d767846",
-            "reference": "80eb5a1f968448b77da9e8b2c0827f6e8d767846",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.5.9",
-            "symfony/polyfill-mbstring": "~1.1"
-        },
-        "require-dev": {
-            "symfony/expression-language": "~2.8|~3.0"
-        },
-        "time": "2017-06-05T13:06:51+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "3.3-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Symfony\\Component\\HttpFoundation\\": ""
-            },
-            "exclude-from-classmap": [
-                "/Tests/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony HttpFoundation Component",
-        "homepage": "https://symfony.com"
-    },
-    {
         "name": "bitwasp/bitcoin",
         "version": "v0.0.31.2",
         "version_normalized": "0.0.31.2",
@@ -4491,6 +3844,713 @@
             "sdk",
             "transaction",
             "wallet"
+        ]
+    },
+    {
+        "name": "twig/twig",
+        "version": "v1.34.4",
+        "version_normalized": "1.34.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/twigphp/Twig.git",
+            "reference": "f878bab48edb66ad9c6ed626bf817f60c6c096ee"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/twigphp/Twig/zipball/f878bab48edb66ad9c6ed626bf817f60c6c096ee",
+            "reference": "f878bab48edb66ad9c6ed626bf817f60c6c096ee",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "psr/container": "^1.0",
+            "symfony/debug": "~2.7",
+            "symfony/phpunit-bridge": "~3.3@dev"
+        },
+        "time": "2017-07-04T13:19:31+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.34-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Twig_": "lib/"
+            },
+            "psr-4": {
+                "Twig\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com",
+                "homepage": "http://fabien.potencier.org",
+                "role": "Lead Developer"
+            },
+            {
+                "name": "Armin Ronacher",
+                "email": "armin.ronacher@active-4.com",
+                "role": "Project Founder"
+            },
+            {
+                "name": "Twig Team",
+                "homepage": "http://twig.sensiolabs.org/contributors",
+                "role": "Contributors"
+            }
+        ],
+        "description": "Twig, the flexible, fast, and secure template language for PHP",
+        "homepage": "http://twig.sensiolabs.org",
+        "keywords": [
+            "templating"
+        ]
+    },
+    {
+        "name": "php-http/message",
+        "version": "1.6.0",
+        "version_normalized": "1.6.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-http/message.git",
+            "reference": "2edd63bae5f52f79363c5f18904b05ce3a4b7253"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-http/message/zipball/2edd63bae5f52f79363c5f18904b05ce3a4b7253",
+            "reference": "2edd63bae5f52f79363c5f18904b05ce3a4b7253",
+            "shasum": ""
+        },
+        "require": {
+            "clue/stream-filter": "^1.3",
+            "php": ">=5.4",
+            "php-http/message-factory": "^1.0.2",
+            "psr/http-message": "^1.0"
+        },
+        "provide": {
+            "php-http/message-factory-implementation": "1.0"
+        },
+        "require-dev": {
+            "akeneo/phpspec-skip-example-extension": "^1.0",
+            "coduo/phpspec-data-provider-extension": "^1.0",
+            "ext-zlib": "*",
+            "guzzlehttp/psr7": "^1.0",
+            "henrikbjorn/phpspec-code-coverage": "^1.0",
+            "phpspec/phpspec": "^2.4",
+            "slim/slim": "^3.0",
+            "zendframework/zend-diactoros": "^1.0"
+        },
+        "suggest": {
+            "ext-zlib": "Used with compressor/decompressor streams",
+            "guzzlehttp/psr7": "Used with Guzzle PSR-7 Factories",
+            "slim/slim": "Used with Slim Framework PSR-7 implementation",
+            "zendframework/zend-diactoros": "Used with Diactoros Factories"
+        },
+        "time": "2017-07-05T06:40:53+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.6-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Http\\Message\\": "src/"
+            },
+            "files": [
+                "src/filters.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Márk Sági-Kazár",
+                "email": "mark.sagikazar@gmail.com"
+            }
+        ],
+        "description": "HTTP Message related tools",
+        "homepage": "http://php-http.org",
+        "keywords": [
+            "http",
+            "message",
+            "psr-7"
+        ]
+    },
+    {
+        "name": "zendframework/zend-validator",
+        "version": "2.9.2",
+        "version_normalized": "2.9.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/zendframework/zend-validator.git",
+            "reference": "a58dbe8463b93de0d650e296d56cb7da4a129ff3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/zendframework/zend-validator/zipball/a58dbe8463b93de0d650e296d56cb7da4a129ff3",
+            "reference": "a58dbe8463b93de0d650e296d56cb7da4a129ff3",
+            "shasum": ""
+        },
+        "require": {
+            "container-interop/container-interop": "^1.1",
+            "php": "^5.6 || ^7.0",
+            "zendframework/zend-stdlib": "^2.7.6 || ^3.1"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^6.0.8 || ^5.7.15",
+            "zendframework/zend-cache": "^2.6.1",
+            "zendframework/zend-coding-standard": "~1.0.0",
+            "zendframework/zend-config": "^2.6",
+            "zendframework/zend-db": "^2.7",
+            "zendframework/zend-filter": "^2.6",
+            "zendframework/zend-http": "^2.5.4",
+            "zendframework/zend-i18n": "^2.6",
+            "zendframework/zend-math": "^2.6",
+            "zendframework/zend-servicemanager": "^2.7.5 || ^3.0.3",
+            "zendframework/zend-session": "^2.6.2",
+            "zendframework/zend-uri": "^2.5"
+        },
+        "suggest": {
+            "zendframework/zend-db": "Zend\\Db component, required by the (No)RecordExists validator",
+            "zendframework/zend-filter": "Zend\\Filter component, required by the Digits validator",
+            "zendframework/zend-i18n": "Zend\\I18n component to allow translation of validation error messages",
+            "zendframework/zend-i18n-resources": "Translations of validator messages",
+            "zendframework/zend-math": "Zend\\Math component, required by the Csrf validator",
+            "zendframework/zend-servicemanager": "Zend\\ServiceManager component to allow using the ValidatorPluginManager and validator chains",
+            "zendframework/zend-session": "Zend\\Session component, required by the Csrf validator",
+            "zendframework/zend-uri": "Zend\\Uri component, required by the Uri and Sitemap\\Loc validators"
+        },
+        "time": "2017-07-20T16:44:59+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.9-dev",
+                "dev-develop": "2.10-dev"
+            },
+            "zf": {
+                "component": "Zend\\Validator",
+                "config-provider": "Zend\\Validator\\ConfigProvider"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Zend\\Validator\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "description": "provides a set of commonly needed validators",
+        "homepage": "https://github.com/zendframework/zend-validator",
+        "keywords": [
+            "validator",
+            "zf2"
+        ]
+    },
+    {
+        "name": "transloadit/php-sdk",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/transloadit/php-sdk.git",
+            "reference": "5956a1c2911c3116ce153d3ddad076f007138a44"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/transloadit/php-sdk/zipball/5956a1c2911c3116ce153d3ddad076f007138a44",
+            "reference": "5956a1c2911c3116ce153d3ddad076f007138a44",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*",
+            "satooshi/php-coveralls": "0.7.0"
+        },
+        "time": "2017-07-05T08:36:47+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "transloadit": "lib"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Transloadit SDK",
+        "homepage": "https://github.com/transloadit/php-sdk",
+        "keywords": [
+            "Thumbnails",
+            "audio",
+            "document",
+            "encoding",
+            "file",
+            "image",
+            "processing",
+            "resizing",
+            "transloadit",
+            "uploading",
+            "video",
+            "waveform"
+        ]
+    },
+    {
+        "name": "auth0/auth0-php",
+        "version": "4.0.13",
+        "version_normalized": "4.0.13.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/auth0/auth0-PHP.git",
+            "reference": "50cfcafab2dfa8ae88a4abce4dc4c076f7b4b513"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/auth0/auth0-PHP/zipball/50cfcafab2dfa8ae88a4abce4dc4c076f7b4b513",
+            "reference": "50cfcafab2dfa8ae88a4abce4dc4c076f7b4b513",
+            "shasum": ""
+        },
+        "require": {
+            "adoy/oauth2": "^1.3",
+            "ext-json": "*",
+            "firebase/php-jwt": "^3.0",
+            "guzzlehttp/guzzle": "~6.0",
+            "php": ">=5.5"
+        },
+        "require-dev": {
+            "codeclimate/php-test-reporter": "^0.2.0",
+            "josegonzalez/dotenv": "^2.0",
+            "phpunit/phpunit": "4.6.*"
+        },
+        "time": "2017-07-24T20:27:25+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Auth0\\SDK\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Auth0",
+                "email": "support@auth0.com",
+                "homepage": "http://www.auth0.com/"
+            }
+        ],
+        "description": "Auth0 PHP SDK."
+    },
+    {
+        "name": "symfony/options-resolver",
+        "version": "v3.3.6",
+        "version_normalized": "3.3.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/options-resolver.git",
+            "reference": "ff48982d295bcac1fd861f934f041ebc73ae40f0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/options-resolver/zipball/ff48982d295bcac1fd861f934f041ebc73ae40f0",
+            "reference": "ff48982d295bcac1fd861f934f041ebc73ae40f0",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.5.9"
+        },
+        "time": "2017-04-12T14:14:56+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\OptionsResolver\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony OptionsResolver Component",
+        "homepage": "https://symfony.com",
+        "keywords": [
+            "config",
+            "configuration",
+            "options"
+        ]
+    },
+    {
+        "name": "symfony/http-foundation",
+        "version": "v3.3.6",
+        "version_normalized": "3.3.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/http-foundation.git",
+            "reference": "49e8cd2d59a7aa9bfab19e46de680c76e500a031"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/http-foundation/zipball/49e8cd2d59a7aa9bfab19e46de680c76e500a031",
+            "reference": "49e8cd2d59a7aa9bfab19e46de680c76e500a031",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.5.9",
+            "symfony/polyfill-mbstring": "~1.1"
+        },
+        "require-dev": {
+            "symfony/expression-language": "~2.8|~3.0"
+        },
+        "time": "2017-07-21T11:04:46+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.3-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Component\\HttpFoundation\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "https://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony HttpFoundation Component",
+        "homepage": "https://symfony.com"
+    },
+    {
+        "name": "php-http/discovery",
+        "version": "1.3.0",
+        "version_normalized": "1.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-http/discovery.git",
+            "reference": "7b50ab4d6c9fdaa1ed53ae310c955900af6e3372"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-http/discovery/zipball/7b50ab4d6c9fdaa1ed53ae310c955900af6e3372",
+            "reference": "7b50ab4d6c9fdaa1ed53ae310c955900af6e3372",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.5 || ^7.0"
+        },
+        "require-dev": {
+            "henrikbjorn/phpspec-code-coverage": "^2.0.2",
+            "php-http/httplug": "^1.0",
+            "php-http/message-factory": "^1.0",
+            "phpspec/phpspec": "^2.4",
+            "puli/composer-plugin": "1.0.0-beta10"
+        },
+        "suggest": {
+            "php-http/message": "Allow to use Guzzle, Diactoros or Slim Framework factories",
+            "puli/composer-plugin": "Sets up Puli which is recommended for Discovery to work. Check http://docs.php-http.org/en/latest/discovery.html for more details."
+        },
+        "time": "2017-08-03T10:12:53+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.3-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Http\\Discovery\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Márk Sági-Kazár",
+                "email": "mark.sagikazar@gmail.com"
+            }
+        ],
+        "description": "Finds installed HTTPlug implementations and PSR-7 message factories",
+        "homepage": "http://php-http.org",
+        "keywords": [
+            "adapter",
+            "client",
+            "discovery",
+            "factory",
+            "http",
+            "message",
+            "psr7"
+        ]
+    },
+    {
+        "name": "react/promise-timer",
+        "version": "v1.2.0",
+        "version_normalized": "1.2.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/reactphp/promise-timer.git",
+            "reference": "3bc527fbd1201a193ab41c19b9a770d71a3514af"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/reactphp/promise-timer/zipball/3bc527fbd1201a193ab41c19b9a770d71a3514af",
+            "reference": "3bc527fbd1201a193ab41c19b9a770d71a3514af",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3",
+            "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
+            "react/promise": "~2.1|~1.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^5.0 || ^4.8"
+        },
+        "time": "2017-08-08T16:30:19+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "React\\Promise\\Timer\\": "src/"
+            },
+            "files": [
+                "src/functions.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Christian Lück",
+                "email": "christian@lueck.tv"
+            }
+        ],
+        "description": "Trivial timeout implementation for Promises",
+        "homepage": "https://github.com/react/promise-timer",
+        "keywords": [
+            "async",
+            "event-loop",
+            "promise",
+            "reactphp",
+            "timeout",
+            "timer"
+        ]
+    },
+    {
+        "name": "react/dns",
+        "version": "v0.4.10",
+        "version_normalized": "0.4.10.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/reactphp/dns.git",
+            "reference": "457fbc43c04e9612573a24245d950c091c0fc40e"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/reactphp/dns/zipball/457fbc43c04e9612573a24245d950c091c0fc40e",
+            "reference": "457fbc43c04e9612573a24245d950c091c0fc40e",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "react/cache": "~0.4.0|~0.3.0",
+            "react/event-loop": "^1.0 || ^0.5 || ^0.4 || ^0.3.5",
+            "react/promise": "^2.1 || ^1.2.1",
+            "react/promise-timer": "^1.2",
+            "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5 || ^0.4.4",
+            "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.5"
+        },
+        "require-dev": {
+            "clue/block-react": "^1.2",
+            "phpunit/phpunit": "^5.0 || ^4.8.10"
+        },
+        "time": "2017-08-10T12:31:41+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "React\\Dns\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Async DNS resolver for ReactPHP",
+        "keywords": [
+            "async",
+            "dns",
+            "dns-resolver",
+            "reactphp"
+        ]
+    },
+    {
+        "name": "bugsnag/bugsnag",
+        "version": "v3.6.0",
+        "version_normalized": "3.6.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/bugsnag/bugsnag-php.git",
+            "reference": "b074a15a2659fa32d9032a40f8be55824476997d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/bugsnag/bugsnag-php/zipball/b074a15a2659fa32d9032a40f8be55824476997d",
+            "reference": "b074a15a2659fa32d9032a40f8be55824476997d",
+            "shasum": ""
+        },
+        "require": {
+            "composer/ca-bundle": "^1.0",
+            "guzzlehttp/guzzle": "^5.0|^6.0",
+            "php": ">=5.5"
+        },
+        "require-dev": {
+            "mtdowling/burgomaster": "dev-master#72151eddf5f0cf101502b94bf5031f9c53501a04",
+            "php-mock/php-mock-phpunit": "^1.1",
+            "phpunit/phpunit": "^4.8|^5.0"
+        },
+        "time": "2017-08-10T23:23:03+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.5-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Bugsnag\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "James Smith",
+                "email": "notifiers@bugsnag.com",
+                "homepage": "https://bugsnag.com"
+            }
+        ],
+        "description": "Official Bugsnag notifier for PHP applications.",
+        "homepage": "https://github.com/bugsnag/bugsnag-php",
+        "keywords": [
+            "bugsnag",
+            "errors",
+            "exceptions",
+            "logging",
+            "tracking"
+        ]
+    },
+    {
+        "name": "blackfire/php-sdk",
+        "version": "v1.9.1",
+        "version_normalized": "1.9.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/blackfireio/php-sdk.git",
+            "reference": "1e9bf90676b773812f80b5a68bbdf02057adb116"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/blackfireio/php-sdk/zipball/1e9bf90676b773812f80b5a68bbdf02057adb116",
+            "reference": "1e9bf90676b773812f80b5a68bbdf02057adb116",
+            "shasum": ""
+        },
+        "require": {
+            "composer/ca-bundle": "^1.0",
+            "php": ">=5.2.0"
+        },
+        "suggest": {
+            "ext-blackfire": "The C version of the Blackfire probe",
+            "ext-zlib": "To push config to remote profiling targets"
+        },
+        "time": "2017-08-10T13:21:56+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.5.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "src/autostart.php"
+            ],
+            "psr-4": {
+                "Blackfire\\": "src/Blackfire"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Blackfire.io",
+                "email": "support@blackfire.io"
+            }
+        ],
+        "description": "Blackfire.io PHP SDK",
+        "keywords": [
+            "performance",
+            "profiler",
+            "uprofiler",
+            "xhprof"
         ]
     }
 ]
