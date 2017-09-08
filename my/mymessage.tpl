@@ -64,7 +64,7 @@
             <br>
 
         {% elseif el.type == 'button' %}
-            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}" {%if el.onclick %}onclick="{{ el.onclick }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
+            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}"{%if el.onclick %} onclick="{{ el.onclick }}"{% endif %}{%if el.href %} href="{{ el.href }}"{% endif %}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
 
         {% elseif el.type == 'labelslist' %}
         {% if el.header %}<p class="myfwlabellisthead">{{ el.header|raw }}{% endif %}

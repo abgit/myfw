@@ -41,6 +41,65 @@ class myfilters{
         return $vals;
     }
 
+    public static function usernameinstagram( $value ){
+
+        if( preg_match('/^([a-zA-Z0-9._]+)$/', $value, $matches ) )
+            return $matches[1];
+
+        if( preg_match('/^@([a-zA-Z0-9._]+)$/', $value, $matches ) )
+            return $matches[1];            
+
+        if( preg_match('/^https?:\/\/(www.)?instagram.com\/([a-zA-Z0-9._]+)/i', $value, $matches ) )
+            return $matches[2];
+
+        return false;
+    }
+
+    public static function usernamefacebook( $value ){
+
+        if( preg_match('/^([a-zA-Z0-9._]+)$/', $value, $matches ) )
+            return $matches[1];
+
+        if( preg_match('/^@([a-zA-Z0-9._]+)$/', $value, $matches ) )
+            return $matches[1];            
+
+        if( preg_match('/^https?:\/\/(www.)?facebook.com\/([a-zA-Z0-9._]+)/i', $value, $matches ) )
+            return $matches[2];
+
+        return false;
+    }
+
+    public static function channelyoutube( $value ){
+
+        if( preg_match('/^([a-zA-Z0-9._]+)$/', $value, $matches ) || preg_match('/^@([a-zA-Z0-9._]+)$/', $value, $matches ) ){
+
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$matches[1].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = json_decode($res, true);
+
+            if( isset( $res['items'][0]['id'] ) )
+                return $matches[1];
+
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&forUsername='.$matches[1].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = json_decode($res, true);
+
+            return isset( $res['items'][0]['id'] ) ? $res['items'][0]['id'] : false;
+        }
+
+        if( preg_match('/^(https?:\/\/)?(www.)?youtube.com\/channel\/([a-zA-Z0-9._]+)/i', $value, $matches ) ){
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$matches[3].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = json_decode($res, true);
+            return isset( $res['items'][0]['id'] ) ? $res['items'][0]['id'] : false;
+        }
+
+        if( preg_match('/^(https?:\/\/)?(www.)?youtube.com\/user\/([a-zA-Z0-9._]+)/i', $value, $matches ) ){
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&forUsername='.$matches[3].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = json_decode($res, true);
+            return isset( $res['items'][0]['id'] ) ? $res['items'][0]['id'] : false;
+        }
+
+        return false;
+    }
+
     public static function toround( $value ){
         return rtrim( rtrim( $value, "0"), "." );
     }

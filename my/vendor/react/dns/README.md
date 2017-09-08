@@ -14,6 +14,7 @@ easily be used to create a DNS server.
 * [Caching](#caching)
   * [Custom cache adapter](#custom-cache-adapter)
 * [Advanced usage](#advanced-usage)
+  * [HostsFileExecutor](#hostsfileexecutor)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -38,6 +39,11 @@ $loop->run();
 ```
 
 See also the [first example](examples).
+
+> Note that the factory loads the hosts file from the filesystem once when
+  creating the resolver instance.
+  Ideally, this method should thus be executed only once before the loop starts
+  and not repeatedly while it is running.
 
 Pending DNS queries can be cancelled by cancelling its pending promise like so:
 
@@ -118,6 +124,24 @@ $loop->run();
 
 See also the [fourth example](examples).
 
+### HostsFileExecutor
+
+Note that the above `Executor` class always performs an actual DNS query.
+If you also want to take entries from your hosts file into account, you may
+use this code:
+
+```php
+$hosts = \React\Dns\Config\HostsFile::loadFromPathBlocking();
+
+$executor = new Executor($loop, new Parser(), new BinaryDumper(), null);
+$executor = new HostsFileExecutor($hosts, $executor);
+
+$executor->query(
+    '8.8.8.8:53', 
+    new Query('localhost', Message::TYPE_A, Message::CLASS_IN, time())
+);
+```
+
 ## Install
 
 The recommended way to install this library is [through Composer](http://getcomposer.org).
@@ -126,7 +150,7 @@ The recommended way to install this library is [through Composer](http://getcomp
 This will install the latest supported version:
 
 ```bash
-$ composer require react/dns:^0.4.10
+$ composer require react/dns:^0.4.11
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

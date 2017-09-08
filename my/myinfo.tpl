@@ -37,15 +37,22 @@
 
                                     {% if profile.icons %}
     					    			<div class="icons-group">
-                                            {% for icon in profile.icons if ( icon.depends == false or values[ icon.depends ] )%}
-        				                    	<a class="{{ icon.class|default('tip') }}" title="{{ icon.title }}"{% if icon.hrefkey and values[ icon.hrefkey ] %} href="{{ values[ icon.hrefkey ] }}"{% elseif icon.href %} href="{{ icon.href }}"{% endif %} data-original-title="{{ icon.prefix }}{{ values[ icon.key ]}}{{ icon.sufix }}" target="_blank"><i class="{{ icon.icon }}"></i></a>
+                                            {% for icon in profile.icons %}
+           				                    	<a class="{{ icon.class|default('tip') }}" href="{{ icon.href }}{{ values[ icon.hrefkey ] }}{{ icon.hrefsufix }}" target="_blank"><i class="{{ icon.icon }}"></i></a>
     			                    	    {% endfor %}
                                         </div>
                                     {% endif %}
 
 						    		{% if profile.string.key %}<h6>{{ values[ profile.string.key ] }}</h6>{% endif %}
+
 						    	</div>
 					    	</div>
+                            
+                                    {% if profile.menu %}
+                                        {{ profile.menu.obj|raw }}
+                                    {% endif %}
+
+                            
     </div>
     <div class="col-lg-{{ 12 - meta.size|default( 4 ) }}">
 {% else %}
@@ -84,7 +91,8 @@
         {% endif %}
 
     {% elseif el.type == 'custom' %}
-        {% if el.title %}<h6>{{ el.title }}</h6>{% endif %}{{el.obj|raw}}
+        {% if el.title %}<hr><h6>{{ el.title }}{% if el.description %}<small class="display-block" style="line-height:1.2">{{el.description|nl2br}}</small>{% endif %}</h6>{% endif %}
+        {{el.obj|raw}}
 
     {% elseif el.type == 'sl' %}
         <hr>

@@ -11,7 +11,7 @@
                         
 
 
-<ul class="statistics">
+<ul class="statistics" style="text-align:{{ align|default( 'center' ) }}">
 {% for stat in elements %}
 
                     {% set value = values[ stat.key ] %}

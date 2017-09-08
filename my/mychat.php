@@ -74,8 +74,6 @@
             if( !is_array( $this->message ) )
                 $this->message = array();
             $this->message[ 'labels' ][]  = array( 'label' => $label, 'labeldepends' => $depends );
-//            $this->message[ 'label' ]        = $label;
-//            $this->message[ 'labeldepends' ] = $depends;
             return $this;
         }
 
@@ -159,9 +157,9 @@
 
         public function addAjax( $values ){
             $this->init   = false;
-            $this->values = $values;
+            $this->values = is_array( $values ) ? $values : json_decode( $values, true );
             $this->app->ajax()->append( '#' . $this->id . 'msgs', $this->__toString() )
-                              ->scrollBottom( '#' . $this->id . 'box' )
+//                              ->scrollBottom( '#' . $this->id . 'box' )
                               ->val( '#' . $this->id . 'msg', '' );
             $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $values ) ? 0 : $this->values[count($values) - 1][ 'id' ] );
         }
@@ -182,24 +180,25 @@
         }
 
         public function & pusherSubscribe(){
-//            $this->app->ajax()->pusherSubscribe( $this->app->pusher()->getPKey(), $channel, $event, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box', $this->selfid );
-            $this->app->pusher()->ajaxSubscribe( $this->pchannel, $this->pevent/*, '#' . $this->id . 'msgs', true, $this->app->pusher()->getPCluster(), '#' . $this->id . 'box', $this->selfid*/, $this->selfid, 'reversed' );
-
-//            $this->channel = $channel;
+            $this->app->pusher()->ajaxSubscribe( $this->pchannel, $this->pevent, $this->selfid, 'reversed' );
             return $this;
         }
         
         public function & pusherAdd( $values ){
             $this->init   = false;
-            $this->values = $values;
+            $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
             $this->app->pusher()->chatAdd( '#' . $this->id . 'msgs', $this->__toString(), '#' . $this->id . 'box' )->send( $this->pchannel, $this->pevent );
-//            $this->app->pusher()->trigger( $channel, $event, $this->app->ajax()->filter( $this->__toString() ) );
             return $this;
         }
 
         public function & ajaxClearTextarea(){
             $this->app->ajax()->val( '#' . $this->id . 'msg', '' );
+            return $this;
+        }
+
+        public function & load( $loadurl ){
+            $this->app->ajax()->callAction( $loadurl );
             return $this;
         }
 

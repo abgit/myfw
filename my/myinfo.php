@@ -50,8 +50,8 @@ class myinfo{
         return $this;
     }
 
-    public function & addCustom( $name, $obj, $title = '' ){
-        $this->elements[ $name ] = array( 'obj' => $obj, 'title' => $title, 'type' => 'custom' );
+    public function & addCustom( $name, $obj, $title = '', $description = '' ){
+        $this->elements[ $name ] = array( 'obj' => $obj, 'title' => $title, 'type' => 'custom', 'description' => $description );
         return $this;
     }
 
@@ -89,14 +89,19 @@ class myinfo{
         $this->profile[ 'string' ] = array( 'key' => $key );
         return $this;
     }
+
+    public function & setProfileMenu( $obj ){
+        $this->profile[ 'menu' ] = array( 'obj' => $obj );
+        return $this;
+    }
     
     public function & setProfileDescriptionImage( $key, $cdn, $sufix, $width, $height ){
         $this->profile[ 'descimg' ] = array( 'key' => $key, 'cdn' => $cdn, 'sufix' => $sufix, 'width' => $width, 'height' => $height );
         return $this;
     }
 
-    public function & addProfileIcon( $icon, $href, $key, $prefix, $sufix, $hrefkey = false, $depends = false ){
-        $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'key' => $key, 'prefix' => $prefix, 'sufix' => $sufix, 'hrefkey' => $hrefkey, 'depends' => $depends );
+    public function & addProfileIcon( $icon, $href, $hrefkey = false, $hrefsufix = false ){
+        $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'hrefkey' => $hrefkey, 'hrefsufix' => $hrefsufix );
         return $this;
     }
 

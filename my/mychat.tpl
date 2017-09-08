@@ -1,7 +1,7 @@
 
     {% if init %}
 
-                <div class="chat" id="{{windowid}}">
+                <div class="chat" id="{{windowid}}" >
                     <div id="{{id}}msgs">
 
     {% endif %}
@@ -53,11 +53,12 @@
                                         <img src="{{ cdn }}{{ msg[ message.imgkey ] }}" class="img-responsive" width="{{ msg[ message.imgwidth ] }}" height="{{ msg[ message.imgheight ] }}" />
 
                                     {% elseif msg[ message.moviekeythumb ] %}
-                                        <video poster="{{ cdn }}{{ msg[ message.moviekeythumb ] }}" width="{{ msg[ message.moviekeywidth ] }}" height="{{ msg[ message.moviekeyheight ] }}" controls>
+                                        <video poster="{{ cdn }}{{ msg[ message.moviekeythumb ] }}" width="{{ msg[ message.moviekeywidth ] }}" height="{{ msg[ message.moviekeyheight ] }}" controls style="display:block; vertical-align:auto">
                                           {% if message.moviekeymp4 %}<source src="{{ cdn }}{{ msg[ message.moviekeymp4 ] }}" type="video/mp4">{% endif %}
                                           {% if message.moviekeywebm %}<source src="{{ cdn }}{{ msg[ message.moviekeywebm ] }}" type="video/webm">{% endif %}
                                           Your browser does not support the video tag.
                                         </video>
+
                                     {% endif %}
                                     
                                     {% if keyowner or keydate %}

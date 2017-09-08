@@ -33,14 +33,14 @@
 	{% endif %}
 
 	{% if ismodal %}
-            <div id="{{ modal.id }}" class="modal" tabindex="-1" role="dialog"{{ modal.static ? ' data-keyboard="false" data-backdrop="static"'}}>
-				<div class="modal-dialog{{ modal.class ? ' ' ~ modal.class }}"{% if modal.width %} style="max-width:{{modal.width}}px"{% endif %}>
+            <div id="{{ modal.id }}" class="{{ isajax ? 'modal' }}" tabindex="-1" role="dialog"{{ modal.static ? ' data-keyboard="false" data-backdrop="static"'}}>
+				<div class="modal-dialog{{ modal.class ? ' ' ~ modal.class }}" style="{% if isajax %}{% if modal.width %}max-width:{{modal.width}}px{% endif %}{% else %}max-width:100%;width:{{modal.width|default( 1120 )}}px;margin:0px{% endif %}">
 					<div class="modal-content">
-						<div class="modal-header" style="background-color:#3B5998">
-							{% if modal.closebutton %}<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>{% endif %}
+						<div class="modal-header {{ isajax ? 'modal-header-ajax' : 'modal-header-page' }}">
+							{% if modal.closebutton and isajax %}<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>{% endif %}
 							<h4 class="modal-title">{% if modal.icon %}<i class="{{ modal.icon }}"></i>{% endif %}&nbsp;{{ modal.title }}</h4>
 						</div>
-    					<div class="modal-body with-padding" style="padding:20px 21px 0px 21px">
+    					<div class="modal-body with-padding">
 	{% endif %}
 
 
@@ -368,7 +368,7 @@
             {% if el.width is not empty %}
                 <div class="row">
                     <div class="col-xs-7" style="min-height:{{ el.height }}px">
-                        <img onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <img onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px;cursor:pointer" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                     </div>
                     <div class="col-xs-5" style="padding:0px;">
@@ -380,7 +380,7 @@
                     <div class="col-xs-12">
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                         <button onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);$('#filestacks{{ name ~ el.name }}').text(myfwt(Blobs[0].filename,25)).addClass('label-success');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
-                        <span id="filestacks{{ name ~ el.name }}" class="label {%if el.value %}label-success{%endif%}" style="margin-top:4px;display:block">{% if el.value %}{{ el.value|t( 20, '...', false ) }}{% else %}&nbsp;{% endif %}</span>
+                        <span id="filestacks{{ name ~ el.name }}" class="label {%if el.value %}label-success{%endif%}" style="margin-top:4px;display:block;cursor:pointer">{% if el.value %}{{ el.value|t( 20, '...', false ) }}{% else %}&nbsp;{% endif %}</span>
                     </div>
                 </div>
             {% endif %}

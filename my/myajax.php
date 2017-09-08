@@ -293,8 +293,12 @@ class myajax{
         return $this;
     }
 
+    public function obj(){
+        return json_encode( $this->out );
+    }
+
     public function render(){
-        print json_encode( $this->out );
+        print $this->obj();
     }
 
 }

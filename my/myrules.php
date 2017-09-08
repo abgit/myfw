@@ -94,6 +94,29 @@ class myrules{
         return ( intval( $value ) <= intval( $opts ) );
     }
 
+    public static function instagramBio( $value, $bio ){
+        $username = myfilters::usernameinstagram( $value );
+
+        if( !$username )
+            return false;
+
+        $json = file_get_contents( 'https://www.instagram.com/' . $username . '/?__a=1' );
+        $json = json_decode( $json, true );
+        return ( isset( $json[ 'user' ][ 'biography' ] ) && strpos( strtoupper( $json[ 'user' ][ 'biography' ] ), strtoupper( $bio ) ) !== false );
+    }
+
+    public static function youtubeBio( $channel_id, $bio ){
+
+        $channel_id = myfilters::channelyoutube( $channel_id );
+
+        if( !$channel_id )
+            return false;
+
+        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$channel_id.'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+        $res = json_decode($res, true);
+        return ( isset( $res['items'][0]['snippet']['description'] ) && strpos( strtoupper( $res['items'][0]['snippet']['description'] ), strtoupper( $bio ) ) !== false );
+    }
+
     public static function maxdecimal( $value, $opts, $formelement = null ) {
         $x = explode( '.', strval( $value ) );
         return ( is_array( $x ) && ( ( count( $x ) === 1 && isset( $x[0] ) && is_numeric( $x[0] ) ) || ( count( $x ) === 2 && isset( $x[0] ) && is_numeric( $x[0] ) && isset( $x[1] ) && is_numeric( $x[1] ) && strlen( $x[1] ) <= intval( $opts ) ) ) );

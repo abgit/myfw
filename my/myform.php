@@ -89,8 +89,8 @@ class myform{
         return $this->formname;
     }
 
-    public function & setModal( $title = '', $class = 'modal-lg', $icon = '', $static = true, $width = '', $closebutton = true ){
-        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width, 'closebutton' => $closebutton );
+    public function & setModal( $title = '', $class = 'modal-lg', $icon = '', $static = true, $width = '', $closebutton = true, $pagewidth = 1210 ){
+        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width, 'closebutton' => $closebutton, 'pagewidth' => $pagewidth );
         return $this;
     }
 
@@ -240,19 +240,7 @@ class myform{
         $this->elements[ 'smm' . $this->counter++ ] = array( 'type' => 'staticmessage', 'message' => $message, 'title' => $title, 'icon' => $icon, 'date' => $date, 'rules' => array(), 'filters' => array() );
         return $this;
     }    
-/*
-    public function & addGrid( $obj ){
-        $name = is_string( $obj ) ? $obj : ( 'gri' . $this->counter++ );
-        $this->elements[ $name ] = array( 'type' => 'grid', 'obj' => $obj );
-        return $this;
-    }    
 
-    public function & setGrid( $name, $obj ){
-        if( isset( $this->elements[ $name ] ) )
-            $this->elements[ $name ] = $obj;
-        return $this;
-    }
-*/
     public function & addCustom( $name, $obj ){
         $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
         return $this;

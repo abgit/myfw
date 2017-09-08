@@ -6,6 +6,7 @@ class mystats{
     private $values = array();
     private $items;
     private $hidebutton = false;
+    private $align;
 
     public function __construct( $name ){
         $this->name = $name;
@@ -85,6 +86,11 @@ class mystats{
         return $this;
     }
 
+    public function & setAlign( $align ){
+        $this->align = $align;
+        return $this;
+    }
+
     public function &updateAjaxValues( $values, $pusherChannel = false ){
 
         if( !is_array( $values ) )
@@ -125,13 +131,6 @@ class mystats{
         return $this;
     }
 
-/*
-    public function & changeValues( $values, $mode ){
-        $mode == 1 ? $this->setValues( $values ) : $this->updateAjaxValues( $values );
-        return $this;
-    }
-*/
-
     public function __toString(){
         return $this->render();
     }
@@ -140,7 +139,8 @@ class mystats{
         return $this->app->render( '@my/mystats', array( 'values'     => is_null( $values ) ? $this->values : $values,
                                                          'name'       => $this->name,
                                                          'elements'   => $this->elements,
-                                                         'hidebutton' => $this->hidebutton
+                                                         'hidebutton' => $this->hidebutton,
+                                                         'align'      => $this->align
                                                          ), null, null, null, false, false );
 
     }

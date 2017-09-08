@@ -75,6 +75,7 @@
         private $calendar    = null;
         private $menu        = null;
         private $pusher      = null;
+        private $breadcrumb  = null;
         private $memcached   = null;
         private $intercom    = null;
 
@@ -323,6 +324,12 @@
 			if( ! isset( $this->pusher ) )
 				$this->pusher = new mypusher();
 			return $this->pusher;
+		}
+
+		public function breadcrumb(){
+			if( ! isset( $this->breadcrumb ) )
+				$this->breadcrumb = new mybreadcrumb();
+			return $this->breadcrumb;
 		}
 
 		public function blockcypher(){
