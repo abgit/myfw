@@ -110,7 +110,7 @@ class mygrid{
             return call_user_func_array( $this->actions[ $name ], $arguments );
         }
     }
-    
+
     public function & addToolbarButton( $label, $icon, $onclick, $class = 'info' ){
         $this->buttons[] = array( 'label' => $label, 'icon' => $icon, 'onclick' => $onclick, 'class' => $class );
         return $this;
@@ -148,11 +148,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addThumb( $key, $kval, $label = '', $onclick = '', $default = '' ){
+    public function & addThumb( $key, $kval, $label = '', $urlobj = '', $default = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'thumb', 'onclick' => $onclick, 'default' => $default );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'thumb', 'urlobj' => $urlobj, 'default' => $default );
         return $this;
     }
 
@@ -172,11 +172,11 @@ class mygrid{
         return $this;
     }
 
-    public function & addUrl( $key, $kval, $label, $onclick = false, $bold = false, $align = 'left', $truncate = '' ){
+    public function & addUrl( $key, $kval, $label, $urlobj = false, $bold = false, $align = 'left', $truncate = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'url', 'onclick' => $onclick, 'bold' => $bold, 'truncate' => $truncate );
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'url', 'urlobj' => $urlobj, 'bold' => $bold, 'truncate' => $truncate );
         return $this;
     }
 

@@ -57,14 +57,23 @@ class myfilters{
 
     public static function usernamefacebook( $value ){
 
+        $username = '';
+
         if( preg_match('/^([a-zA-Z0-9._]+)$/', $value, $matches ) )
-            return $matches[1];
+            $username = $matches[1];
 
         if( preg_match('/^@([a-zA-Z0-9._]+)$/', $value, $matches ) )
-            return $matches[1];            
+            $username = $matches[1];            
 
         if( preg_match('/^https?:\/\/(www.)?facebook.com\/([a-zA-Z0-9._]+)/i', $value, $matches ) )
-            return $matches[2];
+            $username = $matches[2];
+
+        if( !empty( $username ) ){
+            $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '?fields=id&access_token=' . \Slim\Slim::getInstance()->config( 'facebook.key' ) );
+            $json = json_decode($json, true);
+            
+            return isset( $json[ 'id' ] ) ? $json[ 'id' ] : false;
+        }
 
         return false;
     }
@@ -214,6 +223,55 @@ class myfilters{
         return str_replace( isset( $tags[1] ) ? $tags[1] : array(), array_map( function($n) use ( $valuearray ){ return isset( $valuearray[ $n ] ) ? $valuearray[ $n ] : ''; }, isset( $tags[0] ) ? $tags[0] : array() ), $val );
     }
 
+    public static function urlobj( $val, $valuearray = array(), $tags = array() ){
+        if( is_array( $val ) && isset( $val[ 'obj' ] ) ){
+            switch( $val[ 'obj' ] ){
+                case 'url':
+                case 'urlsubmit':
+                case 'urlajax':   return myfilters::_urlobj( $val, $valuearray, $tags );
+                case 'urls':      return myfilters::_urlobjmultiple( $val, $valuearray );
+            }
+        }
+
+    }
+
+    public static function _urlobj( $val, $valuearray = array(), $tags = array() ){
+        if( is_array( $val ) && isset( $val[ 'obj' ] ) ){
+
+            if( isset( $val[ 'url' ] ) ){
+                $url = ( !empty( $valuearray ) && !empty( $tags ) ) ? myfilters::replaceurl( $val[ 'url' ], $valuearray, $tags ) : $val[ 'url' ];
+            }else{
+                $url = null;
+            }
+
+            switch( $val[ 'obj' ] ){
+                case 'urlajax':   return "onclick=\"myfwsubmit('" . $url . ( is_string( $val[ 'msg' ] ) ? "','" . $val[ 'msg' ] : '' ) . "')\"";
+                case 'urlsubmit': return "onclick=\"myfwformsubmit('" . $val[ 'formname' ] . "','','','" . $val[ 'submitbutton' ] . "','" . $val[ 'msg' ] . "','" . $val[ 'action' ] . "'," . $val[ 'delay' ] . ")\"";
+                case 'url':       return 'href="' . $url . '"' . ( ( isset( $val[ 'target' ] ) && !empty( $val[ 'target' ] ) ) ? ' target="' . $val[ 'target' ] . '"' : '' );
+            }
+        }
+    }
+
+    public static function _urlobjmultiple( $url, $values ){
+
+        if( is_array( $url ) ){
+            $keys               = $url[ 'keys' ];
+            $urlmultiplekey     = $url[ 'code' ];
+            $urlmultipledefault = $url[ 'default' ];
+            $url                = $url[ 'urls' ];
+
+            if( isset( $values[ $urlmultiplekey ] ) ){
+                foreach( $url as $i => $urlobj ){
+                    if( strval( $i ) === strval( $values[ $urlmultiplekey ] ) ){
+                        return myfilters::_urlobj( $urlobj, $values, $keys );
+                    }
+                }
+            }
+
+            return is_string( $urlmultipledefault ) ? myfilters::_urlobj( $urlmultipledefault, $values, $keys ) : '';
+        }
+    }
+
     public static function cdn( $html ){
         $app  = \Slim\Slim::getInstance();
         return preg_replace( '~(href|src|url|content)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $app->config( 'filter.cdn.ext' ). ')(["\'])~i', '$1$2"' . $app->config( 'filter.cdn.domain' ) . '$5$6"', $html  );
@@ -333,35 +391,6 @@ class myfilters{
     }
 
 
-    public static function link( $url, $values, $keys = array() ){
-
-        if( is_array( $url ) ){
-            $keys               = $url[ 'keys' ];
-            $urlmultiplekey     = $url[ 'code' ];
-            $urlmultipledefault = $url[ 'default' ];
-            $url                = $url[ 'urls' ];
-
-            if( isset( $values[ $urlmultiplekey ] ) ){
-                foreach( $url as $i => $string ){
-                    if( strval( $i ) === strval( $values[ $urlmultiplekey ] ) ){
-                        $url = $string;
-                        break;
-                    }
-                }
-            }
-
-            if( is_array( $url ) )
-                $url = is_string( $urlmultipledefault ) ? $urlmultipledefault : '';
-        }
-
-        foreach( $keys as $label => $k ){
-            if( isset( $values[ $k ] ) ){
-                $url = str_replace( $label, $values[ $k ], $url );
-            }
-        }
-        return $url;
-    }
-
     public static function inarray( $string, $array, $default = 'unknown' ){
 
         $string = strval( $string );
@@ -479,7 +508,7 @@ class myfilters{
     }
 
     public static function markdown( $data ){
-        $parser = new mymarkdown();
+        $parser = new \Michelf\MarkdownExtra();
         $parser->no_markup = true;
         $parser->no_entities = true;
         return $parser->transform($data);

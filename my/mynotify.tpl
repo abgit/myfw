@@ -32,7 +32,7 @@
                 {% for val in values %}
                 <li class="{{ ( unreadkey and val[ unreadkey ] ) ? 'unread' }}">
                 
-                    <a {% if itemaction.onclick or itemaction.onclickdefault %}onclick="{{ itemaction.onclick|link( val ) }}"{% endif %}>
+                    <a {% if itemaction.urlobj %} {{ itemaction.urlobj|urlobj( val ) }} {% endif %}>
                         {% if itemthumb.key and val[ itemthumb.key ] %}
                             <img class="user-face notifthumb{{ val[ itemthumb.classkey ] }}" alt="" src="{{ val[ itemthumb.key ] }}">
                         {% endif %}

@@ -1,8 +1,5 @@
 <?php
 
-    use Aptoma\Twig\Extension\MarkdownExtension;
-    use Aptoma\Twig\Extension\MarkdownEngine;
-
     define( "APP_WEBMODE", isset( $_SERVER['HTTP_HOST'] ) );
 
     // slim warnings on cron
@@ -126,7 +123,7 @@
 
             $this->post( '/myfwtip/:tip', 'islogged', function( $tip ){
                 if( class_exists( 'Memcached' ) && isset( $this->client[ 'uuid' ] ) && $this->memcached()->get( $tip . md5( $this->client[ 'uuid' ] ) ) === 0 )
-                    $this->memcached()->set( $tip . md5( $this->client[ 'uuid' ] ), 1 );
+                    $this->memcached()->set( $tip . md5( $this->client[ 'uuid' ] ), 1, time() + 172800 );
             })->name( 'myfwtip' )->conditions( array( 'tip' => 'tip[a-zA-Z0-9]{1,20}' ) );
 
             $this->post( '/myfw/filestack/:fsid', 'islogged', function( $fsid ){
@@ -150,7 +147,7 @@
                 if( isset( $this->container['settings'][$name] ) ){
 
                     if( !is_string( $this->container['settings'][$name] ) )
-                        return $this->container['settings'][$name];
+                        return is_callable( $this->container['settings'][$name] ) ? $this->container['settings'][$name]() : $this->container['settings'][$name];
 
                     preg_match("/([^$!@#][a-zA-Z0-9]+[-]{1})([$!@#][a-zA-Z0-9_]+.*)/", $this->container['settings'][$name], $vars );
                     if( is_array( $vars ) && !empty( $vars ) ){
@@ -595,6 +592,9 @@
 
                 $env->addFilter( new Twig_SimpleFilter( 'cdn', array( 'myfilters', 'cdn' )
                 , array( 'is_safe' => array( 'html' ) ) ) );
+
+                $env->addFilter( new Twig_SimpleFilter( 'urlobj', array( 'myfilters', 'urlobj' )
+                , array( 'is_safe' => array( 'html' ) ) ) );
                 
                 $env->addFilter( new Twig_SimpleFilter( '*',
                     function( $f  ){
@@ -617,10 +617,7 @@
                 }));
 
                 $env->addExtension( new Twig_Extension_StringLoader() );
-
-                $engine = new MarkdownEngine\MichelfMarkdownEngine();
-
-                $env->addExtension(new MarkdownExtension($engine));
+                $env->addExtension( new Aptoma\Twig\Extension\MarkdownExtension( new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine() ) );
 
                 if( $this->config( 'templates.cachepath' ) )
                     $env->setCache( $this->config( 'templates.cachepath' ) );
@@ -659,12 +656,39 @@
             return "myfwsubmit('" . $this->urlFor( $action, $options ) . "'" . ( is_string( $msg ) ? ( ",'" . $msg . "'" ) : '' ) . ")";
         }
 
-        public function urlForAjaxActions( $urls, $code, $keys, $default ){
-            return array( 'type' => 'ajaxactions', 'urls' => $urls, 'code' => $code, 'keys' => $keys, 'default' => $default );
+        public function urlForAjaxObj( $action, $options = array(), $msg = false ){
+            return array( 'obj' => 'urlajax',
+                          'url' => $this->urlFor( $action, $options ),
+                          'msg' => $msg );
+        }
+
+        public function urlForObj( $action, $options = array(), $target = '' ){
+            return array( 'obj'    => 'url',
+                          'url'    => $this->urlFor( $action, $options ),
+                          'target' => $target );
+        }
+
+        public function urlObj( $url, $target = '' ){
+            return array( 'obj'    => 'url',
+                          'url'    => $url,
+                          'target' => $target );
+        }
+
+        public function urlForMultiple( $urls, $code, $keys, $default ){
+            return array( 'obj'     => 'urls',
+                          'urls'    => $urls,
+                          'code'    => $code,
+                          'keys'    => $keys,
+                          'default' => $default );
         }
 
         public function urlForAjaxForm( $formname, $action, $submitbutton = '', $msg = 'Loading ...', $delay = 0 ){
-            return "myfwformsubmit('" . $formname . "','','','" . $formname . $submitbutton . "','" . $msg . "','" . $action . "'," . intval( $delay ) .  ")";
+            return array( 'obj'          => 'urlsubmit',
+                          'formname'     => $formname,
+                          'submitbutton' => $formname . $submitbutton,
+                          'msg'          => $msg,
+                          'action'       => $action,
+                          'delay'        => intval( $delay ) );
         }
 
         public function urlForWindow( $action, $options = array() ){
@@ -694,13 +718,13 @@
 		public function cron( $match, $callback = '' ){
 			global $argv;
 
-            if( ! is_array( $argv ) )
+            if( !is_array( $argv ) )
                 return false;
 
-			if( is_string( $match ) && isset( $argv[1] ) && is_string( $argv[1] ) && $argv[1] === $match && is_callable( $callback ) )
+			if( is_string( $match ) && !empty( $callback ) && isset( $argv[1] ) && is_string( $argv[1] ) && $argv[1] === $match && is_callable( $callback ) )
                 return call_user_func( $callback );
 
-            if( is_callable( $match ) )
+            if( !is_string( $match ) && empty( $callback ) && is_callable( $match ) )
                 return call_user_func( $match );
 		}
 

@@ -74,6 +74,11 @@ class myajax{
         return $this;
     }
 
+    public function & clipboard(){
+        $this->out[ 'cb' ] = true;
+        return $this;
+    }
+
     public function & ziggeo( $hidden, $div ){
         $this->out[ 'zi' ][] = array( 'h' => $hidden, 'd' => $div );
         return $this;

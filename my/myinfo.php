@@ -3,12 +3,14 @@
 class myinfo{
     
     private $name;
-    private $values = array();
+    private $values   = array();
     private $elements = array();
     private $counter  = 0;
     private $emptymsg = 'No information to display';
-    private $profile = false;
-    private $meta = array();
+    private $profile  = false;
+    private $meta     = array();
+    private $keys     = array();
+    private $keyshtml = array();
 
     public function __construct( $name ){
         $this->name = $name;
@@ -65,8 +67,8 @@ class myinfo{
         return $this;
     }
 
-    public function & setProfileThumb( $key, $size = 150, $default = '', $cdn = '', $onclick = '' ){
-        $this->profile[ 'thumb' ] = array( 'key' => $key, 'size' => $size, 'default' => $default, 'cdn' => $cdn, 'onclick' => $onclick );
+    public function & setProfileThumb( $key, $size = 150, $default = '', $cdn = '', $href = '', $onclick = '' ){
+        $this->profile[ 'thumb' ] = array( 'key' => $key, 'size' => $size, 'default' => $default, 'cdn' => $cdn, 'href' => $href, 'onclick' => $onclick );
         return $this;
     }
 
@@ -102,6 +104,12 @@ class myinfo{
 
     public function & addProfileIcon( $icon, $href, $hrefkey = false, $hrefsufix = false ){
         $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'hrefkey' => $hrefkey, 'hrefsufix' => $hrefsufix );
+        return $this;
+    }
+
+    public function & setKey( $key, $keyhtml ){
+        $this->keys[]     = $key;
+        $this->keyshtml[] = $keyhtml;
         return $this;
     }
 
@@ -146,7 +154,8 @@ class myinfo{
                                                         'values'   => $this->values,
                                                         'emptymsg' => $this->emptymsg,
                                                         'profile'  => $this->profile,
-                                                        'meta'     => $this->meta
+                                                        'meta'     => $this->meta,
+                                                        'tags'     => array( $this->keys, $this->keyshtml )
                                                          ), null, null, null, false, false );
     }
     

@@ -14,7 +14,7 @@
         </div>
     </div>
     {% endif %}
-    
+
     {{ menuhtml|raw }}
 
     <div style="overflow-y:visible">
@@ -90,13 +90,13 @@
 
                                                         {% elseif td.type == 'thumb' %}
 
-                                                            {% if td.onclick %}
-                				                            	<a onclick="{{ td.onclick|link( val, { (keyhtml) : key }) }}">
+                                                            {% if td.urlobj %}
+                				                            	<a {{ td.urlobj|urlobj( val, tags ) }}>
                                                             {% endif %}
 
                                                             <img src="{{ value|default( td.default ) }}" alt="" class="user-face">
 
-                                                            {% if td.onclick %}
+                                                            {% if td.urlobj %}
                 				                            	</a>
                                                             {% endif %}
 
@@ -108,7 +108,7 @@
                                                             <span {% if class %}class="label label-mini label-{{ class }}"{% endif %}>{{ td.replaceval ? value|replaceonly( td.replaceval ) : value|t(20) }}{{ td.sufix|label( value ) }}</span>
 
                                                         {% elseif td.type == 'url' %}
-            				                            	<a class="grid-url"{%if td.onclick %} onclick="{{ td.onclick|link( val, { (keyhtml) : key } ) }}"{% endif %} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 60 ) ) }}</a>
+            				                            	<a class="grid-url" {{ td.urlobj|urlobj( val, tags ) }} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 40 ) ) }}</a>
 
                                                         {% elseif td.type == 'br' %}
                                                             <br />
@@ -152,7 +152,7 @@
                                                             {% if not td.depends or ( td.depends and val[ td.depends ] ) %}
     					                                    <div class="btn-group">
                                                                 {% for option in td.buttons if ( option.showdepends is not defined or val[ option.showdepends ] ) %}
-                                                                <a type="button" class="btn btn-primary btn-xs" {% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{{ option.label }}</a>
+                                                                <a type="button" class="btn btn-{{ option.class|default( 'primary' ) }} btn-xs" {% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{{ option.label }}</a>
     		                                                    {% endfor %}    						                                    
 
                                                                 {% if td.options is not empty %}
@@ -160,7 +160,7 @@
         													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
                                                                     {% for option in td.options %}
                                                                         {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
-                														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a{% if option.href and not optiondisabled %} href="{{ option.href|replaceurl( val, tags ) }}" target="_blank"{% endif %}{% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
+                														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a {{ not optiondisabled ? option.urlobj|urlobj( val, tags ) }}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
         		                                                    {% endfor %}
                     		    									</ul>
                                                                 {% endif %}                                                                

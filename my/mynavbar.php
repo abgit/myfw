@@ -34,18 +34,40 @@ class mynavbar{
         return $this;
     }
 
-    public function & addItem( $text, $onclick = '', $href = '', $class = '', $style = '' ){
-        $this->elements[] = array( 'type' => 'item', 'text' => $text, 'onclick' => $onclick, 'href' => $href, 'class' => $class, 'style' => $style );
+    public function & addItem( $id, $text, $urlobj = '', $class = '', $style = '' ){
+        $this->elements[ $id ] = array( 'type' => 'item', 'id' => $id, 'text' => $text, 'urlobj' => $urlobj, 'class' => $class, 'style' => $style );
         return $this;
     }
 
-    public function & addCustom( $obj ){
-        $this->elements[] = array( 'type' => 'custom', 'obj' => $obj );
+    public function & addCustom( $id, $obj ){
+        $this->elements[ $id ] = array( 'type' => 'custom', 'id' => $id, 'obj' => $obj );
         return $this;
     }
 
-    public function & addMenu( $label, $options, $thumb = '', $htmlid = '', $thumbid = '' ){
-        $this->elements[] = array( 'type' => 'menu', 'label' => $label, 'options' => $options, 'thumb' => $thumb, 'htmlid' => $htmlid, 'thumbid' => $thumbid );
+    public function & addMenu( $id, $label, $options, $thumb = '', $htmlid = '', $thumbid = '' ){
+        $this->elements[ $id ] = array( 'type' => 'menu', 'id' => $id, 'label' => $label, 'options' => $options, 'thumb' => $thumb, 'htmlid' => $htmlid, 'thumbid' => $thumbid );
+        return $this;
+    }
+
+    public function & setActive( $id ){
+
+        if( isset( $this->elements[ $id ] ) ){
+            $this->elements[ $id ][ 'active' ] = true;
+            return $this;
+        }
+
+        foreach( $this->elements as $elid => $el ){
+            if( isset( $el[ 'options' ] ) ){
+                foreach( $el[ 'options' ] as $k => $opt ){
+                    if( isset( $opt[ 'id' ] ) && $opt[ 'id' ] == $id ){
+                        $this->elements[ $elid ][ 'active' ] = true;
+                        $this->elements[ $elid ][ 'options' ][ $k ][ 'active' ] = true;
+                        return $this;
+                    }
+                }
+            }
+        }
+
         return $this;
     }
 

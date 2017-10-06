@@ -7,13 +7,13 @@
 							<div class="thumbnail">
                                 {% if values[ profile.thumb.key ] or profile.thumb.default %}
 						    	    <div class="thumb">
-                                        {% if profile.thumb.onclick %}
-                                            <a onClick="{{ profile.thumb.onclick }}">
+                                        {% if profile.thumb.onclick or profile.thumb.href %}
+                                            <a{% if profile.thumb.onclick %} onclick="{{ profile.thumb.onclick|replaceurl( values, tags ) }}"{% endif %}{% if profile.thumb.href %} href="{{ profile.thumb.href|replaceurl( values, tags ) }}"{% endif %}>
                                         {% endif %}
                                     
     									<img width="{{ profile.thumb.size }}" height="{{ profile.thumb.size }}" src="{{ profile.thumb.cdn }}{{ values[ profile.thumb.key ]|default( profile.thumb.default ) }}">
 
-                                        {% if profile.thumb.onclick %}
+                                        {% if profile.thumb.onclick or profile.thumb.href %}
                                         </a>
                                         {% endif %}
 

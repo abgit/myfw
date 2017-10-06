@@ -23,15 +23,15 @@
                 {% for el in elements %}
                     
                     {% if el.type == 'item' %}
-        				<li class="{{ el.class }}" style="vertical-align:top;{{ el.style }}">
-	        				<a{% if el.href %} href="{{ el.href }}"{% elseif el.onclick %} onclick="{{ el.onclick }}"{% endif %}>{{ el.text|t(50) }}</a>
+        				<li class="{{ el.class }}{{ el.active ? ' navbaractive' }}" style="vertical-align:top;{{ el.style }}" id="navbar{{ el.id }}">
+	        				<a {{ el.urlobj|urlobj }}>{{ el.text|t(50) }}</a>
 		        		</li>
 
                     {% elseif el.type == 'custom' %}
                         {{ el.obj|raw }}                    
 
                     {% elseif el.type == 'menu' %}
-    				<li class="user dropdown">
+    				<li class="user dropdown{{ el.active ? ' navbaractive' }}" id="navbar{{ el.id }}">
 	    				<a class="dropdown-toggle" data-toggle="dropdown">
 		    				<span id="{{ el.htmlid }}">{{ el.label }}</span>
 			    			<i class="caret"></i>
@@ -41,7 +41,7 @@
 				    	</a>
     					<ul class="dropdown-menu dropdown-menu-right icons-right">
                             {% for opt in el.options %}
-	    					    <li><a {% if opt.onclick %}onClick="{{ opt.onclick }}"{% endif %}{% if opt.href %}href="{{ opt.href }}"{% endif %}><i class="{{ opt.icon }}"></i> {{ opt.label }}</a></li>
+	    					    <li id="navbari{{ opt.id }}" class="{{ opt.active ? 'active' }}"><a {% if opt.onclick %}onClick="{{ opt.onclick }}"{% endif %}{% if opt.href %}href="{{ opt.href }}"{% endif %}><i class="{{ opt.icon }}"></i> {{ opt.label }}</a></li>
 			    		    {% endfor %}
                         </ul>
 				    </li>

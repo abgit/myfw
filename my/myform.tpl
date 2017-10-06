@@ -285,6 +285,11 @@
                 {% set value = el.replacelist ? el.value|replaceonly( el.replacelist ) : el.value %}
 
                 {% if el.showvalue|default( true ) %}<p class="form-control-static" id="{{name ~ el.name}}">{{ value ? el.prefix|raw }}{{ value|default( 'unknown' )|nl2br }}{{ value ? el.sufix|raw }}</p>{% endif %}
+
+                {% if el.clipboard %}
+                <button class="btn btn-default clipb" data-clipboard-text="{{ el.value|replace({"\n":' ', "\r":' '}) }}">Copy to clipboard</button>
+                {% endif %}
+
                 {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'button' %}
@@ -368,7 +373,7 @@
             {% if el.width is not empty %}
                 <div class="row">
                     <div class="col-xs-7" style="min-height:{{ el.height }}px">
-                        <img onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px;cursor:pointer" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <img id="filestacki{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                     </div>
                     <div class="col-xs-5" style="padding:0px;">
@@ -486,7 +491,7 @@
 
 	{% if ismodal %}
                         </div>
-                        <div class="modal-footer">
+                        <div class="modal-footer {{ not isajax ? 'pagefooter' }}">
 								
 	{% endif %}
             

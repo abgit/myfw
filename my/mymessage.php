@@ -149,8 +149,8 @@ class mymessage{
         return $this;
     }
 
-    public function & addButton( $label, $icon, $onclick, $class = '', $color = false, $colorbackground = false, $href = '' ){
-        $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'onclick' => $onclick, 'class' => $class, 'color' => $color, 'colorbackground' => $colorbackground, 'href' => $href );
+    public function & addButton( $label, $icon, $urlobj, $class = '', $color = false, $colorbackground = false ){
+        $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'urlobj' => $urlobj, 'class' => $class, 'color' => $color, 'colorbackground' => $colorbackground );
         return $this;
     }
 

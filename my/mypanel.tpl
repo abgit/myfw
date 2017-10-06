@@ -6,7 +6,7 @@
                                                 {% for menu in elements.tmenu %}
 
                                                     {% if menu.type == 0 %}
-                                                        <a style="margin-left:2px;margin-top:6px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %}{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
+                                                        <a style="margin-left:2px;margin-top:6px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %} {{ menu.urlobj|urlobj }}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
 
                                                     {% elseif menu.type == 3 %}
                                                         {% for i in 1..menu.it %}<br />{% endfor %}
@@ -16,7 +16,7 @@
                                                     <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"><i class="{{ menu.icon }}"></i> {{menu.label}} <span class="caret"></span></a>
     													<ul class="dropdown-menu icons-right dropdown-menu-right">
                                                             {% for submenu in menu.options %}
-                                                                <li><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
+                                                                <li><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %} {{ submenu.urlobj|urlobj( value, tags ) }}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </div>
@@ -26,7 +26,7 @@
                                                     <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"><i class="{{ menu.icon }}"></i> <span id="menbl{{ menu.id }}">{{menu.label}}</span> <span class="caret"></span></a>
     													<ul class="dropdown-menu icons-left dropdown-menu-right">
                                                             {% for submenu in menu.options %}
-                                                                <li {{submenu.selected ? 'class="active"' }} id="menl{{ menu.id }}{{ submenu.id }}"><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %}{% if submenu.href %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i id="meni{{ menu.id }}{{ submenu.id }}" class="icon-checkmark" style="visibility:{{ submenu.selected ? 'visible' : 'hidden' }}"></i> {{ submenu.label }}</a></li>
+                                                                <li {{submenu.selected ? 'class="active"' }} id="menl{{ menu.id }}{{ submenu.id }}"><a{% if submenu.color %} style="color:{{submenu.color}}"{% endif %} {{ submenu.urlobj|urlobj( value, tags ) }}><i id="meni{{ menu.id }}{{ submenu.id }}" class="icon-checkmark" style="visibility:{{ submenu.selected ? 'visible' : 'hidden' }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </div>
@@ -51,13 +51,13 @@
 
     										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
                                                 
-                                                {% if elements.thumb.onclick %}
-                                                    <a onclick="{{ elements.thumb.onclick|replaceurl( value, tags ) }}"{% if elements.thumb.href %} href="{{ elements.thumb.href|replaceurl( value, tags ) }}"{% endif %}>
+                                                {% if elements.thumb.urlobj %}
+                                                    <a {{ elements.thumb.urlobj|urlobj( value, tags ) }}>
                                                 {% endif %}
 
                                                 <img class="pt{{ value[ elements.thumb.classkey ] }}" style="margin-top:10px;margin-left:-10px" src="{% if elements.thumb.static %}{{ cdn }}{{ elements.thumb.key|raw }}{% else %}{{ cdn }}{{ value[ elements.thumb.key ]|default( elements.thumb.default ) }}{% endif %}">
 
-                                                {% if elements.thumb.onclick %}
+                                                {% if elements.thumb.urlobj %}
                                                     </a>
                                                 {% endif %}
                                             </div>
@@ -69,15 +69,15 @@
 
     										<div class="{{ class2 }} task-description">
 
-                                                    {% if elements.title.onclick %}
-                                                        <a onclick="{{ elements.title.onclick|replaceurl( value, tags ) }}">
+                                                    {% if elements.title.urlobj %}
+                                                        <a {{ elements.title.urlobj|urlobj( value, tags )|raw }}>
                                                     {% endif %}
 
     										        {% if elements.title %}
                                             		    <span class="task-d">{% if elements.title.static %}{{ elements.title.key|raw }}{% else %}{{ value[ elements.title.key ]|t( elements.title.maxsize|default( 30 ) ) }}{% endif %}</span>
     										        {% endif %}
 
-                                                    {% if elements.title.onclick %}
+                                                    {% if elements.title.urlobj %}
                                                         </a>
                                                     {% endif %}
 
@@ -236,7 +236,7 @@
                                                     {% if menu.type == 0 %}
                                                     
                                                         <li id="pm{{ menu.id }}{{ value[ key ] }}" {{ ( menu.showdepends is defined and menu.showdepends is not empty and value[ menu.showdepends ] is defined and not value[ menu.showdepends ] ) ? 'class="hide"' }}>
-                                                            <a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}"{% if menu.href %} href="{{ menu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if menu.onclick %} onclick="{{ menu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ menu.icon }}" style="margin-right:2px"> </i>
+                                                            <a style="font-size:12px;{% if menu.color %}color:{{menu.color}}{% endif %}" {{ menu.urlobj|urlobj( value, tags ) }}><i class="{{ menu.icon }}" style="margin-right:2px"> </i>
                                                                 <span id="pms{{ value[ key ] }}">{% if menu.depends and not value[ menu.depends ] %}{{ menu.label }}{% else %}{{menu.dependsLabelPrefix|raw }}{{ value[ menu.dependsValueKey ] }}{{ menu.dependsLabelSufix|raw }}{% endif %}</span>
                                                             </a>
                                                         </li>
@@ -254,7 +254,7 @@
                                                             
                                                                 {% set optiondisabled = ( submenu.disabled or ( submenu.disableddepends and value[ submenu.disableddepends ] ) ) %}
 
-                                                                <li class="{{ optiondisabled ? 'disabled' }}{{ submenu.keyclass ? ' panmc' ~ submenu.id ~ value[ submenu.keyclass ] }}" id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if submenu.href and not optiondisabled %} href="{{ submenu.href|replace({ (keyhtml): value[ key ] }) }}"{% endif %}{% if submenu.onclick and not optiondisabled %} onclick="{{ submenu.onclick|replace({ (keyhtml): value[ key ] }) }}"{% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
+                                                                <li class="{{ optiondisabled ? 'disabled' }}{{ submenu.keyclass ? ' panmc' ~ submenu.id ~ value[ submenu.keyclass ] }}" id="panm{{ value[key] }}{{ loop.index0 }}" {{ submenudisplay != 1 ? 'style="display:none"' }}><a{% if submenu.color %} style="font-size:12px;color:{{submenu.color}}"{% endif %}{% if not optiondisabled %} {{ submenu.urlobj|urlobj( value, tags ) }} {% endif %}><i class="{{ submenu.icon }}"></i> {{ submenu.label }}</a></li>
                                                             {% endfor %}
     													</ul>
     											    </li>

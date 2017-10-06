@@ -100,8 +100,8 @@ class mynotify{
         return $this;
     }
 
-    public function & setItemAction( $onclick ){
-        $this->itemaction = array( 'onclick' => $onclick );
+    public function & setItemAction( $urlobj ){
+        $this->itemaction = array( 'urlobj' => $urlobj );
         return $this;
     }
 

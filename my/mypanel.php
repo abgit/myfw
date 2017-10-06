@@ -67,8 +67,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $onclick = '', $classkey = '', $default = '', $href = '' ){
-        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'onclick' => $onclick, 'classkey' => $classkey, 'default' => $default, 'href' => $href );
+    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $urlobj = '', $classkey = '', $default = '' ){
+        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'urlobj' => $urlobj, 'classkey' => $classkey, 'default' => $default );
         return $this;
     }
     
@@ -77,8 +77,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addTitle( $key, $static = false, $onclick = '', $maxsize = '' ){
-        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick, 'maxsize' => $maxsize );
+    public function & addTitle( $key, $static = false, $urlobj = null, $maxsize = '' ){
+        $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static, 'urlobj' => $urlobj, 'maxsize' => $maxsize );
         return $this;
     }
 
@@ -220,8 +220,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $id = '', $depends = false, $dependsLabelPrefix = '', $dependsLabelSufix = '', $dependsValueKey = '', $showdepends = '' ){
-        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'id' => $id, 'depends' => $depends, 'dependsLabelPrefix' => $dependsLabelPrefix, 'dependsLabelSufix' => $dependsLabelSufix, 'dependsValueKey' => $dependsValueKey, 'showdepends' => $showdepends );
+    public function & addButton( $label, $urlobj, $icon = 'icon-cog4', $color = '', $id = '', $depends = false, $dependsLabelPrefix = '', $dependsLabelSufix = '', $dependsValueKey = '', $showdepends = '' ){
+        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'color' => $color, 'id' => $id, 'depends' => $depends, 'dependsLabelPrefix' => $dependsLabelPrefix, 'dependsLabelSufix' => $dependsLabelSufix, 'dependsValueKey' => $dependsValueKey, 'showdepends' => $showdepends );
         return $this;
     }
 
@@ -237,8 +237,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addToolbarButton( $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $class = '' ){
-        $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'href' => $href, 'onclick' => $onclick, 'label' => $label, 'color' => $color, 'class' => $class );
+    public function & addToolbarButton( $label, $urlobj = '', $icon = 'icon-cog4', $color = '', $class = '' ){
+        $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'color' => $color, 'class' => $class );
         return $this;
     }
 
