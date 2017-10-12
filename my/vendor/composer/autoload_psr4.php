@@ -54,6 +54,7 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'FG\\' => array($vendorDir . '/fgrosse/phpasn1/lib'),
     'Endroid\\QrCode\\' => array($vendorDir . '/endroid/qrcode/src'),
+    'Defuse\\Crypto\\' => array($vendorDir . '/defuse/php-encryption/src'),
     'Composer\\Semver\\' => array($vendorDir . '/composer/semver/src'),
     'Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
     'Coinbase\\Wallet\\' => array($vendorDir . '/coinbase/coinbase/src'),

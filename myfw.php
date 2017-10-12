@@ -165,10 +165,10 @@
 
                         case '#': list( $all, $variable, $sufix ) = $this->configparse( $setting );
                                   $var = $this->getenvconfigvar( $variable );
-                                  return is_null( $var ) ? null : ( $prefix . $this->configdecrypt( $var ) . $sufix );
+                                  return is_null( $var ) ? null : ( $prefix . mycrypt::decrypt( $var ) . $sufix );
 
                         case '!': list( $all, $variable, $sufix ) = $this->configparse( $setting );
-                                  return $prefix . $this->configdecrypt( $variable ) . $sufix;
+                                  return $prefix . mycrypt::decrypt( $variable ) . $sufix;
 
                         case '$': list( $all, $variable, $sufix ) = $this->configparse( $setting );
                                   return $prefix . $this->session()->get( $variable ) . $sufix;
@@ -194,7 +194,7 @@
             $var = getenv( $name );
             return $var === false ? null : $var;
         }
-
+/*
         public function configencrypt( $plain, $key = null ) {
 
             $key = substr( is_null( $key ) ? $this->container['settings'][ 'app.mc' ] : $key, 0, 32 );
@@ -214,7 +214,7 @@
             list( $iv, $value ) = unserialize( base64_decode( $encoded ) );
             return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_CBC, $iv ), "\0");
         }
-
+*/
         public function log(){
             if( $this->config( 'log.init' ) && is_null( $this->loginit ) ){
                 $this->config( 'log.writer', new mylog() );
@@ -843,15 +843,15 @@
 
     // check ajax post
     function isajax(){
-        $app = \Slim\Slim::getInstance();
+        $app = myfw::getInstance();
         if( $app->config( 'isajax.enable' ) !== 0 && !$app->request->isAjax() )
             $app->pass();
         else
-            $app->setajaxmode();            
+            $app->setajaxmode();
     }
 
     function iscache(){
-		$app = \Slim\Slim::getInstance();
+		$app = myfw::getInstance();
         if( $app->config( 'iscache.enable' ) !== 0 ){
             $app->renderCached() ? $app->stop() : $app->setcacheable();
         }

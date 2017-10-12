@@ -119,6 +119,10 @@ class ComposerStaticInit66bce31fde88d29aaa8ca58fc6697d33
         array (
             'Endroid\\QrCode\\' => 15,
         ),
+        'D' => 
+        array (
+            'Defuse\\Crypto\\' => 14,
+        ),
         'C' => 
         array (
             'Composer\\Semver\\' => 16,
@@ -337,6 +341,10 @@ class ComposerStaticInit66bce31fde88d29aaa8ca58fc6697d33
         'Endroid\\QrCode\\' => 
         array (
             0 => __DIR__ . '/..' . '/endroid/qrcode/src',
+        ),
+        'Defuse\\Crypto\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/defuse/php-encryption/src',
         ),
         'Composer\\Semver\\' => 
         array (

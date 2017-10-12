@@ -4,32 +4,25 @@
 
         private $pdo;
         private $stmt;
+        private $driver;
 
         public function __construct(){
             $this->app  = \Slim\Slim::getInstance();
-            $this->driver = $this->app->config( 'db.driver' );
+            $dsn        = $this->app->config( 'db.dsn' );
 
-            if( $this->driver === 'mysql' ){
-                $this->pdo  = new PDO( $this->app->config( 'db.dsn' ), $this->app->config( 'db.username' ), $this->app->config( 'db.password' ), array( 1002 => 'SET NAMES utf8' ) );
+            switch( $dsn ){
+                case 'heroku': $url          = parse_url( getenv( 'DATABASE_URL' ) );
+                               $this->pdo    = new PDO( sprintf( 'pgsql:host=%s;dbname=%s;port=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
+                               $this->driver = 'pgsql';
+                               break;
 
-            }elseif( $this->driver === 'postgresql' ){
-                $this->pdo  = new PDO( $this->app->config( 'db.dsn' ) );                
-
-            }elseif( $this->driver === 'heroku' ){
-                $url       = parse_url( getenv( 'DATABASE_URL' ) );
-                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s;port=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
-
-            }elseif( $this->driver === 'fortrabbit' ){
-                $url       = parse_url( $this->app->configdecrypt( getenv( 'DATABASE_URL' ) ) );
-                $this->pdo = new PDO( sprintf( 'pgsql:host=%s;dbname=%s;port=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
-
-            }else{
-                d( 'db invalid driver' );
+                default:       $url          = parse_url( $dsn );
+                               $this->pdo    = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $url['scheme'], $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
+                               $this->driver = 'pgsql';
+                               break;
             }
 
             $this->stmt = null;
-
-//            if( $this->app->config( 'db.debug' ) )
             $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
         }
 
@@ -125,10 +118,13 @@
                 }
             }
 
-            if( $this->driver === 'mysql' )
-                $this->stmt = $this->pdo->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
-            else
-                $this->stmt = $this->pdo->prepare( 'select * from ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+            switch( $this->driver ){
+                case 'mysql': $this->stmt = $this->pdo->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+                              break;
+
+                case 'pgsql': $this->stmt = $this->pdo->prepare( 'select * from ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+                              break;
+            }
 
             // bind
             foreach( $elements as $col => $sett )

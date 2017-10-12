@@ -3,7 +3,7 @@
     {% if values %}
                     <div class="tab-pane fade active in" id="videos">
 						<div class="row">
-                            {% for value in values %}
+							{% for value in values %}
 							<div class="col-lg-4 col-md-6 col-sm-6">
 								<div class="block">
 								    <div class="thumbnail thumbnail-boxed">

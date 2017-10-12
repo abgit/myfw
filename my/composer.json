@@ -28,6 +28,8 @@
 
 		"blocktrail/blocktrail-sdk": "3.0.5",
 
-		"transloadit/php-sdk": "dev-master"
+		"transloadit/php-sdk": "dev-master",
+		
+		"defuse/php-encryption": "2.*"
 		}
 }
