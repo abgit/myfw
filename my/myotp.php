@@ -6,11 +6,13 @@ use Base32\Base32;
 
 class myotp{
 
-    public function qrcode( $string ){
-        \Slim\Slim::getInstance()->response->headers->set('Content-Type', 'image/png');
-        \PHPQRCode\QRcode::png( $string, false, 'L', 5, 1 );
+    /** @var mycontainer */
+    private $app;
+
+    public function __construct( $c ){
+        $this->app = $c;
     }
-    
+
     public function createSecret(){
         return GoogleAuthenticator::generateRandom();
     }

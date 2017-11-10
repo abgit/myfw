@@ -2,7 +2,9 @@
 
     class mychat{
 
+        /** @var mycontainer*/
         private $app;
+
         private $id;
         private $values;
         private $urlimage;
@@ -24,11 +26,15 @@
         private $filestack;
         private $selfid;
 
-        public function __construct( $id ){
-            $this->app  = \Slim\Slim::getInstance();
-            $this->id   = $id;
-            $this->init = true;
+        public function __construct( $c ){
+            $this->app      = $c;
+            $this->init     = true;
+        }
+
+        public function & setID( $id ){
+            $this->id       = $id;
             $this->windowid = $id . 'box';
+            return $this;
         }
 
         public function getWindowId(){
@@ -38,17 +44,17 @@
         public function & setValues( $values ){
             $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
-            $this->app->session()->set( 'myfwchat' . $this->id . 'f', empty( $this->values ) ? 0 : $this->values[0][ 'id' ] );
-            $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $this->values ) ? 0 : $this->values[count($this->values) - 1][ 'id' ] );
+            $this->app->session->set( 'myfwchat' . $this->id . 'f', empty( $this->values ) ? 0 : $this->values[0][ 'id' ] );
+            $this->app->session->set( 'myfwchat' . $this->id . 'l', empty( $this->values ) ? 0 : $this->values[count($this->values) - 1][ 'id' ] );
             return $this;
         }
 
         public function getFirst(){
-            return $this->app->session()->get( 'myfwchat' . $this->id . 'f', 0 );
+            return $this->app->session->get( 'myfwchat' . $this->id . 'f', 0 );
         }
 
         public function getLast(){
-            return $this->app->session()->get( 'myfwchat' . $this->id . 'l', 0 );
+            return $this->app->session->get( 'myfwchat' . $this->id . 'l', 0 );
         }
 
         public function & setMessage( $url, $key, $caption = '', $textarea = '' ){
@@ -126,14 +132,14 @@
         }
 
         public function getImage(){
-            return ( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && $this->app->rules()->md5( $_POST[ 'img' ] ) ) ? $_POST[ 'img' ] : false;
+            return ( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && $this->app->rules->md5( $_POST[ 'img' ] ) ) ? $_POST[ 'img' ] : false;
         }
 
         public function getFilestackImage(){
 
             if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
 
-                $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ 'img' ], 'read', 'metadata', false ) ), true );
+                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ 'img' ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'image' ) !== false )
                     return $_POST[ 'img' ];
@@ -146,7 +152,7 @@
 
             if( isset( $_POST[ 'mov' ] ) && is_string( $_POST[ 'mov' ] ) && strpos( $_POST[ 'mov' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
 
-                $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ 'mov' ], 'read', 'metadata', false ) ), true );
+                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ 'mov' ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'video' ) !== false )
                     return $_POST[ 'mov' ];
@@ -158,10 +164,10 @@
         public function addAjax( $values ){
             $this->init   = false;
             $this->values = is_array( $values ) ? $values : json_decode( $values, true );
-            $this->app->ajax()->append( '#' . $this->id . 'msgs', $this->__toString() )
+            $this->app->ajax->append( '#' . $this->id . 'msgs', $this->__toString() )
 //                              ->scrollBottom( '#' . $this->id . 'box' )
                               ->val( '#' . $this->id . 'msg', '' );
-            $this->app->session()->set( 'myfwchat' . $this->id . 'l', empty( $values ) ? 0 : $this->values[count($values) - 1][ 'id' ] );
+            $this->app->session->set( 'myfwchat' . $this->id . 'l', empty( $values ) ? 0 : $this->values[count($values) - 1][ 'id' ] );
         }
 
         public function & setSelfId( $selfid ){
@@ -180,7 +186,7 @@
         }
 
         public function & pusherSubscribe(){
-            $this->app->pusher()->ajaxSubscribe( $this->pchannel, $this->pevent, $this->selfid, 'reversed' );
+            $this->app->pusher->ajaxSubscribe( $this->pchannel, $this->pevent, $this->selfid, 'reversed' );
             return $this;
         }
         
@@ -188,23 +194,23 @@
             $this->init   = false;
             $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
-            $this->app->pusher()->chatAdd( '#' . $this->id . 'msgs', $this->__toString(), '#' . $this->id . 'box' )->send( $this->pchannel, $this->pevent );
+            $this->app->pusher->chatAdd( '#' . $this->id . 'msgs', $this->__toString(), '#' . $this->id . 'box' )->send( $this->pchannel, $this->pevent );
             return $this;
         }
 
         public function & ajaxClearTextarea(){
-            $this->app->ajax()->val( '#' . $this->id . 'msg', '' );
+            $this->app->ajax->val( '#' . $this->id . 'msg', '' );
             return $this;
         }
 
         public function & load( $loadurl ){
-            $this->app->ajax()->callAction( $loadurl );
+            $this->app->ajax->callAction( $loadurl );
             return $this;
         }
 
         public function & setFilestack( $urlimage, $urlvideo = false ){
 
-            $secret    = $this->app->config( 'filestack.secret' );
+            $secret    = $this->app->config[ 'filestack.secret' ];
             $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
             $policy64  = base64_encode( $policy );
             $signature = hash_hmac( 'sha256', $policy64, $secret );
@@ -212,8 +218,8 @@
 
             $fsoptions = new stdClass();
         
-            $location = $this->app->config( 'filestack.location' );
-            $path     = $this->app->config( 'filestack.path' );
+            $location = $this->app->config[ 'filestack.location' ];
+            $path     = $this->app->config[ 'filestack.path' ];
         
             if( $location )
                 $fsoptions->location = $location;
@@ -230,17 +236,14 @@
 
         public function & setTransloadit( $urlimage, $formname, $options ){
 
-            $driver = $this->app->config( 'transloadit.driver' );
+            $driver = $this->app->config[ 'transloadit.driver' ];
 
             if( $driver === 'heroku' ){
                 $apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
                 $apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
-            }elseif( $driver === 'fortrabbit' ){
-                $apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
-                $apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
             }else{
-                $apikey    = $this->app->config( 'transloadit.k' );
-                $apisecret = $this->app->config( 'transloadit.s' );
+                $apikey    = $this->app->config[ 'transloadit.k' ];
+                $apisecret = $this->app->config[ 'transloadit.s' ];
             }        
 
             $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array() );
@@ -279,7 +282,6 @@
                           'windowid'    => $this->windowid,
                           'urlimage'    => $this->urlimage,
                           'formname'    => $this->formname,
-                          'message'     => $this->message,
                           'buttons'     => $this->buttons,
                           'keyowner'    => $this->keyowner,
                           'keydate'     => $this->keydate,
@@ -293,6 +295,6 @@
         }
         
         public function __toString(){
-            return $this->app->render( '@my/mychat', $this->obj(), null, null, 0, false, false );
+            return $this->app->view->fetch( '@my/mychat.twig', $this->obj() );
         }
     }

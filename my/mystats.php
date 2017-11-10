@@ -2,15 +2,17 @@
 
 class mystats{
 
-    private $name;
-    private $values = array();
-    private $items;
-    private $hidebutton = false;
-    private $align;
+    /** @var mycontainer*/
+    private $app;
 
-    public function __construct( $name ){
-        $this->name = $name;
-        $this->app = \Slim\Slim::getInstance();
+    private $name;
+    private $align;
+    private $elements = array();
+    private $values = array();
+    private $hidebutton = false;
+
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
     public function & setID( $id ){
@@ -96,7 +98,7 @@ class mystats{
         if( !is_array( $values ) )
             $values = json_decode( $values, true );
 
-        $obj = $pusherChannel ? $this->app->pusher() : $this->app->ajax();
+        $obj = $pusherChannel ? $this->app->pusher : $this->app->ajax;
 
         foreach( $this->elements as $name => $el ){
             if( isset( $values[ $el[ 'key' ] ] ) )
@@ -111,7 +113,7 @@ class mystats{
             if( isset( $values[ $el[ 'key' ] ] ) && isset( $el[ 'addonlabelposkey' ] ) )
                 $obj->text( '#st' . $el[ 'key' ] . 'lpos', $values[ $el[ 'addonlabelposkey' ] ] );
         }
-        
+
         if( $pusherChannel )
             $obj->send( $pusherChannel, null );
 
@@ -120,13 +122,13 @@ class mystats{
 
     public function &updateAjaxValue( $key, $value, $valuepre = null, $valuepos = null ){
 
-        $this->app->ajax()->text( '#st' . $key, $value );
+        $this->app->ajax->text( '#st' . $key, $value );
 
         if( !is_null( $valuepre ) )
-            $this->app->ajax()->text( '#st' . $key . 'lpre', $valuepre );
+            $this->app->ajax->text( '#st' . $key . 'lpre', $valuepre );
 
         if( !is_null( $valuepos ) )
-            $this->app->ajax()->text( '#st' . $key . 'lpos', $valuepos );
+            $this->app->ajax->text( '#st' . $key . 'lpos', $valuepos );
 
         return $this;
     }
@@ -136,12 +138,10 @@ class mystats{
     }
 
     private function render( $values = null ){
-        return $this->app->render( '@my/mystats', array( 'values'     => is_null( $values ) ? $this->values : $values,
-                                                         'name'       => $this->name,
-                                                         'elements'   => $this->elements,
-                                                         'hidebutton' => $this->hidebutton,
-                                                         'align'      => $this->align
-                                                         ), null, null, null, false, false );
-
+        return $this->app->view->fetch( '@my/mystats.twig', array( 'values'     => is_null( $values ) ? $this->values : $values,
+                                                                            'name'       => $this->name,
+                                                                            'elements'   => $this->elements,
+                                                                            'hidebutton' => $this->hidebutton,
+                                                                            'align'      => $this->align ) );
     }
 }

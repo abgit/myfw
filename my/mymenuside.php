@@ -2,11 +2,14 @@
 
 class mymenuside{
 
+    /** @var mycontainer*/
+    private $app;
+
     private $elements = array();
     private $header;
 
-    public function __construct(){
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
     public function & setHeader( $label, $icon = '' ){
@@ -20,12 +23,8 @@ class mymenuside{
     }
 
     public function __toString(){
-        return $this->render();
-    }
-
-    private function render(){
-        return $this->app->render( '@my/mymenuside', array( 'elements' => $this->elements,
-                                                            'header'   => $this->header ), null, null, null, false, false );
+        return $this->app->view->fetch( '@my/mymenuside.twig', array( 'elements' => $this->elements,
+                                                                               'header'   => $this->header ) );
 
     }
 }

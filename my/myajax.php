@@ -1,9 +1,9 @@
 <?php
 
 class myajax{
-    
+
     protected $out = array();
-    
+
     public function & msg( $msg, $header = null, $args = array() ){
 
         if( !is_null( $header ) ){
@@ -109,7 +109,10 @@ class myajax{
         return $this;
     }
 
-    public function & redirect( $url, $ms = 1000 ){
+    public function & redirect( $url, $message = '', $ms = 1000 ){
+
+        $this->msgWarning( empty( $message ) ? 'Redirecting ...' : $message, null, array( 'openDuration' => 0, 'sticky' => true ) );
+
         $this->out[ 'rd' ] =  array( 'u' => $url, 'm' => $ms );
         return $this;
     }
@@ -299,11 +302,11 @@ class myajax{
     }
 
     public function obj(){
-        return json_encode( $this->out );
+        return $this->out;
     }
 
-    public function render(){
-        print $this->obj();
+    public function __toString(){
+        return json_encode( $this->obj() );
     }
 
 }

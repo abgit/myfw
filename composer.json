@@ -1,0 +1,35 @@
+{
+    "name": "my",
+
+    "require": {
+		 "slim/slim": "^3.0",
+		 "slim/twig-view": "*",
+		 "pavlakis/slim-cli": "*",
+		 "bryanjhv/slim-session": "~3.0",
+		 "phpFastCache/phpFastCache": "*",
+		 
+		 "defuse/php-encryption": "2.*",
+         "mailgun/mailgun-php": "2.*",
+ 		 "jaycodesign/decimal": "dev-master",
+		 "jaycodesign/btchelper": "dev-master",
+		 "christian-riesen/otp": "1.*",
+		 "aferrandini/phpqrcode": "1.*",
+		 "pusher/pusher-php-server": "^2.2",
+         "auth0/auth0-php": "4.*",
+		 "bugsnag/bugsnag": "^3.0",
+		 "blackfire/php-sdk": "*",
+		 "mixpanel/mixpanel-php" : "2.*",
+		 "aptoma/twig-markdown": "3.*",
+		 "michelf/php-markdown": "1.*",
+		 
+		 "blocktrail/blocktrail-sdk": "3.1.0",
+
+		 "nexmo/client": "@beta"
+	},
+
+	"autoload": {
+         "psr-0": {
+            "my": "my/"
+         }
+    }
+}

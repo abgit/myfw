@@ -1,8 +1,8 @@
 <?php
 
 class mylist{
-    
-  public static $countries = array(
+
+  public $countries = array(
     "AF" => "Afghanistan",
 	"AL" => "Albania",
 	"DZ" => "Algeria",
@@ -269,7 +269,7 @@ class mylist{
 	"AX" => "Åland Islands" );
 
     
-    public static $timezones = array (
+    public $timezones = array (
         '(UTC-11:00) Midway Island' => 'Pacific/Midway',
         '(UTC-11:00) Samoa' => 'Pacific/Samoa',
         '(UTC-10:00) Hawaii' => 'Pacific/Honolulu',
@@ -414,8 +414,14 @@ class mylist{
         '(UTC+12:00) Wellington' => 'Pacific/Auckland',
         '(UTC+13:00) Nuku\'alofa' => 'Pacific/Tongatapu' );
 
+    /** @var mycontainer*/
+    private $app;
 
-    public static function getAWSips( $zone = 'eu-west-1', $service = 'EC2' ){
+    public function __construct( $c ){
+        $this->app = $c;
+    }
+
+    public function getAWSips( $zone = 'eu-west-1', $service = 'EC2' ){
     
         $res = array();
         $ips = json_decode( file_get_contents( 'https://ip-ranges.amazonaws.com/ip-ranges.json' ) );

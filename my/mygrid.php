@@ -1,7 +1,10 @@
 <?php
 
 class mygrid{
-    
+
+    /** @var mycontainer*/
+    private $app;
+
     private $name     = null;
     private $key      = null;
     private $cols     = null;
@@ -9,11 +12,9 @@ class mygrid{
     private $more     = false;
     private $values   = null;
     private $keyhtml  = null;
-    private $menu     = 0;
     private $title    = array();
     private $emptymsg = 'No elements to display';
     private $buttons  = array();
-    private $classes  = array();
     private $actions  = array();
     private $modal    = null;
     private $orderby  = false;
@@ -27,10 +28,10 @@ class mygrid{
     private $keyshtml = array();
     private $classxs  = null;
     private $classsm  = null;
+    private $form     = null;
     
-    public function __construct( $name = 'g' ){
-        $this->name = $name;
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app  = $c;
     }
 
     public function & setID( $id ){
@@ -74,7 +75,7 @@ class mygrid{
     }
     
     public function & setW( $k, $width ){
-        $widths = $this->app->config( 'grid.widths' );
+        $widths = $this->app->config[ 'grid.widths' ];
 
         if( isset( $this->labels[ $k ] ) )
             $this->labels[ $k ][ 'width' ] = ( isset( $widths[ $width ] ) && !is_numeric( $width ) ) ? $widths[ $width ] : intval( $width );
@@ -109,6 +110,8 @@ class mygrid{
         if( isset( $this->actions[ $name ] ) ){
             return call_user_func_array( $this->actions[ $name ], $arguments );
         }
+
+        return null;
     }
 
     public function & addToolbarButton( $label, $icon, $onclick, $class = 'info' ){
@@ -264,7 +267,7 @@ class mygrid{
         if( isset( $this->cols[ $menu ][0][ 'options' ] ) ){
             foreach( $this->cols[ $menu ][0][ 'options' ] as $i => $options ){
                 if( isset( $options[ 'id' ] ) && $options[ 'id' ] == $id ){
-                    $this->app->ajax()->attr( '#' . $key . 'm' . $i, 'class', 'disabled' );
+                    $this->app->ajax->attr( '#' . $key . 'm' . $i, 'class', 'disabled' );
                     return $this;
                 }
             }
@@ -285,7 +288,7 @@ class mygrid{
         if( is_string( $this->titlekey ) && isset( $values[ $this->titlekey ] ) )
             $this->title[ 'labelkey' ] = $values[ $this->titlekey ];
 
-        $this->app->session()->set( $this->name . 'gridinit', false );
+        $this->app->session->set( $this->name . 'gridinit', false );
 
         return $this;
     }
@@ -407,7 +410,7 @@ class mygrid{
         if( is_array( $values ) ){
             foreach( $values as $row ){
                 if( isset( $row[ $this->key ] ) )
-                    $this->app->ajax()->replacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ) );
+                    $this->app->ajax->replacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ) );
             }
         }
 
@@ -419,11 +422,11 @@ class mygrid{
         if( is_string( $values ) )
             $values = json_decode( $values, true );
 
-        $this->app->ajax()->hide( '#' . $this->name . 'empty' );
+        $this->app->ajax->hide( '#' . $this->name . 'empty' );
 
         foreach( $values as $row ){
             if( isset( $row[ $this->key ] ) )
-                $this->app->ajax()->addreplacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ), '#' . $this->name );
+                $this->app->ajax->addreplacewith( '#' . $this->name . $row[ $this->key ], $this->render( array( $row ) ), '#' . $this->name );
         }
 
         return $this;    
@@ -437,16 +440,16 @@ class mygrid{
         if( empty( $values ) )
             $values = array();
         
-        $this->app->ajax()->html( '#' . $this->name, $this->render( $values, true ) );
+        $this->app->ajax->html( '#' . $this->name, $this->render( $values, true ) );
 
-        if( myrules::isdecimal( count( $values ) / $this->perpage ) )
-            $this->app->ajax()->remove( '#' . $this->name . 'more' );
+        if( $this->app->rules->isdecimal( count( $values ) / $this->perpage ) )
+            $this->app->ajax->remove( '#' . $this->name . 'more' );
 
         return $this;    
     }
 
     public function & deleteAjaxValue( $key ){
-        $this->app->ajax()->hideTableRow( '#' . $this->name . $key, '#' . $this->name );
+        $this->app->ajax->hideTableRow( '#' . $this->name . $key, '#' . $this->name );
         return $this;
     }
 
@@ -465,13 +468,13 @@ class mygrid{
         $counter = count( $values );
 
         if( $counter ){
-            $append ? $this->app->ajax()->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax()->prepend( '#' . $this->name, $this->render( $values ) );
+            $append ? $this->app->ajax->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax->prepend( '#' . $this->name, $this->render( $values ) );
 
-            $this->app->ajax()->hide( '#' . $this->name . 'empty' );
+            $this->app->ajax->hide( '#' . $this->name . 'empty' );
         }
 
         if( $this->perpage > $counter )
-            $this->app->ajax()->remove( '#' . $this->name . 'more' );
+            $this->app->ajax->remove( '#' . $this->name . 'more' );
 
         return $this;
     }
@@ -485,11 +488,11 @@ class mygrid{
     }
 
     public function & pageIncrement(){
-        $this->app->session()->set( $this->name . 'gridinit', false );
+        $this->app->session->set( $this->name . 'gridinit', false );
 
-        $g = $this->app->session()->get( $this->name . 'gridpage' );
+        $g = $this->app->session->get( $this->name . 'gridpage' );
 
-        $this->app->session()->set( $this->name . 'gridpage', 1 + $g );
+        $this->app->session->set( $this->name . 'gridpage', 1 + $g );
 
         return $this;
     }
@@ -504,22 +507,22 @@ class mygrid{
 
     public function getPage(){
 
-        if( $this->app->session()->get( $this->name . 'gridinit', true ) === true ){
+        if( $this->app->session->get( $this->name . 'gridinit', true ) === true ){
             return 0;
         }
-        return 1 + $this->app->session()->get( $this->name . 'gridpage', 0 );
+        return 1 + $this->app->session->get( $this->name . 'gridpage', 0 );
     }
 
     public function getLimit(){
 
         $resetall = false;
 
-        if( $this->app->session()->get( $this->name . 'gridinit' ) === true ){
+        if( $this->app->session->get( $this->name . 'gridinit' ) === true ){
 
-            $resetall = $this->app->session()->get( $this->name . 'gridresetall' );
+            $resetall = $this->app->session->get( $this->name . 'gridresetall' );
         }
 
-        return ( $resetall === true ) ? $this->perpage : ( $this->perpage + $this->perpage * $this->app->session()->get( $this->name . 'gridpage' ) );
+        return ( $resetall === true ) ? $this->perpage : ( $this->perpage + $this->perpage * $this->app->session->get( $this->name . 'gridpage' ) );
 //        return $this->perpage;
     }
 
@@ -528,14 +531,11 @@ class mygrid{
     }
 
     public function & pageReset( $resetall = true ){
-        $this->app->session()->set( $this->name . 'gridinit',     true );
-        $this->app->session()->set( $this->name . 'gridresetall', $resetall );
+        $this->app->session->set( $this->name . 'gridinit',     true );
+        $this->app->session->set( $this->name . 'gridresetall', $resetall );
         return $this;
     }
 
-    public function __toString(){
-        return $this->render();
-    }
 
     public function & setModal( $title, $class = 'modal-lg', $icon = 'icon-paragraph-justify2', $static = true, $width = '' ){
         $this->modal = array( 'formid' => 'mygf' . $this->name, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width );
@@ -547,18 +547,28 @@ class mygrid{
         return $this;
     }
 
-    public function modalform(){
-        return $this->app->form( $this->modal[ 'formid' ] )
-                                    ->addAjax()
-                                    ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
-                                    ->addCustom( $this->name, $this );
+    public function modalform():myform{
+
+        if( is_null( $this->form ) )
+            $this->form = $this->app->form;
+
+        return $this->form->setID( $this->modal[ 'formid' ] )
+                          ->addAjax()
+                          ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
+                          ->addCustom( $this->name, $this );
     }
 
     public function show( $htmlid = null ){
         if( is_null( $htmlid ) ){
             return $this->modalform()->show();
         }
-        $this->app->ajax()->html( $htmlid, $this->render() );
+        $this->app->ajax->html( $htmlid, $this->render() );
+
+        return null;
+    }
+
+    public function __toString(){
+        return $this->render();
     }
 
     private function render( $customvalues = null, $renderempty = false ){
@@ -572,26 +582,25 @@ class mygrid{
         if( is_null( $this->classsm ) )
             $this->setClass( array_keys( array_slice( $this->cols, 2, -2 ) ), 'hidden-sm' );
 
-        return $this->app->render( '@my/mygrid', array( 'name'            => $this->name,
-                                                        'key'             => $this->key,
-                                                        'keyhtml'         => $this->keyhtml,
-                                                        'labels'          => $this->labels,
-                                                        'allitems'        => is_null( $customvalues ),
-                                                        'emptyitem'       => ( is_null( $customvalues ) || ( $renderempty && empty( $customvalues ) ) ),
-                                                        'values'          => $values,
-                                                        'more'            => $this->more,
-                                                        'moreshow'        => ( $valuestotal > 0 && !myrules::isdecimal( $valuestotal / $this->perpage ) ),
-                                                        'title'           => $this->title,
-                                                        'emptymsg'        => $this->emptymsg,
-                                                        'buttons'         => $this->buttons,
-                                                        'perpage'         => $this->perpage,
-                                                        'orderby'         => $this->orderby,
-                                                        'orderbya'        => $this->orderbya,
-                                                        'menuhtml'        => $this->menuhtml,
-                                                        'rowclass'        => $this->rowclass,
-                                                        'rowclassdepends' => $this->rowclassdepends,
-                                                        'cols'            => $this->cols,
-                                                        'tags'            => array( array( $this->key ) + $this->keys, array( $this->keyhtml ) + $this->keyshtml )
-                                                        ), null, null, 0, false, false );        
+        return $this->app->view->fetch( '@my/mygrid.twig', array( 'name'            => $this->name,
+                                                                           'key'             => $this->key,
+                                                                           'keyhtml'         => $this->keyhtml,
+                                                                           'labels'          => $this->labels,
+                                                                           'allitems'        => is_null( $customvalues ),
+                                                                           'emptyitem'       => ( is_null( $customvalues ) || ( $renderempty && empty( $customvalues ) ) ),
+                                                                           'values'          => $values,
+                                                                           'more'            => $this->more,
+                                                                           'moreshow'        => ( $valuestotal > 0 && !$this->app->rules->isdecimal( $valuestotal / $this->perpage ) ),
+                                                                           'title'           => $this->title,
+                                                                           'emptymsg'        => $this->emptymsg,
+                                                                           'buttons'         => $this->buttons,
+                                                                           'perpage'         => $this->perpage,
+                                                                           'orderby'         => $this->orderby,
+                                                                           'orderbya'        => $this->orderbya,
+                                                                           'menuhtml'        => $this->menuhtml,
+                                                                           'rowclass'        => $this->rowclass,
+                                                                           'rowclassdepends' => $this->rowclassdepends,
+                                                                           'cols'            => $this->cols,
+                                                                           'tags'            => array( array( $this->key ) + $this->keys, array( $this->keyhtml ) + $this->keyshtml ) ) );
     }
 }

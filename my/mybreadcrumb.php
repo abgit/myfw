@@ -2,10 +2,13 @@
 
 class mybreadcrumb{
 
+    /** @var mycontainer*/
+    private $app;
+
     private $elements = array();
 
-    public function __construct(){
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
     public function & addElement( $key, $label, $href = '' ){
@@ -18,7 +21,6 @@ class mybreadcrumb{
     }
 
     private function render(){
-        return $this->app->render( '@my/mybreadcrumb', array( 'elements' => $this->elements ), null, null, null, false, false );
-
+        return $this->app->view->fetch( '@my/mybreadcrumb.twig', array( 'elements' => $this->elements ) );
     }
 }

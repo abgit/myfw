@@ -1,14 +1,24 @@
 <?php
 
+
     class mydb{
 
+        /** @var abcontainer */
+        private $app;
+
+        /** @var PDO */
         private $pdo;
+
+        /** @var PDOStatement */
         private $stmt;
+
         private $driver;
 
-        public function __construct(){
-            $this->app  = \Slim\Slim::getInstance();
-            $dsn        = $this->app->config( 'db.dsn' );
+        public function __construct( $container ){
+
+            $this->app = $container;
+
+            $dsn = $this->app->config[ 'db.dsn' ];
 
             switch( $dsn ){
                 case 'heroku': $url          = parse_url( getenv( 'DATABASE_URL' ) );
@@ -23,7 +33,9 @@
             }
 
             $this->stmt = null;
-            $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+
+            if( isset( $this->app[ 'db.errmode' ] ) )
+                $this->pdo->setAttribute( PDO::ATTR_ERRMODE, $this->app[ 'db.errmode' ] );
         }
 
         public function & pdo(){
@@ -32,11 +44,11 @@
         
         public function & msg( $msgs = null, $headers = null ){
 
-            $errcode = $this->app->db()->errorCode();
+            $errcode = $this->errorCode();
 
             if( is_array( $msgs ) ){
                 if( isset( $msgs[ $errcode ] ) ){
-                    $this->app->ajax()->msgError( $msgs[ $errcode ], isset( $headers[ $errcode ] ) ? $headers[ $errcode ] : ( is_string( $headers ) ? $headers : null ) );
+                    $this->app->ajax->msgError( $msgs[ $errcode ], isset( $headers[ $errcode ] ) ? $headers[ $errcode ] : ( is_string( $headers ) ? $headers : null ) );
                     return $this;
                 }
             }
@@ -45,6 +57,10 @@
         }
 
         private function & query( $procedure, $values = array() ){
+
+            // add custom global values
+            if( isset( $this->app[ 'db.queryargs' ] ) && is_array( $this->app[ 'db.queryargs' ] ) )
+                $values = $this->app[ 'db.queryargs' ] + $values;
 
             // split procedure
             preg_match( '/([a-zA-Z0-9]+)\(([a-zA-Z0-9\,|_]*)\)/', $procedure, $s );
@@ -131,38 +147,58 @@
                 $this->stmt->bindValue( $col, $sett[0], $sett[1] );
 
             $this->stmt->execute();
+
+            // check error warning
+            if( !empty( $this->errorCode() ) ){
+
+                if( isset( $this->app[ 'db.onerror' ] ) ) {
+                    return $this->app['db.onerror']($this->errorCode(), $this->errorInfo(), $procedure, $values );
+                }
+
+            }
+
             return $this->stmt;
         }
 
-        private function getErrorResult( $procedure, $args ){
-
-            if( is_callable( array( $this->app, 'onDBError' ) ) )
-                call_user_func( $this->app->onDBError, $this->errorCode(), $this->errorInfo(), $procedure, $args );
-
-            if( $this->app->config( 'db.debug' ) === true )
-                $this->app->request->isAjax() ? $this->app->ajax()->msgWarning( $this->errorInfo(), 'Debug' ) : print( $this->errorCode() . $this->errorInfo() );
-
-            return is_null( $this->stmt ) ? 0 : implode( ' ', $this->stmt->errorInfo() );
-        }
 
         public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){
 
-            try{
-                $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );		
-            }catch( ErrorException $e ){
-                $result = $this->getErrorResult( $procedure, $args );
-                return false;
-            }
+            $result = $this->query( $procedure, $args )
+                            ->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
+
             return ( count( $result ) > 0 );
         }
+
+
+        public function findOne( & $result, string $procedure, array $args = array(), bool $returnobject = false ){
+
+            $result = $this->query( $procedure, $args )
+                ->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
+
+            return ( ! empty( $result ) );
+        }
+
+
+        public function findResult( & $result, $procedure, $args = array() ){
+
+            $result = $this->query( $procedure, $args )->fetchAll();
+
+            if( !is_array( $result ) || count($result) != 1 )
+                return false;
+
+            return intval( reset( $result[0] ) ) > 0;
+        }
+
 
         public function findAllReturn( $procedure, $args = array(), $returnobject = false ){
             return $this->findAll( $result, $procedure, $args, $returnobject ) ? $result : array();
         }
 
+
         public function findOneReturn( $procedure, $args = array(), $returnobject = false ){
             return $this->findOne( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
+
 
         public function findValue( & $result, $procedure, $args = array(), $returnobject = false ){
             if( !$this->findOne( $oneresult, $procedure, $args, $returnobject ) || empty( $oneresult ) )
@@ -174,43 +210,20 @@
             return ( count( $oneresult ) > 0 );
         }
 
+
         public function findValueReturn( $procedure, $args = array(), $returnobject = false ){
             return $this->findValue( $result, $procedure, $args, $returnobject ) ? $result : false;
         }
 
-        public function findOne( & $result, $procedure, $args = array(), $returnobject = false ){
-
-            try{
-                $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
-            }catch( ErrorException $e ){
-                $result = $this->getErrorResult( $procedure, $args );
-                return false;
-            }
-
-            return ( ! empty( $result ) );
-        }
 
         public function errorCode(){
             return intval( $this->stmt->errorCode() );
         }
+
 
         public function errorInfo(){
             $arr = $this->stmt->errorInfo();
             return isset( $arr[2] ) ? $arr[2] : 'unknown error';
         }
 
-        public function findResult( & $result, $procedure, $args = array() ){
-
-            try{
-                $result = $this->query( $procedure, $args )->fetchAll();
-            }catch( ErrorException $e ){
-                $result = $this->getErrorResult( $procedure, $args );
-                return false;
-            }
-            
-            if( !is_array( $result ) || count($result) != 1 )
-                return false;
-
-            return intval( reset( $result[0] ) ) > 0;
-        }
     }

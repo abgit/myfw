@@ -1,10 +1,18 @@
 <?php
 
+// TODO: port variables to social.* syntax
 class mysocial{
+
+    /** @var mycontainer*/
+    private $app;
+
+    public function __construct( $c ){
+        $this->app = $c;
+    }
 
     public function instagram( $url ){
 
-        $username = myfilters::usernameinstagram( $url );
+        $username = $this->app->filters->usernameinstagram( $url );
 
         if( !$username )
            return false;
@@ -15,26 +23,30 @@ class mysocial{
         if( isset( $json[ 'user' ][ 'id' ] ) )
             return array( 'followers' => $json[ 'user' ][ 'followed_by' ][ 'count' ],
                           'posts'     => $json[ 'user' ][ 'media' ][ 'count' ] );
+
+        return false;
     }
 
     public function facebook( $url ){
 
-        $username = myfilters::usernamefacebook( $url );
+        $username = $this->app->filters->usernamefacebook( $url );
 
         if( !$username )
            return false;
 
-        $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '/?fields=fan_count,about&access_token=' . \Slim\Slim::getInstance()->config( 'facebook.key' ) );
+        $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '/?fields=fan_count,about&access_token=' . $this->app->config[ 'facebook.key' ] );
         $json = json_decode( $json, true );
 
         if( isset( $json[ 'fan_count' ] ) )
             return array( 'fans' => $json[ 'fan_count' ] );
+
+        return false;
     }
 
 
     public function facebookVideos( $url, $total ){
 
-        $username = myfilters::usernamefacebook( $url );
+        $username = $this->app->filters->usernamefacebook( $url );
 
         if( !$username )
            return false;
@@ -43,7 +55,7 @@ class mysocial{
         $res   = array();
 
         while(1){
-            $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '/videos?' . ( empty( $after ) ? '' : 'after=' . $after . '&' ) . 'limit=25&access_token=' . \Slim\Slim::getInstance()->config( 'facebook.key' ) );
+            $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '/videos?' . ( empty( $after ) ? '' : 'after=' . $after . '&' ) . 'limit=25&access_token=' . $this->app->config[ 'facebook.key' ] );
             $json = json_decode( $json, true );
 
             if( !isset( $json[ 'data' ] ) )
@@ -54,7 +66,7 @@ class mysocial{
                 if( !isset( $node[ 'id' ] ) )
                     return $res;                
 
-                $jsonvideo = file_get_contents( 'https://graph.facebook.com/v2.10/' . $node[ 'id' ] . '?fields=title,likes.summary(true),comments.summary(true)&access_token=' . \Slim\Slim::getInstance()->config( 'facebook.key' ) );
+                $jsonvideo = file_get_contents( 'https://graph.facebook.com/v2.10/' . $node[ 'id' ] . '?fields=title,likes.summary(true),comments.summary(true)&access_token=' . $this->app->config[ 'facebook.key' ] );
                 $jsonvideo = json_decode( $jsonvideo, true );
 
                 if( !isset( $jsonvideo[ 'title' ] ) )
@@ -83,7 +95,7 @@ class mysocial{
 
     public function youtube( $channel_id ){
 
-        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$channel_id.'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$channel_id.'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key=' . $this->app->config[ 'youtube.key' ] );
         $res = json_decode($res, true);
 
         if( isset( $res['items'][0]['statistics'] ) )
@@ -101,7 +113,7 @@ class mysocial{
        $res           = array();
 
         while(1){
-            $json = file_get_contents( 'https://www.googleapis.com/youtube/v3/search?' . ( empty( $nextPageToken ) ? '' : 'pageToken=' . $nextPageToken . '&' ) . 'order=date&part=snippet&channelId='. $channel_id . '&maxResults=25&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $json = file_get_contents( 'https://www.googleapis.com/youtube/v3/search?' . ( empty( $nextPageToken ) ? '' : 'pageToken=' . $nextPageToken . '&' ) . 'order=date&part=snippet&channelId='. $channel_id . '&maxResults=25&key=' . $this->app->config[ 'youtube.key' ] );
             $json = json_decode( $json, true );
 
             if( !isset( $json[ 'items' ] ) )
@@ -109,7 +121,7 @@ class mysocial{
 
             foreach( $json[ 'items' ] as $item ){
 
-                $jsonvideo = file_get_contents('https://www.googleapis.com/youtube/v3/videos?part=statistics&id='. $item[ 'id' ]['videoId'] . '&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+                $jsonvideo = file_get_contents('https://www.googleapis.com/youtube/v3/videos?part=statistics&id='. $item[ 'id' ]['videoId'] . '&key=' . $this->app->config[ 'youtube.key' ] );
                 $jsonvideo = json_decode($jsonvideo, true);
 
                 if( !isset( $jsonvideo[ 'items' ] ) )
@@ -134,12 +146,14 @@ class mysocial{
 
             $nextPageToken = $json[ 'nextPageToken' ];
         }
+
+        return $res;
     }
 
 
     public function instagramPosts( $url, $total ){
 
-        $username = myfilters::usernameinstagram( $url );
+        $username = $this->app->filters->usernameinstagram( $url );
 
         if( !$username )
            return false;

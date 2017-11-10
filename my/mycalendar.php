@@ -2,8 +2,11 @@
 
     class mycalendar{
 
+        /** @var mycontainer*/
         private $app;
+
         private $id;
+        private $init;
         private $values;
         private $onclick;
         private $onclickmsg;
@@ -21,9 +24,8 @@
         private $datestart;
         private $dateend;
 
-        public function __construct( $id = null ){
-            $this->app  = \Slim\Slim::getInstance();
-            $this->id   = $id;
+        public function __construct( $c ){
+            $this->app  = $c;
             $this->init = true;
         }
 
@@ -50,7 +52,7 @@
         }
 
         public function getDate(){
-            return ( isset( $_POST[ 'id' ] ) && is_string( $_POST[ 'id' ] ) && strlen( $_POST[ 'id' ] ) >= $this->dateend && myrules::isdate( substr( $_POST[ 'id' ], $this->datestart, $this->dateend ) ) ) ? substr( $_POST[ 'id' ], $this->datestart, $this->dateend ) : null;
+            return ( isset( $_POST[ 'id' ] ) && is_string( $_POST[ 'id' ] ) && strlen( $_POST[ 'id' ] ) >= $this->dateend && $this->app->rules->isdate( substr( $_POST[ 'id' ], $this->datestart, $this->dateend ) ) ) ? substr( $_POST[ 'id' ], $this->datestart, $this->dateend ) : null;
         }
 
         public function getID(){
@@ -106,7 +108,7 @@
                                   'start' => $x[ $this->keydate ] );
 
                     if( !is_null( $this->keycolor ) && isset( $x[ $this->keycolor ] ) ){
-                        $val[ 'color' ] = empty( $this->colorfilter ) ? $x[ $this->keycolor ] : $this->app->filters()->replaceonly( $x[ $this->keycolor ], $this->colorfilter );
+                        $val[ 'color' ] = empty( $this->colorfilter ) ? $x[ $this->keycolor ] : $this->app->filters->replaceonly( $x[ $this->keycolor ], $this->colorfilter );
                     }else{
                         $val[ 'color' ] = $this->colordefault;
                     }
@@ -121,12 +123,12 @@
         }
         
         public function & ajaxRemoveEvent( $event_id = null ){
-            $this->app->ajax()->calendarEventRemove( '#cal' . $this->id, is_null( $event_id ) ? date( "Y-m-d", time() ) : $event_id );
+            $this->app->ajax->calendarEventRemove( '#cal' . $this->id, is_null( $event_id ) ? date( "Y-m-d", time() ) : $event_id );
             return $this;
         }
 
         public function & ajaxRefresh(){
-            $this->app->ajax()->calendarRefresh( '#cal' . $this->id );
+            $this->app->ajax->calendarRefresh( '#cal' . $this->id );
             return $this;
         }
 
@@ -143,19 +145,19 @@
             $event_start = date( "Y-m-d", is_string( $event_start ) ? strtotime( $event_start ) : intval( $event_start ) );
             $event_end   = date( "Y-m-d", is_string( $event_end )   ? strtotime( $event_end )   : intval( $event_end ) );
 
-            $this->app->ajax()->calendarEventAdd( '#cal' . $this->id, $this->addonpre . $event_title . $this->addonpos, $event_start, $event_end, $event_id, $event_color );
+            $this->app->ajax->calendarEventAdd( '#cal' . $this->id, $this->addonpre . $event_title . $this->addonpos, $event_start, $event_end, $event_id, $event_color );
             return $this;
         }
 
         public function getStart(){
-            if( isset( $_GET[ 'start' ] ) && myrules::isdate( $_GET[ 'start' ] ) && isset( $_GET[ 'end' ] ) && myrules::isdate( $_GET[ 'end' ] ) && ( strtotime( $_GET[ 'start' ] ) < strtotime( $_GET[ 'end' ] ) ) && ( strtotime( $_GET[ 'start' ] ) > ( strtotime( $_GET[ 'end' ] ) - 5184000 ) ) )
+            if( isset( $_GET[ 'start' ] ) && $this->app->rules->isdate( $_GET[ 'start' ] ) && isset( $_GET[ 'end' ] ) && $this->app->rules->isdate( $_GET[ 'end' ] ) && ( strtotime( $_GET[ 'start' ] ) < strtotime( $_GET[ 'end' ] ) ) && ( strtotime( $_GET[ 'start' ] ) > ( strtotime( $_GET[ 'end' ] ) - 5184000 ) ) )
                 return $_GET[ 'start' ];
             
             return false;
         }
 
         public function getEnd(){
-            if( isset( $_GET[ 'start' ] ) && myrules::isdate( $_GET[ 'start' ] ) && isset( $_GET[ 'end' ] ) && myrules::isdate( $_GET[ 'end' ] ) && ( strtotime( $_GET[ 'start' ] ) < strtotime( $_GET[ 'end' ] ) ) && ( strtotime( $_GET[ 'start' ] ) > ( strtotime( $_GET[ 'end' ] ) - 5184000 ) ) )
+            if( isset( $_GET[ 'start' ] ) && $this->app->rules->isdate( $_GET[ 'start' ] ) && isset( $_GET[ 'end' ] ) && $this->app->rules->isdate( $_GET[ 'end' ] ) && ( strtotime( $_GET[ 'start' ] ) < strtotime( $_GET[ 'end' ] ) ) && ( strtotime( $_GET[ 'start' ] ) > ( strtotime( $_GET[ 'end' ] ) - 5184000 ) ) )
                 return $_GET[ 'end' ];
             
             return false;
@@ -164,7 +166,7 @@
         public function obj(){
             
             if( $this->init )
-                $this->app->ajax()->calendar( '#cal' . $this->id );
+                $this->app->ajax->calendar( '#cal' . $this->id );
 
             return array( 'url'         => $this->url,
                           'onclick'     => $this->onclick,
@@ -172,8 +174,8 @@
                           'id'          => $this->id,
                           'init'        => $this->init );
         }
-        
+
         public function __toString(){
-            return $this->app->render( '@my/mycalendar', $this->obj(), null, null, 0, false, false );
+            return $this->app->view->fetch( '@my/mycalendar.twig', $this->obj() );
         }
     }

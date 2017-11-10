@@ -2,12 +2,15 @@
 
 class myclipboard{
 
+    /** @var mycontainer*/
+    private $app;
+
     private $label;
     private $values;
     private $image;
 
-    public function __construct(){
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
     public function & setLabel( $label ){
@@ -26,14 +29,8 @@ class myclipboard{
     }
 
     public function __toString(){
-        return $this->render();
-    }
+        $this->app->ajax->clipboard();
 
-    private function render(){
-
-        $this->app->ajax()->clipboard();
-
-        return $this->app->render( '@my/myclipboard', array( 'label' => $this->label, 'values' => $this->values, 'image' => $this->image ), null, null, null, false, false );
-
+        return $this->app->view->fetch( '@my/myclipboard.twig', array( 'label' => $this->label, 'values' => $this->values, 'image' => $this->image ) );
     }
 }

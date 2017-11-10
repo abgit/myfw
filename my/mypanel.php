@@ -2,6 +2,9 @@
 
 class mypanel{
 
+    /** @var mycontainer*/
+    private $app;
+
     private $name;
     private $key;
     private $keyhtml;
@@ -15,12 +18,10 @@ class mypanel{
     private $size       = 6;
     private $sizeoffset = 0;
     private $action     = false;
-    private $idmenusel  = 0;
     private $cdn        = false;
 
-    public function __construct( $name = 'p' ){
-        $this->name = $name;
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
     public function & setID( $id ){
@@ -67,8 +68,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addThumb( $key, $keyhttps = null, $static = false, $size = 3, $urlobj = '', $classkey = '', $default = '' ){
-        $this->elements[ 'thumb' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key, 'static' => $static, 'size' => $size, 'urlobj' => $urlobj, 'classkey' => $classkey, 'default' => $default );
+    public function & addThumb( $key, $static = false, $size = 3, $urlobj = '', $classkey = '', $default = '' ){
+        $this->elements[ 'thumb' ] = array( 'key' => $key, 'static' => $static, 'size' => $size, 'urlobj' => $urlobj, 'classkey' => $classkey, 'default' => $default );
         return $this;
     }
     
@@ -92,8 +93,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addBackground( $key, $keyhttps = null ){
-        $this->elements[ 'back' ] = array( 'key' => ( !is_null( $keyhttps ) && $this->app->ishttps() ) ? $keyhttps : $key );
+    public function & addBackground( $key ){
+        $this->elements[ 'back' ] = array( 'key' => $key );
         return $this;
     }
 
@@ -108,7 +109,7 @@ class mypanel{
     }
 
     public function & ajaxUpdateProgress( $key, $value ){
-        $this->app->ajax()->css( '#ppb' . $key, 'width', $value . '%' );
+        $this->app->ajax->css( '#ppb' . $key, 'width', $value . '%' );
         return $this;
     }
 
@@ -117,7 +118,7 @@ class mypanel{
         if( isset( $this->elements[ 'status' ] ) )
             foreach( $this->elements[ 'status' ] as $el )
                 if( isset( $el[ 'key' ] ) && $el[ 'key' ] == $statuskey && isset( $el[ 'type' ] ) && $el[ 'type' ] == 1 && isset( $el[ 'sufix' ] ) )
-                    $this->app->ajax()->text( '#psiv' . $key . $statuskey, $value . myfilters::label( $el[ 'sufix' ], $value ) );
+                    $this->app->ajax->text( '#psiv' . $key . $statuskey, $value . $this->app->filters->label( $el[ 'sufix' ], $value ) );
 
         return $this;
     }
@@ -128,21 +129,21 @@ class mypanel{
         if( isset( $this->elements[ 'info' ][ $infokey ] ) )
             $value = $this->elements[ 'info' ][ $infokey ][ 'prefix' ] . $value . $this->elements[ 'info' ][ $infokey ][ 'sufix' ] . $extravalue . $this->elements[ 'info' ][ $infokey ][ 'extrasufix' ];
         
-        $this->app->ajax()->html( '#pic' . $infokey . $panelkey, $value )
-                          ->removeClass( '#pi' . $infokey . $panelkey, 'hide' );
+        $this->app->ajax->html( '#pic' . $infokey . $panelkey, $value )
+                        ->removeClass( '#pi' . $infokey . $panelkey, 'hide' );
         return $this;
     }
 
     public function & ajaxHideInfo( $panelkey, $infokey ){
         
-        $this->app->ajax()->html( '#pic' . $infokey . $panelkey, '' )
-                          ->switchClass( '#pi' . $infokey . $panelkey, 'hide', 'hide' );
+        $this->app->ajax->html( '#pic' . $infokey . $panelkey, '' )
+                        ->switchClass( '#pi' . $infokey . $panelkey, 'hide', 'hide' );
         return $this;
     }
 
     public function & ajaxMenuLabel( $panelkey, $value ){
         
-        $this->app->ajax()->html( '#pms' . $panelkey, $value );
+        $this->app->ajax->html( '#pms' . $panelkey, $value );
 
         return $this;
     }
@@ -178,17 +179,17 @@ class mypanel{
     }
 
     public function & ajaxStatusIconShow( $key, $id, $operation = true ){
-        $this->app->ajax()->css( '#pani' . $id . $key, 'display', $operation ? 'inline' : 'none' );
+        $this->app->ajax->css( '#pani' . $id . $key, 'display', $operation ? 'inline' : 'none' );
         return $this;
     }
 
     public function & ajaxStatusIconShowClass( $classname, $operation = true ){
-        $this->app->ajax()->css( '.panicon' . $classname, 'display', $operation ? 'inline' : 'none' );
+        $this->app->ajax->css( '.panicon' . $classname, 'display', $operation ? 'inline' : 'none' );
         return $this;
     }
 
     public function & ajaxThumbChange( $src, $class ){
-        $this->app->ajax()->attr( '.pt' . $class, 'src', ( is_string( $src ) && strlen( $src ) ) ? $src : ( isset( $this->elements[ 'thumb' ][ 'default' ] ) ? $this->elements[ 'thumb' ][ 'default' ] : '' ) );
+        $this->app->ajax->attr( '.pt' . $class, 'src', ( is_string( $src ) && strlen( $src ) ) ? $src : ( isset( $this->elements[ 'thumb' ][ 'default' ] ) ? $this->elements[ 'thumb' ][ 'default' ] : '' ) );
         return $this;
     }
 
@@ -199,7 +200,7 @@ class mypanel{
                 if( $menu[ 'type' ] == 1 ){
                     foreach( $menu[ 'options' ] as $k => $option ){
                         if( isset( $option[ 'id' ] ) && $option[ 'id' ] == $index ){
-                            $this->app->ajax()->css( '#panm' . $id . $k, 'display', $operation ? 'block' : 'none' );
+                            $this->app->ajax->css( '#panm' . $id . $k, 'display', $operation ? 'block' : 'none' );
                             break;
                         }
                     }
@@ -211,7 +212,7 @@ class mypanel{
     }
 
     public function & ajaxMenuShowClass( $index, $class, $operation = true ){
-        $this->app->ajax()->css( '.panmc' . $index . $class, 'display', $operation ? 'block' : 'none' );
+        $this->app->ajax->css( '.panmc' . $index . $class, 'display', $operation ? 'block' : 'none' );
         return $this;
     }
 
@@ -276,15 +277,15 @@ class mypanel{
         if( isset( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] ) ){
             foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr ){
                 if( $arr[ 'id' ] == $index ){
-                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $arr[ 'id' ], true )
-                                      ->attr( '#menl' . $ctxmenuid . $arr[ 'id' ], 'class', 'active' );
+                    $this->app->ajax->visibility( '#meni' . $ctxmenuid . $arr[ 'id' ], true )
+                                    ->attr( '#menl' . $ctxmenuid . $arr[ 'id' ], 'class', 'active' );
 
                     if( isset( $arr[ 'menu' ] ) ){
-                        $this->app->ajax()->text( '#menbl' . $ctxmenuid, $arr[ 'menu' ] );
+                        $this->app->ajax->text( '#menbl' . $ctxmenuid, $arr[ 'menu' ] );
                     }
                 }else{
-                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $arr[ 'id' ], false )
-                                      ->attr( '#menl' . $ctxmenuid . $arr[ 'id' ], 'class', '' );
+                    $this->app->ajax->visibility( '#meni' . $ctxmenuid . $arr[ 'id' ], false )
+                                    ->attr( '#menl' . $ctxmenuid . $arr[ 'id' ], 'class', '' );
                 }
             }
         }
@@ -314,7 +315,7 @@ class mypanel{
 
         if( isset( $_POST[ 'os' ] ) ){
             $this->offset = intval( $_POST[ 'os' ] );
-            $this->app->ajax()->val( '#' . $this->name . 'moreos', $this->offset + $this->perpage );
+            $this->app->ajax->val( '#' . $this->name . 'moreos', $this->offset + $this->perpage );
         }else{
             $this->offset  = $offset;        
         }
@@ -345,7 +346,7 @@ class mypanel{
         return $this;
     }
 
-    public function &addAjaxValues( $values, $append = true ){
+    public function & addAjaxValues( $values, $append = true ){
 
         if( !is_array( $values ) )
             return $this;
@@ -353,17 +354,17 @@ class mypanel{
         $counter = count( $values );
 
         if( $counter ){
-            $append ? $this->app->ajax()->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax()->prepend( '#' . $this->name, $this->render( $values ) );
+            $append ? $this->app->ajax->append( '#' . $this->name, $this->render( $values ) ) : $this->app->ajax->prepend( '#' . $this->name, $this->render( $values ) );
         }
 
         if( $this->perpage > $counter )
-            $this->app->ajax()->hide( '#' . $this->name . 'more' );
+            $this->app->ajax->hide( '#' . $this->name . 'more' );
 
         return $this;
     }
 
     public function & ajaxRemove( $tag ){
-        $this->app->ajax()->hide( '#' . $this->name . $tag );
+        $this->app->ajax->hide( '#' . $this->name . $tag );
         return $this;
     }
 
@@ -375,11 +376,11 @@ class mypanel{
         $counter = count( $values );
 
         if( $this->perpage > $counter )
-            $this->app->ajax()->hide( '#' . $this->name . 'more' );
+            $this->app->ajax->hide( '#' . $this->name . 'more' );
         else
-            $this->app->ajax()->show( '#' . $this->name . 'more' );
+            $this->app->ajax->show( '#' . $this->name . 'more' );
 
-        $this->app->ajax()->html( '#' . $this->name, $this->render( $values ) );
+        $this->app->ajax->html( '#' . $this->name, $this->render( $values ) );
 
         $this->resetOffset();
 
@@ -387,30 +388,31 @@ class mypanel{
     }
 
 
+    public function show( $htmlid ){
+        $this->app->ajax->html( $htmlid, $this->render() );
+    }
+
+
     public function __toString(){
         return $this->render();
     }
 
-    public function show( $htmlid ){
-        $this->app->ajax()->html( $htmlid, $this->render() );
-    }
 
     private function render( $values = null ){
-        return $this->app->render( '@my/mypanel', array( 'values'     => is_null( $values ) ? $this->values : $values,
-                                                         'elements'   => $this->elements,
-                                                         'name'       => $this->name,
-                                                         'key'        => $this->key,
-                                                         'keyhtml'    => $this->keyhtml,
-                                                         'emptymsg'   => $this->emptymsg,
-                                                         'cdn'        => $this->cdn,
-                                                         'more'       => $this->more,
-                                                         'offset'     => $this->offset + $this->perpage,
-                                                         'perpage'    => $this->perpage,
-                                                         'size'       => $this->size,
-                                                         'sizeoffset' => $this->sizeoffset,
-                                                         'allitems'   => is_null( $values ),
-                                                         'action'     => $this->action,
-                                                         'tags'       => array( array( $this->key ), array( $this->keyhtml ) )
-                                                         ), null, null, null, false, false );
+        return $this->app->view->fetch( '@my/mypanel.twig', array( 'values'     => is_null( $values ) ? $this->values : $values,
+                                                                            'elements'   => $this->elements,
+                                                                            'name'       => $this->name,
+                                                                            'key'        => $this->key,
+                                                                            'keyhtml'    => $this->keyhtml,
+                                                                            'emptymsg'   => $this->emptymsg,
+                                                                            'cdn'        => $this->cdn,
+                                                                            'more'       => $this->more,
+                                                                            'offset'     => $this->offset + $this->perpage,
+                                                                            'perpage'    => $this->perpage,
+                                                                            'size'       => $this->size,
+                                                                            'sizeoffset' => $this->sizeoffset,
+                                                                            'allitems'   => is_null( $values ),
+                                                                            'action'     => $this->action,
+                                                                            'tags'       => array( array( $this->key ), array( $this->keyhtml ) ) ) );
     }
 }

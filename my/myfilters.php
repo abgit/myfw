@@ -2,46 +2,53 @@
 
 class myfilters{
 
+    /** @var mycontainer*/
+    private $app;
 
-    public static function trim( $value ){
+    public function __construct( $c ){
+        $this->app = $c;
+    }
+
+    public function trim( $value ){
         return trim( $value );
     }
 
-    public static function sha1( $value ){
+    public function sha1( $value ){
         return sha1( $value );
     }
 
-    public static function md5( $string ){
+    public function md5( $string ){
         return md5( $string );
     }
 
-    public static function nl2br( $string ){
+    public function nl2br( $string ){
         return nl2br( $string );
     }
 
-    public static function nozero( $string ){
+    public function nozero( $string ){
         return empty( $string ) ? '' : $string;
     }
 
-    public static function jsondecode( $string ){
+    public function jsondecode( $string ){
         return is_string( $string ) ? json_decode( $string, true ) : $string;
     }
 
-    public static function bitcoinqrcode( $amount, $acc, $size ){
-        return \Slim\Slim::getInstance()->blockchain()->qrcode( $amount, '', $acc, $size );
+    public function bitcoinqrcode( $amount, $acc, $size ){
+        return $this->app->blockchain->qrcode( $amount, '', $acc, $size );
     }
-    
-    public static function bitcoinfrombtc( $amount, $currencies ){
-        $btc  = \Slim\Slim::getInstance()->blockchain()->exchangebtc();
+
+/*
+    public function bitcoinfrombtc( $amount, $currencies ){
+        $btc  = $this->app->blockchain->exchangebtc();
         $vals = array();
         if( is_array( $currencies ) )
             foreach( $currencies as $cur )
                 $vals[ $cur ] = isset( $btc[ $cur ] ) ? $btc[ $cur ] : array();
 
         return $vals;
-    }
+    }*/
 
-    public static function usernameinstagram( $value ){
+    public function usernameinstagram( $value ){
 
         if( preg_match('/^([a-zA-Z0-9._]+)$/', $value, $matches ) )
             return $matches[1];
@@ -55,7 +62,7 @@ class myfilters{
         return false;
     }
 
-    public static function usernamefacebook( $value ){
+    public function usernamefacebook( $value ){
 
         $username = '';
 
@@ -69,7 +76,7 @@ class myfilters{
             $username = $matches[2];
 
         if( !empty( $username ) ){
-            $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '?fields=id&access_token=' . \Slim\Slim::getInstance()->config( 'facebook.key' ) );
+            $json = file_get_contents( 'https://graph.facebook.com/v2.10/' . $username . '?fields=id&access_token=' . $this->app->config[ 'facebook.key' ] );
             $json = json_decode($json, true);
             
             return isset( $json[ 'id' ] ) ? $json[ 'id' ] : false;
@@ -78,30 +85,30 @@ class myfilters{
         return false;
     }
 
-    public static function channelyoutube( $value ){
+    public function channelyoutube( $value ){
 
         if( preg_match('/^([a-zA-Z0-9._]+)$/', $value, $matches ) || preg_match('/^@([a-zA-Z0-9._]+)$/', $value, $matches ) ){
 
-            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$matches[1].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$matches[1].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key=' . $this->app->config[ 'youtube.key' ] );
             $res = json_decode($res, true);
 
             if( isset( $res['items'][0]['id'] ) )
                 return $matches[1];
 
-            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&forUsername='.$matches[1].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&forUsername='.$matches[1].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key=' . $this->app->config[ 'youtube.key' ] );
             $res = json_decode($res, true);
 
             return isset( $res['items'][0]['id'] ) ? $res['items'][0]['id'] : false;
         }
 
         if( preg_match('/^(https?:\/\/)?(www.)?youtube.com\/channel\/([a-zA-Z0-9._]+)/i', $value, $matches ) ){
-            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$matches[3].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$matches[3].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key=' . $this->app->config[ 'youtube.key' ] );
             $res = json_decode($res, true);
             return isset( $res['items'][0]['id'] ) ? $res['items'][0]['id'] : false;
         }
 
         if( preg_match('/^(https?:\/\/)?(www.)?youtube.com\/user\/([a-zA-Z0-9._]+)/i', $value, $matches ) ){
-            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&forUsername='.$matches[3].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key='.\Slim\Slim::getInstance()->config( 'youtube.key' ));
+            $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&forUsername='.$matches[3].'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key=' . $this->app->config[ 'youtube.key' ] );
             $res = json_decode($res, true);
             return isset( $res['items'][0]['id'] ) ? $res['items'][0]['id'] : false;
         }
@@ -109,35 +116,35 @@ class myfilters{
         return false;
     }
 
-    public static function toround( $value ){
+    public function toround( $value ){
         return rtrim( rtrim( $value, "0"), "." );
     }
 
-    public static function satoshi( $amount ){
+    public function satoshi( $amount ){
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
-    public static function filestack( $urloriginal, $call = 'read', $custom = '', $process = true, $expiry = null ){
+    public function filestack( $urloriginal, $call = 'read', $custom = '', $process = true, $expiry = null ){
 
         $url = substr( $urloriginal, 33 );
 
         if( empty( $url ) || strpos( $urloriginal, 'https://cdn.filestackcontent.com' ) !== 0 )
             return '';
 
-        $secret    = \Slim\Slim::getInstance()->config( 'filestack.secret' );
+        $secret    = $this->app->config[ 'filestack.secret' ];
         $policy    = '{"expiry":' . ( is_numeric( $expiry ) ? $expiry : strtotime( 'first day of next month midnight' ) ) . ',"call":"' . $call . '"}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
-        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+//        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
 
-        return $process ? 'https://process.filestackapi.com/' . \Slim\Slim::getInstance()->config( 'filestack.api' ) . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . ( empty( $custom ) ? '' : '/' ) . $url : 'https://www.filestackapi.com/api/file/' . $url . ( empty( $custom ) ? '' : '/' ) . $custom . '?signature=' . $signature . '&policy=' . $policy64;
+        return $process ? 'https://process.filestackapi.com/' . $this->app->config[ 'filestack.api' ] . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . ( empty( $custom ) ? '' : '/' ) . $url : 'https://www.filestackapi.com/api/file/' . $url . ( empty( $custom ) ? '' : '/' ) . $custom . '?signature=' . $signature . '&policy=' . $policy64;
     }
 
-    public static function filestackresize( $url, $w, $h = null ){
-        return myfilters::filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) . ',f:max/output=f:jpg', true, 4000000000 );
+    public function filestackresize( $url, $w, $h = null ){
+        return $this->app->filters->filestack( $url, 'convert', 'resize=w:' . intval( $w ) . ',h:' . intval( is_null( $h ) ? $w : $h ) . ',f:max/output=f:jpg', true, 4000000000 );
     }
-
-    public static function filestackmovie( $url, $part ){
+/*
+    public function filestackmovie( $url, $part ){
 
         $app  = \Slim\Slim::getInstance();
         $hash = 'fs' . md5( $url );
@@ -170,28 +177,28 @@ class myfilters{
         
         return '';
     }
-
-    public static function toBTC( $satoshi, $decimal = 8 ) {
+*/
+    public function toBTC( $satoshi, $decimal = 8 ) {
         return bcdiv((float)(string)$satoshi, 100000000, $decimal );
     }
 
-    public static function toBTCString($satoshi) {
-        return sprintf("%.8f", self::toBTC($satoshi));
+    public function toBTCString($satoshi) {
+        return sprintf("%.8f", $this->toBTC( $satoshi ) );
     }
 
-    public static function toSatoshiString($btc) {
+    public function toSatoshiString($btc) {
         return bcmul(sprintf("%.8f", (float)$btc), 100000000, 0);
     }
 
-    public static function toSatoshi($btc) {
-        return (float)self::toSatoshiString($btc);
+    public function toSatoshi($btc) {
+        return (float) $this->toSatoshiString($btc);
     }
     
-    public static function nl2space( $string ){
+    public function nl2space( $string ){
         return preg_replace( "@( )*[\\r|\\n|\\t]+( )*@", " ", $string );
     }
 
-    public static function label( $string, $number ){
+    public function label( $string, $number ){
         $exp = explode( '!', $string );
 
         if( count( $exp ) < 2 || strlen( $exp[1] ) == 0 )
@@ -203,81 +210,32 @@ class myfilters{
         return $exp[0];
     }
 
-    public static function floatval( $string ){
+    public function floatval( $string ){
         return is_array($string) ? array_map( 'floatval', $string ) : floatval( $string );
     }
 
-    public static function intval( $value ){
-        return is_array( $string ) ? array_map( 'intval', $string ) : intval( $string );
+    public function intval( $value ){
+        return is_array( $value ) ? array_map( 'intval', $value ) : intval( $value );
     }
 
-    public static function shortify( $value, $onlyalpha = false ){
+    public function shortify( $value, $onlyalpha = false ){
         return $onlyalpha ? preg_replace( "/[^a-zA-Z0-9]/", '', $value ) : preg_replace( "/[^a-zA-Z0-9_-]/", "-", $value );
     }
 
-    public static function hexcolor( $val ){
+    public function hexcolor( $val ){
         return ( strlen( $val ) > 2 && substr( $val, 0, 1 ) != '#' ) ? '#' . $val : $val;
     }
 
-    public static function replaceurl( $val, $valuearray, $tags ){
+    public function replaceurl( $val, $valuearray, $tags ){
         return str_replace( isset( $tags[1] ) ? $tags[1] : array(), array_map( function($n) use ( $valuearray ){ return isset( $valuearray[ $n ] ) ? $valuearray[ $n ] : ''; }, isset( $tags[0] ) ? $tags[0] : array() ), $val );
     }
 
-    public static function urlobj( $val, $valuearray = array(), $tags = array() ){
-        if( is_array( $val ) && isset( $val[ 'obj' ] ) ){
-            switch( $val[ 'obj' ] ){
-                case 'url':
-                case 'urlsubmit':
-                case 'urlajax':   return myfilters::_urlobj( $val, $valuearray, $tags );
-                case 'urls':      return myfilters::_urlobjmultiple( $val, $valuearray );
-            }
-        }
 
+    public function cdn( $html ){
+        return preg_replace( '~(href|src|url|content)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $this->app->config[ 'filter.cdn.ext' ] . ')(["\'])~i', '$1$2"' . $this->app->config[ 'filter.cdn.domain' ] . '$5$6"', $html  );
     }
 
-    public static function _urlobj( $val, $valuearray = array(), $tags = array() ){
-        if( is_array( $val ) && isset( $val[ 'obj' ] ) ){
-
-            if( isset( $val[ 'url' ] ) ){
-                $url = ( !empty( $valuearray ) && !empty( $tags ) ) ? myfilters::replaceurl( $val[ 'url' ], $valuearray, $tags ) : $val[ 'url' ];
-            }else{
-                $url = null;
-            }
-
-            switch( $val[ 'obj' ] ){
-                case 'urlajax':   return "onclick=\"myfwsubmit('" . $url . ( is_string( $val[ 'msg' ] ) ? "','" . $val[ 'msg' ] : '' ) . "')\"";
-                case 'urlsubmit': return "onclick=\"myfwformsubmit('" . $val[ 'formname' ] . "','','','" . $val[ 'submitbutton' ] . "','" . $val[ 'msg' ] . "','" . $val[ 'action' ] . "'," . $val[ 'delay' ] . ")\"";
-                case 'url':       return 'href="' . $url . '"' . ( ( isset( $val[ 'target' ] ) && !empty( $val[ 'target' ] ) ) ? ' target="' . $val[ 'target' ] . '"' : '' );
-            }
-        }
-    }
-
-    public static function _urlobjmultiple( $url, $values ){
-
-        if( is_array( $url ) ){
-            $keys               = $url[ 'keys' ];
-            $urlmultiplekey     = $url[ 'code' ];
-            $urlmultipledefault = $url[ 'default' ];
-            $url                = $url[ 'urls' ];
-
-            if( isset( $values[ $urlmultiplekey ] ) ){
-                foreach( $url as $i => $urlobj ){
-                    if( strval( $i ) === strval( $values[ $urlmultiplekey ] ) ){
-                        return myfilters::_urlobj( $urlobj, $values, $keys );
-                    }
-                }
-            }
-
-            return is_string( $urlmultipledefault ) ? myfilters::_urlobj( $urlmultipledefault, $values, $keys ) : '';
-        }
-    }
-
-    public static function cdn( $html ){
-        $app  = \Slim\Slim::getInstance();
-        return preg_replace( '~(href|src|url|content)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $app->config( 'filter.cdn.ext' ). ')(["\'])~i', '$1$2"' . $app->config( 'filter.cdn.domain' ) . '$5$6"', $html  );
-    }
-
-    public static function intervalmin( $value, $intervals ){
+    public function intervalmin( $value, $intervals ){
         if( !is_array( $intervals ) )
             return $intervals;
 
@@ -292,7 +250,7 @@ class myfilters{
         return isset( $intervals[ 'default' ] ) ? $intervals[ 'default' ] : '';
     }
 
-    public static function intersect( $array, $optarray ){
+    public function intersect( $array, $optarray ){
 
         if( !is_array( $optarray ) )
             $optarray = explode( ';', $optarray );
@@ -307,11 +265,11 @@ class myfilters{
         return $res;
     }
 
-    public static function values( $array ){
+    public function values( $array ){
         return is_array( $array ) ? implode( ', ', array_values( $array ) ) : $array;
     }
 
-    public static function replaceonly( $string, $array ){
+    public function replaceonly( $string, $array ){
         
         if( empty( $array ) )
             $array = array();
@@ -325,7 +283,7 @@ class myfilters{
     }
 
 
-    public static function urls( $string, $separator = null ){
+    public function urls( $string, $separator = null ){
 
         $res = array();
 
@@ -342,7 +300,7 @@ class myfilters{
     }
 
 
-    public static function meta( $url, $separator = null ){
+    public function meta( $url, $separator = null ){
 
         $res = array();
         $dom = new DOMDocument( '1.0', 'UTF-8' );
@@ -367,6 +325,7 @@ class myfilters{
 
             foreach( $dom->getElementsByTagName( 'meta' ) as $meta ){
 
+                /** @var DOMElement $meta */
                 switch( $meta->getAttribute( 'property' ) ){
                     case 'twitter:title':
                     case 'og:title':       $res[ 'title' ]       = $meta->getAttribute( 'content' );
@@ -391,7 +350,7 @@ class myfilters{
     }
 
 
-    public static function inarray( $string, $array, $default = 'unknown' ){
+    public function inarray( $string, $array, $default = 'unknown' ){
 
         $string = strval( $string );
         if( is_array( $array ) )
@@ -402,17 +361,17 @@ class myfilters{
         return $default;
     }
 
-    public static function statecolor($string){
+    public function statecolor($string){
         if( intval( $string ) > 0 ){ return '#090'; }
         if( intval( $string ) < 0 ){ return '#F00'; }
         return '#960';
     }
 
-    public static function extension($string){
+    public function extension($string){
         return strtolower( pathinfo( $string, PATHINFO_EXTENSION ) );
     }
 
-    public static function order( $string, $returnOriginal = true ){
+    public function order( $string, $returnOriginal = true ){
         $sufix = 'th';
         switch( intval( $string ) ){
             case 1: $sufix = 'st'; break;
@@ -422,15 +381,15 @@ class myfilters{
         return $returnOriginal ? $string . $sufix : $sufix;
     }
 
-    public static function t( $string, $chars = 10, $rep = '..', $right = true ){
+    public function t( $string, $chars = 10, $rep = '..', $right = true ){
         return $chars < strlen($string) ? ( $right ? ( substr( $string, 0, $chars ) . $rep ) : ( $rep . substr( $string, strlen( $string ) - $chars ) ) ) : $string;
     }
 
-    public static function m( $string, $showSymbol = true ){
+    public function m( $string, $showSymbol = true ){
         return ( $showSymbol ? '&euro; ' : '' ) . round( $string, 2 );
     }
 
-    public static function rnumber( $string, $mini = false ){
+    public function rnumber( $string, $mini = false ){
         $string = ( 0 + str_replace( ",", "", $string ) );
         if( !is_numeric( $string ) )
             return false;
@@ -445,20 +404,14 @@ class myfilters{
         return ( $mini ? '<1K' : number_format( $string ) );
     }
 
-    public static function bcloudname( $string ){
-        $b = new mybcloud();
-        $b = $b->getCategoriesList();
-        return isset( $b[$string] ) ? $b[$string][0] : 'unknown';
-    }
-
-    public static function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){
+    public function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){
         if( strpos( $hash, '@' ) )
             $hash = md5( strtolower( trim( $hash ) ) );
 
-        return ( \Slim\Slim::getInstance()->request->isAjax() ? 'http://www.gravatar.com/avatar/' : 'https://secure.gravatar.com/avatar/' ) . $hash . "?s=$s&d=$d&r=$r";
+        return 'https://secure.gravatar.com/avatar/' . $hash . "?s=$s&d=$d&r=$r";
     }
 
-    public static function transloadit( $json, $step, $property = null, $property2 = null, $property3 = null ){
+    public function transloadit( $json, $step, $property = null, $property2 = null, $property3 = null ){
     
         $arr = is_string( $json ) ? json_decode( $json ) : $json;
 
@@ -490,31 +443,33 @@ class myfilters{
         return null;
     }
 
-    public static function url( $value ){
-        if( ! empty( $value ) )
-            return ( strtolower( substr( $value, 0, 7 ) ) != 'http://' && strtolower( substr( $value, 0, 8 ) ) != 'https://' ) ? 'http://' . $value : $value;
+    public function url( $value ){
+        if( empty( $value ) )
+            return '';
+
+        return ( strtolower( substr( $value, 0, 7 ) ) != 'http://' && strtolower( substr( $value, 0, 8 ) ) != 'https://' ) ? 'http://' . $value : $value;
     }
 
-    public static function domain( $value ){
+    public function domain( $value ){
         return parse_url( ( strtolower( substr( $value, 0, 7 ) ) != 'http://' && strtolower( substr( $value, 0, 8 ) ) != 'https://' ) ? 'http://' . $value : $value, PHP_URL_HOST );
     }
  
-    public static function urlusername( $value ){
+    public function urlusername( $value ){
         return parse_url( $value, PHP_URL_USER );
     }
 
-    public static function urlregion( $value ){
+    public function urlregion( $value ){
         return substr( strstr( parse_url( $value,  PHP_URL_HOST ), '.', true ), 4 );
     }
 
-    public static function markdown( $data ){
+    public function markdown( $data ){
         $parser = new \Michelf\MarkdownExtra();
         $parser->no_markup = true;
         $parser->no_entities = true;
         return $parser->transform($data);
     }
 
-    public static function ago( $datetime, $full = 0 , $includeoriginal = 0 ){
+    public function ago( $datetime, $full = 0 , $includeoriginal = 0 ){
 
         if( strtotime( $datetime ) < 1 )
             return '';
@@ -522,8 +477,7 @@ class myfilters{
         $now = new DateTime;
         $ago = new DateTime( $datetime );
         $diff = $now->diff( $ago );
-        $diff->w = floor( $diff->d / 7 );
-        $diff->d -= $diff->w * 7;
+        $diff->d = $diff->d - ( floor( $diff->d / 7 ) * 7 );
         $string = array( 'y' => 'year', 'm' => 'month', 'w' => 'week', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second' );
         foreach( $string as $k => &$v ){
             if( $diff->$k ){
@@ -540,13 +494,13 @@ class myfilters{
         return ( $string ? ( $ago ? '' : 'in ' ) . implode( ', ', $string ) . ( $ago ? ' ago' : '' ) : 'just now' ) . ( $includeoriginal ? ( ', ' . $datetime ) : '' );
     }
 
-    public static function xss( $data ){
+    public function xss( $data ){
 
         // remove email before markdown
         $data = preg_replace("/[^@\s]*@[^@\s]*\.[^@\s]*/", "[email]", $data);
 
         // markdown
-        $data = myfilters::markdown( $data );
+        $data = $this->markdown( $data );
 
         // xss
         // Fix &entity\n;
@@ -584,13 +538,13 @@ class myfilters{
     }
 
     // js design helper: worldmap
-    public static function worldmap( $value, $options ){
+    public function worldmap( $value, $options ){
 
         // id
         if( !isset( $options[ 'id' ] ) )
-            return;
+            return '';
         
-        $id = myfilters::shortify( $options[ 'id' ], true );
+        $id = $this->shortify( $options[ 'id' ], true );
 
         $html = '';
         if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
@@ -612,13 +566,13 @@ class myfilters{
     }
     
     // js design helper: morris line
-    public static function morrisline( $value, $options ){
+    public function morrisline( $value, $options ){
 
         // id
         if( !isset( $options[ 'id' ] ) )
-            return;
+            return '';
         
-        $id = myfilters::shortify( $options[ 'id' ], true );
+        $id = $this->shortify( $options[ 'id' ], true );
 
         $html = '';
         if( !isset( $options[ 'js' ] ) || $options[ 'js' ] != false ){
@@ -635,11 +589,11 @@ class myfilters{
     }
 
     // js design helper: morris donut
-    public static function morrisdonut( $value, $options ){
+    public function morrisdonut( $value, $options ){
 
         // id
         if( !isset( $options[ 'id' ] ) )
-            return;
+            return '';
 
         $id = myfilters::shortify( $options[ 'id' ], true );
 
@@ -657,7 +611,7 @@ class myfilters{
         return $html;
     }
 
-    public static function autolink( $string ){
+    public function autolink( $string ){
 
         return preg_replace_callback( '~\b(?:https?)://\S+~i', function( $v ){
                     if( preg_match( '~\.jpe?g|\.png|\.gif|\.svg|\.bmp$~i', $v[0] ) ){

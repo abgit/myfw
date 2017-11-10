@@ -1,59 +1,62 @@
 <?php
 
     use Auth0\SDK\API\Authentication;
+    use Auth0\SDK\API\Oauth2Client;
     use Auth0\SDK\API\Management;
     use Auth0\SDK\Store\SessionStore;
 
+    /**
+     * @property string $uuid
+     */
+    class myauth0 implements arrayaccess{
 
-    class myauth0{
+        /** @var mycontainer */
+        private $app;
 
-	    private $auth0;
-    
-        public function __construct(){
-            $this->app = \Slim\Slim::getInstance();
+        /** @var Oauth2Client  */
+        private $auth0;
 
-            if( $this->app->config( 'auth0.driver' ) === 'heroku' ){
-                    $this->app->config( 'auth0.domain',       '@AUTH0_DOMAIN' );
-                    $this->app->config( 'auth0.clientid',     '@AUTH0_CLIENT_ID' );
-                    $this->app->config( 'auth0.clientsecret', '@AUTH0_CLIENT_SECRET' );
-                    $this->app->config( 'auth0.redirecturi',  '@AUTH0_CALLBACK_URL' );
-                    $this->app->config( 'auth0.apptoken',     '@AUTH0_APPTOKEN' );
+        private $domain;
+	    private $clientid;
+        private $clientsecret;
+        private $redirecturi;
+        private $apptoken;
+        private $logouturi;
+        private $linkurl;
 
-            }elseif( $this->app->config( 'auth0.driver' ) === 'fortrabbit' ){
-                    $this->app->config( 'auth0.domain',       '@AUTH0_DOMAIN' );
-                    $this->app->config( 'auth0.clientid',     '@AUTH0_CLIENT_ID' );
-                    $this->app->config( 'auth0.clientsecret', '#AUTH0_CLIENT_SECRET' );
-                    $this->app->config( 'auth0.redirecturi',  '@AUTH0_CALLBACK_URL' );
-                    $this->app->config( 'auth0.apptoken',     '@AUTH0_APPTOKEN' );
-            }
-
+        // TODO: add /auth0/callback middleware
+        public function __construct( $c ){
+            $this->app = $c;
+            $this->domain       = $this->app->config[ 'auth0.domain' ];
+            $this->clientid     = $this->app->config[ 'auth0.clientid' ];
+            $this->clientsecret = $this->app->config[ 'auth0.clientsecret' ];
+            $this->redirecturi  = $this->app->config[ 'auth0.redirecturi' ];
+            $this->apptoken     = $this->app->config[ 'auth0.apptoken' ];
+            $this->logouturi    = $this->app->config[ 'auth0.logouturi' ];
+            $this->linkurl      = $this->app->config[ 'auth0.linkurl' ];
         }
 
         private function init( $persist = true ){
 
-            $auth0 = new Authentication( $this->app->config( 'auth0.domain' ), $this->app->config( 'auth0.clientid' ) );
-
             if( $persist )
-                $this->auth0 = $auth0->get_oauth_client( $this->app->config( 'auth0.clientsecret' ), $this->app->config( 'auth0.redirecturi' ), [
-                              'persist_id_token' => true,
-                              'persist_refresh_token' => true,
-                               ]);
+                $options = [ 'persist_id_token'      => true,
+                             'persist_refresh_token' => true ];
             else
-                $this->auth0 = $auth0->get_oauth_client( $this->app->config( 'auth0.clientsecret' ), $this->app->config( 'auth0.redirecturi' ), [
-                              'persist_id_token' => false,
-                              'persist_refresh_token' => false,
-                              'persist_user' => false,
-                              'store' => false
-                              ]);
+                $options = [ 'persist_id_token'      => false,
+                             'persist_refresh_token' => false,
+                             'persist_user'          => false,
+                             'store'                 => false ];
 
-//$userInfo = $auth0Oauth->getUser();
+            $obj = new Authentication( $this->domain, $this->clientid );
+            $this->auth0 = $obj->get_oauth_client( $this->clientsecret, $this->redirecturi, $options );
         }
 
         public function islogged(){
 
             $this->init();
 
-            $client = ( new SessionStore() )->get('user');
+            $client = ( new SessionStore() );
+            $client = $client->get('user');
 
             if( !$client )
                 $client = $this->auth0->getUser();
@@ -67,18 +70,55 @@
                 $client[ 'auth0uuid' ] = md5( $client[ 'user_id' ] );
                 $client[ 'loginmode' ] = $client[ 'provider' ] == 'auth0' ? 'username & password' : $client[ 'provider' ];
 
-                $this->app->client = $client;
+                $this->app->session->myauth0 = $client;
+
                 return true;
             }
 
             return false;
         }
-        
+
+        public function client(){
+            return isset( $this->app->session->myauth0 ) && is_array( $this->app->session->myauth0 ) ? $this->app->session->myauth0 : array();
+        }
+
+        public function offsetGet( $setting ) {
+
+            if( isset( $this->app->session->myauth0[ $setting ] ) )
+                return $this->app->session->myauth0[ $setting ];
+
+            return null;
+        }
+
+        public function offsetSet( $offset, $value ) {
+
+            $client = $this->app->session->myauth0;
+
+            $client[$offset] = $value;
+
+            $this->app->session->myauth0 = $client;
+        }
+
+        public function offsetExists( $offset ) {
+            return isset($this->app->session->myauth0[ $offset ] );
+        }
+
+        public function offsetUnset( $offset ) {
+
+            $client = $this->app->session->myauth0;
+
+            unset( $client[$offset] );
+
+            $this->app->session->myauth0 = $client;
+        }
+
         public function logout(){
+
+            $this->app->session->destroy();
 
             $this->init();
 
-            return $this->auth0->logout();
+            $this->auth0->logout();
         }
         
         public function link(){
@@ -91,11 +131,11 @@
             $link = $this->auth0->getUser();
 
             if( $link && isset( $user["user_id"] ) && isset( $link["user_id"] ) && isset( $link["identities"][0]["provider"] ) && isset( $link["identities"][0]["user_id"] ) ){
-                 $auth0Api = new Management( $this->app->config( 'auth0.apptoken' ), $this->app->config( 'auth0.domain' ) );
+                 $auth0Api = new Management( $this->apptoken, $this->domain );
                  $response = $auth0Api->users->linkAccount( $user["user_id"], array( "provider" => $link["identities"][0]["provider"], "user_id" => $link["identities"][0]["user_id"] ) );
 
                  $store = new SessionStore();
-                 $user  = $store->set('user', $auth0Api->users->get( $user["user_id"] ) );
+                 $store->set('user', $auth0Api->users->get( $user["user_id"] ) );
 
                  return $response;
             }
@@ -108,11 +148,11 @@
             $store = new SessionStore();
             $user  = $store->get('user');
 
-            $auth0Api = new Management( $this->app->config( 'auth0.apptoken' ), $this->app->config( 'auth0.domain' ) );
+            $auth0Api = new Management( $this->apptoken, $this->domain );
             $response = $auth0Api->users->unlinkAccount( $user["user_id"], $provider, $provideruserid );
 
             $store = new SessionStore();
-            $user  = $store->set('user', $auth0Api->users->get( $user["user_id"] ) );
+            $store->set('user', $auth0Api->users->get( $user["user_id"] ) );
 
             return $response;
         }
@@ -161,22 +201,18 @@
 
         public function getSocialProviders(){
 
-//            $providers = array();
             $store = new SessionStore();
             $user  = $store->get('user');
 
             if( isset( $user[ 'identities' ] ) && is_array( $user[ 'identities' ] ) )
                 return $user[ 'identities' ];
-//                foreach( $user[ 'identities' ] as $arr )
-//                    if( isset( $arr[ 'provider' ] ) )
-//                        $providers[] = array( 'provider' => $arr[ 'provider' ], 'connection' => $arr[ 'connection' ], 'user_id' => $arr[ 'user_id' ] );
 
             return array();
         }
         
         public function logoutURL( $global = false ){
 
-            return 'https://' . $this->app->config( 'auth0.domain' ) . '/logout?returnTo=' . $this->app->config( 'auth0.logouturi' ) . ( $global ? '' : ( '&client_id=' . $this->app->config( 'auth0.clientid' ) ) );
+            return 'https://' . $this->domain . '/logout?returnTo=' . $this->logouturi . ( $global ? '' : ( '&client_id=' . $this->clientid ) );
         }
 
     }

@@ -1,5 +1,8 @@
 <?php
 
+use \Slim\Http\Request as Request;
+use \Slim\Http\Response as Response;
+
 class myform{
 
     private $formname;
@@ -38,11 +41,11 @@ class myform{
     private $numlines;
     private $ncols;
 
+    /** @var mycontainer*/
     private $app;
 
-    public function __construct( $name = '' ){
+    public function __construct( $c ){
 
-        $this->formname         = $name;
         $this->elements         = array();
         $this->counter          = 1;
         $this->valuesdefault    = array();
@@ -58,7 +61,6 @@ class myform{
         $this->rendersubmit     = true;
         $this->customRules      = array();
         $this->disabled         = array();
-        $this->csrfname         = $name . 'csrf';
         $this->preventmsg       = 'undefined';
 
         // captcha
@@ -71,8 +73,13 @@ class myform{
         $this->numlines         = 4;   // number of lines
         $this->ncols            = 20;  // foreground or background cols
 
-        $this->app = \Slim\Slim::getInstance();
-        $this->isajax = $this->app->request->isAjax();
+        $this->app = $c;
+    }
+
+    public function & setName( $formname ){
+        $this->formname = $formname;
+        $this->csrfname = $formname . 'csrf';
+        return $this;
     }
 
     public function & clear(){
@@ -140,7 +147,7 @@ class myform{
         if( is_null( $picker_options ) )
             $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
 
-        $secret    = $this->app->config( 'filestack.secret' );
+        $secret    = $this->app->config[ 'filestack.secret' ];
         $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
@@ -151,8 +158,8 @@ class myform{
 
         if( is_null( $store_options ) ){
             $store_options = array();
-            $location = $this->app->config( 'filestack.location' );
-            $path     = $this->app->config( 'filestack.path' );
+            $location = $this->app->config[ 'filestack.location' ];
+            $path     = $this->app->config[ 'filestack.path' ];
 
             if( $location )
                 $store_options[ 'location' ] = $location;
@@ -189,7 +196,7 @@ class myform{
     }
 
     public function & focus( $element ){
-        $this->app->ajax()->focus( '#' . $this->formname . $element );
+        $this->app->ajax->focus( '#' . $this->formname . $element );
         return $this;
     }
 
@@ -212,14 +219,14 @@ class myform{
         $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array(), 'align' => $align, 'hr' => $hr );
         return $this;
     }
-
+/*
     public function & setHeaderDescription( $description, $class = '' ){
         if( isset( $this->elements[ 'hdr' . strtolower( $title ) ] ) ){
             $this->elements[ 'hdr' . strtolower( $title ) ][ 'description' ] = $description;
             $this->elements[ 'hdr' . strtolower( $title ) ][ 'descriptionclass' ] = $class;
         }
         return $this;
-    }
+    }*/
 
     public function & setFooter(){
         $this->footer = true;
@@ -234,7 +241,7 @@ class myform{
     public function & addStatic( $name, $label = '', $help = '', $showvalue = '', $prefix = '', $sufix = '', $replacelist = false, $clipboard = false ){
 
         if( $clipboard )
-            $this->app->ajax()->clipboard();
+            $this->app->ajax->clipboard();
 
         $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue, 'prefix' => $prefix, 'sufix' => $sufix, 'replacelist' => $replacelist, 'clipboard' => $clipboard );
         return $this;
@@ -262,9 +269,9 @@ class myform{
     public function & addCameraTag( $name, $label = 'Video', $maxlength = null, $sources = '', $help = '' ){
         
         $expiration = time() + 1800;
-        $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
+        $signature  = $this->app->config[ 'cameratag.key' ] ? hash_hmac( 'sha1', $expiration, $this->app->config[ 'cameratag.key' ] ) : '';
 
-        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'maxlength' => $maxlength, 'appexpiration' => $expiration, 'appsignature' => $signature, 'sources' => $sources, 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'cameratag', 'valuetype' => 'cameratag', 'name' => $name, 'label' => $label, 'appid' => $this->app->config[ 'cameratag.appid' ], 'maxlength' => $maxlength, 'appexpiration' => $expiration, 'appsignature' => $signature, 'sources' => $sources, 'help' => $help );
 
         $this->addRule( function() use ( $name ){
 
@@ -274,14 +281,14 @@ class myform{
                     return true;
 
                 try{ 
-                    $json = file_get_contents( 'https://cameratag.com/api/v10/videos/' . $_POST[ $this->formname . $name ][ 'video_uuid' ] . '.json?api_key=' . $this->app->config( 'cameratag.key' ) );
+                    $json = file_get_contents( 'https://cameratag.com/api/v10/videos/' . $_POST[ $this->formname . $name ][ 'video_uuid' ] . '.json?api_key=' . $this->app->config[ 'cameratag.key' ] );
                     $json = json_decode( $json, true );
 
                 } catch (Exception $e ){
                     return 'Invalid video';
                 }
 
-                if( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && isset( $json[ 'type' ] ) && $json[ 'type' ] == 'Video' && $json[ 'uuid' ] == $_POST[ $this->formname . $name ][ 'video_uuid' ] && $json[ 'app_uuid' ] == $this->app->config( 'cameratag.appid' ) )
+                if( isset( $json[ 'state' ] ) && isset( $json[ 'uuid' ] ) && isset( $json[ 'app_uuid' ] ) && isset( $json[ 'type' ] ) && $json[ 'type' ] == 'Video' && $json[ 'uuid' ] == $_POST[ $this->formname . $name ][ 'video_uuid' ] && $json[ 'app_uuid' ] == $this->app->config[ 'cameratag.appid' ] )
                     return true;
             }
 
@@ -295,10 +302,10 @@ class myform{
     public function & addCameraTagPhoto( $name, $label = 'Photo', $appid = null, $help = '' ){
         
         if( is_null( $appid ) )
-            $appid = $this->app->config( 'cameratag.appid' );
+            $appid = $this->app->config[ 'cameratag.appid' ];
 
         $expiration = time() + 1800;
-        $signature  = $this->app->config( 'cameratag.key' ) ? hash_hmac( 'sha1', $expiration, $this->app->config( 'cameratag.key' ) ) : '';
+        $signature  = $this->app->config[ 'cameratag.key' ] ? hash_hmac( 'sha1', $expiration, $this->app->config[ 'cameratag.key' ] ) : '';
 
         $this->elements[ $name ] = array( 'type' => 'cameratagphoto', 'valuetype' => 'cameratagphoto', 'name' => $name, 'label' => $label, 'appid' => $appid, 'appexpiration' => $expiration, 'appsignature' => $signature, 'help' => $help );
 
@@ -310,7 +317,7 @@ class myform{
                     return true;
 
                 try{ 
-                    $json = file_get_contents( 'https://cameratag.com/api/v10/photos/' . $_POST[ $this->formname . $name . '_uuid' ] . '.json?api_key=' . $this->app->config( 'cameratag.key' ) );
+                    $json = file_get_contents( 'https://cameratag.com/api/v10/photos/' . $_POST[ $this->formname . $name . '_uuid' ] . '.json?api_key=' . $this->app->config[ 'cameratag.key' ] );
                     $json = json_decode( $json, true );
 
                 } catch (Exception $e ){
@@ -329,21 +336,21 @@ class myform{
 
 
     public function & addCameraTagVideo( $name, $label = 'Video' ){
-        $this->elements[ $name ] = array( 'type' => 'cameratagvideo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
+        $this->elements[ $name ] = array( 'type' => 'cameratagvideo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config[ 'cameratag.appid' ], 'appcdn' => $this->app->config[ 'cameratag.appcdn' ] );
         return $this;
     }
 
     public function & addCameraTagImage( $name, $label = 'Image' ){
-        $this->elements[ $name ] = array( 'type' => 'cameratagimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config( 'cameratag.appid' ), 'appcdn' => $this->app->config( 'cameratag.appcdn' ) );
+        $this->elements[ $name ] = array( 'type' => 'cameratagimage', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'appid' => $this->app->config[ 'cameratag.appid' ], 'appcdn' => $this->app->config[ 'cameratag.appcdn' ] );
         return $this;
     }
-
+/*
     public function & addZiggeo( $name, $label = 'Video' ){
         $this->elements[ $name ] = array( 'type' => 'ziggeo', 'valuetype' => 'simple', 'name' => $name, 'label' => $label );
 
         $this->app->ajax()->Ziggeo( $this->formname . $name, '#' . $this->formname . $name . 'd' );
         return $this;
-    }
+    }*/
 
 
     public function & addMonth( $name, $label ){
@@ -439,11 +446,12 @@ class myform{
         return $this;
     }
 
+    /*
     public function & addTransloadit( $name, $label, $options = array(), $settings = array(), $help = '' ){
 
         // default options
         $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array(), 'mode' => 'image' );
-        $driver = $this->app->config( 'transloadit.driver' );
+        $driver = $this->app->config[ 'transloadit.driver' ];
 
         if( $driver === 'heroku' ){
             $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
@@ -452,8 +460,8 @@ class myform{
             $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
             $this->apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
         }else{
-            $this->apikey    = $this->app->config( 'transloadit.k' );
-            $this->apisecret = $this->app->config( 'transloadit.s' );
+            $this->apikey    = $this->app->config[ 'transloadit.k' ];
+            $this->apisecret = $this->app->config[ 'transloadit.s' ];
         }        
 
         $params = array( 'auth' => array( 'key'     => $this->apikey,
@@ -472,15 +480,17 @@ class myform{
 
         $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->apisecret ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
         return $this;
-    }
+    }*/
 
 
-    public function processFilestackThumb( $fsid ){
+    public function processFilestackThumb( Request $request, Response $response, $args ){
     
         if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
-            $this->app->ajax()->attr( '#filestacki' . $fsid, 'src', myfilters::filestack( $_POST[ 'img' ] ) )
-                              ->render();
+            $this->app->ajax->attr( '#filestacki' . $args[ 'fsid' ], 'src', $this->app->filters->filestack( $_POST[ 'img' ] ) )
+                            ->render();
         }
+
+        return $response;
     }
 
 
@@ -489,7 +499,7 @@ class myform{
         if( is_null( $picker_options ) )
             $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
 
-        $secret    = $this->app->config( 'filestack.secret' );
+        $secret    = $this->app->config[ 'filestack.secret' ];
         $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
@@ -498,12 +508,12 @@ class myform{
         $picker_options[ 'policy' ]    = $policy64;
         $picker_options[ 'signature' ] = $signature;
 
-        $processing = $this->app->urlFor( 'myfwfilestack', array( 'fsid' => $this->formname . $name ) );
+        $processing = $this->app->urlfor->action( 'myfwfilestack', array( 'fsid' => $this->formname . $name ) );
 
         if( is_null( $store_options ) ){
             $store_options = array();
-            $location = $this->app->config( 'filestack.location' );
-            $path     = $this->app->config( 'filestack.path' );
+            $location = $this->app->config[ 'filestack.location' ];
+            $path     = $this->app->config[ 'filestack.path' ];
 
             if( $location )
                 $store_options[ 'location' ] = $location;
@@ -512,7 +522,7 @@ class myform{
                 $store_options[ 'path' ] = $path;
         }
 
-        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => empty( $thumbdefault ) ? $this->app->config( 'filestack.default' ) : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ) );
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => empty( $thumbdefault ) ? $this->app->config[ 'filestack.default' ] : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ) );
 
         $this->addRule( function() use ( $name ){
 
@@ -521,7 +531,7 @@ class myform{
                 if( empty( $_POST[ $this->formname . $name ] ) )
                     return true;
 
-                $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
+                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) )
                     return true;
@@ -539,7 +549,7 @@ class myform{
 
     public function & addFilestackWebcam( $name, $label, $width, $height, $urlvideo, $help = '' ){
 
-        $secret    = $this->app->config( 'filestack.secret' );
+        $secret    = $this->app->config[ 'filestack.secret' ];
         $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
         $policy64  = base64_encode( $policy );
         $signature = hash_hmac( 'sha256', $policy64, $secret );
@@ -547,8 +557,8 @@ class myform{
 
         $fsoptions = new stdClass();
         
-        $location = $this->app->config( 'filestack.location' );
-        $path     = $this->app->config( 'filestack.path' );
+        $location = $this->app->config[ 'filestack.location' ];
+        $path     = $this->app->config[ 'filestack.path' ];
         
         if( $location )
             $fsoptions->location = $location;
@@ -556,7 +566,7 @@ class myform{
         if( $path )
             $fsoptions->path = $path;
 
-        $this->elements[ $name ] = array( 'type' => 'filestackwebcam', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config( 'filestack.api' ), 'default' => $this->app->config( 'filestack.defaultcam' ), 'security' => $security, 'urlvideo' => $urlvideo, 'help' => $help, 'fsoptions' => $fsoptions );
+        $this->elements[ $name ] = array( 'type' => 'filestackwebcam', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => $this->app->config[ 'filestack.defaultcam' ], 'security' => $security, 'urlvideo' => $urlvideo, 'help' => $help, 'fsoptions' => $fsoptions );
 
         $this->addRule( function() use ( $name ){
 
@@ -565,7 +575,7 @@ class myform{
                 if( empty( $_POST[ $this->formname . $name ] ) )
                     return true;
 
-                $json = json_decode( file_get_contents( myfilters::filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
+                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
 
                 if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'video' ) !== false )
                     return true;
@@ -679,14 +689,14 @@ class myform{
 
         return $rand;
     }
-
+/*
     private function initCaptcha(){
 
         // create the hash for the random number
         $rand = $this->getRandom( 5 );
 
         // save random value in session
-        $this->app->session()->set( 'captcha_string', $rand );
+        $this->app->session->set( 'captcha_string', $rand );
 
         return $rand;
     }
@@ -865,7 +875,7 @@ class myform{
     private function add_text($img, $string){
         $cmtcol = imagecolorallocatealpha ($img, 128, 0, 0, 64);
         imagestring($img, 5, 10, imagesy($img)-20, $string, $cmtcol);
-    }
+    }*/
 
     public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $href = '', $icon = '' ){
 
@@ -916,10 +926,10 @@ class myform{
 
         $csrfnew = $this->getRandom( 8 );
 
-        $this->app->session()->set( $this->csrfname, $csrfnew );
+        $this->app->session->set( $this->csrfname, $csrfnew );
 
         // add csrf to ajax
-        $this->app->ajax()->addFormCsrf( $this->csrfname, $csrfnew );
+        $this->app->ajax->addFormCsrf( $this->csrfname, $csrfnew );
     
         return $csrfnew;
     }
@@ -930,12 +940,12 @@ class myform{
         if( !$this->csrfinit ){
 
             // create csrf if not exists
-            if( empty( $this->app->session()->get( $this->csrfname ) ) )
+            if( empty( $this->app->session->get( $this->csrfname ) ) )
                 $this->csrfreset();
 
             $this->addRule( function(){
 
-                $csrf = $this->app->session()->get( $this->csrfname, '' );
+                $csrf = $this->app->session->get( $this->csrfname, '' );
 
                 if( is_string( $csrf ) && !empty( $csrf ) && isset( $_POST[ $this->csrfname ] ) && $csrf === $_POST[ $this->csrfname ] ){
 
@@ -957,8 +967,8 @@ class myform{
 
     public function & setSubmitMessage( $msg, $title = 'Sucess' ){
 
-        if( $this->isajax )
-            $this->app->ajax()->msgOk( $msg, $title );
+        if( $this->app->isajax )
+            $this->app->ajax->msgOk( $msg, $title );
 
         $this->submitMessage = $msg;
         return $this;
@@ -966,8 +976,8 @@ class myform{
 
     public function & setWarningMessage( $msg, $title = 'Warning' ){
 
-        if( $this->isajax )
-            $this->app->ajax()->msgWarning( $msg, $title );
+        if( $this->app->isajax )
+            $this->app->ajax->msgWarning( $msg, $title );
 
         $this->warningMessage = $msg;
         return $this;
@@ -975,8 +985,8 @@ class myform{
 
     public function & setErrorMessage( $msg, $title = 'Errors found' ){
 
-        if( $this->isajax )
-            $this->app->ajax()->msgError( $msg, $title );
+        if( $this->app->isajax )
+            $this->app->ajax->msgError( $msg, $title );
 
         $this->errors[] = $msg;
         $this->wasValid = false;
@@ -1000,19 +1010,19 @@ class myform{
 
     public function & hide( $messageok = null, $messageerror = null ){
 
-        if( $this->isajax ){
-            $this->app->ajax()->setFormReset( $this->formname );
+        if( $this->app->isajax ){
+            $this->app->ajax->setFormReset( $this->formname );
 
             if( !empty( $this->modal ) ){
                 $modal = $this->modal;
-                $this->app->ajax()->modalHide( $modal[ 'id' ] );
+                $this->app->ajax->modalHide( $modal[ 'id' ] );
             }
 
             if( !empty( $messageok ) )
-                $this->app->ajax()->msgOk( $messageok );
+                $this->app->ajax->msgOk( $messageok );
 
             if( !empty( $messageerror ) )
-                $this->app->ajax()->msgError( $messageerror );
+                $this->app->ajax->msgError( $messageerror );
         }
 
         $this->hide = true;
@@ -1035,9 +1045,13 @@ class myform{
                     $cameratag[] = $this->formname . $el[ 'name' ];
                 }
                 if( $el[ 'type' ] == 'custom' && is_a( $el[ 'obj' ], 'mychat' ) ){
-                    $transloadit   = $el[ 'obj' ]->getTransloadit();
-                    $chatscroll    = '#' . $el[ 'obj' ]->getWindowId();
-                    $pusherchannel = $el[ 'obj' ]->getPusherChannel();
+
+                    /** @var mychat $obj */
+                    $obj = $el[ 'obj' ];
+
+                    $transloadit   = $obj->getTransloadit();
+                    $chatscroll    = '#' . $obj->getWindowId();
+                    $pusherchannel = $obj->getPusherChannel();
                 }
             }
         }
@@ -1046,7 +1060,7 @@ class myform{
         if( ! isset( $this->modal['id'] ) )
             $this->setModal();
 
-        $this->app->ajax()->showForm( $this->formname, $this->app->ajax()->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag );
+        $this->app->ajax->showForm( $this->formname, $this->app->ajax->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag );
         return $this;
     }
 
@@ -1192,8 +1206,8 @@ class myform{
 
         $isvalid = ( $this->wasValid = empty( $this->errors ) );
 
-        if( !$isvalid && $this->isajax )
-            $this->app->ajax()->msgError( $this->getErrors() );
+        if( !$isvalid && $this->app->isajax )
+            $this->app->ajax->msgError( $this->getErrors() );
 
         return $isvalid;
     }
@@ -1235,7 +1249,7 @@ class myform{
                                         $values[ $n ] = implode( ';', $v );
                                     }
                                     break;
-                case 'transloadit': if( isset( $_POST[ $this->formname . $n ] ) ){
+                /*case 'transloadit': if( isset( $_POST[ $this->formname . $n ] ) ){
                                         $this->app->transloadit()->requestAssembly( $res, $_POST[ $this->formname . $n ] );
                                         $values[ $n ] = $res;
                                     }
@@ -1247,7 +1261,7 @@ class myform{
                 case 'cameratagphoto': if( isset( $_POST[ $this->formname . $n . '_uuid' ] ) && is_string( $_POST[ $this->formname . $n . '_uuid' ] ) ){
                                         $values[ $n ] = $_POST[ $this->formname . $n . '_uuid' ];
                                     }
-                                    break;
+                                    break;*/
                 default:            continue;
             }
 
@@ -1295,8 +1309,8 @@ class myform{
                         $v = call_user_func( array( 'myfilters', $f ), $v );
 
             $this->elements[$n][ 'value' ] = $v;
-            if( isset( $el[ 'type' ] ) && $el[ 'type' ] == 'captcha' )
-                $this->initCaptcha();
+//            if( isset( $el[ 'type' ] ) && $el[ 'type' ] == 'captcha' )
+//                $this->initCaptcha();
         }
 
         return array(   'hide'          => $this->hide,
@@ -1314,17 +1328,16 @@ class myform{
                         'renderaction'  => $this->renderaction,
                         'rendersubmit'  => $this->rendersubmit,
                         'csrfname'      => $this->csrfname,
-                        'csrf'          => $this->app->session()->get( $this->csrfname, '' ),
-                        'isajax'        => $this->isajax,
-                        'closeb'        => $this->isajax && $this->closebutton,
+                        'csrf'          => $this->app->session->get( $this->csrfname, '' ),
+                        'isajax'        => $this->app->isajax,
+                        'closeb'        => $this->app->isajax && $this->closebutton,
                         'closeset'      => $this->closebuttonsettings,
                         'footer'        => $this->footer,
                         'ismodal'       => !empty( $this->modal ),
-                        'modal'         => $this->modal
-                        );
+                        'modal'         => $this->modal );
     }
 
     public function __toString(){
-        return $this->app->render( '@my/myform', $this->obj(), null, null, 0, false, false );
+        return $this->app->view->fetch( '@my/myform.twig', $this->obj() );
     }
 }

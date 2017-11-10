@@ -1,7 +1,10 @@
 <?php
 
 class mynavbar{
-    
+
+    /** @var mycontainer*/
+    private $app;
+
     private $name;
     private $values   = array();
     private $elements = array();
@@ -9,13 +12,17 @@ class mynavbar{
     private $cdn      = false;
     private $text     = '';
 
-    public function __construct( $name ){
-        $this->name = $name;
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
-    public function & setHeader( $logo, $logosecure = null, $href = '', $toogle = true ){
-        $this->header = array( 'logo' => ( !is_null( $logosecure ) && $this->app->ishttps() ) ? $logosecure : $logo, 'href' => $href, 'toogle' => $toogle );
+    public function & setName( $name ){
+        $this->name = $name;
+        return $this;
+    }
+
+    public function & setHeader( $logo, $href = '', $toogle = true ){
+        $this->header = array( 'logo' => $logo, 'href' => $href, 'toogle' => $toogle );
         return $this;
     }
 
@@ -30,7 +37,7 @@ class mynavbar{
     }
     
     public function & ajaxUpdateText( $message, $htmlid = 'navbartxt' ){
-        $this->app->ajax()->html( '#' . $htmlid, $message, true );
+        $this->app->ajax->html( '#' . $htmlid, $message, true );
         return $this;
     }
 
@@ -73,7 +80,7 @@ class mynavbar{
 
     public function & ajaxThumbChange( $thumb, $htmlid = 'navbarimg' ){
         
-        $this->app->ajax()->attr( '#' . $htmlid, 'src', $thumb );
+        $this->app->ajax->attr( '#' . $htmlid, 'src', $thumb );
         return $this;
     }
 
@@ -82,13 +89,12 @@ class mynavbar{
     }
 
     public function render( $values = null ){
-        return $this->app->render( '@my/mynavbar', array( 'values'   => is_null( $values ) ? $this->values : $values,
-                                                          'name'     => $this->name,
-                                                          'header'   => $this->header,
-                                                          'text'     => $this->text,
-                                                          'cdn'      => $this->cdn,
-                                                          'elements' => $this->elements
-                                                         ), null, null, null, false, false );
+        return $this->app->view->fetch( '@my/mynavbar.twig', array( 'values'   => is_null( $values ) ? $this->values : $values,
+                                                                             'name'     => $this->name,
+                                                                             'header'   => $this->header,
+                                                                             'text'     => $this->text,
+                                                                             'cdn'      => $this->cdn,
+                                                                             'elements' => $this->elements ) );
     }
 
 }

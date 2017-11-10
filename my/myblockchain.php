@@ -2,10 +2,13 @@
 
 class myblockchain{
 
+    /** @var mycontainer*/
+    private $app;
+
     private $exchange = null;
-    
-    public function __construct(){
-        $this->app = \Slim\Slim::getInstance();
+
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
 
@@ -63,7 +66,7 @@ class myblockchain{
 
 
     public function receive( $address = null, $callback = null ){
-        return $this->load( 'api/receive', array( 'method' => 'create', 'address' => is_null( $address ) ? $this->app->config( 'bitcoin.acc' ) : $address, 'callback' => is_null( $callback ) ? ( 'http://' . $this->app->config( 'app.hostname' ) . $this->app->urlFor( $this->app->config( 'bitcoin.callback' ) ) ) : $callback ) );    
+        return $this->load( 'api/receive', array( 'method' => 'create', 'address' => is_null( $address ) ? $this->app->config[ 'bitcoin.acc' ] : $address, 'callback' => is_null( $callback ) ? ( 'http://' . $this->app->config[ 'app.hostname' ] . $this->app->urlfor->action( $this->app->config[ 'bitcoin.callback' ] ) ) : $callback ) );
     }
     
 
@@ -90,8 +93,8 @@ class myblockchain{
 
     public function qrcode( $amount, $label = '', $account = '', $size = 200 ){
 
-        $account = empty( $account ) ? $this->app->config( 'bitcoin.acc' )   : urlencode( $account );
-        $label   = empty( $label )   ? $this->app->config( 'bitcoin.label' ) : urlencode( $label );
+        $account = empty( $account ) ? $this->app->config[ 'bitcoin.acc' ]   : urlencode( $account );
+        $label   = empty( $label )   ? $this->app->config[ 'bitcoin.label' ] : urlencode( $label );
 
         return $this->load( 'qr?data=bitcoin:' . $account, array( 'amount' => $amount, 'label' => $label, 'size' => $size ), true );
     }
@@ -107,7 +110,7 @@ class myblockchain{
 
     public function payment( $to, $amount, $guid = '', $password = '', $from = '', $second_password = '', $fee = '', $note = '' ){
 
-        $params = array( 'password'        => empty( $password ) ? $this->app->config( 'bitcoin.p' ) : $password,
+        $params = array( 'password'        => empty( $password ) ? $this->app->config[ 'bitcoin.p' ] : $password,
                          'to'              => $to,
                          'amount'          => $amount );
 
@@ -120,7 +123,7 @@ class myblockchain{
         if( $note )
             $params[ 'note' ] = $note;
 
-        return $this->load( 'merchant/' . ( empty( $guid ) ? $this->app->config( 'bitcoin.guid' ) : $guid ) . '/payment', $params );
+        return $this->load( 'merchant/' . ( empty( $guid ) ? $this->app->config[ 'bitcoin.guid' ] : $guid ) . '/payment', $params );
     }
 
 

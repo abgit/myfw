@@ -1,14 +1,21 @@
 <?php
 
 class mymenu{
-    
+
+    /** @var mycontainer*/
+    private $app;
+
     private $elements = array();
     private $idmenusel  = 0;
     private $name;
 
-    public function __construct( $name ){
+    public function __construct( $c ){
+        $this->app = $c;
+    }
+
+    public function & setName( $name ){
         $this->name = $name;
-        $this->app = \Slim\Slim::getInstance();
+        return $this;
     }
 
     public function & addButton( $id, $label, $onclick = '', $href = '', $icon = 'icon-cog4', $color = '', $class = '' ){
@@ -35,11 +42,11 @@ class mymenu{
     public function & setMenuSelected( $index, $ctxmenuid = '' ){
         $ctxmenuid = empty( $ctxmenuid ) ? $this->name . 'sel' : $ctxmenuid;
     
-        if( $this->app->request->isAjax() ){
+        if( $this->app->isajax ){
             if( isset( $this->elements[ $ctxmenuid ][ 'options' ] ) )
                 foreach( $this->elements[ $ctxmenuid ][ 'options' ] as $i => $arr )
-                    $this->app->ajax()->visibility( '#meni' . $ctxmenuid . $i, ( $i == $index ) ? true : false )
-                                      ->attr( '#menl' . $ctxmenuid . $i, 'class', ( $i == $index ) ? 'active' : '' );
+                    $this->app->ajax->visibility( '#meni' . $ctxmenuid . $i, ( $i == $index ) ? true : false )
+                                    ->attr( '#menl' . $ctxmenuid . $i, 'class', ( $i == $index ) ? 'active' : '' );
         }else{
                 foreach( $this->elements[ $ctxmenuid ][ 'options' ] as $i => $arr ){
                     $this->elements[ $ctxmenuid ][ 'options' ][ $i ][ 'selected' ] = ( $i == $index ) ? true : false;
@@ -57,18 +64,13 @@ class mymenu{
     }*/
 
     public function & ajaxButtonLabel( $id, $value ){
-        $this->app->ajax()->html( '#menulab' . $this->name . $id, $value );
+        $this->app->ajax->html( '#menulab' . $this->name . $id, $value );
         return $this;
     }
 
     public function __toString(){
-        return $this->render();
-    }
-
-    private function render( $values = null ){
-        return $this->app->render( '@my/mymenu', array( 'name'     => $this->name,
-                                                        'elements' => $this->elements
-                                                         ), null, null, null, false, false );
+        return $this->app->view->fetch( '@my/mymenu.twig', array( 'name'     => $this->name,
+                                                                           'elements' => $this->elements ) );
     }
     
 }

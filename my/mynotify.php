@@ -2,6 +2,9 @@
 
 class mynotify{
 
+    /** @var mycontainer*/
+    private $app;
+
     private $name;
     private $keys = array();
     private $title;
@@ -9,6 +12,7 @@ class mynotify{
     private $values = array();
     private $buttonright;
     private $buttonleft;
+    private $itemaction;
     private $itemtitle;
     private $itemthumb;
     private $itemdescription;
@@ -20,9 +24,8 @@ class mynotify{
     private $allitems = true;
     private $onshow;
 
-    public function __construct( $name = 'n' ){
-        $this->name = $name;
-        $this->app = \Slim\Slim::getInstance();
+    public function __construct( $c ){
+        $this->app = $c;
     }
 
     public function & setName( $name ){
@@ -116,13 +119,13 @@ class mynotify{
 
         $this->setValues( $values, $counter );
 
-        $this->app->ajax()->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter );
+        $this->app->ajax->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter );
         return $this;
     }
 
 
     public function & ajaxThumbChange( $class, $value ){
-        $this->app->ajax()->attr( '.notifthumb' . $class, 'src', $value );
+        $this->app->ajax->attr( '.notifthumb' . $class, 'src', $value );
         return $this;
     }
 
@@ -133,7 +136,7 @@ class mynotify{
 
         $this->setValues( $values, $counter );
 
-        $this->app->pusher()->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter )->send( is_null( $channel ) ? $this->app->config( 'pusher.channel' ) : $channel, is_null( $event ) ? $this->app->config( 'pusher.event' ) : $event );
+        $this->app->pusher->notifyUpdate( '#' . $this->name, $this->__toString(), $this->counter )->send( is_null( $channel ) ? $this->app->config[ 'pusher.channel' ] : $channel, is_null( $event ) ? $this->app->config[ 'pusher.event' ] : $event );
         return $this;
     }
 
@@ -142,25 +145,24 @@ class mynotify{
     }
 
     private function render( $values = null ){
-        return $this->app->render( '@my/mynotify', array( 'values'          => is_null( $values ) ? $this->values : $values,
-                                                          'name'            => $this->name,
-                                                          'keys'            => $this->keys,
-                                                          'title'           => $this->title,
-                                                          'icon'            => $this->icon,
-                                                          'buttonright'     => $this->buttonright,
-                                                          'buttonleft'      => $this->buttonleft,
-                                                          'itemtitle'       => $this->itemtitle,
-                                                          'itemlabel'       => $this->itemlabel,
-                                                          'itemthumb'       => $this->itemthumb,
-                                                          'itemdescription' => $this->itemdescription,
-                                                          'itemaction'      => $this->itemaction,
-                                                          'itemmore'        => $this->itemmore,
-                                                          'counter'         => $this->counter,
-                                                          'emptymsg'        => $this->emptymsg,
-                                                          'unreadkey'       => $this->unreadkey,
-                                                          'onshow'          => $this->onshow,
-                                                          'allitems'        => $this->allitems
-                                                         ), null, null, null, false, false );
+        return $this->app->view->fetch( '@my/mynotify.twig', array( 'values'          => is_null( $values ) ? $this->values : $values,
+                                                                             'name'            => $this->name,
+                                                                             'keys'            => $this->keys,
+                                                                             'title'           => $this->title,
+                                                                             'icon'            => $this->icon,
+                                                                             'buttonright'     => $this->buttonright,
+                                                                             'buttonleft'      => $this->buttonleft,
+                                                                             'itemtitle'       => $this->itemtitle,
+                                                                             'itemlabel'       => $this->itemlabel,
+                                                                             'itemthumb'       => $this->itemthumb,
+                                                                             'itemdescription' => $this->itemdescription,
+                                                                             'itemaction'      => $this->itemaction,
+                                                                             'itemmore'        => $this->itemmore,
+                                                                             'counter'         => $this->counter,
+                                                                             'emptymsg'        => $this->emptymsg,
+                                                                             'unreadkey'       => $this->unreadkey,
+                                                                             'onshow'          => $this->onshow,
+                                                                             'allitems'        => $this->allitems ) );
 
     }
 }
