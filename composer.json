@@ -1,7 +1,13 @@
 {
-    "name": "my",
+	"name": "myfw",
 
     "require": {
+		 "php": "7.1.*",
+		 "ext-memcached": "*",
+		 "ext-gd": "*",
+		 "ext-bcmath": "*",
+		 "ext-openssl": "*",
+
 		 "slim/slim": "^3.0",
 		 "slim/twig-view": "*",
 		 "pavlakis/slim-cli": "*",
@@ -29,7 +35,7 @@
 
 	"autoload": {
          "psr-0": {
-            "my": "my/"
+			"my": "myfw/my"
          }
     }
 }

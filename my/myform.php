@@ -1170,7 +1170,7 @@ class myform{
                     if( empty( $value ) && !isset( $el[ 'rules' ][ 'required' ] ) )
                         continue;
 
-                    if( ! is_callable( array( 'myrules', $rulename ) ) || ! call_user_func( array( 'myrules', $rulename ), $value, $ruleoptions, $values, $el ) ){
+                    if( ! is_callable( array( $this->app->rules, $rulename ) ) || ! call_user_func( array( $this->app->rules, $rulename ), $value, $ruleoptions, $values, $el ) ){
 
                         // add error message if message is not null
                         if( !is_null( $rulemessage ) )
@@ -1267,8 +1267,8 @@ class myform{
 
             if( $applyFilters && isset( $el[ 'filters' ] ) && is_array( $el[ 'filters' ] ) )
                 foreach( $el[ 'filters' ] as $f )
-                    if( is_callable( array( 'myfilters', $f ) ) )
-                        $values[ $n ] = call_user_func( array( 'myfilters', $f ), $values[ $n ] );
+                    if( is_callable( array( $this->app->filters, $f ) ) )
+                        $values[ $n ] = call_user_func( array( $this->app->filters, $f ), $values[ $n ] );
         }
 
         return $values;
@@ -1305,8 +1305,8 @@ class myform{
             
             if( isset( $el[ 'filtershtml' ] ) )
                 foreach( $el[ 'filtershtml' ] as $f )
-                    if( is_callable( array( 'myfilters', $f ) ) )
-                        $v = call_user_func( array( 'myfilters', $f ), $v );
+                    if( is_callable( array( $this->app->filters, $f ) ) )
+                        $v = call_user_func( array( $this->app->filters, $f ), $v );
 
             $this->elements[$n][ 'value' ] = $v;
 //            if( isset( $el[ 'type' ] ) && $el[ 'type' ] == 'captcha' )

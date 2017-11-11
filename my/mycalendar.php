@@ -29,7 +29,7 @@
             $this->init = true;
         }
 
-        public function & setID( $id ){
+        public function & setName( $id ){
             $this->id = $id;
             return $this;
         }

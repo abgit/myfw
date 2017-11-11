@@ -477,7 +477,13 @@ class myfilters{
         $now = new DateTime;
         $ago = new DateTime( $datetime );
         $diff = $now->diff( $ago );
-        $diff->d = $diff->d - ( floor( $diff->d / 7 ) * 7 );
+
+        /** @noinspection PhpUndefinedFieldInspection $diff->w */
+        $diff->w  = floor( $diff->d / 7 );
+
+        /** @noinspection PhpUndefinedFieldInspection $diff->w */
+        $diff->d -= $diff->w * 7;
+
         $string = array( 'y' => 'year', 'm' => 'month', 'w' => 'week', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second' );
         foreach( $string as $k => &$v ){
             if( $diff->$k ){
