@@ -119,7 +119,7 @@
         }
 
         public function json(){
-            print json_encode( $this->values, JSON_UNESCAPED_SLASHES );
+            return json_encode( $this->values, JSON_UNESCAPED_SLASHES );
         }
         
         public function & ajaxRemoveEvent( $event_id = null ){

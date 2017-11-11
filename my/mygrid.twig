@@ -152,7 +152,7 @@
                                                             {% if not td.depends or ( td.depends and val[ td.depends ] ) %}
     					                                    <div class="btn-group">
                                                                 {% for option in td.buttons if ( option.showdepends is not defined or val[ option.showdepends ] ) %}
-                                                                <a type="button" class="btn btn-{{ option.class|default( 'primary' ) }} btn-xs" {% if option.onclick and not optiondisabled %} onclick="{{ option.onclick|replaceurl( val, tags ) }}"{% endif %}>{{ option.label }}</a>
+                                                                <a type="button" class="btn btn-{{ option.class|default( 'primary' ) }} btn-xs" {% if option.urlobj and not optiondisabled %} {{ option.urlobj|urlobj( val, tags ) }}"{% endif %}>{{ option.label }}</a>
     		                                                    {% endfor %}    						                                    
 
                                                                 {% if td.options is not empty %}
