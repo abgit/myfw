@@ -29,6 +29,8 @@ class mygrid{
     private $classxs  = null;
     private $classsm  = null;
     private $form     = null;
+    public  $onInit   = null;
+    public  $onMore   = null;
     
     public function __construct( $c ){
         $this->app  = $c;
@@ -547,12 +549,23 @@ class mygrid{
         return $this;
     }
 
+    public function init(){
+        call_user_func($this->onInit);
+        return $this;
+    }
+
+    public function more(){
+        call_user_func($this->onMore);
+        return $this;
+    }
+
+
     public function modalform():myform{
 
         if( is_null( $this->form ) )
             $this->form = $this->app->form;
 
-        return $this->form->setID( $this->modal[ 'formid' ] )
+        return $this->form->setName( $this->modal[ 'formid' ] )
                           ->addAjax()
                           ->setModal( $this->modal[ 'title' ], $this->modal[ 'class' ], $this->modal[ 'icon' ], $this->modal[ 'static' ], $this->modal[ 'width' ] )
                           ->addCustom( $this->name, $this );
