@@ -444,7 +444,7 @@ class mygrid{
         
         $this->app->ajax->html( '#' . $this->name, $this->render( $values, true ) );
 
-        if( $this->app->rules->isdecimal( count( $values ) / $this->perpage ) )
+        if( $this->app->rules->isdecimal( count( $values ) / $this->getLimit() ) )
             $this->app->ajax->remove( '#' . $this->name . 'more' );
 
         return $this;    
