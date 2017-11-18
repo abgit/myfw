@@ -184,7 +184,7 @@ class myfw{
             return $view;
         });
 
-        $app->post( '/verify/{h:cf[a-f0-9]{32}}/{twotoken:[0-9A-Z]{16}}/', 'myconfirm:processRequest' )
+        $app->post( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:[0-9A-Z]{16}}/]', 'myconfirm:processRequest' )
             ->setName( 'myfwconfirm' );
 
         $app->add(new \Slim\Middleware\Session([

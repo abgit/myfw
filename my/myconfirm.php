@@ -22,6 +22,9 @@ class myconfirm{
 */
     public function processRequest( Request $request, Response $response, $args ) {
 
+        if( !isset( $args[ 'twotoken' ] ) )
+            throw new Exception( 'Token invalid' );
+
         $h        = $args[ 'h' ];
         $twotoken = $args[ 'twotoken' ];
 
@@ -76,12 +79,16 @@ class myconfirm{
                 unset( $postvars[ $k ] );
 
         /** @var \Slim\Route $route */
-        $route = $this->app->request->getAttribute('route');
+        //$route = $this->app->request->getAttribute('route');
+
+        $actual_link = ( isset( $_SERVER['HTTPS'] ) ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
         //$route = $this->router->getCurrentRoute();
-        $hash  = 'cf' . md5( json_encode( array( $route->getName(), $route->getArguments() /*getParams()*/ ) + $postvars ) );
+        $hash  = 'cf' . md5( json_encode( array( $actual_link /*$route->getName(), $route->getArguments() */ ) + $postvars ) );
 
-        if( $this->app->session->get( $hash . 'confirm', false ) === 1 ){
+//        ( $this->app->request->getHeaderLine('X-Confirm') );
+
+        if( $this->app->session->get( $hash . 'confirm', false ) === $this->app->request->getHeaderLine('X-Confirm') ){
             $this->app->session->delete( $hash . 'confirm' );
             $this->app->session->delete( $hash );
             return true;
@@ -106,8 +113,8 @@ class myconfirm{
             //$this->stop();
         }
 
-        $uri    = $this->app->request->getUri();   // $this->request->getResourceUri();
-        $method = $this->app->request->getMethod();// $this->request->getMethod();
+//        $uri    = $this->app->request->getUri();   // $this->request->getResourceUri();
+//        $method = $this->app->request->getMethod();// $this->request->getMethod();
 
         $sms = ( $call === 2 );
 
@@ -125,7 +132,7 @@ class myconfirm{
             $pinhelp  = 'Use your two-factor app to generate the 6-digit pin';
         }
 
-        $this->app->session->set( $hash, array( 'uri' => $uri, 'method' => $method, '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
+        $this->app->session->set( $hash, array( 'url' => $actual_link, /*'uri' => $uri, 'method' => $method,*/ '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
         $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $pin, $pinlabel, $pinhelp );
 //                        ->render();
 //        $this->stop();
