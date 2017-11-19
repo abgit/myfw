@@ -40,6 +40,11 @@
                           'target' => $target );
         }
 
+        public function redir( $action, $options = array() ){
+            return array( 'obj'    => 'redir',
+                          'url'    => $this->action( $action, $options ) );
+        }
+
         public function multiple( $urls, $code, $keys, $default ){
             return array( 'obj'     => 'urls',
                           'urls'    => $urls,
@@ -64,7 +69,8 @@
                 switch( $val[ 'obj' ] ){
                     case 'url':
                     case 'urlsubmit':
-                    case 'urlajax':   return $this->_urlobj( $val, $valuearray, $tags );
+                    case 'urlajax':
+                    case 'redir':     return $this->_urlobj( $val, $valuearray, $tags );
                     case 'urls':      return $this->_urlobjmultiple( $val, $valuearray );
                 }
             }
@@ -84,6 +90,7 @@
                     case 'urlajax':   return "onclick=\"myfwsubmit('" . $url . ( is_string( $val[ 'msg' ] ) ? "','" . $val[ 'msg' ] : '' ) . "')\"";
                     case 'urlsubmit': return "onclick=\"myfwformsubmit('" . $val[ 'formname' ] . "','','','" . $val[ 'submitbutton' ] . "','" . $val[ 'msg' ] . "','" . $val[ 'action' ] . "'," . $val[ 'delay' ] . ")\"";
                     case 'url':       return 'href="' . $url . '"' . ( ( isset( $val[ 'target' ] ) && !empty( $val[ 'target' ] ) ) ? ' target="' . $val[ 'target' ] . '"' : '' );
+                    case 'redir':     return "onclick=\"myfwredir('" . $url . "')\"";
                 }
             }
             return '';
