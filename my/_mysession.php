@@ -1,6 +1,6 @@
 <?php 
 
-    class mysession{
+    class _mysession{
 
         private $sessionactive = false;
         private $memcached     = null;

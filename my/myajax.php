@@ -109,6 +109,11 @@ class myajax{
         return $this;
     }
 
+    public function & confirmSubmit( $url, $confimheader ){
+        $this->out[ 'xx' ] = array( 'u' => $url, 'h' => $confimheader );
+        return $this;
+    }
+
     public function & redirect( $url, $message = '', $ms = 1000 ){
 
         $this->msgWarning( empty( $message ) ? 'Redirecting ...' : $message, null, array( 'openDuration' => 0, 'sticky' => true ) );

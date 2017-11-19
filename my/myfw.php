@@ -118,6 +118,22 @@ class myfw{
             return new myform($c);
         });
 
+
+        $app->add(new \Slim\Middleware\Session([
+            'name'        => 'mysession',
+            'autorefresh' => true,
+            'lifetime'    => '20 minutes'
+        ]));
+
+        $container['session'] = function () {
+            ( new mysession( [ 'name'        => 'mysession',
+                               'autorefresh' => true,
+                               'lifetime'    => '20 minutes' ] ) )->start();
+
+            return new \SlimSession\Helper;
+        };
+
+
         $container['confirm'] = function ($c) {
             return new myconfirm($c);
         };
@@ -184,18 +200,9 @@ class myfw{
             return $view;
         });
 
-        $app->post( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:[0-9A-Z]{16}}/]', 'myconfirm:processRequest' )
+        $app->post( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:[0-9]{6}}]', 'myconfirm:processRequest' )
             ->setName( 'myfwconfirm' );
 
-        $app->add(new \Slim\Middleware\Session([
-            'name'        => 'mysession',
-            'autorefresh' => true,
-            'lifetime'    => '20 minutes'
-        ]));
-
-        $container['session'] = function () {
-            return new \SlimSession\Helper;
-        };
 
         $app->post( '/myfw/tip/{tip:tip[a-zA-Z0-9]{1,20}}', 'mymessage:processTip' )
             ->setName( 'myfwtip' );
@@ -226,6 +233,19 @@ class myfw{
         if ($container->config['ratelimit'] === true && !$container->memcached->rateisvalid()) {
             throw new myexception(myexception::RATELIMIT,
                 'Too much requests. Please wait ' . $container->memcached->ratelocktimeout() . 's and try again.');
+        }
+
+        // myconfirm method to populate $_POST
+        $xconfirm = $request->getHeaderLine('X-Confirm');
+
+        if( !empty( $xconfirm ) && empty( $_POST ) ){
+            $hashid = $container->session->get( $xconfirm, false );
+            if( is_string( $hashid ) ){
+                $hash = $container->session->get( $hashid, false );
+                if( isset( $hash['postvars'] ) ){
+                    $_POST = $hash['postvars'];
+                }
+            }
         }
 
         /** @var Response $response */

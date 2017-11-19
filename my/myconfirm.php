@@ -8,57 +8,27 @@ class myconfirm{
     /** @var mycontainer*/
     private $app;
 
-    // TODO: remove globalapp hack
     public function __construct( $c ){
         $this->app = $c;
     }
-/*
-    public function middleware( \Slim\App $globalapp ){
-        $this->globalapp = $globalapp;
 
-        $this->globalapp->post( '/verify/{h:cf[a-f0-9]{32}}/{twotoken:[0-9A-Z]{16}}/', [ $this, 'processRequest' ] )
-                        ->setName( 'myfwconfirm' );
-    }
-*/
     public function processRequest( Request $request, Response $response, $args ) {
 
-        if( !isset( $args[ 'twotoken' ] ) )
-            throw new Exception( 'Token invalid' );
+        $obj = $this->app->session->get( $args[ 'h' ], false );
 
-        $h        = $args[ 'h' ];
-        $twotoken = $args[ 'twotoken' ];
+        if( isset( $obj[ 'url' ] ) && isset( $obj[ 'xconfirm' ] ) && isset( $obj[ 'pin' ] ) ){
 
-        $obj = $this->app->session->get( $h, false );
+            if( $obj[ 'pin' ] === true ){
 
-                if( isset( $obj[ 'uri' ] ) && isset( $obj[ 'method' ] ) ){
+                if ( !isset( $args[ 'twotoken' ] ) || !$this->app->rules->twofactortoken( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ] ) )
+                    throw new myexception( myexception::AJAXWARNING, 'Two-factor token invalid' );
+            }
 
-                    if( isset( $obj[ '2f' ] ) && $obj[ '2f' ] ){
-                        if ( !$this->app->rules->twofactortoken( $twotoken ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $twotoken ) ) /*call_user_func( $this->on2Fcall, $twotoken ) !== true*/
-                            throw new Exception( 'Two-factor token invalid' );
-                            //                            return $this->app->ajax->msgWarning( 'Token is not valid.' )->render();
+            $this->app->ajax->confirmSubmit( $obj[ 'url' ], $obj[ 'xconfirm' ] );
+            return;
+        }
 
-                        $this->app->ajax->confirmDialogClose();
-                    }
-
-//                    $route = $this->router->getMatchedRoutes( $obj[ 'method' ], $obj[ 'uri' ], true );
-
-//                    if( isset( $route[0] ) ){
-                        $this->app->session->set( $h . 'confirm', 1 );
-
-                        if( isset( $obj[ 'postvars' ] ) )
-                            $_POST = $obj[ 'postvars' ];
-
-                        // TODO: process request in client side
-//                        return $this->globalapp->subRequest( $obj[ 'method' ], $obj[ 'uri' ] );
-                        //                        return $route[0]->dispatch();
-//                    }
-
-                    return $response;
-                }
-
-                throw new myexception( myexception::NOTFOUND );
-//                $this->notFound();
-
+        throw new myexception( myexception::NOTFOUND );
     }
 
 
@@ -78,43 +48,33 @@ class myconfirm{
             if( strpos( $k, 'csrf' ) )
                 unset( $postvars[ $k ] );
 
-        /** @var \Slim\Route $route */
-        //$route = $this->app->request->getAttribute('route');
+        $actual_link = $_SERVER[ 'REQUEST_URI' ];
 
-        $actual_link = ( isset( $_SERVER['HTTPS'] ) ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $hash = 'cf' . md5( $actual_link . json_encode( $postvars ) );
 
-        //$route = $this->router->getCurrentRoute();
-        $hash  = 'cf' . md5( json_encode( array( $actual_link /*$route->getName(), $route->getArguments() */ ) + $postvars ) );
+        $current_hash = $this->app->session->get( $hash, false );
 
-//        ( $this->app->request->getHeaderLine('X-Confirm') );
-
-        if( $this->app->session->get( $hash . 'confirm', false ) === $this->app->request->getHeaderLine('X-Confirm') ){
-            $this->app->session->delete( $hash . 'confirm' );
+        if( isset( $current_hash[ 'xconfirm' ] ) && $current_hash[ 'xconfirm' ] === $this->app->request->getHeaderLine('X-Confirm') ){
             $this->app->session->delete( $hash );
+            $this->app->ajax->confirmDialogClose();
             return true;
         }
 
         if( !is_null( $customBefore ) && is_callable( $customBefore ) ){
             $call = call_user_func( $customBefore );
         }else{
-//          $call = ( isset( $this->bef2Fcall ) && is_callable( $this->bef2Fcall )  ) ? call_user_func( $this->bef2Fcall, $mode ) : false;
             $call = isset( $this->app[ 'confirm.oncheck' ] ) ? $this->app[ 'confirm.oncheck' ]( $mode ) : false;
         }
 
         if( $confirmByDefault === true && $call === false ){
-            $this->app->session->delete( $hash . 'confirm' );
             $this->app->session->delete( $hash );
+            $this->app->ajax->confirmDialogClose();
             return true;
         }
 
         if( is_string( $call ) ){
             throw new myexception( myexception::AJAXWARNING, $call );
-            //$this->ajax()->msgError( $call )->render();
-            //$this->stop();
         }
-
-//        $uri    = $this->app->request->getUri();   // $this->request->getResourceUri();
-//        $method = $this->app->request->getMethod();// $this->request->getMethod();
 
         $sms = ( $call === 2 );
 
@@ -132,12 +92,14 @@ class myconfirm{
             $pinhelp  = 'Use your two-factor app to generate the 6-digit pin';
         }
 
-        $this->app->session->set( $hash, array( 'url' => $actual_link, /*'uri' => $uri, 'method' => $method,*/ '2f' => intval( $twofactor ), '2s' => intval( $sms ), 'postvars' => $_POST ) );
+        $xconfirm = md5( $hash . rand( 1, 1000000 ) );
+
+        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $pin, 'postvars' => $_POST ) );
+        $this->app->session->set( $xconfirm, $hash );
+
         $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $pin, $pinlabel, $pinhelp );
-//                        ->render();
-//        $this->stop();
+
         throw new myexception( myexception::STOP );
     }
-
 
 }
