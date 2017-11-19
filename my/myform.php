@@ -30,16 +30,6 @@ class myform{
 
     private $csrfname;
     private $csrfinit = false;
-	
-    // captcha
-    private	$font;
-    private $signature;
-    private $perturbation;
-    private $imgwid;
-    private $imghgt;
-    private $numcirc;
-    private $numlines;
-    private $ncols;
 
     /** @var mycontainer*/
     private $app;
@@ -62,16 +52,6 @@ class myform{
         $this->customRules      = array();
         $this->disabled         = array();
         $this->preventmsg       = 'undefined';
-
-        // captcha
-        $this->font             = dirname( __FILE__ ) . '/myform.ttf';	
-        $this->signature        = ". -     /   _   (   +";
-        $this->perturbation     = 1.0; // bigger numbers give more distortion; 1 is standard
-        $this->imgwid           = 200; // image width, pixels
-        $this->imghgt           = 100; // image height, pixels
-        $this->numcirc          = 4;   // number of wobbly circles
-        $this->numlines         = 4;   // number of lines
-        $this->ncols            = 20;  // foreground or background cols
 
         $this->app = $c;
     }
@@ -219,14 +199,6 @@ class myform{
         $this->elements[ 'hdr' . strtolower( $title ) ] = array( 'type' => 'formheader', 'title' => $title, 'description' => $description, 'descriptionclass' => $descriptionclass, 'icon' => $icon, 'rules' => array(), 'filters' => array(), 'align' => $align, 'hr' => $hr );
         return $this;
     }
-/*
-    public function & setHeaderDescription( $description, $class = '' ){
-        if( isset( $this->elements[ 'hdr' . strtolower( $title ) ] ) ){
-            $this->elements[ 'hdr' . strtolower( $title ) ][ 'description' ] = $description;
-            $this->elements[ 'hdr' . strtolower( $title ) ][ 'descriptionclass' ] = $class;
-        }
-        return $this;
-    }*/
 
     public function & setFooter(){
         $this->footer = true;
@@ -446,83 +418,23 @@ class myform{
         return $this;
     }
 
-    /*
-    public function & addTransloadit( $name, $label, $options = array(), $settings = array(), $help = '' ){
-
-        // default options
-        $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array(), 'mode' => 'image' );
-        $driver = $this->app->config[ 'transloadit.driver' ];
-
-        if( $driver === 'heroku' ){
-            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
-            $this->apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
-        }elseif( $driver === 'fortrabbit' ){
-            $this->apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
-            $this->apisecret = $this->app->configdecrypt( getenv( 'TRANSLOADIT_SECRET_KEY' ) );
-        }else{
-            $this->apikey    = $this->app->config[ 'transloadit.k' ];
-            $this->apisecret = $this->app->config[ 'transloadit.s' ];
-        }        
-
-        $params = array( 'auth' => array( 'key'     => $this->apikey,
-                                          'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
-
-        if( isset( $options[ 'template_id' ] ) && !empty( $options[ 'template_id' ] ) )
-            $params[ 'template_id' ] = $options[ 'template_id' ];
-
-        if( isset( $options[ 'steps' ] ) && !empty( $options[ 'steps' ] ) )
-            $params[ 'steps' ] = $options[ 'steps' ];
-
-        if( isset( $options[ 'fields' ] ) && !empty( $options[ 'fields' ] ) )
-            $params[ 'fields' ] = $options[ 'fields' ];
-
-        $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
-
-        $this->elements[ $name ] = array( 'type' => 'transloadit', 'valuetype' => 'transloadit', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'settings' => $settings, 'options' => array( 'params' => $params, 'signature' => hash_hmac('sha1', $params, $this->apisecret ), 'width' => $options['width'], 'height' => $options['height'], 'mode' => $options[ 'mode' ] ), 'help' => $help );
-        return $this;
-    }*/
-
 
     public function processFilestackThumb( Request $request, Response $response, $args ){
     
         if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
-            $this->app->ajax->attr( '#filestacki' . $args[ 'fsid' ], 'src', $this->app->filters->filestack( $_POST[ 'img' ] ) )
-                            ->render();
+            $this->app->ajax->attr( '#filestacki' . $args[ 'fsid' ], 'src', $this->app->filters->filestack( $_POST[ 'img' ] ) );
         }
-
-        return $response;
     }
 
 
-    public function & addFilestack( $name, $label, $width = '', $height = ''/*, $processing = ''*/, $picker_options = null, $store_options = null, $help = '', $thumbdefault = '' ){
+    public function & addFilestack( $name, $label, $width = '', $height = '', $picker_options, $help = '', $thumbdefault = '' ){
 
-        if( is_null( $picker_options ) )
-            $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
-
-        $secret    = $this->app->config[ 'filestack.secret' ];
-        $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
-        $policy64  = base64_encode( $policy );
-        $signature = hash_hmac( 'sha256', $policy64, $secret );
-
-        // add security
-        $picker_options[ 'policy' ]    = $policy64;
-        $picker_options[ 'signature' ] = $signature;
+        if( isset( $this->app[ 'filestack.options'] ) )
+            $picker_options = $picker_options + $this->app[ 'filestack.options'];
 
         $processing = $this->app->urlfor->action( 'myfwfilestack', array( 'fsid' => $this->formname . $name ) );
 
-        if( is_null( $store_options ) ){
-            $store_options = array();
-            $location = $this->app->config[ 'filestack.location' ];
-            $path     = $this->app->config[ 'filestack.path' ];
-
-            if( $location )
-                $store_options[ 'location' ] = $location;
-
-            if( $path )
-                $store_options[ 'path' ] = $path;
-        }
-
-        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => empty( $thumbdefault ) ? $this->app->config[ 'filestack.default' ] : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ) );
+        $this->elements[ $name ] = array( 'type' => 'filestack', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => empty( $thumbdefault ) ? $this->app->config[ 'filestack.default' ] : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options, JSON_HEX_APOS ) );
 
         $this->addRule( function() use ( $name ){
 
@@ -537,7 +449,7 @@ class myform{
                     return true;
             }
 
-            return 'Invalid recording';
+            return 'Invalid media';
         });
         return $this;
     }
@@ -547,45 +459,6 @@ class myform{
         return $this;
     }
 
-    public function & addFilestackWebcam( $name, $label, $width, $height, $urlvideo, $help = '' ){
-
-        $secret    = $this->app->config[ 'filestack.secret' ];
-        $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
-        $policy64  = base64_encode( $policy );
-        $signature = hash_hmac( 'sha256', $policy64, $secret );
-        $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
-
-        $fsoptions = new stdClass();
-        
-        $location = $this->app->config[ 'filestack.location' ];
-        $path     = $this->app->config[ 'filestack.path' ];
-        
-        if( $location )
-            $fsoptions->location = $location;
-
-        if( $path )
-            $fsoptions->path = $path;
-
-        $this->elements[ $name ] = array( 'type' => 'filestackwebcam', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => $this->app->config[ 'filestack.defaultcam' ], 'security' => $security, 'urlvideo' => $urlvideo, 'help' => $help, 'fsoptions' => $fsoptions );
-
-        $this->addRule( function() use ( $name ){
-
-            if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://cdn.filestackcontent.com/' ) === 0 ) ){
-
-                if( empty( $_POST[ $this->formname . $name ] ) )
-                    return true;
-
-                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
-
-                if( isset( $json[ 'mimetype' ] ) && strpos( $json[ 'mimetype' ], 'video' ) !== false )
-                    return true;
-            }
-
-            return 'Invalid recording';
-        });
-        return $this;
-    }
-    
     public function & addSeparator(){
         $this->elements[ 'sep' . $this->counter++ ] = array( 'type' => 'separator', 'rules' => array(), 'filters' => array() );
         return $this;
@@ -598,11 +471,6 @@ class myform{
 
     public function & addSeparatorHR(){
         $this->elements[ 'sep' . $this->counter++ ] = array( 'type' => 'separatorhr', 'rules' => array(), 'filters' => array() );
-        return $this;
-    }
-
-    public function & addCaptcha( $name = 'captcha' ){
-        $this->elements[ $name ] = array( 'type' => 'captcha', 'valuetype' => 'simple', 'name' => $name, 'rules' => array( 'required' => 'Security code is required', 'captcha' => 'Security code is not valid' ), 'filters' => array() );
         return $this;
     }
 
@@ -689,193 +557,6 @@ class myform{
 
         return $rand;
     }
-/*
-    private function initCaptcha(){
-
-        // create the hash for the random number
-        $rand = $this->getRandom( 5 );
-
-        // save random value in session
-        $this->app->session->set( 'captcha_string', $rand );
-
-        return $rand;
-    }
-
-    public function showCaptcha(){
-
-        $rand = $this->initCaptcha();
-
-        $image = $this->warped_text_image($this->imgwid, $this->imghgt, $rand);
-        $this->add_text($image, $this->signature);
-
-        // send several headers to make sure the image is not cached taken directly from the PHP Manual
-        // Date in the past  
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");  
-        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");  
-        header("Cache-Control: no-store, no-cache, must-revalidate");  
-        header("Cache-Control: post-check=0, pre-check=0", false);  
-        header("Pragma: no-cache");      
-        header('Content-type: image/png'); 
-
-        // send the image to the browser 
-        imagepng($image); 
-
-        // destroy the image to free up the memory 
-        imagedestroy($image); 
-    }
-
-    private function frand(){
-        return 0.0001*rand(0,9999);
-    }
-
-    // wiggly random line centered at specified coordinates
-    private function randomline($img, $col, $x, $y) {
-
-        $theta = ($this->frand()-0.5)*M_PI*0.7;
-        $len = rand($this->imgwid*0.4,$this->imgwid*0.7);
-        $lwid = rand(0,2);
-        $k = $this->frand()*0.6+0.2; $k = $k*$k*0.5;
-        $phi = $this->frand()*6.28;
-        $step = 0.5;
-        $dx = $step*cos($theta);
-        $dy = $step*sin($theta);
-        $n = $len/$step;
-        $amp = 1.5*$this->frand()/($k+5.0/$len);
-        $x0 = $x - 0.5*$len*cos($theta);
-        $y0 = $y - 0.5*$len*sin($theta);
-        $ldx = round(-$dy*$lwid);
-        $ldy = round($dx*$lwid);
-        for ($i = 0; $i < $n; ++$i) {
-            $x = $x0+$i*$dx + $amp*$dy*sin($k*$i*$step+$phi);
-            $y = $y0+$i*$dy - $amp*$dx*sin($k*$i*$step+$phi);
-            imagefilledrectangle($img, $x, $y, $x+$lwid, $y+$lwid, $col);
-        }
-    }
-
-    // amp = amplitude (<1), num=numwobb (<1)
-    private function imagewobblecircle($img, $xc, $yc, $r, $wid, $amp, $num, $col){
-        $dphi = 1;
-        if ($r > 0)
-            $dphi = 1/(6.28*$r);
-
-        $woffs = rand(0,100)*0.06283;
-        for ($phi = 0; $phi < 6.3; $phi += $dphi) {
-            $r1 = $r * (1-$amp*(0.5+0.5*sin($phi*$num+$woffs)));
-            $x = $xc + $r1*cos($phi);
-            $y = $yc + $r1*sin($phi);
-            imagefilledrectangle($img, $x, $y, $x+$wid, $y+$wid, $col);
-        }
-    }
-
-    // make a distorted copy from $tmpimg to $img. $wid,$height apply to $img,
-    // $tmpimg is a factor $iscale bigger.
-    private function distorted_copy($tmpimg, $img, $width, $height, $iscale){
-        $numpoles = 3;
-        
-        // make an array of poles AKA attractor points
-        //  global $perturbation;
-        for ($i = 0; $i < $numpoles; ++$i) {
-            do {
-                $px[$i] = rand(0, $width);
-            } while ($px[$i] >= $width*0.3 && $px[$i] <= $width*0.7);
-
-            do {
-                $py[$i] = rand(0, $height);
-            } while ($py[$i] >= $height*0.3 && $py[$i] <= $height*0.7);
-
-            $rad[$i] = rand($width*0.4, $width*0.8);
-            $tmp = -$this->frand()*0.15-0.15;
-            $amp[$i] = $this->perturbation * $tmp;
-        }
-
-        // get img properties bgcolor
-        $bgcol = imagecolorat($tmpimg, 1, 1);
-        $width2 = $iscale*$width;
-        $height2 = $iscale*$height;
-
-        // loop over $img pixels, take pixels from $tmpimg with distortion field
-        for ($ix = 0; $ix < $width; ++$ix)
-            for ($iy = 0; $iy < $height; ++$iy) {
-                $x = $ix;
-                $y = $iy;
-            for ($i = 0; $i < $numpoles; ++$i) {
-                $dx = $ix - $px[$i];
-                $dy = $iy - $py[$i];
-                if ($dx == 0 && $dy == 0)
-                    continue;
-                $r = sqrt($dx*$dx + $dy*$dy);
-                if ($r > $rad[$i])
-                    continue;
-                $rscale = $amp[$i] * sin(3.14*$r/$rad[$i]);
-                $x += $dx*$rscale;
-                $y += $dy*$rscale;
-            }
-            $c = $bgcol;
-            $x *= $iscale;
-            $y *= $iscale;
-            if ($x >= 0 && $x < $width2 && $y >= 0 && $y < $height2)
-                $c = imagecolorat($tmpimg, $x, $y);
-            imagesetpixel($img, $ix, $iy, $c);
-        }
-    }
-
-    private function warped_text_image($width, $height, $string){
-
-        // internal variablesinternal scale factor for antialias
-        $iscale = 3;
-
-        // initialize temporary image
-        $width2 = $iscale*$width;
-        $height2 = $iscale*$height;
-        $tmpimg = imagecreate($width2, $height2);
-        $bgColor = imagecolorallocatealpha ($tmpimg, 252, 252, 252, 0);
-        $col = imagecolorallocate($tmpimg, 0, 0, 0);
-
-        // init final image
-        $img = imagecreate($width, $height);
-        imagepalettecopy($img, $tmpimg);    
-        imagecopy($img, $tmpimg, 0,0 ,0,0, $width, $height);
-
-        // put straight text into $tmpimage
-        $fsize = $height2*0.25;
-        $bb = imageftbbox($fsize, 0, $this->font, $string);
-        $tx = $bb[4]-$bb[0];
-        $ty = $bb[5]-$bb[1];
-        $x = floor($width2/2 - $tx/2 - $bb[0]);
-        $y = round($height2/2 - $ty/2 - $bb[1]);
-        imagettftext($tmpimg, $fsize, 0, $x, $y, -$col, $this->font, $string);
-
-        // warp text from $tmpimg into $img
-        $this->distorted_copy($tmpimg, $img, $width, $height, $iscale);
-
-        // add wobbly circles (spaced)
-        //  global $numcirc;
-        for ($i = 0; $i < $this->numcirc; ++$i) {
-            $x = $width * (1+$i) / ($this->numcirc+1);
-            $x += (0.5-$this->frand())*$width/$this->numcirc;
-            $y = rand($height*0.1, $height*0.9);
-            $r = $this->frand();
-            $r = ($r*$r+0.2)*$height*0.2;
-            $lwid = rand(0,2);
-            $wobnum = rand(1,4);
-            $wobamp = $this->frand()*$height*0.01/($wobnum+1);
-            $this->imagewobblecircle($img, $x, $y, $r, $lwid, $wobamp, $wobnum, $col);
-        }
-
-        // add wiggly lines
-        for ($i = 0; $i < $this->numlines; ++$i) {
-            $x = $width * (1+$i) / ($this->numlines+1);
-            $x += (0.5-$this->frand())*$width/$this->numlines;
-            $y = rand($height*0.1, $height*0.9);
-            $this->randomline($img, $col, $x, $y);
-        }
-        return $img;
-    }
-
-    private function add_text($img, $string){
-        $cmtcol = imagecolorallocatealpha ($img, 128, 0, 0, 64);
-        imagestring($img, 5, 10, imagesy($img)-20, $string, $cmtcol);
-    }*/
 
     public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $href = '', $icon = '' ){
 
@@ -1249,19 +930,6 @@ class myform{
                                         $values[ $n ] = implode( ';', $v );
                                     }
                                     break;
-                /*case 'transloadit': if( isset( $_POST[ $this->formname . $n ] ) ){
-                                        $this->app->transloadit()->requestAssembly( $res, $_POST[ $this->formname . $n ] );
-                                        $values[ $n ] = $res;
-                                    }
-                                    break;
-                case 'cameratag': if( isset( $_POST[ $this->formname . $n ][ 'video_uuid' ] ) && is_string( $_POST[ $this->formname . $n ][ 'video_uuid' ] ) ){
-                                        $values[ $n ] = $_POST[ $this->formname . $n ][ 'video_uuid' ];
-                                    }
-                                    break;
-                case 'cameratagphoto': if( isset( $_POST[ $this->formname . $n . '_uuid' ] ) && is_string( $_POST[ $this->formname . $n . '_uuid' ] ) ){
-                                        $values[ $n ] = $_POST[ $this->formname . $n . '_uuid' ];
-                                    }
-                                    break;*/
                 default:            continue;
             }
 
@@ -1309,8 +977,6 @@ class myform{
                         $v = call_user_func( array( $this->app->filters, $f ), $v );
 
             $this->elements[$n][ 'value' ] = $v;
-//            if( isset( $el[ 'type' ] ) && $el[ 'type' ] == 'captcha' )
-//                $this->initCaptcha();
         }
 
         return array(   'hide'          => $this->hide,

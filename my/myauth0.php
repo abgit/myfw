@@ -114,11 +114,11 @@
 
         public function logout(){
 
-            $this->app->session->destroy();
-
             $this->init();
 
             $this->auth0->logout();
+
+            $this->app->session->destroy();
         }
         
         public function link(){

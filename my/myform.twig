@@ -377,14 +377,14 @@
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
                     </div>
                     <div class="col-xs-5" style="padding:0px;">
-                        <button onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){myfwsubmit('{{ el.processing }}','Processing ...',{img:Blobs[0].url},false,'info',2000);$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick='client.pick({{ el.pickeroptions|raw }}).then(function(result){myfwsubmit("{{ el.processing }}","Processing ...",{img:result.filesUploaded[0].url},false,"info",2000);$("#filestackh{{ name ~ el.name }}").val(result.filesUploaded[0].url);});' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     </div>
                 </div>
             {% else %}
                 <div class="row">
                     <div class="col-xs-12">
                         <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
-                        <button onClick="filepicker.pickAndStore({{ el.pickeroptions }},{{ el.storeoptions }},function(Blobs){$('#filestackh{{ name ~ el.name }}').val(Blobs[0].url);$('#filestacks{{ name ~ el.name }}').text(myfwt(Blobs[0].filename,25)).addClass('label-success');});" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <button onClick='client.pick({{ el.pickeroptions|raw }} ).then(function(result){$("#filestackh{{ name ~ el.name }}").val(result.filesUploaded[0].url);$("#filestacks{{ name ~ el.name }}").text(myfwt(result.filesUploaded[0].filename,25)).addClass("label-success");});' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                         <span id="filestacks{{ name ~ el.name }}" class="label {%if el.value %}label-success{%endif%}" style="margin-top:4px;display:block;cursor:pointer">{% if el.value %}{{ el.value|t( 20, '...', false ) }}{% else %}&nbsp;{% endif %}</span>
                     </div>
                 </div>

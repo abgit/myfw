@@ -6,8 +6,8 @@
 
             {% if header.logo or header.toogle %}
 			<div class="navbar-header">
-				
-                <a class="navbar-brand" style="padding-left:14px;padding-top:12px"{% if header.href %} href="{{ header.href }}"{% endif %}><img src="{{ cdn }}{{ header.logo }}" alt=""></a>
+
+                <a class="navbar-brand" style="padding-left:14px;padding-top:12px" {{ header.urlobj|urlobj }}><img src="{{ cdn }}{{ header.logo }}" alt=""></a>
 
                 {% if header.toogle %}
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-icons">
@@ -41,7 +41,7 @@
 				    	</a>
     					<ul class="dropdown-menu dropdown-menu-right icons-right">
                             {% for opt in el.options %}
-	    					    <li id="navbari{{ opt.id }}" class="{{ opt.active ? 'active' }}"><a {% if opt.onclick %}onClick="{{ opt.onclick }}"{% endif %}{% if opt.href %}href="{{ opt.href }}"{% endif %}{% if opt.urlobj %}{{ opt.urlobj|urlobj }}{% endif %}><i class="{{ opt.icon }}"></i> {{ opt.label }}</a></li>
+	    					    <li id="navbari{{ opt.id }}" class="{{ opt.active ? 'active' }}"><a {{ opt.urlobj|urlobj }}><i class="{{ opt.icon }}"></i> {{ opt.label }}</a></li>
 			    		    {% endfor %}
                         </ul>
 				    </li>

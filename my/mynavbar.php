@@ -21,8 +21,8 @@ class mynavbar{
         return $this;
     }
 
-    public function & setHeader( $logo, $href = '', $toogle = true ){
-        $this->header = array( 'logo' => $logo, 'href' => $href, 'toogle' => $toogle );
+    public function & setHeader( $logo, $urlobj = '', $toogle = true ){
+        $this->header = array( 'logo' => $logo, 'urlobj' => $urlobj, 'toogle' => $toogle );
         return $this;
     }
 

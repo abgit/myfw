@@ -210,6 +210,14 @@ class myfw{
         $app->post( '/myfw/filestack/{fsid:[a-zA-Z0-9]{1,20}}', 'myform:processFilestackThumb' )
             ->setName( 'myfwfilestack' );
 
+        $container['filestack.policy'] = function ($c) {
+            return base64_encode('{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}' );
+        };
+
+        $container['filestack.signature'] = function ($c) {
+            return hash_hmac( 'sha256', $c['filestack.policy'], $c->config[ 'filestack.secret' ] );
+        };
+
         $app->post( '/pusher/auth', 'mypusher:checkEndpoint' );
     }
 
