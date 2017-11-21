@@ -24,11 +24,6 @@ class mypanel{
         $this->app = $c;
     }
 
-    public function & setID( $id ){
-        $this->name = $id;
-        return $this;
-    }
-
     public function & setName( $name ){
         $this->name = $name;
         return $this;
