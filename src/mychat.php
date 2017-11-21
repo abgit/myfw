@@ -10,7 +10,6 @@
         private $urlimage;
         private $formname;
         private $message;
-        private $transloadit;
         private $wait;
         private $init = false;
         private $cdn;
@@ -23,7 +22,8 @@
         private $windowid;
         private $pchannel;
         private $pevent;
-        private $filestack;
+        private $filestackimage;
+        private $filestackvideo;
         private $selfid;
 
         public function __construct( $c ){
@@ -31,7 +31,7 @@
             $this->init     = true;
         }
 
-        public function & setID( $id ){
+        public function & setName( $id ){
             $this->id       = $id;
             $this->windowid = $id . 'box';
             return $this;
@@ -208,90 +208,45 @@
             return $this;
         }
 
-        public function & setFilestack( $urlimage, $urlvideo = false ){
+        public function & setFilestackImage( $urlimage, $picker_options ){
 
-            $secret    = $this->app->config[ 'filestack.secret' ];
-            $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
-            $policy64  = base64_encode( $policy );
-            $signature = hash_hmac( 'sha256', $policy64, $secret );
-            $security  = "policy:'" . $policy64 . "',signature:'" . $signature . "',";
+            if( isset( $this->app[ 'filestack.options'] ) )
+                $picker_options = $picker_options + $this->app[ 'filestack.options'];
 
-            $fsoptions = new stdClass();
-        
-            $location = $this->app->config[ 'filestack.location' ];
-            $path     = $this->app->config[ 'filestack.path' ];
-        
-            if( $location )
-                $fsoptions->location = $location;
-
-            if( $path )
-                $fsoptions->path = $path;
-
-            $this->filestack[ 'security' ]  = $security;
-            $this->filestack[ 'urlimage' ]  = $urlimage;
-            $this->filestack[ 'urlvideo' ]  = $urlvideo;
-            $this->filestack[ 'fsoptions' ] = $fsoptions;
+            $this->filestackimage[ 'urlimage' ]  = $urlimage;
+            $this->filestackimage[ 'fsoptions' ] = json_encode( $picker_options, JSON_HEX_APOS );
             return $this;
         }
 
-        public function & setTransloadit( $urlimage, $formname, $options ){
+        public function & setFilestackVideo( $urlvideo, $picker_options ){
 
-            $driver = $this->app->config[ 'transloadit.driver' ];
+            if( isset( $this->app[ 'filestack.options'] ) )
+                $picker_options = $picker_options + $this->app[ 'filestack.options'];
 
-            if( $driver === 'heroku' ){
-                $apikey    = getenv( 'TRANSLOADIT_AUTH_KEY' );
-                $apisecret = getenv( 'TRANSLOADIT_SECRET_KEY' );
-            }else{
-                $apikey    = $this->app->config[ 'transloadit.k' ];
-                $apisecret = $this->app->config[ 'transloadit.s' ];
-            }        
-
-            $options = $options + array( 'template_id' => '', 'width' => 0, 'height' => 0, 'steps' => array() );
-
-            $params = array( 'auth' => array( 'key'     => $apikey,
-                                              'expires' => gmdate('Y/m/d H:i:s+00:00', strtotime('+1 hour') ) ) );
-
-
-            if( !empty( $options[ 'template_id' ] ) )
-                $params[ 'template_id' ] = $options[ 'template_id' ];
-
-            if( !empty( $options[ 'steps' ] ) )
-                $params[ 'steps' ] = $options[ 'steps' ];
-
-            if( isset( $options[ 'fields' ] ) )
-                $params[ 'fields' ] = $options[ 'fields' ];
-
-            $params = json_encode( $params, JSON_UNESCAPED_SLASHES );
-
-            $this->transloadit = array( 'params' => $params, 'signature' => hash_hmac( 'sha1', $params, $apisecret ) );
-            $this->urlimage    = $urlimage;
-            $this->formname    = $formname;
-        
+            $this->filestackvideo[ 'urlvideo' ]  = $urlvideo;
+            $this->filestackvideo[ 'fsoptions' ] = json_encode( $picker_options, JSON_HEX_APOS );
             return $this;
         }
 
-        public function getTransloadit(){
-            return is_array( $this->transloadit ) ? 1 : 0;
-        }
 
         public function obj(){
-            return array( 'values'      => $this->values,
-                          'message'     => $this->message,
-                          'transloadit' => $this->transloadit,
-                          'filestack'   => $this->filestack,
-                          'windowid'    => $this->windowid,
-                          'urlimage'    => $this->urlimage,
-                          'formname'    => $this->formname,
-                          'buttons'     => $this->buttons,
-                          'keyowner'    => $this->keyowner,
-                          'keydate'     => $this->keydate,
-                          'keythumb'    => $this->keythumb,
+            return array( 'values'          => $this->values,
+                          'message'         => $this->message,
+                          'filestackimage'  => $this->filestackimage,
+                          'filestackvideo'  => $this->filestackvideo,
+                          'windowid'        => $this->windowid,
+                          'urlimage'        => $this->urlimage,
+                          'formname'        => $this->formname,
+                          'buttons'         => $this->buttons,
+                          'keyowner'        => $this->keyowner,
+                          'keydate'         => $this->keydate,
+                          'keythumb'        => $this->keythumb,
                           'keythumbdefault' => $this->keythumbdefault,
-                          'keyme'       => $this->keyme,
-                          'cdn'         => $this->cdn,
-                          'id'          => $this->id,
-                          'selfid'      => $this->selfid,
-                          'init'        => $this->init );
+                          'keyme'           => $this->keyme,
+                          'cdn'             => $this->cdn,
+                          'id'              => $this->id,
+                          'selfid'          => $this->selfid,
+                          'init'            => $this->init );
         }
         
         public function __toString(){

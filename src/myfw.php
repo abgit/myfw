@@ -210,6 +210,9 @@ class myfw{
         $app->post( '/myfw/filestack/{fsid:[a-zA-Z0-9]{1,20}}', 'myform:processFilestackThumb' )
             ->setName( 'myfwfilestack' );
 
+        $app->post( '/myfw/markdown', 'myform:processMarkdown' )
+            ->setName( 'myfwmarkdown' );
+
         $container['filestack.policy'] = function ($c) {
             return base64_encode('{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}' );
         };

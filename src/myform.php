@@ -122,34 +122,24 @@ class myform{
         return $this;
     }
 
-    public function & addMarkdown( $name, $label, $picker_options, $store_options, $processing ){
+    public function & addMarkdown( $name, $label, $picker_options ){
 
-        if( is_null( $picker_options ) )
-            $picker_options = array( 'multiple' => false, 'mimetypes' => array( 'image/jpg','image/jpeg','image/png','image/bmp' ), 'cropRatio' => 1, 'cropForce' => true, 'services' => array( 'COMPUTER', 'CONVERT' ), 'conversions' => array( 'crop', 'rotate', 'filter' ) );
+        if( isset( $this->app[ 'filestack.options'] ) )
+            $picker_options = $picker_options + $this->app[ 'filestack.options'];
 
-        $secret    = $this->app->config[ 'filestack.secret' ];
-        $policy    = '{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}';
-        $policy64  = base64_encode( $policy );
-        $signature = hash_hmac( 'sha256', $policy64, $secret );
+        $processing = $this->app->urlfor->action( 'myfwmarkdown' );
 
-        // add security
-        $picker_options[ 'policy' ]    = $policy64;
-        $picker_options[ 'signature' ] = $signature;
+        $this->elements[ $name ] = array( 'type' => 'markdown', 'valuetype' => 'simple', 'pickeroptions' => json_encode( $picker_options, JSON_HEX_APOS ), 'processing' => $processing, 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
+        return $this;
+    }
 
-        if( is_null( $store_options ) ){
-            $store_options = array();
-            $location = $this->app->config[ 'filestack.location' ];
-            $path     = $this->app->config[ 'filestack.path' ];
-
-            if( $location )
-                $store_options[ 'location' ] = $location;
-
-            if( $path )
-                $store_options[ 'path' ] = $path;
+    public function processMarkdown()
+    {
+        if( isset($_POST['img'] ) ) {
+            return $this->app->ajax->markdown( $this->app->filters->filestackresize( $_POST['img'], isset( $this->app['markdown.width'] ) ? $this->app['markdown.width'] : 600, isset( $this->app['markdown.height'] ) ? $this->app['markdown.height'] : 300 ) );
         }
 
-        $this->elements[ $name ] = array( 'type' => 'markdown', 'valuetype' => 'simple', 'pickeroptions' => json_encode( $picker_options ), 'storeoptions' => json_encode( $store_options ), 'processing' => $processing, 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
-        return $this;
+        return false;
     }
 
     public function & addPassword( $name, $label ){
