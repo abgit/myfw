@@ -152,7 +152,7 @@
             if( !empty( $this->errorCode() ) ){
 
                 if( isset( $this->app[ 'db.onerror' ] ) ) {
-                    return $this->app['db.onerror']($this->errorCode(), $this->errorInfo(), $procedure, $values );
+                    $this->app['db.onerror']($this->errorCode(), $this->errorInfo(), $procedure, $values );
                 }
 
             }
