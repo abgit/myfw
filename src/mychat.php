@@ -194,7 +194,8 @@
             $this->init   = false;
             $this->values = is_array( $values ) ? $values : json_decode( $values, true );
 
-            $this->app->pusher->chatAdd( '#' . $this->id . 'msgs', $this->__toString(), '#' . $this->id . 'box' )->send( $this->pchannel, $this->pevent );
+            $this->app->pusher->chatAdd( '#' . $this->id . 'msgs', $this->__toString(), '#' . $this->id . 'box' )
+                              ->send( $this->pchannel, $this->pevent );
             return $this;
         }
 

@@ -29,7 +29,7 @@ use \Slim\Http\Response as Response;
             $this->pkey = $url[ 'user' ];
             $this->pcluster = $this->app->filters->urlregion( $urloriginal );
 
-            $this->pusherObj = new Pusher(
+            $this->pusherObj = new Pusher\Pusher(
                   $this->pkey,
                   $url[ 'pass' ],
                   $path[ 'basename' ],
