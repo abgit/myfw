@@ -14,6 +14,7 @@ class myfw{
         $container = $this->container = $app->getContainer();
 
         $container['ipaddress'] = function () {
+            d('panic3');
             return $_SERVER['REMOTE_ADDR'];
         };
 
