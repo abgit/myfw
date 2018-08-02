@@ -8,17 +8,24 @@ use \Slim\Http\Response as Response;
         /** @var mycontainer */
         private $app;
 
-        /** @var Pusher */
+        /** @var Pusher\Pusher */
         private $pusherObj;
 
         private $pkey;
         private $pcluster;
-        private $pouts;
+        private $pouts = array();
 
         public function __construct( $c ){
             $this->app = $c;
+        }
 
-            $this->pouts = array();
+        public function empty(){
+            return empty( $this->pouts );
+        }
+
+        private function init(){
+            if( isset( $this->pusherObj ) )
+                return false;
 
             $urloriginal = $this->app->config[ 'pusher.driver' ] === 'heroku' ? getenv( 'PUSHER_URL' ) : $this->app->config[ 'pusher.url' ];
 
@@ -35,14 +42,17 @@ use \Slim\Http\Response as Response;
                   $path[ 'basename' ],
                   array( 'cluster' => $this->pcluster, 'encrypted' => true )
             );
+
+            return true;
         }
 
         public function ajaxSubscribe( $channel, $event, $replace = false, $replaceWith = false ){
+            $this->init();
             $this->app->ajax->pusherSubscribe( $this->pkey, $channel, $event, true, $this->pcluster, $replace, $replaceWith );
         }
 
         public function checkEndpoint( Request $request, Response $response ){
-
+            $this->init();
             $channel = $this->app->config[ 'pusher.channel' ];
 
             if( isset( $_POST['channel_name'] ) && is_string( $_POST['channel_name'] ) && $_POST['channel_name'] === $channel )
@@ -52,7 +62,7 @@ use \Slim\Http\Response as Response;
         }
 
         public function send( $channel, $event = null ){
-
+            $this->init();
             if( empty( $channel ) )
                 $channel = $this->app->config[ 'pusher.channel' ];
 
@@ -66,7 +76,7 @@ use \Slim\Http\Response as Response;
         }
 
         public function sendAll(){
-
+            $this->init();
             if( !empty( $this->out ) )
                 foreach( $this->out as $oper => $val )
                     $this->pouts[ $this->app->config[ 'pusher.channel' ] ][ $this->app->config[ 'pusher.event' ] ][ $oper ] = $val;
