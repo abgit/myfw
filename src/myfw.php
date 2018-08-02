@@ -264,7 +264,8 @@ d('panic2');
         /** @var Response $response */
         $response = $next($request, $response);
 
-        $container->pusher->sendall();
+        if( $container->pusher )
+            $container->pusher->sendall();
 
         if( $container->isajax )
             return $response->withJson( $container->ajax->obj() );
