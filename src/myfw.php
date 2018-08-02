@@ -264,7 +264,7 @@ d('panic2');
         /** @var Response $response */
         $response = $next($request, $response);
 
-        if( $container->pusher )
+        if( isset( $container->pusher ) )
             $container->pusher->sendall();
 
         if( $container->isajax )
