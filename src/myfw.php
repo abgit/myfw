@@ -14,7 +14,6 @@ class myfw{
         $container = $this->container = $app->getContainer();
 
         $container['ipaddress'] = function () {
-            d('panic3');
             return $_SERVER['REMOTE_ADDR'];
         };
 
@@ -26,7 +25,6 @@ class myfw{
             return new myajax();
         };
         $container['auth0'] = function ($c) {
-d('panic2');
             return new myauth0($c);
         };
         $container['db'] = function ($c) {
@@ -226,8 +224,8 @@ d('panic2');
         $app->post( '/pusher/auth', 'mypusher:checkEndpoint' );
     }
 
-
-    public function __invoke(Request $request, Response $response, $next) {
+    /** @throws myexception */
+    public function __invoke( Request $request, Response $response, $next) {
 
         $container = $this->container;
 

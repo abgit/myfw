@@ -1,6 +1,6 @@
 {
 	"name": "myfw",
-
+	"description": "a mini php framework",
     "require": {
 		 "php": "7.1.*",
 		 "ext-memcached": "*",
@@ -32,7 +32,6 @@
 
 		 "nexmo/client": "@beta"
 	},
-
 	"autoload": {
          "psr-0": {
 			"my": "src"
