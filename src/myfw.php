@@ -25,7 +25,7 @@ class myfw{
             return new myajax();
         };
         $container['auth0'] = function ($c) {
-d('panic');
+d('panic2');
             return new myauth0($c);
         };
         $container['db'] = function ($c) {
