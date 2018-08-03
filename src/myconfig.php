@@ -123,7 +123,12 @@ class myconfig implements arrayaccess{
 
 
     public function decrypt( $message, $key = null ){
-        return Crypto::decrypt( $message, Key::loadFromAsciiSafeString( is_null( $key ) ? $this->app[ 'config.crypt' ] : $key ) );
+        try {
+            return Crypto::decrypt($message,
+                Key::loadFromAsciiSafeString(is_null($key) ? $this->app['config.crypt'] : $key));
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
 
@@ -138,7 +143,11 @@ class myconfig implements arrayaccess{
 
 
     public function decryptWithPassword( $message, $key = null ){
-        return Crypto::decryptWithPassword( $message, $key );
+        try {
+            return Crypto::decryptWithPassword($message, $key);
+        }catch (Exception $e){
+            return null;
+        }
     }
 
 }
