@@ -53,7 +53,7 @@
     
 
         	{% if el.type == 'formgroup' %}
-                <div class="form-group">
+                <div class="form-group fg{{ loop.index }}">
                     <div class="row">
 
                     {% set formgroup    = el.total %}
@@ -63,7 +63,7 @@
                 <div class="{{formgroupcss}}">
 
             {% elseif not el.isbutton %}
-                <div class="form-group">
+                <div class="form-group fg{{ loop.index }}">
             {% endif %}
         
 

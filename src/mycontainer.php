@@ -39,6 +39,7 @@
  * @property mypanel $panel
  * @property mystats $stats
  * @property myform $form
+ * @property myclient $client
  *
  * properties:
  * @property boolean $isajax

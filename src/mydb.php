@@ -53,6 +53,8 @@
                 }
             }
 
+            $this->app->ajax->msgError( $errcode );
+
             return $this;
         }
 
@@ -217,7 +219,16 @@
 
 
         public function errorCode(){
-            return intval( $this->stmt->errorCode() );
+            $errcode = $this->stmt->errorCode();
+            if( $errcode !== '00000' )
+                return intval( $errcode );
+
+            // try to parse from errorInfo
+            $arr = $this->stmt->errorInfo();
+            if( isset( $arr[2] ) && is_string( $arr[2] ) && strlen( $arr[2] ) > 8 )
+                return intval( substr( $arr[2], 8 ) );
+
+            return 0;
         }
 
 

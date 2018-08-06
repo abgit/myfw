@@ -8,19 +8,6 @@
         // TODO: add /auth0/callback middleware
         public function __construct( $c ){
             $this->app = $c;
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-
-            if( !isset( $this->app->session->myclient[ 'ipaddress' ] ) )
-                $this->app->session->myclient[ 'ipaddress' ] = $ipaddress;
-
-            if( !isset( $this->app->session->myclient[ 'countrycode' ] ) )
-                $this->app->session->myclient[ 'countrycode' ] = geoip_country_code_by_name( $ipaddress );
-
-            if( !isset( $this->app->session->myclient[ 'countryname' ] ) )
-                $this->app->session->myclient[ 'countryname' ] = geoip_country_name_by_name( $ipaddress );
-
-            if( !isset( $this->app->session->myclient[ 'useragent' ] ) )
-                $this->app->session->myclient[ 'useragent' ] = $_SERVER['HTTP_USER_AGENT'];
         }
 
         public function islogged(){
@@ -29,6 +16,22 @@
 
         public function getAll(){
             return isset( $this->app->session->myclient ) && is_array( $this->app->session->myclient ) ? $this->app->session->myclient : array();
+        }
+
+        public function ipaddress(){
+            return $_SERVER['REMOTE_ADDR'];
+        }
+
+        public function countryCode(){
+            return function_exists('geoip_country_code_by_name') ? geoip_country_code_by_name( $this->ipaddress() ) : null;
+        }
+
+        public function countryName(){
+            return function_exists('geoip_country_name_by_name') ? geoip_country_name_by_name( $this->ipaddress() ) : null;
+        }
+
+        public function useragent(){
+            return $_SERVER['HTTP_USER_AGENT'];
         }
 
         public function offsetGet( $setting ) {
