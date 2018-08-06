@@ -232,7 +232,7 @@ class myfilters{
 
 
     public function cdn( $html ){
-        return preg_replace( '~(href|src|url|content)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $this->app->config[ 'filter.cdn.ext' ] . ')(["\'])~i', '$1$2"' . $this->app->config[ 'filter.cdn.domain' ] . '$5$6"', $html  );
+        return preg_replace( '~(href|src|url|content)([=(])(["\'])(?!(http|https|//))([^"\']+)(' . $this->app->config[ 'filter.cdn.ext' ] . ')(["\'])~i', '$1$2$3' . $this->app->config[ 'filter.cdn.domain' ] . '$5$6$3', $html  );
     }
 
     public function intervalmin( $value, $intervals ){
