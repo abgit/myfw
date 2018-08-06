@@ -13,6 +13,8 @@
 
         public function __construct( $c ){
 
+            parent::__construct();
+
             $this->app = $c;
 
             if( !$this->getServerList() ){
