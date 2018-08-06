@@ -75,6 +75,9 @@ class myfw{
         $container['otp'] = function ($c) {
             return new myotp($c);
         };
+        $container['client'] = function ($c) {
+            return new myclient($c);
+        };
 
 
         // objects
