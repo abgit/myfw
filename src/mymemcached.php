@@ -13,13 +13,50 @@
 
         public function __construct( $c ){
 
-            parent::__construct();
+            parent::__construct( APP_NAME );
 
             $this->app = $c;
 
-            if( !$this->getServerList() ){
+            if( ! empty( $this->app->config[ 'memcached.servers' ] ) ) {
+                $servers = explode(',', $this->app->config['memcached.servers'] );
+            }else{
+                $servers = explode(',', ini_get('session.save_path') );
+            }
 
-                $servers = explode( ',', $this->app->config[ 'memcached.servers' ] );
+            // apply redundancy for multiple servers
+            if( count( $servers ) > 1 ){
+
+                // Use a global, tunable timeout, from which all time-related tuning
+                // options derive
+                $timeout = 50;
+
+                // Set options
+                $this->setOptions([
+
+                    // Assure that dead servers are properly removed and ...
+                    // ... retried after a short while (here: 2 seconds)
+                    // KETAMA must be enabled so that replication can be used
+                    // Replicate the data, i.e. write it to both memcached serverss
+                    \Memcached::OPT_REMOVE_FAILED_SERVERS => true,
+                    \Memcached::OPT_RETRY_TIMEOUT         => 2,
+                    \Memcached::OPT_LIBKETAMA_COMPATIBLE  => true,
+                    \Memcached::OPT_NUMBER_OF_REPLICAS    => 1,
+
+                    // Those values assure that a dead (due to increased latency or
+                    // really unresponsive) memcached server increased dropped fast
+                    // and the other is used.
+                    \Memcached::OPT_POLL_TIMEOUT          => $timeout,           // milliseconds
+                    \Memcached::OPT_SEND_TIMEOUT          => $timeout * 1000,    // microseconds
+                    \Memcached::OPT_RECV_TIMEOUT          => $timeout * 1000,    // microseconds
+                    \Memcached::OPT_CONNECT_TIMEOUT       => $timeout,           // milliseconds
+
+                    // Further performance tuning
+                    \Memcached::OPT_BINARY_PROTOCOL       => true,
+                    \Memcached::OPT_NO_BLOCK              => true,
+                ]);
+            }
+
+            if( !$this->getServerList() ){
                 foreach( $servers as $s ){
                     $parts = explode( ':', $s );
                     if( isset( $parts[0] ) && isset( $parts[1] ) )

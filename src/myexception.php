@@ -11,6 +11,7 @@ class myexception extends Exception {
     const NOTFOUND     = 104;
     const RATELIMIT    = 105;
     const STOP         = 106;
+    const REDIRECTOK   = 107;
 
     public function __construct( $code, $message = '' ) {
         $this->message = $message;
@@ -22,9 +23,10 @@ class myexception extends Exception {
         /** @var abContainer $c */
         switch( $code ){
             case myexception::REDIRECT:
+            case myexception::REDIRECTOK:
 
                 if( $c->isajax ) {
-                    return $response->withJson( $c->ajax->redirect( $message )
+                    return $response->withJson( $c->ajax->redirect( $message, '', 1000, $code == myexception::REDIRECTOK )
                                                         ->obj() );
                 }else {
                     return $response->withRedirect( $message );

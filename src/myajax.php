@@ -114,9 +114,15 @@ class myajax{
         return $this;
     }
 
-    public function & redirect( $url, $message = '', $ms = 1000 ){
+    public function & redirect( $url, $message = '', $ms = 1000, $success = false ){
 
-        $this->msgWarning( empty( $message ) ? 'Redirecting ...' : $message, null, array( 'openDuration' => 0, 'sticky' => true ) );
+        $msg     = empty( $message ) ? 'Redirecting ...' : $message;
+        $options = array( 'openDuration' => 0, 'sticky' => true );
+
+        if( $success )
+            $this->msgOK( $msg, null, $options );
+        else
+            $this->msgWarning( $msg, null, $options );
 
         $this->out[ 'rd' ] =  array( 'u' => $url, 'm' => $ms );
         return $this;
