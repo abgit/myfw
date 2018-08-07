@@ -12,6 +12,7 @@ class myconfirm{
         $this->app = $c;
     }
 
+    /** @throws myexception */
     public function processRequest( Request $request, Response $response, $args ) {
 
         $obj = $this->app->session->get( $args[ 'h' ], false );
@@ -31,12 +32,12 @@ class myconfirm{
         throw new myexception( myexception::NOTFOUND );
     }
 
-
+    /** @throws myexception */
     public function checkToken( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
         return $this->check( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore );
     }
 
-
+    /** @throws myexception */
     public function check( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $confirmByDefault = false, $customBefore = null ){
 
         if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';

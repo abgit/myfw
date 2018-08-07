@@ -5,17 +5,16 @@
         /** @var mycontainer */
         private $app;
 
-        // TODO: add /auth0/callback middleware
         public function __construct( $c ){
             $this->app = $c;
         }
 
         public function islogged(){
-            return isset( $this->app->session->myclient[ 'uuid'] );
+            return isset( $this->app->session['myclient'][ 'uuid'] );
         }
 
         public function getAll(){
-            return isset( $this->app->session->myclient ) && is_array( $this->app->session->myclient ) ? $this->app->session->myclient : array();
+            return isset( $this->app->session['myclient'] ) && is_array( $this->app->session['myclient'] ) ? $this->app->session['myclient'] : array();
         }
 
         public function ipaddress(){
@@ -36,32 +35,32 @@
 
         public function offsetGet( $setting ) {
 
-            if( isset( $this->app->session->myclient[ $setting ] ) )
-                return $this->app->session->myclient[ $setting ];
+            if( isset( $this->app->session['myclient'][ $setting ] ) )
+                return $this->app->session['myclient'][ $setting ];
 
             return null;
         }
 
         public function offsetSet( $offset, $value ) {
 
-            $client = $this->app->session->myclient;
+            $client = $this->app->session['myclient'];
 
             $client[$offset] = $value;
 
-            $this->app->session->myclient = $client;
+            $this->app->session['myclient'] = $client;
         }
 
         public function offsetExists( $offset ) {
-            return isset($this->app->session->myclient[ $offset ] );
+            return isset($this->app->session['myclient'][ $offset ] );
         }
 
         public function offsetUnset( $offset ) {
 
-            $client = $this->app->session->myclient;
+            $client = $this->app->session['myclient'];
 
             unset( $client[$offset] );
 
-            $this->app->session->myclient = $client;
+            $this->app->session['myclient'] = $client;
         }
 
         public function logout(){

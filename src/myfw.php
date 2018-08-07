@@ -203,7 +203,10 @@ class myfw{
             return $view;
         });
 
-        $app->post( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:[0-9]{6}}]', 'myconfirm:processRequest' )
+//        $app->get( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:[0-9]{6}}]', 'myconfirm:processRequest' )
+//            ->setName( 'myfwconfirm' );
+
+        $app->post( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:.*}]', 'myconfirm:processRequest' )
             ->setName( 'myfwconfirm' );
 
 
