@@ -96,6 +96,33 @@ class myrules{
         return ( strlen( $value ) >= intval( $opts ) );
     }
 
+    public function minlengthtrim( $value, $opts, $formelement = null ) {
+        return myrules::minlength( trim( $value ), $opts, $formelement );
+    }
+
+    public function hasupper( $value, $opts, $formelement = null ) {
+        return preg_match('/[A-Z]/', $value );
+    }
+
+    public function haslower( $value, $opts, $formelement = null ) {
+        return preg_match('/[a-z]/', $value );
+    }
+
+    public function hasnumber( $value, $opts, $formelement = null ) {
+        return preg_match('/\d/', $value );
+    }
+
+    public function hasletter( $value, $opts, $formelement = null ) {
+        return preg_match('/[a-zA-Z]/', $value );
+    }
+
+    public function hasspecial( $value, $opts, $formelement = null ) {
+        return preg_match('/[^a-zA-Z\d]/', $value );
+    }
+    public function hasnospaces( $value, $opts, $formelement = null ) {
+        return !preg_match('/\s/', $value );
+    }
+
     public function maxvalue( $value, $opts, $formelement = null ) {
         return ( intval( $value ) <= intval( $opts ) );
     }
