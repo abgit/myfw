@@ -14,8 +14,8 @@ class myexception extends Exception {
     const REDIRECTOK   = 107;
 
     public function __construct( $code, $message = '' ) {
-        $this->message = $message;
         $this->code    = $code;
+        $this->message = $message;
     }
 
     public static function response( $code, $message, Response $response, $c ){
