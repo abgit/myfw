@@ -22,6 +22,7 @@
  * @property mynotify $notify
  * @property mynexmo $nexmo
  * @property mysocial $social
+ * @property mycidr $cidr
  * @property \SlimSession\Helper $session
  * @property \Slim\Views\Twig $view
  *

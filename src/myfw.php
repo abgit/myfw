@@ -78,6 +78,9 @@ class myfw{
         $container['client'] = function ($c) {
             return new myclient($c);
         };
+        $container['cidr'] = function ($c) {
+            return new mycidr($c);
+        };
 
 
         // objects
@@ -252,7 +255,7 @@ class myfw{
                 'Too much requests. Please wait ' . $container->memcached->ratelocktimeout() . 's and try again.');
         }
 
-        if ( isset( $container->config[ 'app.cidr' ] ) && !empty( $container->config[ 'app.cidr' ] ) && !$container->list->ip_in_rangelist( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
+        if ( isset( $container->config[ 'app.cidr' ] ) && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
             throw new myexception(myexception::STOP,
                 'IP ' . $_SERVER['REMOTE_ADDR'] . ' not in APP cidr whitelist.');
         }

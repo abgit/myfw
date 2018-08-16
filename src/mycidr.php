@@ -20,9 +20,6 @@ class mycidr{
         return false;
     }
 
-    public function matchsession(){
-        return $this->match( $this->app->ipaddress, $this->app->config[ 'cidr.list' ] );
-    }
 
     private function ip_in_range( $ip, $range ) {
         if ( strpos( $range, '/' ) == false ){
