@@ -257,7 +257,7 @@ class myfw{
 
         if ( isset( $container->config[ 'app.cidr' ] ) && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
             throw new myexception(myexception::STOP,
-                'IP ' . $_SERVER['REMOTE_ADDR'] . ' not in APP cidr whitelist ' . $container->config[ 'app.cidr' ]);
+                'IP ' . $_SERVER['REMOTE_ADDR'] . ' not in APP cidr whitelist.' );
         }
 
         // myconfirm method to populate $_POST
