@@ -20,7 +20,6 @@ class mycidr{
         return false;
     }
 
-
     private function ip_in_range( $ip, $range ) {
         if ( strpos( $range, '/' ) == false ){
             $range .= '/32';
