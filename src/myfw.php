@@ -250,7 +250,7 @@ class myfw{
             return ( $request->isPost() && !empty( $hostname ) && !empty( $referer ) && strpos( strtolower( $referer ), strtolower( $hostname ) ) !== false );
         };
 
-        if ($container->config[ 'app.ratelimit' ] === true && !$container->memcached->rateisvalid()) {
+        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->memcached->rateisvalid() ) {
             throw new myexception(myexception::RATELIMIT,
                 'Too much requests. Please wait ' . $container->memcached->ratelocktimeout() . 's and try again.');
         }
