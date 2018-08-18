@@ -17,11 +17,11 @@ class myconfirm{
 
         $obj = $this->app->session->get( $args[ 'h' ], false );
 
-        if( isset( $obj[ 'url' ] ) && isset( $obj[ 'xconfirm' ] ) && isset( $obj[ 'pin' ] ) ){
+        if( isset( $obj[ 'url' ] ) && isset( $obj[ 'xconfirm' ] ) && isset( $obj[ 'pin' ] ) && isset( $obj[ 'validateSecret' ] ) ){
 
             if( $obj[ 'pin' ] === true ){
 
-                if ( !isset( $args[ 'twotoken' ] ) || !$this->app->rules->twofactortoken( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ] ) )
+                if ( !isset( $args[ 'twotoken' ] ) || !$this->app->rules->twofactortoken( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ], null, $obj[ 'validateSecret' ] ) )
                     throw new myexception( myexception::AJAXWARNING, 'Two-factor token invalid' );
             }
 
@@ -29,16 +29,22 @@ class myconfirm{
             return;
         }
 
-        throw new myexception( myexception::NOTFOUND );
+        $this->app->ajax->confirmDialogClose();
+//        throw new myexception( myexception::NOTFOUND );
     }
 
     /** @throws myexception */
     public function checkToken( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
-        return $this->check( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore );
+        return $this->check( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore, false );
     }
 
     /** @throws myexception */
-    public function check( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $confirmByDefault = false, $customBefore = null ){
+    public function checkTokenOrSecret( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null){
+        return $this->check( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore, true );
+    }
+
+    /** @throws myexception */
+    public function check( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $confirmByDefault = false, $customBefore = null, $validateSecret = false ){
 
         if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';
         if( empty( $help ) )  $help  = '';
@@ -89,13 +95,13 @@ class myconfirm{
             $pinhelp  = 'This action requires a 4-digit pin from a sms. An sms was sent.';
         }elseif( $twofactor == true ){
             $title    = 'Two-factor authentication by app';
-            $pinlabel = 'Pin';
-            $pinhelp  = 'Use your two-factor app to generate the 6-digit pin';
+            $pinlabel = $validateSecret == false ? 'Pin' : 'Pin or Secret';
+            $pinhelp  = $validateSecret == false ? 'Use your two-factor app to generate the 6-digit pin' : 'Use your two-factor app to generate the 6-digit pin or use Secret';
         }
 
         $xconfirm = md5( $hash . rand( 1, 1000000 ) );
 
-        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $pin, 'postvars' => $_POST ) );
+        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $pin, 'postvars' => $_POST, 'validateSecret' => $validateSecret ) );
         $this->app->session->set( $xconfirm, $hash );
 
         $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $pin, $pinlabel, $pinhelp );
