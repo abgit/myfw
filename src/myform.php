@@ -417,7 +417,44 @@ class myform{
     }
 
 
-    public function & addFilestack( $name, $label, $width = '', $height = '', $picker_options, $help = '', $thumbdefault = '' ){
+    public function & addUploadcare( $name, $label, $width = '', $height = '', $picker_options = array(), $help = '', $thumbdefault = '' ){
+
+        if( isset( $this->app[ 'uploadcare.options'] ) )
+            $picker_options = $picker_options + $this->app[ 'uploadcare.options'];
+
+        $processing = $this->app->urlfor->action( 'myfwuploadcare', array( 'fsid' => $this->formname . $name ) );
+
+        $this->elements[ $name ] = array( 'type' => 'uploadcare', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => empty( $thumbdefault ) ? $this->app->config[ 'filestack.default' ] : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options, JSON_HEX_APOS ) );
+
+        $this->addRule( function() use ( $name ){
+
+            if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://ucarecdn.com/' ) === 0 ) ){
+
+                if( empty( $_POST[ $this->formname . $name ] ) )
+                    return true;
+
+                // TODO: check uploadcare filter to implement
+                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
+
+                if( isset( $json[ 'mimetype' ] ) )
+                    return true;
+            }
+
+            return 'Invalid media';
+        });
+        return $this;
+    }
+
+/*
+uploadcare.openDialog(null, {
+crop: ""
+}).done(function(file) {
+    file.promise().done(function(fileInfo){
+        console.log(fileInfo.cdnUrl);
+    });
+});*/
+
+    public function & addFilestack( $name, $label, $width = '', $height = '', $picker_options = array(), $help = '', $thumbdefault = '' ){
 
         if( isset( $this->app[ 'filestack.options'] ) )
             $picker_options = $picker_options + $this->app[ 'filestack.options'];
