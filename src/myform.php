@@ -142,8 +142,8 @@ class myform{
         return false;
     }
 
-    public function & addPassword( $name, $label ){
-        $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
+    public function & addPassword( $name, $label, $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
