@@ -96,6 +96,10 @@ class myrules{
         return ( strlen( $value ) >= intval( $opts ) );
     }
 
+    public function length( $value, $opts, $formelement = null ) {
+        return ( strlen( $value ) == intval( $opts ) );
+    }
+
     public function minlengthtrim( $value, $opts, $formelement = null ) {
         return myrules::minlength( trim( $value ), $opts, $formelement );
     }
