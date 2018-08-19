@@ -297,7 +297,7 @@
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
                 <div>
                 {% if el.onclick %}
-                    <button type="button" class="btn btn-default" onClick="{{el.onclick|raw}}" value="{{ el.labelbutton }}"/>
+                    <button type="button" class="btn btn-default" onClick="{{el.onclick|raw}}">{{ el.labelbutton }}</button>
                 {% else %}
                     <a class="btn btn-default" href="{{el.href|raw}}" target="_blank">{% if el.icon %}<i class="icon-{{ el.icon }}"></i>{% endif %}{{ el.labelbutton }}</a>
                 {% endif %}

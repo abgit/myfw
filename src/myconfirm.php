@@ -21,7 +21,7 @@ class myconfirm{
 
             if( $obj[ 'pin' ] === true ){
 
-                if ( !isset( $args[ 'twotoken' ] ) || !$this->app->rules->twofactortoken( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ], null, $obj[ 'validateSecret' ] ) )
+                if ( !isset( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ], null, $obj[ 'validateSecret' ] ) )
                     throw new myexception( myexception::AJAXWARNING, 'Two-factor token invalid' );
             }
 
