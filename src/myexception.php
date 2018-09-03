@@ -12,6 +12,7 @@ class myexception extends Exception {
     const RATELIMIT    = 105;
     const STOP         = 106;
     const REDIRECTOK   = 107;
+    const FORBIDDEN    = 108;
 
     public function __construct( $code, $message = '' ) {
         $this->code    = $code;
@@ -73,6 +74,17 @@ class myexception extends Exception {
                 }else {
                     return $response->withHeader('Content-Type', 'text/html')
                                     ->write($message);
+                }
+                break;
+
+            case myexception::FORBIDDEN:
+                if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->msgError( $message, 'Forbidden'  )
+                                                                ->obj() );
+                }else {
+                    return $response->withStatus(403 )
+                                    ->withHeader('Content-Type', 'text/html')
+                                    ->write( $message );
                 }
                 break;
         }
