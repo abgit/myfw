@@ -6,8 +6,7 @@ use \Slim\Http\Response as Response;
 class myexception extends Exception {
 
     const REDIRECT     = 101;
-    const MESSAGE      = 102;
-    const AJAXWARNING  = 103;
+    const ERROR        = 103;
     const NOTFOUND     = 104;
     const RATELIMIT    = 105;
     const STOP         = 106;
@@ -41,12 +40,13 @@ class myexception extends Exception {
                 }
                 break;
 
-            case myexception::AJAXWARNING:
+            case myexception::ERROR:
                 if( $container->isajax ) {
-                    return $response->withJson( $container->ajax->msgWarning( $message )
+                    return $response->withJson( $container->ajax->msgError( $message )
                                                                 ->obj() );
                 }else{
-                    return $response;
+                    return $response->withHeader('Content-Type', 'text/html')
+                                    ->write($message);
                 }
                 break;
 
@@ -69,11 +69,9 @@ class myexception extends Exception {
 
             case myexception::STOP:
                 if( $container->isajax ) {
-                    return $response->withJson( $container->ajax->msgError( $message )
-                                                                ->obj() );
+                    return $response->withJson( $container->ajax->obj() );
                 }else {
-                    return $response->withHeader('Content-Type', 'text/html')
-                                    ->write($message);
+                    return $response;
                 }
                 break;
 

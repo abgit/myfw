@@ -22,7 +22,7 @@ class myconfirm{
             if( $obj[ 'pin' ] === true ){
 
                 if ( !isset( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ], null, $obj[ 'validateSecret' ] ) )
-                    throw new myexception( myexception::AJAXWARNING, 'Two-factor token invalid' );
+                    throw new myexception( myexception::ERROR, 'Two-factor token invalid' );
             }
 
             $this->app->ajax->confirmSubmit( $obj[ 'url' ], $obj[ 'xconfirm' ] );
@@ -80,7 +80,7 @@ class myconfirm{
         }
 
         if( is_string( $call ) ){
-            throw new myexception( myexception::AJAXWARNING, $call );
+            throw new myexception( myexception::ERROR, $call );
         }
 
         $sms = ( $call === 2 );
