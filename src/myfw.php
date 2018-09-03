@@ -279,10 +279,13 @@ class myfw{
         if( !$container->pusher->empty() )
             $container->pusher->sendall();
 
-        if( $container->isajax )
-            return $response->withJson( $container->ajax->obj() );
+        // check debug mode
+        if( isset( $container->config[ 'app.debug' ] ) && $container->config[ 'app.debug' ] === true ) {
+            $response = $response->withAddedHeader('X-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
+            $response = $response->withAddedHeader('X-myfw-db', $container->db->getDebugsCounter() );
+        }
 
-        return $response;
+        return $container->isajax ? $response->withJson( $container->ajax->obj() ) : $response;
     }
 
 }

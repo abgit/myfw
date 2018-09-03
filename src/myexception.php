@@ -18,25 +18,32 @@ class myexception extends Exception {
         $this->message = $message;
     }
 
-    public static function response( $code, $message, Response $response, $c ){
+    public static function response( $code, $message, Response $response, $container ){
 
-        /** @var abContainer $c */
+        /** @var abContainer $container */
+
+        // check debug mode
+        if( isset( $container->config[ 'app.debug' ] ) && $container->config[ 'app.debug' ] === true ) {
+            $response = $response->withAddedHeader('X-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
+            $response = $response->withAddedHeader('X-myfw-db', $container->db->getDebugsCounter() );
+        }
+
         switch( $code ){
             case myexception::REDIRECT:
             case myexception::REDIRECTOK:
 
-                if( $c->isajax ) {
-                    return $response->withJson( $c->ajax->redirect( $message, '', 1000, $code == myexception::REDIRECTOK )
-                                                        ->obj() );
+                if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->redirect( $message, '', 1000, $code == myexception::REDIRECTOK )
+                                                          ->obj() );
                 }else {
                     return $response->withRedirect( $message );
                 }
                 break;
 
             case myexception::AJAXWARNING:
-                if( $c->isajax ) {
-                    return $response->withJson( $c->ajax->msgWarning( $message )
-                                                        ->obj() );
+                if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->msgWarning( $message )
+                                                                ->obj() );
                 }else{
                     return $response;
                 }
@@ -49,9 +56,9 @@ class myexception extends Exception {
                 break;
 
             case myexception::RATELIMIT:
-                if( $c->isajax ) {
-                    return $response->withJson( $c->ajax->msgWarning( $message )
-                                                        ->obj() );
+                if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->msgWarning( $message )
+                                                                ->obj() );
                 }else {
                     return $response->withStatus(429)
                                     ->withHeader('Content-Type', 'text/html')
@@ -60,8 +67,8 @@ class myexception extends Exception {
                 break;
 
             case myexception::STOP:
-                if( $c->isajax ) {
-                    return $response->withJson( $c->ajax->obj() );
+                if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->obj() );
                 }else {
                     return $response->withHeader('Content-Type', 'text/html')
                                     ->write($message);

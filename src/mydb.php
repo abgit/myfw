@@ -14,6 +14,11 @@
 
         private $driver;
 
+        private $debugs = array();
+
+        private $debugs_sum     = 0;
+        private $debugs_counter = 0;
+
         public function __construct( $container ){
 
             $this->app = $container;
@@ -63,6 +68,9 @@
             // add custom global values
             if( isset( $this->app[ 'db.queryargs' ] ) && is_array( $this->app[ 'db.queryargs' ] ) )
                 $values = $this->app[ 'db.queryargs' ] + $values;
+
+            // debug time start
+            $debug_start = microtime( true );
 
             // split procedure
             preg_match( '/([a-zA-Z0-9]+)\(([a-zA-Z0-9\,|_]*)\)/', $procedure, $s );
@@ -150,11 +158,22 @@
 
             $this->stmt->execute();
 
+            // get error
+            $error = !empty( $this->errorCode() );
+
+            // add debug
+            if( isset( $this->app[ 'app.debug' ] ) && $this->app[ 'app.debug' ] === true ){
+                $this->debugs_counter ++;
+                $debug_time = (float)microtime(true) - $debug_start;
+                $this->debugs_sum += $debug_time;
+                $this->debugs[] = sprintf("%s|%.3f%s", $procedure_name, $debug_time, $error ? '|E' . $this->errorCode() : ''  );
+            }
+
             // check error warning
-            if( !empty( $this->errorCode() ) ){
+            if( $error ){
 
                 if( isset( $this->app[ 'db.onerror' ] ) ) {
-                    $this->app['db.onerror']($this->errorCode(), $this->errorInfo(), $procedure, $values );
+                    $this->app['db.onerror']( $this->errorCode(), $this->errorInfo(), $procedure, $values );
                 }
 
             }
@@ -162,6 +181,9 @@
             return $this->stmt;
         }
 
+        public function getDebugsCounter(){
+            return sprintf("%d in %.3f (%s)", $this->debugs_counter, $this->debugs_sum, implode( "+", $this->debugs ) );
+        }
 
         public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){
 
