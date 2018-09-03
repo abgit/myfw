@@ -68,7 +68,8 @@ class myexception extends Exception {
 
             case myexception::STOP:
                 if( $container->isajax ) {
-                    return $response->withJson( $container->ajax->obj() );
+                    return $response->withJson( $container->ajax->msgError( $message )
+                                                                ->obj() );
                 }else {
                     return $response->withHeader('Content-Type', 'text/html')
                                     ->write($message);
