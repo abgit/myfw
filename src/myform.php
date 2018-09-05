@@ -454,6 +454,7 @@ crop: ""
     });
 });*/
 
+
     public function & addFilestack( $name, $label, $width = '', $height = '', $picker_options = array(), $help = '', $thumbdefault = '' ){
 
         if( isset( $this->app[ 'filestack.options'] ) )

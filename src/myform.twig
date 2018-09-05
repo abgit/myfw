@@ -391,8 +391,44 @@
             {% endif %}
             {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
+            {% elseif el.type == 'uploadcare' %}
+                <label>{{ el.label|raw }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
 
-			{% elseif el.type == 'filestackwebcam' %}
+            {% if el.width is not empty %}
+                <div class="row">
+                    <div class="col-xs-7" style="min-height:{{ el.height }}px">
+                        <img id="uploadcarei{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <input type="hidden" id="uploadcareh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
+
+                    </div>
+                    <div class="col-xs-5" style="padding:0px;">
+                        <button onClick='uploadcare.openDialog(null, {
+  publicKey: "demopublickey",
+                        imagesOnly: true,
+                        previewStep: true,
+                        crop: "300x200"
+                        }).done(function(file) {
+myfwloadon("Uploading . . .", "success" );
+        file.done(function(fileInfo) {
+            myfwloadoff();
+            /*alert(fileInfo.uuid);*/
+        });
+    });' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <input type="hidden" id="filestackh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
+                        <button onClick='client.pick({{ el.pickeroptions|raw }} ).then(function(result){$("#filestackh{{ name ~ el.name }}").val(result.filesUploaded[0].url);$("#filestacks{{ name ~ el.name }}").text(myfwt(result.filesUploaded[0].filename,25)).addClass("label-success");});' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestackh{{ name ~ el.name }}').val('');$('#filestacks{{ name ~ el.name }}').text('&nbsp;').removeClass('label-success');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+                        <span id="filestacks{{ name ~ el.name }}" class="label {%if el.value %}label-success{%endif%}" style="margin-top:4px;display:block;cursor:pointer">{% if el.value %}{{ el.value|t( 20, '...', false ) }}{% else %}&nbsp;{% endif %}</span>
+                    </div>
+                </div>
+            {% endif %}
+            {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+
+                {% elseif el.type == 'filestackwebcam' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
                 <div class="row">
                     <div class="col-xs-8">
