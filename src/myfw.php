@@ -219,6 +219,9 @@ class myfw{
         $app->post( '/myfw/filestack/{fsid:[a-zA-Z0-9]{1,20}}', 'myform:processFilestackThumb' )
             ->setName( 'myfwfilestack' );
 
+        $app->post( '/myfw/uploadcare/{fsid:.*}', 'myform:processUploadcareThumb' )
+            ->setName( 'myfwuploadcare' );
+
         $app->post( '/myfw/markdown', 'myform:processMarkdown' )
             ->setName( 'myfwmarkdown' );
 

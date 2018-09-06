@@ -409,10 +409,22 @@ class myform{
     }
 
 
-    public function processFilestackThumb( Request $request, Response $response, $args ){
+    public function processUploadcareThumb( Request $request, Response $response, $args ){
     
-        if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
-            $this->app->ajax->attr( '#filestacki' . $args[ 'fsid' ], 'src', $this->app->filters->filestack( $_POST[ 'img' ] ) );
+        if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) ){
+
+            // store cropped version and get new uuid
+            try {
+                $api = new Uploadcare\Api($this->app->config['uploadcare.key'], $this->app->config['uploadcare.secret']);
+                $file = $api->createLocalCopy( $_POST[ 'img' ] );
+                $uuid = $file->getUuid();
+                $url  = $file->getUrl();
+            } catch (Exception $e) {
+            }
+
+
+            $this->app->ajax->attr( '#uploadcarei' . $args[ 'fsid' ], 'src', $url );
+            $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
         }
     }
 
@@ -428,31 +440,37 @@ class myform{
 
         $this->addRule( function() use ( $name ){
 
-            if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) && ( empty( $_POST[ $this->formname . $name ] ) || strpos( $_POST[ $this->formname . $name ], 'https://ucarecdn.com/' ) === 0 ) ){
+            if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) ){
 
                 if( empty( $_POST[ $this->formname . $name ] ) )
                     return true;
 
-                // TODO: check uploadcare filter to implement
-                //$json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
+                    try {
+                        $api = new Uploadcare\Api($this->app->config['uploadcare.key'], $this->app->config['uploadcare.secret']);
+                        $file = $api->getFile($_POST[$this->formname . $name])->getUuid();
 
-                //if( isset( $json[ 'mimetype' ] ) )
-                //    return true;
+                        if (!empty($file)) {
+                            return true;
+                        }
+
+                    } catch (Exception $e) {
+                    }
+
             }
 
-            return 'Invalid media';
+            return 'Invalid media uploadcare';
         });
+
         return $this;
     }
 
-/*
-uploadcare.openDialog(null, {
-crop: ""
-}).done(function(file) {
-    file.promise().done(function(fileInfo){
-        console.log(fileInfo.cdnUrl);
-    });
-});*/
+
+    public function processFilestackThumb( Request $request, Response $response, $args ){
+
+        if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) && strpos( $_POST[ 'img' ], 'https://cdn.filestackcontent.com/' ) === 0 ){
+            $this->app->ajax->attr( '#filestacki' . $args[ 'fsid' ], 'src', $this->app->filters->filestack( $_POST[ 'img' ] ) );
+        }
+    }
 
 
     public function & addFilestack( $name, $label, $width = '', $height = '', $picker_options = array(), $help = '', $thumbdefault = '' ){
@@ -758,7 +776,7 @@ crop: ""
                     /** @var mychat $obj */
                     $obj = $el[ 'obj' ];
 
-                    $transloadit   = $obj->getTransloadit();
+                    //$transloadit   = $obj->getTransloadit();
                     $chatscroll    = '#' . $obj->getWindowId();
                     $pusherchannel = $obj->getPusherChannel();
                 }

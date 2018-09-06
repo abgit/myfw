@@ -124,6 +124,26 @@ class myfilters{
         return is_numeric( $amount ) ? round( 100000000 * floatval( str_replace( ',', '.', $amount ) ) ) : '';
     }
 
+    public function uploadcare( $urloriginal, $call = 'read', $custom = '', $process = true, $expiry = null ){
+
+//        $url = substr( $urloriginal, 21 );
+
+        // TODO: check $urloriginal syntax format of uploadcare uuid
+        if( empty( $urloriginal ) /*|| strpos( $urloriginal, 'https://ucarecdn.com' ) !== 0*/ )
+            return '';
+
+//        $secret    = $this->app->config[ 'filestack.secret' ];
+//        $policy    = '{"expiry":' . ( is_numeric( $expiry ) ? $expiry : strtotime( 'first day of next month midnight' ) ) . ',"call":"' . $call . '"}';
+//        $policy64  = base64_encode( $policy );
+//        $signature = hash_hmac( 'sha256', $policy64, $secret );
+
+//        return $process ? 'https://process.filestackapi.com/' . $this->app->config[ 'filestack.api' ] . '/security=policy:' . $policy64 . ',signature:' . $signature . '/' . $custom . ( empty( $custom ) ? '' : '/' ) . $url : 'https://www.filestackapi.com/api/file/' . $url . ( empty( $custom ) ? '' : '/' ) . $custom . '?signature=' . $signature . '&policy=' . $policy64;
+
+// b85bbf3a-393d-4217-b23e-02f0329a017d/
+        return 'https://ucarecdn.com/' . $urloriginal . '/';
+
+    }
+
     public function filestack( $urloriginal, $call = 'read', $custom = '', $process = true, $expiry = null ){
 
         $url = substr( $urloriginal, 33 );

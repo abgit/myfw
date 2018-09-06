@@ -402,22 +402,14 @@
 
                     </div>
                     <div class="col-xs-5" style="padding:0px;">
-                        <button onClick='uploadcare.openDialog(null, {
-  publicKey: "{{ c( 'uploadcare.key' ) }}",
-                        imagesOnly: true,
-                        previewStep: true,
-                        crop: "300x200"
-                        }).done(function(file) {
-myfwloadon("Uploading . . .", "success" );
-        file.done(function(fileInfo) {
-            myfwloadoff();
+                        <button onClick='uploadcare.openDialog(null, {{ el.pickeroptions|raw }} ).done(function(file) {
+                myfwloadon("Uploading . . .", "info" );
+                file.done(function(fileInfo) {
+                    myfwloadoff();
 
-                                myfwsubmit("{{ el.processing }}","Processing ...",{img:fileInfo.uuid},false,"info",2000);
-                                $("#uploadcareh{{ name ~ el.name }}").val(fileInfo.uuid);
-
-            /*alert(fileInfo.uuid);*/
+                    myfwsubmit("{{ el.processing }}","Processing ...",{img:fileInfo.cdnUrl},false,"info",2000);
         });
-    });' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#filestacki{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#filestackh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
+    });' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#uploadcarei{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#uploadcareh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     </div>
                 </div>
             {% else %}
