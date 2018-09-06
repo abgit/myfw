@@ -424,7 +424,7 @@ class myform{
 
         $processing = $this->app->urlfor->action( 'myfwuploadcare', array( 'fsid' => $this->formname . $name ) );
 
-        $this->elements[ $name ] = array( 'type' => 'uploadcare', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'api' => $this->app->config[ 'filestack.api' ], 'default' => empty( $thumbdefault ) ? $this->app->config[ 'filestack.default' ] : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options, JSON_HEX_APOS ) );
+        $this->elements[ $name ] = array( 'type' => 'uploadcare', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'default' => empty( $thumbdefault ) ? $this->app->config[ 'uploadcare.default' ] : $thumbdefault, 'help' => $help, 'processing' => $processing, 'pickeroptions' => json_encode( $picker_options, JSON_HEX_APOS ) );
 
         $this->addRule( function() use ( $name ){
 
@@ -434,10 +434,10 @@ class myform{
                     return true;
 
                 // TODO: check uploadcare filter to implement
-                $json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
+                //$json = json_decode( file_get_contents( $this->app->filters->filestack( $_POST[ $this->formname . $name ], 'read', 'metadata', false ) ), true );
 
-                if( isset( $json[ 'mimetype' ] ) )
-                    return true;
+                //if( isset( $json[ 'mimetype' ] ) )
+                //    return true;
             }
 
             return 'Invalid media';
