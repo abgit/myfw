@@ -422,7 +422,6 @@ class myform{
             } catch (Exception $e) {
             }
 
-
             $this->app->ajax->attr( '#uploadcarei' . $args[ 'fsid' ], 'src', $url );
             $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
         }

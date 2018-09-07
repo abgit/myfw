@@ -397,7 +397,7 @@
             {% if el.width is not empty %}
                 <div class="row">
                     <div class="col-xs-7" style="min-height:{{ el.height }}px">
-                        <img id="uploadcarei{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|filestackresize( el.width )|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
+                        <img id="uploadcarei{{ name ~ el.name }}" style="height:auto;width:100%;max-width:{{ el.width }}px" src="{{ el.value|uploadcare|default( el.default ) }}" width="{{ el.width }}" height="{{ el.height }}" />
                         <input type="hidden" id="uploadcareh{{ name ~ el.name }}" name="{{ name ~ el.name }}" value="{{ el.value|default( '' ) }}"/>
 
                     </div>
@@ -407,7 +407,7 @@
                 file.done(function(fileInfo) {
                     myfwloadoff();
 
-                    myfwsubmit("{{ el.processing }}","Processing ...",{img:fileInfo.cdnUrl},false,"info",2000);
+                    myfwsubmit("{{ el.processing }}","Processing ...",{img:fileInfo.cdnUrl},false,"info",1000);
         });
     });' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button> <button onClick="$('#uploadcarei{{ name ~ el.name }}').attr('src','{{ el.default }}');$('#uploadcareh{{ name ~ el.name }}').val('');" class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-remove3"></i></button>
                     </div>
