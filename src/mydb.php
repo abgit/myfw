@@ -16,8 +16,11 @@
 
         private $debugs = array();
 
-        private $debugs_sum     = 0;
-        private $debugs_counter = 0;
+        private $debugs_sum       = 0;
+        private $debugs_counter   = 0;
+
+        private $cache_enable     = false;
+        private $cache_expiration;
 
         public function __construct( $container ){
 
@@ -185,10 +188,51 @@
             return sprintf("%d in %.3f (%s)", $this->debugs_counter, $this->debugs_sum, implode( "+", $this->debugs ) );
         }
 
+        public function & cache( $expiration = null ){
+            $this->cache_enable     = true;
+            $this->cache_expiration = is_null( $expiration ) ? time() + 300 : $expiration;
+            return $this;
+        }
+
+        // return FALSE if cache disable; NULL if cache enable but not found
+        private function onCache( &$result, $procedure, $args ){
+
+            if( $this->cache_enable !== true )
+                return false;
+
+            $this->cache_enable = false;
+
+            // get from cache
+            $cache  = $this->app->memcached->get('dbcache-' . md5($procedure, json_encode($args)));
+
+            // if not found return NULL, otherwise return TRUE
+            $return = $this->app->memcached->getResultCode() === \Memcached::RES_NOTFOUND ? null : true;
+
+            // modify result obj only if cache was retrieved
+            if( $return === true )
+                $result = $cache;
+
+            return $return;
+        }
+
+        private function setCache( $result, $procedure, $args ){
+            return $this->app->memcached->set('dbcache-' . md5($procedure, json_encode($args)), $result, $this->cache_expiration );
+        }
+
         public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){
 
-            $result = $this->query( $procedure, $args )
-                            ->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
+            // get cache
+            $oncache = $this->onCache($result, $procedure, $args );
+
+            // if cannot get cache (disable or enable_but_not_found)
+            if( !$oncache ){
+
+                $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
+
+                // save cache if oncache is NULL (enable but not found)
+                if( is_null( $oncache ) )
+                    $this->setCache( $result, $procedure, $args );
+            }
 
             return ( count( $result ) > 0 );
         }
@@ -196,8 +240,18 @@
 
         public function findOne( & $result, string $procedure, array $args = array(), bool $returnobject = false ){
 
-            $result = $this->query( $procedure, $args )
-                ->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
+            // get cache
+            $oncache = $this->onCache($result, $procedure, $args );
+
+            // if cannot get cache (disable or enable_but_not_found)
+            if( !$oncache ){
+
+                $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
+
+                // save cache if oncache is NULL (enable but not found)
+                if( is_null( $oncache ) )
+                    $this->setCache( $result, $procedure, $args );
+            }
 
             return ( ! empty( $result ) );
         }
@@ -205,7 +259,18 @@
 
         public function findResult( & $result, $procedure, $args = array() ){
 
-            $result = $this->query( $procedure, $args )->fetchAll();
+            // get cache
+            $oncache = $this->onCache($result, $procedure, $args );
+
+            // if cannot get cache (disable or enable_but_not_found)
+            if( !$oncache ){
+
+                $result = $this->query( $procedure, $args )->fetchAll();
+
+                // save cache if oncache is NULL (enable but not found)
+                if( is_null( $oncache ) )
+                    $this->setCache( $result, $procedure, $args );
+            }
 
             if( !is_array( $result ) || count($result) != 1 )
                 return false;

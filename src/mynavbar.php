@@ -51,7 +51,7 @@ class mynavbar{
         return $this;
     }
 
-    public function & addMenu( $id, $label, $options, $thumb = '', $htmlid = '', $thumbid = '' ){
+    public function & addMenu( $id, $label, $options, $thumb = '', $htmlid = 'navbartxt', $thumbid = 'navbarimg' ){
         $this->elements[ $id ] = array( 'type' => 'menu', 'id' => $id, 'label' => $label, 'options' => $options, 'thumb' => $thumb, 'htmlid' => $htmlid, 'thumbid' => $thumbid );
         return $this;
     }

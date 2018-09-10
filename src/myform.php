@@ -99,7 +99,7 @@ class myform{
     public function & addBitcoin( $name, $label = '', $help = '', $currencies = array(), $onchange = '', $decimal = 8 ){
         $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies, 'onchange' => $onchange, 'decimal' => $decimal );
         $this->addFilter( $name, 'satoshi' );
-        $this->addRule( $name, 'Invalid bitcoin amount', 'bitcoin' );
+
         if( is_string( $currencies ) && !empty( $currencies ) )
             $this->elements[ $currencies ] = array();
         return $this;
@@ -140,6 +140,15 @@ class myform{
         }
 
         return false;
+    }
+
+    public function & addFroala( $name, $label, $froalaoptions = array() ){
+
+        if( isset( $this->app[ 'froala.options' ] ) )
+            $froalaoptions = $froalaoptions + $this->app[ 'froala.options'];
+
+        $this->elements[ $name ] = array( 'type' => 'froala', 'valuetype' => 'simple', 'froalaoptions' => json_encode( $froalaoptions, JSON_HEX_APOS ), 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
+        return $this;
     }
 
     public function & addPassword( $name, $label, $help = '' ){
