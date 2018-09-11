@@ -489,6 +489,12 @@ class myfilters{
         return $parser->transform($data);
     }
 
+    public function htmlpurifier( $html ){
+        $config = HTMLPurifier_Config::createDefault();
+        $purifier = new HTMLPurifier($config);
+        return $purifier->purify($html);
+    }
+
     public function ago( $datetime, $full = 0 , $includeoriginal = 0 ){
 
         if( strtotime( $datetime ) < 1 )

@@ -124,9 +124,14 @@
                 	<textarea data-pickeroptions='{{el.pickeroptions|raw}}' data-processing="{{el.processing}}" class="markdown" name="{{name ~ el.name}}" id="{{name ~ el.name}}"  style="width:100%; height:100px" >{{ isajax ? el.value|replace({"\n\r": "%0DMYFW", "\n": "%0DMYFW", "\r": "%0DMYFW"}) : el.value }}</textarea>
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
+            {% elseif el.type == 'froalahtml' %}
+                <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
+                <div>{{ el.value|htmlpurifier }}</div>
+
+
             {% elseif el.type == 'froala' %}
                 <label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>
-                <textarea data-froalaoptions='{{el.froalaoptions|raw}}' class="myfroala" name="{{name ~ el.name}}" id="{{name ~ el.name}}"  style="width:100%; height:100px" >{{ isajax ? el.value|replace({"\n\r": "%0DMYFW", "\n": "%0DMYFW", "\r": "%0DMYFW"}) : el.value }}</textarea>
+                <textarea data-froalaoptions='{{el.froalaoptions|raw}}' data-uploadcareoptions='{{el.uploadcareoptions|raw}}' data-processing='{{ el.processing }}' class="myfroala" name="{{name ~ el.name}}" id="{{name ~ el.name}}"  style="width:100%; height:100px" >{{ isajax ? el.value|replace({"\n\r": "%0DMYFW", "\n": "%0DMYFW", "\r": "%0DMYFW"}) : el.value }}</textarea>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 

@@ -33,7 +33,7 @@
                     {% elseif el.type == 'menu' %}
     				<li class="user dropdown{{ el.active ? ' navbaractive' }}" id="navbar{{ el.id }}">
 	    				<a class="dropdown-toggle" data-toggle="dropdown">
-		    				<span id="{{ el.htmlid }}">{{ el.label }}</span>
+		    				<span id="navbarspan{{ el.id }}">{{ el.label }}</span>
 			    			<i class="caret"></i>
                           
                             {% if el.thumb %}<img id="{{ el.thumbid }}" width="40" height="40" src="{{ el.thumb }}" style="margin-right:4px;margin-top:1px">{% endif %}

@@ -36,8 +36,8 @@ class mynavbar{
         return $this;
     }
     
-    public function & ajaxUpdateText( $message, $htmlid = 'navbartxt' ){
-        $this->app->ajax->html( '#' . $htmlid, $message, true );
+    public function & ajaxUpdateText( $message, $id ){
+        $this->app->ajax->html( '#navbarspan' . $id, $message, true );
         return $this;
     }
 

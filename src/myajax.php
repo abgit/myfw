@@ -94,6 +94,11 @@ class myajax{
         return $this;
     }
 
+    public function & froala( $id, $url ){
+        $this->out[ 'fa' ][] = array( 'e' => $id, 'u' => $url );
+        return $this;
+    }
+
     public function & focus( $element ){
         $this->out[ 'fu' ] = array( 'e' => $element );
         return $this;

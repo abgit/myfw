@@ -173,6 +173,9 @@ class myfw{
             $env->addFilter(new Twig_Filter('cdn', array($container->filters, 'cdn')
                 , array('is_safe' => array('html'))));
 
+            $env->addFilter(new Twig_Filter('htmlpurifier', array($container->filters, 'htmlpurifier')
+                , array('is_safe' => array('html'))));
+
             $env->addFilter(new Twig_Filter('urlobj', array($container->urlfor, 'urlobj')
                 , array('is_safe' => array('html'))));
 

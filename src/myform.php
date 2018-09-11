@@ -142,12 +142,22 @@ class myform{
         return false;
     }
 
-    public function & addFroala( $name, $label, $froalaoptions = array() ){
+    public function & addFroala( $name, $label, $froalaoptions = array(), $uploadcareoptions = array() ){
 
         if( isset( $this->app[ 'froala.options' ] ) )
             $froalaoptions = $froalaoptions + $this->app[ 'froala.options'];
 
-        $this->elements[ $name ] = array( 'type' => 'froala', 'valuetype' => 'simple', 'froalaoptions' => json_encode( $froalaoptions, JSON_HEX_APOS ), 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
+        if( isset( $this->app[ 'uploadcare.options'] ) )
+            $uploadcareoptions = $uploadcareoptions + $this->app[ 'uploadcare.options'];
+
+        $processing = $this->app->urlfor->action( 'myfwuploadcare', array( 'fsid' => $this->formname . $name ) );
+
+        $this->elements[ $name ] = array( 'type' => 'froala', 'valuetype' => 'simple', 'processing' => $processing, 'froalaoptions' => json_encode( $froalaoptions, JSON_HEX_APOS ), 'uploadcareoptions' => json_encode( $uploadcareoptions, JSON_HEX_APOS ), 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
+        return $this;
+    }
+
+    public function & addFroalaHTML( $name, $label ){
+        $this->elements[ $name ] = array( 'type' => 'froalahtml', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
         return $this;
     }
 
@@ -434,6 +444,21 @@ class myform{
             $this->app->ajax->attr( '#uploadcarei' . $args[ 'fsid' ], 'src', $url );
             $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
         }
+        elseif( isset( $_POST[ 'fro' ] ) && is_string( $_POST[ 'fro' ] ) ){
+
+            // store cropped version and get new uuid
+            try {
+                $api = new Uploadcare\Api($this->app->config['uploadcare.key'], $this->app->config['uploadcare.secret']);
+                $file = $api->createLocalCopy( $_POST[ 'fro' ] );
+                $uuid = $file->getUuid();
+                $url  = $file->getUrl();
+            } catch (Exception $e) {
+            }
+
+            $this->app->ajax->froala( '#' . $args[ 'fsid' ], $url );
+//            $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
+        }
+
     }
 
 
