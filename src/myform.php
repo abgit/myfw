@@ -142,7 +142,7 @@ class myform{
         return false;
     }
 
-    public function & addFroala( $name, $label, $froalaoptions = array(), $uploadcareoptions = array() ){
+    public function & addFroala( $name, $label, $help, $froalaoptions = array(), $uploadcareoptions = array() ){
 
         if( isset( $this->app[ 'froala.options' ] ) )
             $froalaoptions = $froalaoptions + $this->app[ 'froala.options'];
@@ -152,7 +152,7 @@ class myform{
 
         $processing = $this->app->urlfor->action( 'myfwuploadcare', array( 'fsid' => $this->formname . $name ) );
 
-        $this->elements[ $name ] = array( 'type' => 'froala', 'valuetype' => 'simple', 'processing' => $processing, 'froalaoptions' => json_encode( $froalaoptions, JSON_HEX_APOS ), 'uploadcareoptions' => json_encode( $uploadcareoptions, JSON_HEX_APOS ), 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
+        $this->elements[ $name ] = array( 'type' => 'froala', 'valuetype' => 'simple', 'processing' => $processing, 'froalaoptions' => json_encode( $froalaoptions, JSON_HEX_APOS ), 'uploadcareoptions' => json_encode( $uploadcareoptions, JSON_HEX_APOS ), 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
