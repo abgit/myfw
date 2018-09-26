@@ -10,7 +10,7 @@ class mygrid{
     private $cols     = null;
     private $labels   = null;
     private $more     = false;
-    private $values   = null;
+    private $values   = array();
     private $keyhtml  = null;
     private $title    = array();
     private $emptymsg = 'No elements to display';
