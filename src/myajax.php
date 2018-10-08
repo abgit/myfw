@@ -312,6 +312,11 @@ class myajax{
         return $this;    
     }
 
+    public function & tidioUpdate( $properties ){
+        $this->out[ 'tu' ] = array( 'p' => $properties );
+        return $this;
+    }
+
     public function & markdown( $url ){
         $this->out[ 'md' ] = array( 'u' => $url );
         return $this;
