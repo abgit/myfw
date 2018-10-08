@@ -45,6 +45,10 @@ class myexception extends Exception {
                     return $response->withJson( $container->ajax->msgError( $message )
                                                                 ->obj() );
                 }else{
+
+                    if( $container[ 'exception.template' ] )
+                        $message = $container->view->fetch( $container[ 'exception.template' ], array( 'message' => $message, 'title' => $container[ 'exception.title' ] ) );
+
                     return $response->withHeader('Content-Type', 'text/html')
                                     ->write($message);
                 }

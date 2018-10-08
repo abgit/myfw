@@ -54,14 +54,10 @@
 
             $errcode = $this->errorCode();
 
-            if( is_array( $msgs ) ){
-                if( isset( $msgs[ $errcode ] ) ){
-                    $this->app->ajax->msgError( $msgs[ $errcode ], isset( $headers[ $errcode ] ) ? $headers[ $errcode ] : ( is_string( $headers ) ? $headers : null ) );
-                    return $this;
-                }
-            }
+            $message = ( is_array( $msgs )    && isset( $msgs[ $errcode ] )    ) ? $msgs[ $errcode ]    : ( is_string( $msgs ) ? $msgs : $errcode );
+            $header  = ( is_array( $headers ) && isset( $headers[ $errcode ] ) ) ? $headers[ $errcode ] : ( is_string( $headers ) ? $headers : null );
 
-            $this->app->ajax->msgError( $errcode );
+            $this->app->ajax->msgError( $message, $header );
 
             return $this;
         }
@@ -306,14 +302,22 @@
 
 
         public function errorCode(){
-            $errcode = $this->stmt->errorCode();
-            if( $errcode !== '00000' )
-                return intval( $errcode );
 
-            // try to parse from errorInfo
-            $arr = $this->stmt->errorInfo();
-            if( isset( $arr[2] ) && is_string( $arr[2] ) && strlen( $arr[2] ) > 8 )
-                return intval( substr( $arr[2], 8 ) );
+            if( !is_null( $this->stmt ) ) {
+
+                $errcode = $this->stmt->errorCode();
+
+                // try to parse from errorInfo
+                if( $errcode === '00000' ){
+
+                    $arr = $this->stmt->errorInfo();
+                    if (isset($arr[2]) && is_string($arr[2]) && strlen($arr[2]) > 8) {
+                        return intval(substr($arr[2], 8));
+                    }
+                }else{
+                    return intval($errcode);
+                }
+            }
 
             return 0;
         }
