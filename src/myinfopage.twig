@@ -87,7 +87,7 @@
         {% if val|trim is empty %}
             <i>{{ el.defaulttext|raw }}</i>
         {% else %}
-            {{ val|trim|nl2br|markdown }}
+            {{ val|htmlpurifier }}
         {% endif %}
 
     {% elseif el.type == 'custom' %}
