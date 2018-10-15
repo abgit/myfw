@@ -57,7 +57,7 @@ class myrules{
     }
 
     public function bitcoinaddress( $value, $opts='', $formelement = null ) {
-        return JaycoDesign\BTCHelper\BTCHelper::validBitcoinAddress( trim( strval( $value ) ) );
+        return \JaycoDesign\BTCHelper\BTCHelper::validBitcoinAddress( trim( strval( $value ) ) );
     }
 
     public function tag( $value, $opts='', $formelement = null ) {
