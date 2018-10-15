@@ -1,5 +1,7 @@
 <?php
 
+use \JaycoDesign\BTCHelper\BTCHelper;
+
 class myrules{
 
     private $app;
@@ -57,7 +59,7 @@ class myrules{
     }
 
     public function bitcoinaddress( $value, $opts='', $formelement = null ) {
-        return \JaycoDesign\BTCHelper\BTCHelper::validBitcoinAddress( trim( strval( $value ) ) );
+        return BTCHelper::validBitcoinAddress( trim( strval( $value ) ) );
     }
 
     public function tag( $value, $opts='', $formelement = null ) {
