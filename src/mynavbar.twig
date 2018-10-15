@@ -7,7 +7,7 @@
             {% if header.logo or header.toogle %}
 			<div class="navbar-header">
 
-                <a class="navbar-brand" style="padding-left:14px;padding-top:12px" {{ header.urlobj|urlobj }}><img src="{{ cdn }}{{ header.logo }}" alt=""></a>
+                <a class="navbar-brand" {{ header.urlobj|urlobj }}><img src="{{ cdn }}{{ header.logo }}" alt=""></a>
 
                 {% if header.toogle %}
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-icons">
