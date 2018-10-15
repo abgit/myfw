@@ -94,7 +94,7 @@
 
                         <div class="input-group">
                             <span class="input-group-addon">&#3647;</span>
-                            <input onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });"{% if el.onchange %} onkeypress="{{ el.onchange }}"{% endif %} class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
+                            <input type="number" onkeyup="$('.aux{{name ~ el.name}}').each( function(){ $(this).text( $(this).attr( 'data-symb' ) + ' ' + ( parseFloat(0+$('#{{name ~ el.name}}').val().replace(',','.')) * $(this).attr( 'data-val' )  ).toFixed(2)   ); });"{% if el.onchange %} onkeypress="{{ el.onchange }}"{% endif %} class="form-control" {{el.disabled ? 'disabled="disabled" '}}name="{{name ~ el.name}}" id="{{name ~ el.name}}" type="text" value="{{el.value|toBTC(el.decimal)|toround|nozero}}">
                         </div>
                         <span class="label label-block label-primary text-center btchelper">
                             {% set currencies = el.currencies is iterable ? el.currencies : valuesdefault[ el.currencies ]|jsondecode %}
