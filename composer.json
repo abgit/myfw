@@ -7,6 +7,7 @@
 		 "ext-gd": "*",
 		 "ext-bcmath": "*",
 		 "ext-openssl": "*",
+		 "ext-pdo": "*",
 
 		 "slim/slim": "^3.0",
 		 "slim/twig-view": "*",
