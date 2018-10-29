@@ -491,6 +491,11 @@ class myfilters{
 
     public function htmlpurifier( $html ){
         $config = HTMLPurifier_Config::createDefault();
+        $cache = $this->app->config[ 'htmlpurifier.cache' ];
+
+        if( $cache ) {
+            $config->set('Cache.SerializerPath', realpath( $cache ) );
+        }
         $purifier = new HTMLPurifier($config);
         return $purifier->purify($html);
     }
