@@ -172,6 +172,8 @@ class Memcached_
      */
     protected $socket = null;
 
+    public function __construct( $c ){
+    }
 
     /**
      * Add a serer to the server pool

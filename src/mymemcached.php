@@ -1,5 +1,9 @@
 <?php
 
+use \Slim\Http\Request as Request;
+use \Slim\Http\Response as Response;
+
+
     // dev environment support
     if( !class_exists( 'Memcached' ) ){
         include_once __DIR__ . '/mymemcached_.php';
@@ -141,4 +145,44 @@
 
             return ( $this->getResultCode() !== Memcached::RES_SUCCESS ) ? 0 : ( $t - $now );
         }
+
+
+        public function __invoke(Request $request, Response $response, callable $next)
+        {
+            $key = md5( $request->getMethod() . '||' . $request->getUri()->getPath() . '||' . $request->getBody()->getContents() );
+
+            $cache = $this->get($key);
+
+            if ($this->getResultCode() !== Memcached::RES_SUCCESS) {
+
+                /** @var Response $response */
+                $response = $next($request, $response);
+
+                if ($response->getStatusCode() == 200) {
+
+                    $headers = array();
+                    foreach ($response->getHeaders() as $name => $values) {
+                        $headers[ $name ] = implode(",", $values );
+                    }
+
+                    $data = array(
+                        'header' => $headers,
+                        'body'   => $response->getBody()->__toString()
+                    );
+
+                    $this->set($key, $data, 20);
+                }
+
+            }else{
+
+                foreach( $cache['header'] as $key => $value ){
+                    $response = $response->withHeader($key, $value);
+                }
+
+                $response->getBody()->write( $cache["body"] );
+            }
+
+            return $response;
+        }
+
     }
