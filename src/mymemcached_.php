@@ -182,8 +182,11 @@ class Memcached_
 
     public function getMulti( $array ){
         $res = array();
-        foreach( $array as $key )
-            $res[ $key ] = $this->get( $key );
+        foreach( $array as $key ) {
+            $value = $this->get($key);
+            if( $this->getResultCode() === Memcached::RES_SUCCESS )
+                $res[$key] = $value;
+        }
         return $res;
     }
 
