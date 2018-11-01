@@ -175,6 +175,18 @@ class Memcached_
     public function __construct( $c ){
     }
 
+    public function setMulti( $array, $ttl ){
+        foreach( $array as $key => $value )
+            $this->set( $key, $value, $ttl );
+    }
+
+    public function getMulti( $array ){
+        $res = array();
+        foreach( $array as $key )
+            $res[ $key ] = $this->get( $key );
+        return $res;
+    }
+
     /**
      * Add a serer to the server pool
      *

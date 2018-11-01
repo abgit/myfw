@@ -151,7 +151,7 @@ use \Slim\Http\Response as Response;
         {
             $key = md5( $request->getMethod() . '||' . $request->getUri()->getPath() . '||' . $request->getBody()->getContents() );
 
-            $cache = $this->get($key);
+            $cache = $this->getMulti( array( $key . '_h', $key . '_b' ) );
 
             if ($this->getResultCode() !== Memcached::RES_SUCCESS) {
 
@@ -164,19 +164,23 @@ use \Slim\Http\Response as Response;
                     foreach ($response->getHeaders() as $name => $values) {
                         $headers[ $name ] = implode(",", $values );
                     }
-
-                    $this->set($key , 1, 20);
+                    $body = $response->getBody()->__toString();
+                    //$this->setMulti( array( $key . '_h' => $headers /*array_map( function($x){return implode(',', $x);}, $response->getHeaders() )*/,
+//                                            $key . '_b' => $body ),
+//                           20 );
+                    //$this->set($key , 1, 20);
                     $this->set($key . '_h', $headers, 20);
-                    $this->set($key . '_b', $response->getBody()->__toString(), 20);
+                    $this->set($key . '_b', $body, 20);
                 }
 
             }else{
-                $header = $this->get($key . '_h' );
-                foreach( $header as $key => $value ){
-                    $response = $response->withHeader($key, $value);
+//d( $cache );
+                //$header = $this->get($key . '_h' );
+                foreach( $cache[ $key . '_h' ] as $k => $v ){
+                    $response = $response->withHeader( $k, $v );
                 }
 
-                $response->getBody()->write( $this->get($key . '_b' ) );
+                $response->getBody()->write( $cache[ $key . '_b' ] );
             }
 
             return $response;
