@@ -25,6 +25,8 @@
         private $filestackimage;
         private $filestackvideo;
         private $selfid;
+        private $url;
+        private $textarea;
 
         public function __construct( $c ){
             $this->app      = $c;
@@ -34,6 +36,11 @@
         public function & setName( $id ){
             $this->id       = $id;
             $this->windowid = $id . 'box';
+            return $this;
+        }
+
+        public function & setUrl( $url ){
+            $this->url = $url;
             return $this;
         }
 
@@ -57,10 +64,14 @@
             return $this->app->session->get( 'myfwchat' . $this->id . 'l', 0 );
         }
 
-        public function & setMessage( $url, $key, $caption = '', $textarea = '' ){
+        public function & setTextarea( $help = 'Enter your message...' ){
+            $this->textarea = array( 'help' => $help );
+            return $this;
+        }
+
+        public function & setMessage( $key, $caption = '', $textarea = '' ){
             if( !is_array( $this->message ) )
                 $this->message = array();
-            $this->message[ 'url' ]      = $url;
             $this->message[ 'key' ]      = $key;
             $this->message[ 'caption' ]  = $caption;
             $this->message[ 'textarea' ] = $textarea;
@@ -247,6 +258,8 @@
                           'cdn'             => $this->cdn,
                           'id'              => $this->id,
                           'selfid'          => $this->selfid,
+                          'url'             => $this->url,
+                          'textarea'        => $this->textarea,
                           'init'            => $this->init );
         }
         

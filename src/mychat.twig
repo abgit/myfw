@@ -86,11 +86,11 @@
                     </div>
                 </div>
 
-            {% if message %}
-                <textarea id="{{ id }}msg" placeholder="{{ message.textarea|default( 'Enter your message...' ) }}" cols="1" rows="3" class="form-control"></textarea>
+            {% if textarea %}
+                <textarea id="{{ id }}msg" placeholder="{{ textarea.help }}" cols="1" rows="3" class="form-control"></textarea>
             {% endif %}
 
-            {% if message or buttons or filestack %}
+            {% if url or buttons or filestack %}
                 <div class="message-controls">
                     <div class="pull-right">
             {% endif %}
@@ -98,19 +98,20 @@
                         {% if filestackvideo %}
                             &nbsp;<button onClick='client.pick({{ filestackvideo.fsoptions|raw }} ).then(function(result){myfwsubmit("{{ filestackvideo.urlvideo }}","Processing ... please wait",{mov:result.filesUploaded[0].url},false,"info");});' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-movie"></i></button>
                         {% endif %}
+
                         {% if filestackimage %}
                             &nbsp;<button onClick='client.pick({{ filestackimage.fsoptions|raw }} ).then(function(result){myfwsubmit("{{ filestackimage.urlimage }}","Processing ... please wait",{img:result.filesUploaded[0].url},false,"info");});' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
                         {% endif %}
 
-                        {% if message %}
-                            &nbsp;<button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ message.url }}','Sending ...',{msg:$('#{{ id }}msg').val()});$('#{{ id }}msg').val('');}" class="btn btn-primary btn-xs" type="button">{{ message.caption|default( 'Send message' ) }}</button>
+                        {% if url %}
+                            &nbsp;<button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ url }}','Sending ...',{msg:$('#{{ id }}msg').val()});$('#{{ id }}msg').val('');}" class="btn btn-primary btn-xs" type="button">{{ message.caption|default( 'Send message' ) }}</button>
                         {% endif %}
 
                         {% for button in buttons %}
                             <a style="margin-left:5px;padding: 6px 12px;" type="button" class="btn btn-{{ button.class|default( 'primary' ) }}" onclick="{{ button.onclick }}">{% if button.icon %}<i class="{{ button.icon }}"></i>{% endif %} {{ button.label }}</a>
                         {% endfor %}
 
-            {% if message or buttons %}
+            {% if url or buttons or filestack %}
                     </div>
                 </div>
             {% endif %}

@@ -15,6 +15,7 @@ use \Slim\Http\Response as Response;
         /** @var mycontainer*/
         private $app;
 
+        private $userprefix = false;
         private $pagettl = 20;
 
         public function __construct( $c ){
@@ -149,9 +150,15 @@ use \Slim\Http\Response as Response;
         }
 
 
-        public function __invoke(Request $request, Response $response, callable $next)
-        {
-            $key = md5( $request->getMethod() . '||' . $request->getUri()->getPath() . '||' . $request->getBody()->getContents() );
+        public function & setPageCache( $userprefix ){
+            $this->userprefix = $userprefix;
+            return $this;
+        }
+
+
+        public function __invoke(Request $request, Response $response, callable $next){
+
+            $key = md5( ( $this->userprefix ? $this->app->config[ 'memcached.userprefix' ] : '' ) . '||' . $request->getMethod() . '||' . $request->getUri()->getPath() . '||' . $request->getBody()->getContents() );
 
             $cache = $this->getMulti( array( $key . '_h', $key . '_b' ) );
 
