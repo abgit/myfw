@@ -15,7 +15,7 @@
                     {% if image %}
                         <a class="btn btn-primary" href="{{ values }}" target="_blank" download>Download image</a>
                     {% else %}
-                        <button data-clipboard-text="{{ values|replace({"\n":' ', "\r":' '}) }}" class="btn btn-primary btn-xs clipb" type="button">Copy to clipboard</button>
+                        <button data-clipboard-text="{{ values|replace({"\n":' ', "\r":' '}) }}" class="btn btn-primary btn-xs clipb{{ classname }}" type="button">Copy to clipboard</button>
                     {% endif %}
                     </div>
                 </div>

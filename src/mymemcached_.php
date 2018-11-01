@@ -344,7 +344,7 @@ class Memcached_
             $this->resultCode = Memcached::RES_SUCCESS;
             $this->resultMessage = '';
 
-            return unserialize($s_result);
+            return unserialize(base64_decode($s_result));
         }
     }
 
@@ -457,7 +457,7 @@ class Memcached_
      */
     public function set($key, $val, $expt = 0)
     {
-        $valueString = serialize($val);
+        $valueString = base64_encode(serialize($val));
         $keyString = $this->getKey($key);
 
         $this->writeSocket(

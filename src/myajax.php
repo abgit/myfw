@@ -74,8 +74,8 @@ class myajax{
         return $this;
     }
 
-    public function & clipboard(){
-        $this->out[ 'cb' ] = true;
+    public function & clipboard( $classname ){
+        $this->out[ 'cb' ][] = array( 'c' => $classname );
         return $this;
     }
 

@@ -8,6 +8,7 @@ class myclipboard{
     private $label;
     private $values;
     private $image;
+    private $classname = '';
 
     public function __construct( $c ){
         $this->app = $c;
@@ -15,6 +16,11 @@ class myclipboard{
 
     public function & setLabel( $label ){
         $this->label = $label;
+        return $this;
+    }
+
+    public function & setClass( $classname ){
+        $this->classname = $classname;
         return $this;
     }
 
@@ -29,8 +35,8 @@ class myclipboard{
     }
 
     public function __toString(){
-        $this->app->ajax->clipboard();
+        $this->app->ajax->clipboard( $this->classname );
 
-        return $this->app->view->fetch( '@my/myclipboard.twig', array( 'label' => $this->label, 'values' => $this->values, 'image' => $this->image ) );
+        return $this->app->view->fetch( '@my/myclipboard.twig', array( 'label' => $this->label, 'classname' => $this->classname, 'values' => $this->values, 'image' => $this->image ) );
     }
 }

@@ -219,10 +219,7 @@ class myform{
         return $this;
     }    
 
-    public function & addStatic( $name, $label = '', $help = '', $showvalue = '', $prefix = '', $sufix = '', $replacelist = false, $clipboard = false ){
-
-        if( $clipboard )
-            $this->app->ajax->clipboard();
+    public function & addStatic( $name, $label = '', $help = '', $showvalue = '', $prefix = '', $sufix = '', $replacelist = false){
 
         $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue, 'prefix' => $prefix, 'sufix' => $sufix, 'replacelist' => $replacelist, 'clipboard' => $clipboard );
         return $this;

@@ -15,6 +15,8 @@ use \Slim\Http\Response as Response;
         /** @var mycontainer*/
         private $app;
 
+        private $pagettl = 20;
+
         public function __construct( $c ){
 
             parent::__construct( APP_NAME );
@@ -153,7 +155,7 @@ use \Slim\Http\Response as Response;
 
             $cache = $this->getMulti( array( $key . '_h', $key . '_b' ) );
 
-            if( !isset( $cache[ $key . '_h' ] ) || !isset( $cache[ $key . '_b' ] ) || $this->getResultCode() !== Memcached::RES_SUCCESS) {
+            if( $this->getResultCode() !== Memcached::RES_SUCCESS || !isset( $cache[ $key . '_h' ] ) || !isset( $cache[ $key . '_b' ] ) ) {
 
                 /** @var Response $response */
                 $response = $next($request, $response);
@@ -161,7 +163,7 @@ use \Slim\Http\Response as Response;
                 if ($response->getStatusCode() == 200) {
                     $this->setMulti( array( $key . '_h' => array_map( function($x){return implode(',', $x);}, $response->getHeaders() ),
                                             $key . '_b' => $response->getBody()->__toString() ),
-                           20 );
+                                     $this->pagettl );
                 }
 
             }else{
