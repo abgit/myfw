@@ -165,21 +165,18 @@ use \Slim\Http\Response as Response;
                         $headers[ $name ] = implode(",", $values );
                     }
 
-                    $data = array(
-                        'header' => $headers,
-                        'body'   => $response->getBody()->__toString()
-                    );
-
-                    $this->set($key, $data, 20);
+                    $this->set($key , 1, 20);
+                    $this->set($key . '_h', $headers, 20);
+                    $this->set($key . '_b', $response->getBody()->__toString(), 20);
                 }
 
             }else{
-
-                foreach( $cache['header'] as $key => $value ){
+                $header = $this->get($key . '_h' );
+                foreach( $header as $key => $value ){
                     $response = $response->withHeader($key, $value);
                 }
 
-                $response->getBody()->write( $cache["body"] );
+                $response->getBody()->write( $this->get($key . '_b' ) );
             }
 
             return $response;
