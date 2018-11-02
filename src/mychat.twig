@@ -11,7 +11,12 @@
 
                                 <div class="message-body chatadmin">
                                     {% if msg[ message.key ] %}
-                                        {{ msg[ message.key ]|t(15000)|nl2br }}
+
+                                        {% if uploadcare %}
+                                            {{ msg[ message.key ]|htmlpurifier }}
+                                        {%  elseif textarea %}
+                                            {{ msg[ message.key ]|t(15000)|nl2br }}
+                                        {%  endif %}
 
                     					{% for meta in msg.metainfo|jsondecode %}
 
