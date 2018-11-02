@@ -452,7 +452,7 @@ class myform{
             } catch (Exception $e) {
             }
 
-            $this->app->ajax->froala( '#' . $args[ 'fsid' ], $url );
+            $this->app->ajax->froalaProcess( '#' . $args[ 'fsid' ], $url );
 //            $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
         }
 

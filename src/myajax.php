@@ -94,8 +94,13 @@ class myajax{
         return $this;
     }
 
-    public function & froala( $id, $url ){
+    public function & froalaProcess( $id, $url ){
         $this->out[ 'fa' ][] = array( 'e' => $id, 'u' => $url );
+        return $this;
+    }
+
+    public function & froala( $id ){
+        $this->out[ 'fl' ][] = array( 'i' => $id );
         return $this;
     }
 

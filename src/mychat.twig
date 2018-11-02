@@ -90,6 +90,10 @@
                 <textarea id="{{ id }}msg" placeholder="{{ textarea.help }}" cols="1" rows="3" class="form-control"></textarea>
             {% endif %}
 
+            {% if uploadcare %}
+                <textarea id="{{ id }}msg" data-froalaoptions='{{uploadcare.froalaoptions|raw}}' data-uploadcareoptions='{{uploadcare.uploadcareoptions|raw}}' data-processing='{{ uploadcare.processing }}' style="width:100%; height:100px" ></textarea>
+            {% endif %}
+
             {% if url or buttons or filestack %}
                 <div class="message-controls">
                     <div class="pull-right">
@@ -103,9 +107,14 @@
                             &nbsp;<button onClick='client.pick({{ filestackimage.fsoptions|raw }} ).then(function(result){myfwsubmit("{{ filestackimage.urlimage }}","Processing ... please wait",{img:result.filesUploaded[0].url},false,"info");});' class="btn btn-default btn-xs btn-icon" type="button"><i class="icon-image2"></i></button>
                         {% endif %}
 
-                        {% if url %}
+                        {% if url and textarea %}
                             &nbsp;<button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ url }}','Sending ...',{msg:$('#{{ id }}msg').val()});$('#{{ id }}msg').val('');}" class="btn btn-primary btn-xs" type="button">{{ message.caption|default( 'Send message' ) }}</button>
                         {% endif %}
+
+                        {% if url and uploadcare %}
+                            <button onClick="if($('#{{ id }}msg').val()!==''){myfwsubmit('{{ url }}','Sending ...',{msg:        $('#{{ id }}msg').froalaEditor('html.get') });    $('#{{ id }}msg').froalaEditor('html.set', '');   }" class="btn btn-primary btn-xs" type="button">{{ message.caption|default( 'Send message' ) }}</button>
+                        {% endif %}
+
 
                         {% for button in buttons %}
                             <a style="margin-left:5px;padding: 6px 12px;" type="button" class="btn btn-{{ button.class|default( 'primary' ) }}" onclick="{{ button.onclick }}">{% if button.icon %}<i class="{{ button.icon }}"></i>{% endif %} {{ button.label }}</a>

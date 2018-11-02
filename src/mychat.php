@@ -27,6 +27,7 @@
         private $selfid;
         private $url;
         private $textarea;
+        private $uploadcare;
 
         public function __construct( $c ){
             $this->app      = $c;
@@ -240,6 +241,23 @@
             return $this;
         }
 
+        public function & addFroala( $froalaoptions = array(), $uploadcareoptions = array() ){
+
+            if( isset( $this->app[ 'froala.options' ] ) )
+                $froalaoptions = $froalaoptions + $this->app[ 'froala.options'];
+
+            if( isset( $this->app[ 'uploadcare.options'] ) )
+                $uploadcareoptions = $uploadcareoptions + $this->app[ 'uploadcare.options'];
+
+            $processing = $this->app->urlfor->action( 'myfwuploadcare', array( 'fsid' => $this->id . 'msg' ) );
+
+            $this->uploadcare = array( 'processing' => $processing, 'froalaoptions' => json_encode( $froalaoptions, JSON_HEX_APOS ), 'uploadcareoptions' => json_encode( $uploadcareoptions, JSON_HEX_APOS ) );
+
+            $this->app->ajax->froala( $this->id . 'msg' );
+
+            return $this;
+        }
+
 
         public function obj(){
             return array( 'values'          => $this->values,
@@ -260,6 +278,7 @@
                           'selfid'          => $this->selfid,
                           'url'             => $this->url,
                           'textarea'        => $this->textarea,
+                          'uploadcare'      => $this->uploadcare,
                           'init'            => $this->init );
         }
         
