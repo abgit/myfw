@@ -291,18 +291,19 @@
                 </div>
 
 			{% elseif el.type == 'static' %}
-            
-                {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
 
                 {% set value = el.replacelist ? el.value|replaceonly( el.replacelist ) : el.value %}
+                {% set clipboard = value|replace({"\n":' ', "\r":' '} ) %}
 
-                {% if el.showvalue|default( true ) %}<p class="form-control-static" id="{{name ~ el.name}}">{{ value ? el.prefix|raw }}{{ value|default( 'unknown' )|nl2br }}{{ value ? el.sufix|raw }}</p>{% endif %}
+                {% if el.showvalue == true or value %}
 
-                {% if el.clipboard %}
-                <button class="btn btn-default clipb" data-clipboard-text="{{ el.value|replace({"\n":' ', "\r":' '}) }}">Copy to clipboard</button>
+                    {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
+
+                    <p class="form-control-static {% if el.clipboard %} clipb{{ name }} {% endif %}" {% if el.clipboard %} data-clipboard-text="{{ clipboard }}"{% endif %} id="{{name ~ el.name}}">{{ value ? el.prefix|raw }}{{ value|nl2br }}{{ value ? el.sufix|raw }}</p>
+
+                    {% if el.help %}<span id="help{{name ~ el.name}}" class="help-static help-block">{{el.help|nl2br}}</span>{% endif %}
+
                 {% endif %}
-
-                {% if el.help %}<span id="help{{name ~ el.name}}" class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
 			{% elseif el.type == 'button' %}
             
@@ -330,11 +331,27 @@
 
         	{% elseif el.type == 'staticimage' %}
 
+                {% if el.showvalue == true or el.value %}
+
                     {%if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{%endif%}
-                    <div{%if el.align %} style="text-align:{{ el.align }}"{% endif %}>
-                    <img id="{{el.name}}" {% if el.width %}width="{{ el.width }}"{% endif %} {% if el.height %}height="{{ el.height }}"{% endif %} {% if not el.width and not el.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}"{%for k,v in el.options.html%} {{k}}={{v|json_encode}}{%endfor%}/>
-                    </div>
+
+                    {%if el.align %}<div style="text-align:{{ el.align }}">{% endif %}
+
+                    {% set valueall = el.value|split('|') %}
+                    {% set value    = value[0] %}
+                    {% set href     = value[1] %}
+
+                    {% if href %}<a href="{{ href }}" target="_blank">{% endif %}
+
+                    <img id="{{el.name}}" {% if el.width %}width="{{ el.width }}"{% endif %} {% if el.height %}height="{{ el.height }}"{% endif %} {% if not el.width and not el.height %}style="height:auto;width:100%"{% endif %} src="{{ el.value }}" />
+
+                    {% if href %}</a>{% endif %}
+
+                    {%if el.align %}</div>{% endif %}
+
                     {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+                {% endif %}
 
         	{% elseif el.type == 'staticmovie' %}
 

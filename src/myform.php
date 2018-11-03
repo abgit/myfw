@@ -172,10 +172,10 @@ class myform{
     }
 
 
-    public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '', $align = '' ){
+    public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '', $align = '', $showvalue = true ){
         $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
         $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
-        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'align' => $align, 'help' => $help );
+        $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'align' => $align, 'help' => $help, 'showvalue' => $showvalue );
         return $this;
     }
 
@@ -219,7 +219,7 @@ class myform{
         return $this;
     }    
 
-    public function & addStatic( $name, $label = '', $help = '', $showvalue = '', $prefix = '', $sufix = '', $replacelist = false){
+    public function & addStatic( $name, $label = '', $help = '', $showvalue = true, $prefix = '', $sufix = '', $replacelist = false, $clipboard = false ){
 
         $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue, 'prefix' => $prefix, 'sufix' => $sufix, 'replacelist' => $replacelist, 'clipboard' => $clipboard );
         return $this;
