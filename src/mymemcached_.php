@@ -500,7 +500,7 @@ class Memcached_
      */
     public function setOptions($options)
     {
-        $this->option = array_merge($this->option, $options);
+        $this->option = $this->option + $options ;
         return true;
     }
 
