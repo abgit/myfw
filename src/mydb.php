@@ -21,7 +21,6 @@
 
         private $cache_enable     = false;
         private $cache_expiration;
-        private $cache_userprefix;
 
         public function __construct( $container ){
 
@@ -185,9 +184,8 @@
             return sprintf("%d in %.3f (%s)", $this->debugs_counter, $this->debugs_sum, implode( "+", $this->debugs ) );
         }
 
-        public function & cache( $userprefix, $expiration = null ){
+        public function & cache( $expiration = null ){
             $this->cache_enable     = true;
-            $this->cache_userprefix = $userprefix;
             $this->cache_expiration = is_null( $expiration ) ? time() + 300 : $expiration;
             return $this;
         }
@@ -203,7 +201,10 @@
             // debug time start
             $debug_start = microtime( true );
 
-            $hash       = md5(( $this->cache_userprefix ? $this->app->config[ 'db.cacheprefix'] : '' ) . $procedure . json_encode($args) );
+            // replace args
+            $args = array_merge( $args, $this->app->config[ 'db.cachereplaceargs' ] );
+
+            $hash       = md5( $procedure . json_encode($args) );
             $key_result = 'dbcache-res-' . $hash;
             $key_return = 'dbcache-ret-' . $hash;
 
@@ -226,7 +227,10 @@
 
         private function addCache( $result, $return, $procedure, $args ){
 
-            $hash       = md5(( $this->cache_userprefix ? $this->app->config[ 'db.cacheprefix' ] : '' ) . $procedure . json_encode($args) );
+            // replace args
+            $args = array_merge( $args, $this->app->config[ 'db.cachereplaceargs' ] );
+
+            $hash       = md5( $procedure . json_encode($args) );
             $key_result = 'dbcache-res-' . $hash;
             $key_return = 'dbcache-ret-' . $hash;
 
