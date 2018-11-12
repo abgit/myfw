@@ -151,6 +151,46 @@ class mysocial{
     }
 
 
+    public function youtubeBio( $url, $word ){
+        $html = file_get_contents( $url );
+
+        preg_match_all('/about\-stat".*/', $html, $output_array);
+
+        $res = array();
+        $res[ 'bio' ] = strpos( $html, $word ) !== false;
+        $res[ 'subscribers' ] = preg_replace("/[^0-9\/]/", "", strip_tags( $output_array[0][0] ) );
+        $res[ 'views' ]       = preg_replace("/[^0-9\/]/", "", strip_tags( $output_array[0][1] ) );
+        $res[ 'datesince' ]   = preg_replace("/[^0-9\/]/", "", strip_tags( $output_array[0][2] ) );
+
+        return $res;
+    }
+
+
+    public function instagramBio( $url, $word ){
+        $html = file_get_contents( $url );
+
+        preg_match('/([0-9kKmM.]+) Followers/', $html, $output_array);
+
+        $res = array();
+        $res[ 'bio' ]         = strpos( $html, $word ) !== false;
+        $res[ 'subscribers' ] = $this->app->filters->irnumber( $output_array[1] );
+
+        return $res;
+    }
+
+    public function facebookBio( $url, $word ){
+        $html = file_get_contents( $url );
+
+        preg_match('/([0-9kKmM.]+) people follow this/', $html, $output_array);
+
+        $res = array();
+        $res[ 'bio' ]         = strpos( $html, $word ) !== false;
+        $res[ 'subscribers' ] = $output_array[1];
+
+        return $res;
+    }
+
+
     public function instagramPosts( $url, $total ){
 
         $username = $this->app->filters->usernameinstagram( $url );

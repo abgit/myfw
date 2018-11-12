@@ -424,6 +424,26 @@ class myfilters{
         return ( $mini ? '<1K' : number_format( $string ) );
     }
 
+    public function irnumber( $string, $toint = true ){
+        $size = substr( $string, -1 );
+        $val  = substr( $string, 0, -1 );
+
+        switch( $size ){
+            case 'K':
+            case 'k': $val = floatval( $val ) * 1000;
+                      break;
+
+            case 'M':
+            case 'm': $val = floatval( $val ) * 1000000;
+                      break;
+
+            default: $val = floatval( $string );
+        }
+
+        return $toint ? intval( $val ) : $val;
+    }
+
+
     public function gravatar( $hash, $s = 80, $d = 'mm', $r = 'g' ){
         if( strpos( $hash, '@' ) )
             $hash = md5( strtolower( trim( $hash ) ) );
