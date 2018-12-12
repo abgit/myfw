@@ -26,21 +26,11 @@
 
             $this->app = $container;
 
-            $dsn = $this->app->config[ 'db.dsn' ];
-
-            switch( $dsn ){
-                case 'heroku': $url          = parse_url( getenv( 'DATABASE_URL' ) );
-                               $this->pdo    = new PDO( sprintf( 'pgsql:host=%s;dbname=%s;port=%s', $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
-                               $this->driver = 'pgsql';
-                               break;
-
-                default:       $url          = parse_url( $dsn );
-                               $this->pdo    = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $url['scheme'], $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
-                               $this->driver = 'pgsql';
-                               break;
-            }
-
-            $this->stmt = null;
+            $dsn          = $this->app->config[ 'db.dsn' ];
+            $url          = parse_url( $dsn );
+            $this->driver = 'pgsql';
+            $this->stmt   = null;
+            $this->pdo    = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $url['scheme'], $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
 
             if( isset( $this->app[ 'db.errmode' ] ) )
                 $this->pdo->setAttribute( PDO::ATTR_ERRMODE, $this->app[ 'db.errmode' ] );
@@ -346,8 +336,14 @@
 
 
         public function errorInfo(){
-            $arr = $this->stmt->errorInfo();
-            return isset( $arr[2] ) ? $arr[2] : 'unknown error';
+
+            if( !is_null( $this->stmt ) ) {
+                $arr = $this->stmt->errorInfo();
+                if( isset( $arr[2] ) )
+                    return $arr[2];
+            }
+
+            return 'unknown error';
         }
 
     }

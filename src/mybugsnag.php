@@ -4,7 +4,7 @@
 class mybugsnag{
 
     /** @var Bugsnag\Configuration */
-    private $bugsnag;
+    private $bugsnag = null;
 
     public function __construct( $container ){
 
@@ -13,19 +13,19 @@ class mybugsnag{
 
         $this->bugsnag = Bugsnag\Client::make( $container[ 'bugsnag.token' ] );
 
-        if( isset( $container[ 'bugsnag.releasestage' ] ) )
+        if( isset( $container[ 'bugsnag.releasestage' ] ) && is_string( $container[ 'bugsnag.releasestage' ] ) )
             $this->bugsnag->setReleaseStage( $container[ 'bugsnag.releasestage' ] );
 
-        if( isset( $container[ 'bugsnag.hostname' ] ) )
+        if( isset( $container[ 'bugsnag.hostname' ] ) && is_string( $container[ 'bugsnag.hostname' ] ) )
             $this->bugsnag->setHostname( $container[ 'bugsnag.hostname' ] );
 
-        if( isset( $container[ 'bugsnag.appversion' ] ) )
+        if( isset( $container[ 'bugsnag.appversion' ] ) && is_string( $container[ 'bugsnag.appversion' ] ) )
             $this->bugsnag->setAppVersion( $container[ 'bugsnag.appversion' ] );
 
         Bugsnag\Handler::register( $this->bugsnag );
 
         $this->bugsnag->registerCallback( function( \Bugsnag\Report $report ) use( $container ) {
-            if( isset( $container[ 'bugsnag.user' ] ) )
+            if( isset( $container[ 'bugsnag.user' ] ) && is_array( $container[ 'bugsnag.user' ] ) )
                 $report->setUser( $container[ 'bugsnag.user' ] );
         });
 
