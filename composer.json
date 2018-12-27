@@ -1,5 +1,5 @@
 {
-    "name": "my",
+    "name": "abgit/myfw",
 
     "require": {
 		 "slim/slim": "^3.0",
