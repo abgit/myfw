@@ -30,10 +30,8 @@
             $url          = parse_url( $dsn );
             $this->driver = 'pgsql';
             $this->stmt   = null;
-            $this->pdo    = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $url['scheme'], $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ] );
+            $this->pdo    = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $url['scheme'], $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ], isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) ? $this->app[ 'db.options' ] : array() );
 
-            if( isset( $this->app[ 'db.errmode' ] ) )
-                $this->pdo->setAttribute( PDO::ATTR_ERRMODE, $this->app[ 'db.errmode' ] );
         }
 
         public function & pdo(){
