@@ -14,8 +14,6 @@ class myexception extends Exception {
     const FORBIDDEN    = 108;
 
     public function __construct( $code, $message = '' ) {
-        //$this->code    = $code;
-        //$this->message = $message;
         parent::__construct( $message, $code);
     }
 

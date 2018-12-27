@@ -22,13 +22,15 @@ class mybugsnag{
         if( isset( $container[ 'bugsnag.appversion' ] ) && is_string( $container[ 'bugsnag.appversion' ] ) )
             $this->bugsnag->setAppVersion( $container[ 'bugsnag.appversion' ] );
 
-        Bugsnag\Handler::register( $this->bugsnag );
-
         if( isset( $container[ 'bugsnag.user' ] ) ) {
             $this->bugsnag->registerCallback(function (\Bugsnag\Report $report) use ($container) {
                 $report->setUser( $container['bugsnag.user'] );
             });
         }
+
+        $this->bugsnag->setAutoCaptureSessions(true);
+
+        Bugsnag\Handler::register( $this->bugsnag );
 
     }
 
