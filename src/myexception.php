@@ -14,11 +14,15 @@ class myexception extends Exception {
     const FORBIDDEN    = 108;
 
     public function __construct( $code, $message = '' ) {
-        $this->code    = $code;
-        $this->message = $message;
+        //$this->code    = $code;
+        //$this->message = $message;
+        parent::__construct( $message, $code);
     }
 
-    public static function response( $code, $message, Response $response, $container ){
+    public static function response( $code, $message, ?Response $response, $container ){
+
+        if( is_null( $response ) )
+            $response = new \Slim\Http\Response();
 
         /** @var abContainer $container */
 
@@ -41,6 +45,7 @@ class myexception extends Exception {
                 break;
 
             case myexception::ERROR:
+
                 if( $container->isajax ) {
                     return $response->withJson( $container->ajax->msgError( $message )
                                                                 ->obj() );

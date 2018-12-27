@@ -7,12 +7,12 @@
         private $app;
 
         /** @var PDO */
-        private $pdo;
+        private $pdo = null;
+        private $pdo_url = null;
+        private $pdo_options = array();
 
         /** @var PDOStatement */
-        private $stmt;
-
-        private $driver;
+        private $stmt = null;
 
         private $debugs = array();
 
@@ -24,17 +24,17 @@
 
         public function __construct( $container ){
 
-            $this->app = $container;
+            $this->app     = $container;
+            $this->pdo_url = parse_url( $this->app->config[ 'db.dsn' ] );
 
-            $dsn          = $this->app->config[ 'db.dsn' ];
-            $url          = parse_url( $dsn );
-            $this->driver = 'pgsql';
-            $this->stmt   = null;
-            $this->pdo    = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $url['scheme'], $url[ 'host' ], substr( $url[ 'path' ], 1 ), $url[ 'port' ] ), $url[ 'user' ], $url[ 'pass' ], isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) ? $this->app[ 'db.options' ] : array() );
-
+            if( isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) )
+                $this->pdo_options = $this->app[ 'db.options' ];
         }
 
         public function & pdo(){
+            if( is_null( $this->pdo ) )
+                $this->pdo = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $this->pdo_url['scheme'], $this->pdo_url[ 'host' ], substr( $this->pdo_url[ 'path' ], 1 ), $this->pdo_url[ 'port' ] ), $this->pdo_url[ 'user' ], $this->pdo_url[ 'pass' ], $this->pdo_options );
+
             return $this->pdo;
         }
         
@@ -131,11 +131,12 @@
                 }
             }
 
-            switch( $this->driver ){
-                case 'mysql': $this->stmt = $this->pdo->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+            switch( $this->pdo_url[ 'scheme' ] ){
+
+                case 'pgsql': $this->stmt = $this->pdo()->prepare( 'select * from ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
                               break;
 
-                case 'pgsql': $this->stmt = $this->pdo->prepare( 'select * from ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
+                case 'mysql': $this->stmt = $this->pdo()->prepare( 'CALL ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
                               break;
             }
 
