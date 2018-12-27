@@ -24,10 +24,11 @@ class mybugsnag{
 
         Bugsnag\Handler::register( $this->bugsnag );
 
-        $this->bugsnag->registerCallback( function( \Bugsnag\Report $report ) use( $container ) {
-            if( isset( $container[ 'bugsnag.user' ] ) && is_array( $container[ 'bugsnag.user' ] ) )
-                $report->setUser( $container[ 'bugsnag.user' ] );
-        });
+        if( isset( $container[ 'bugsnag.user' ] ) ) {
+            $this->bugsnag->registerCallback(function (\Bugsnag\Report $report) use ($container) {
+                $report->setUser( $container['bugsnag.user'] );
+            });
+        }
 
     }
 
