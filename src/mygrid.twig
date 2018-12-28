@@ -94,7 +94,7 @@
                 				                            	<a {{ td.urlobj|urlobj( val, tags ) }}>
                                                             {% endif %}
 
-                                                            <img src="{{ value|default( td.default ) }}" alt="" class="user-face">
+                                                            <img src="{{ value|default( td.default ) }}" alt="" class="user-face {{ td.kvalclass ? 'gt' ~ val[ td.kvalclass ] }}">
 
                                                             {% if td.urlobj %}
                 				                            	</a>

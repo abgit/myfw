@@ -148,11 +148,15 @@ class mygrid{
         return $this;
     }
 
-    public function & addThumb( $key, $kval, $label = '', $urlobj = '', $default = '' ){
+    public function & addThumb( $key, $kval, $label = '', $urlobj = '', $default = '', $kvalclass = '' ){
         if( !isset( $this->labels[ $key ] ) ){
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
-        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'thumb', 'urlobj' => $urlobj, 'default' => $default );
+
+        if( empty( $default ) )
+            $default = $this->app->config[ 'panel.defaultmini' ];
+
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'kvalclass' => $kvalclass, 'type' => 'thumb', 'urlobj' => $urlobj, 'default' => $default );
         return $this;
     }
 
@@ -272,6 +276,12 @@ class mygrid{
 
         return $this;
     }
+
+    public function & ajaxThumbChange( $src, $class ){
+        $this->app->ajax->attr( '.gt' . $class, 'src', ( is_string( $src ) && strlen( $src ) ) ? $src : $this->app->config[ 'grid.thumb' ] );
+        return $this;
+    }
+
 
     public function & setAction( $key, $onclick ){
         if( isset( $this->labels[ $key ] ) )
