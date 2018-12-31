@@ -38,8 +38,22 @@ class myrules{
         return $this->regex( strval( $value ), '/^([0-9]{1,5}([\.\,][0-9]{1,8})?)$/' );
     }
 
-   public function isdecimal( $value, $opts='', $formelement = null){
+    public function isdecimal( $value, $opts='', $formelement = null){
         return is_numeric( $value ) && ( floor( $value ) != $value );
+    }
+
+    public function startwith( $value, $opts='', $formelement = null){
+
+        if(!is_array($opts))
+            $opts = array( $opts );
+
+        $value = strtolower( $value );
+
+        foreach( $opts as $opt )
+            if( strpos( $value, strtolower( $opt ) ) === 0 )
+                return true;
+
+        return false;
     }
 
     public function bitcoin( $value, $opts='', $formelement = null){
