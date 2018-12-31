@@ -158,7 +158,7 @@
                                                                 {% if td.options is not empty %}
                                                                     <button data-toggle="dropdown" class="btn btn-icon btn-primary dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon|default( 'icon-cog4' ) }}"></i></button>
         													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
-                                                                    {% for option in td.options %}
+                                                                    {% for option in td.options if (option.depends is not defined or val[ option.depends ] ) %}
                                                                         {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
                 														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a {{ not optiondisabled ? option.urlobj|urlobj( val, tags ) }}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
         		                                                    {% endfor %}
