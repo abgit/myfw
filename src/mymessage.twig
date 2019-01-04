@@ -1,4 +1,6 @@
 
+{% if depends is empty or values[ depends ] %}
+
     {% if customheader %}
         <div class="page-header">
                 {% if customheader.title or customheader.subtitle %}
@@ -16,7 +18,7 @@
     {% endif %}                            
                             
                             
-{% if elements %}           
+   {% if elements %}
 
     {% if video %}
         <div class="row" style="padding-bottom:30px;">
@@ -37,7 +39,7 @@
         <div class="row"><div class="col-md-{{ 12 - offset - offset }} col-md-offset-{{ offset }}">
     {% endif %}
 
-<div id="msg{{ name }}" class="callout callout-{{ classname|default( 'info' ) }} fade in" style="margin-bottom:0px">
+   <div id="msg{{ name }}" class="callout callout-{{ classname|default( 'info' ) }} fade in" style="margin-bottom:0px">
 
     {% if tip.onclick %}
         <button type="button" class="close" data-dismiss="alert" onclick="$('#msg{{ name }}').hide();{{ tip.onclick }}">×</button>
@@ -75,8 +77,8 @@
         </div>
 
         {% endif %}
-    {% endfor %}
-</div>
+      {% endfor %}
+   </div>
 
     {% if offset %}
         </div></div>
@@ -97,5 +99,7 @@
         {% endif %}
     </div>
     {% endif %}
+
+  {% endif %}
 
 {% endif %}

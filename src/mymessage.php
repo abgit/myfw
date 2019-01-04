@@ -22,6 +22,7 @@ class mymessage{
     private $messagesufix;
     private $values = array();
     private $tip = false;
+    private $depends = '';
 
     public function __construct( $c ){
         $this->app = $c;
@@ -54,6 +55,11 @@ class mymessage{
 
     public function & setVideo( $src, $name, $class, $width, $height, $iframe = true, $thumb = '' ){
         $this->video = array( 'src' => $src, 'name' => $name, 'class' => $class, 'width' => $width, 'height' => $height, 'iframe' => $iframe, 'thumb' => $thumb );
+        return $this;
+    }
+
+    public function & setDepends( $depends ){
+        $this->depends = $depends;
         return $this;
     }
 
@@ -98,8 +104,12 @@ class mymessage{
         return $this;
     }
 
-    public function & addTitleMessageRelative( $title, $messagekey ){
+    public function & addTitleRelative( $title ){
         $this->reltitle = $title;
+        return $this;
+    }
+
+    public function & addMessageRelative( $messagekey ){
         $this->relmessagekey = $messagekey;
         return $this;
     }
@@ -136,9 +146,13 @@ class mymessage{
         if( json_last_error() !== JSON_ERROR_NONE ){
             $this->addMessage( $values );
 
-        }elseif( isset( $val[ $this->relmessagekey ] ) ){
-            $this->addTitle( $this->reltitle )
-                 ->addMessage( $val[ $this->relmessagekey ] );
+        }else{
+
+            if( isset( $val[ $this->reltitle ] ) )
+                $this->addTitle( $this->reltitle );
+
+            if( isset( $val[ $this->relmessagekey ] ) )
+                $this->addMessage( $val[ $this->relmessagekey ] );
         }
 
         foreach( $this->elements as $el )
@@ -224,6 +238,7 @@ class mymessage{
                                                                               'messagesufix'    => $this->messagesufix,
                                                                               'offset'          => $this->offset,
                                                                               'tip'             => $this->tip,
+                                                                              'depends'         => $this->depends,
                                                                               'values'          => $this->values ) );
     }
 

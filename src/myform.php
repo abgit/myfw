@@ -223,7 +223,12 @@ class myform{
 
         $this->elements[ $name ] = array( 'type' => 'static', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'help' => $help, 'showvalue' => $showvalue, 'prefix' => $prefix, 'sufix' => $sufix, 'replacelist' => $replacelist, 'clipboard' => $clipboard );
         return $this;
-    }    
+    }
+
+    public function & addStaticHTML( $name ){
+        $this->elements[ $name ] = array( 'type' => 'statichtml', 'name' => $name);
+        return $this;
+    }
 
     public function & addStaticMessage( $message = '', $title = '', $icon = '', $date = '' ){
         $this->elements[ 'smm' . $this->counter++ ] = array( 'type' => 'staticmessage', 'message' => $message, 'title' => $title, 'icon' => $icon, 'date' => $date, 'rules' => array(), 'filters' => array() );
@@ -819,6 +824,10 @@ class myform{
 
         $this->app->ajax->showForm( $this->formname, $this->app->ajax->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag );
         return $this;
+    }
+
+    public function & setValues( $values ){
+        return $this->setDefaultValues( $values );
     }
 
     public function & setDefaultValues( $values, $append = false ){

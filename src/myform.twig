@@ -305,6 +305,13 @@
 
                 {% endif %}
 
+            {% elseif el.type == 'statichtml' %}
+
+                {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
+
+                <p class="form-control-static" id="{{name ~ el.name}}">{{ value|htmlpurifier }}</p>
+
+
 			{% elseif el.type == 'button' %}
             
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %} 
