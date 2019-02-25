@@ -22,6 +22,6 @@ class myotp{
     }
 
     public function verifyCode( $secret, $key ){
-        return (new Otp())->checkTotp(Base32::decode($secret), $key);
+        return !empty( trim( $secret ) ) && !empty( trim( $key ) ) && (new Otp())->checkTotp(Base32::decode($secret), $key);
     }
 }

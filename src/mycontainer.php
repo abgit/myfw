@@ -16,6 +16,7 @@
  * @property mylist $list
  * @property myotp $otp
  * @property mypusher $pusher
+ * @property mybitaps $bitaps
  * @property myconfirm $confirm
  * @property mymailgun $mailgun
  * @property mybreadcrumb $breadcrumb

@@ -67,44 +67,44 @@ class myconfirm{
             return true;
         }
 
+        $call = true;
+
         if( !is_null( $customBefore ) && is_callable( $customBefore ) ){
             $call = call_user_func( $customBefore );
         }else{
-            $call = isset( $this->app[ 'confirm.oncheck' ] ) ? $this->app[ 'confirm.oncheck' ]( $mode ) : false;
+            $call = isset( $this->app[ 'confirm.oncheck' ] ) ? $this->app[ 'confirm.oncheck' ]( $twofactor ) : false;
         }
 
-        if( $confirmByDefault === true && $call === false ){
+        if( $call !== true ) {
+            if (is_string($call)) {
+                throw new myexception(myexception::ERROR, $call);
+            }else{
+                throw new myexception( myexception::STOP );
+            }
+        }
+
+        if( $confirmByDefault === true ){
             $this->app->session->delete( $hash );
             $this->app->ajax->confirmDialogClose();
             return true;
         }
 
-        if( is_string( $call ) ){
-            throw new myexception( myexception::ERROR, $call );
-        }
-
-        $sms = ( $call === 2 );
-
-        $pin   = ( $twofactor == true or $sms == true );
+        $title    = '';
         $pinlabel = '';
         $pinhelp  = '';
 
-        if( $sms == true ){
-            $title    = 'Two-factor authentication by sms';
-            $pinlabel = 'Pin';
-            $pinhelp  = 'This action requires a 4-digit pin from a sms. An sms was sent.';
-        }elseif( $twofactor == true ){
-            $title    = 'Two-factor authentication by app';
+        if( $twofactor == true ){
+            $title    = 'Two-factor authentication';
             $pinlabel = $validateSecret == false ? 'Pin' : 'Pin or Secret';
-            $pinhelp  = $validateSecret == false ? 'Use your two-factor app to generate the 6-digit pin' : 'Use your two-factor app to generate the 6-digit pin or use Secret';
+            $pinhelp  = $validateSecret == false ? 'Fill your 6-digit pin' : 'Fill your 6-digit pin or Secret';
         }
 
         $xconfirm = md5( $hash . rand( 1, 1000000 ) );
 
-        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $pin, 'postvars' => $_POST, 'validateSecret' => $validateSecret ) );
+        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $twofactor, 'postvars' => $_POST, 'validateSecret' => $validateSecret ) );
         $this->app->session->set( $xconfirm, $hash );
 
-        $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $pin, $pinlabel, $pinhelp );
+        $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $twofactor, $pinlabel, $pinhelp );
 
         throw new myexception( myexception::STOP );
     }

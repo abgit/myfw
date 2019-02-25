@@ -51,6 +51,9 @@ class myfw{
         $container['blockchain'] = function ($c) {
             return new myblockchain($c);
         };
+        $container['bitaps'] = function ($c) {
+            return new mybitaps($c);
+        };
         $container['list'] = function ($c) {
             return new mylist($c);
         };

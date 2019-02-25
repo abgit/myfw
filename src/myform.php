@@ -960,11 +960,11 @@ class myform{
 
             if( $counter == 0 ){
                 $res = call_user_func( $rulecallback );
-                if( is_string( $res ) ){
+                if( $res !== true ){
                     if( isset( $rinfo[0] ) ){
-                        $this->errors[ $rinfo[0] ] = $res;
+                        $this->errors[ $rinfo[0] ] = is_string( $res ) ? $res : '';
                     }else{
-                        $this->errors[ '' ] = $res;
+                        $this->errors[ '' ] = is_string( $res ) ? $res : '';
                     }
                 }
             }
@@ -1015,7 +1015,7 @@ class myform{
                                         $values[ $n ] = implode( ';', $v );
                                     }
                                     break;
-                default:            continue;
+                default:            continue 2;
             }
 
             if( $applyFilters && isset( $el[ 'filters' ] ) && is_array( $el[ 'filters' ] ) )
