@@ -1,5 +1,5 @@
 {
-	"name": "myfw",
+	"name": "abgit/myfw",
 	"description": "a mini php framework",
     "require": {
 		 
