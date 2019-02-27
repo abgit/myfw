@@ -29,18 +29,12 @@
 
 		 "aptoma/twig-markdown": "3.*",
 		 "michelf/php-markdown": "1.*",
-
-		 "aptoma/twig-markdown": "3.*",
-		 "michelf/php-markdown": "1.*",
 		 "league/html-to-markdown": "*",
 		 
 		 "uploadcare/uploadcare-php": ">=v2.0,<3.0",
 		 "ezyang/htmlpurifier": "*",
 
-		 "nexmo/client": "1.*",
-		 
-		 "rmccue/requests": ">=1.0"
-		 		 
+		 "nexmo/client": "1.*"
 	},
 	"autoload": {
          "psr-0": {
