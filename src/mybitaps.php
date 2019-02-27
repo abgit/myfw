@@ -2,6 +2,7 @@
 
 class mybitaps{
 
+
     /** @var mycontainer*/
     private $app;
     private $endpoint_market            = 'https://api.bitaps.com/market/v1/';
