@@ -23,6 +23,7 @@
         private $idend;
         private $datestart;
         private $dateend;
+        public $onRefresh = null;
 
         public function __construct( $c ){
             $this->app  = $c;
@@ -36,6 +37,11 @@
 
         public function & setUrl( $url ){
             $this->url = $url;
+            return $this;
+        }
+
+        public function refresh(){
+            call_user_func($this->onRefresh);
             return $this;
         }
 
@@ -161,6 +167,13 @@
                 return $_GET[ 'end' ];
             
             return false;
+        }
+
+        public function getStartEnd( &$start, &$end ){
+            $start = $this->getStart();
+            $end   = $this->getEnd();
+
+            return ( !empty( $start ) && !empty( $end ) );
         }
 
         public function obj(){

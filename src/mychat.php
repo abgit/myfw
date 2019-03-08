@@ -28,6 +28,9 @@
         private $url;
         private $textarea;
         private $uploadcare;
+        public $onInit = null;
+        public $onRefresh = null;
+        public $onAddMessage = null;
 
         public function __construct( $c ){
             $this->app      = $c;
@@ -42,6 +45,21 @@
 
         public function & setUrl( $url ){
             $this->url = $url;
+            return $this;
+        }
+
+        public function init(){
+            call_user_func($this->onInit);
+            return $this;
+        }
+
+        public function refresh(){
+            call_user_func($this->onRefresh);
+            return $this;
+        }
+
+        public function addMessage(){
+            call_user_func($this->onAddMessage);
             return $this;
         }
 

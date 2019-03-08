@@ -564,7 +564,6 @@ class mygrid{
         return $this;
     }
 
-
     public function modalform():myform{
 
         if( is_null( $this->form ) )
