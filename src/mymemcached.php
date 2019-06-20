@@ -38,6 +38,17 @@ use \Slim\Http\Response as Response;
         }
 
 
+        public function getFunction( $key, $timeout, $function ){
+
+            $res = $this->get( $key );
+            if( $this->getResultCode() !== Memcached::RES_SUCCESS ){
+                $res = $function();
+                $this->set( $key, $res, $timeout );
+            }
+
+            return $res;
+        }
+
         private function rateprefix( $persession, $perip, $perprefix = '' ){
 
             $prefix  = $perprefix;

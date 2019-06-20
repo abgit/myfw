@@ -1,6 +1,8 @@
 <?php
 
 
+use Bugsnag\Report;
+
 class mybugsnag{
 
     /** @var Bugsnag\Configuration */
@@ -23,7 +25,7 @@ class mybugsnag{
             $this->bugsnag->setAppVersion( $container[ 'bugsnag.appversion' ] );
 
         if( isset( $container[ 'bugsnag.user' ] ) ) {
-            $this->bugsnag->registerCallback(function (\Bugsnag\Report $report) use ($container) {
+            $this->bugsnag->registerCallback(function (Report $report) use ($container) {
                 $report->setUser( $container['bugsnag.user'] );
             });
         }
@@ -32,6 +34,14 @@ class mybugsnag{
 
         Bugsnag\Handler::register( $this->bugsnag );
 
+    }
+
+
+    public function register( $key, $info ) {
+        if( !is_null( $this->bugsnag ) )
+            $this->bugsnag->registerCallback(function (Report $report) use( $key, $info ) {
+                $report->setMetaData([$key => $info]);
+            });
     }
 
 
