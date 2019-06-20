@@ -19,6 +19,10 @@ class myexception extends Exception {
 
     public static function response( $code, $message, ?Response $response, $container ){
 
+        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true ) {
+            $container->memcached->ratemonodelete();
+        }
+
         if( is_null( $response ) )
             $response = new \Slim\Http\Response();
 

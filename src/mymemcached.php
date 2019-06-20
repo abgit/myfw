@@ -38,42 +38,52 @@ use \Slim\Http\Response as Response;
         }
 
 
-        private function rateprefix( $persession, $perip ){
+        private function rateprefix( $persession, $perip, $perprefix = '' ){
 
-            $prefix  = $persession ? ( 's' . $this->app->session->id() ) : '';
+            $prefix  = $perprefix;
+            $prefix .= $persession ? ( 's' . $this->app->session->id() ) : '';
             $prefix .= $perip      ? ( 'i' . $this->app->ipaddress )  : '';
 
             return $prefix;
         }
 
 
-        public function rateisvalid( $persecond = 3, $perminute = 200, $lockfor = 60, $persession = true, $perip = false, $mono = true ){
+        public function rateisvalid( $persecond = 3, $per5second = 15, $perminute = 200, $lockfor = 60, $persession = true, $perip = false, $perprefix = '', $mono = true ){
 
-            $now = time();
-            $prefix = $this->rateprefix( $persession, $perip );
+            $now    = time();
+            $prefix = $this->rateprefix( $persession, $perip, $perprefix );
 
-            $keysecond = md5( $prefix . date( "YmdHis", $now ) );
-            $keyminute = md5( $prefix . date( "YmdHi", $now ) );
-            $keylock   = md5( $prefix . 'myfwlock' );
-            $keymono   = md5( $prefix . 'myfwmono' );
+            $keysecond  = md5( $prefix . date( "YmdHis", $now ) );
+            $key5second = md5( $prefix . date( "YmdHi", $now ) . intdiv( intval( date( "s", $now ) ), 5 ) );
+            $keyminute  = md5( $prefix . date( "YmdHi", $now ) );
+            $keylock    = md5( $prefix . 'myfwlock' );
+            $keymono    = md5( $prefix . 'myfwmono' );
 
             if( $this->get( $keylock ) === true )
                 return false;
 
-            if( $mono && !$this->add( $keymono, 1,20 ) )
-                usleep( 100000 );
+            if( $mono ){
+                while( !$this->add( $keymono, 1, intval( ini_get('max_execution_time') ) + 1 ) ){
+                    usleep( 30000 );
+                }
+            }
 
             $countersec = $this->get( $keysecond );
             if( $this->getResultCode() !== Memcached::RES_SUCCESS )
                 $countersec = 0;
+
+            $counter5sec = $this->get( $key5second );
+            if( $this->getResultCode() !== Memcached::RES_SUCCESS )
+                $counter5sec = 0;
 
             $countermin = $this->get( $keyminute );
             if( $this->getResultCode() !== Memcached::RES_SUCCESS )
                 $countermin = 0;
 
             // check limits
-            if( $countersec >= $persecond || $countermin >= $perminute ){
+            if( $countersec >= $persecond || $counter5sec >= $per5second || $countermin >= $perminute ){
                 $this->delete( $keysecond );
+                $this->delete( $key5second );
                 $this->delete( $keyminute );
                 $this->set( $keylock, true, $lockfor );
                 $this->set( $keylock . 't', time() + $lockfor, $lockfor );
@@ -81,13 +91,19 @@ use \Slim\Http\Response as Response;
             }
 
             if( $countersec === 0 ){
-                $this->set( $keysecond, 1, 3 );
+                $this->set( $keysecond, 1, 1 + 1 );
             }else{
                 $this->increment( $keysecond );
             }
 
+            if( $counter5sec === 0 ){
+                $this->set( $key5second, 1, 5 + 1 );
+            }else{
+                $this->increment( $key5second );
+            }
+
             if( $countermin === 0 ){
-                $this->set( $keyminute, 1, 63 );
+                $this->set( $keyminute, 1, 60 + 1 );
             }else{
                 $this->increment( $keyminute );
             }
@@ -95,23 +111,22 @@ use \Slim\Http\Response as Response;
             return true;
         }
 
-        public function ratemonodelete( $persession = true, $perip = false ){
+        public function ratemonodelete( $persession = true, $perip = false, $perprefix = '' ){
 
-            $prefix  = $this->rateprefix( $persession, $perip );
+            $prefix  = $this->rateprefix( $persession, $perip, $perprefix );
             $keymono = md5( $prefix . 'myfwmono' );
 
             return $this->delete( $keymono );
         }
         
-        public function ratelocktimeout( $persession = true, $perip = false ){
+        public function ratelocktimeout( $persession = true, $perip = false, $perprefix = '' ){
 
-            $prefix  = $this->rateprefix( $persession, $perip );
+            $prefix  = $this->rateprefix( $persession, $perip, $perprefix );
             $keylock = md5( $prefix . 'myfwlock' );
 
-            $now = time();
             $t = $this->get( $keylock . 't' );
 
-            return ( $this->getResultCode() !== Memcached::RES_SUCCESS ) ? 0 : ( $t - $now );
+            return ( $this->getResultCode() !== Memcached::RES_SUCCESS ) ? 0 : ( $t - time() );
         }
 
 

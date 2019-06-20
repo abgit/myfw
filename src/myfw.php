@@ -294,6 +294,10 @@ class myfw{
             $response = $response->withAddedHeader('X-myfw-db', $container->db->getDebugsCounter() );
         }
 
+        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true ) {
+            $container->memcached->ratemonodelete();
+        }
+
         return $container->isajax ? $response->withJson( $container->ajax->obj() ) : $response;
     }
 
