@@ -59,16 +59,27 @@ use \Slim\Http\Response as Response;
         }
 
 
-        public function rateisvalid( $persecond = 3, $per5second = 15, $perminute = 200, $lockfor = 60, $persession = true, $perip = false, $perprefix = '', $mono = true ){
+        private function ratecounter( $now, $prefix, $seconds ){
+
+            $counter = 0;
+
+            for( $i = 0; $i < $seconds; $i++ ){
+                $keysecond = md5( $prefix . date( "YmdHis", $now - $i ) );
+
+                $counter += intval( $this->get( $keysecond ) );
+            }
+
+            return $counter;
+        }
+
+
+        public function rateisvalid( $persecond = 10, $per5second = null, $perminute = null, $lockfor = 60, $persession = true, $perip = false, $perprefix = '', $mono = true ){
 
             $now    = time();
             $prefix = $this->rateprefix( $persession, $perip, $perprefix );
 
-            $keysecond  = md5( $prefix . date( "YmdHis", $now ) );
-            $key5second = md5( $prefix . date( "YmdHi", $now ) . intdiv( intval( date( "s", $now ) ), 5 ) );
-            $keyminute  = md5( $prefix . date( "YmdHi", $now ) );
-            $keylock    = md5( $prefix . 'myfwlock' );
-            $keymono    = md5( $prefix . 'myfwmono' );
+            $keylock      = md5( $prefix . 'myfwlock' );
+            $keymono      = md5( $prefix . 'myfwmono' );
 
             if( $this->get( $keylock ) === true )
                 return false;
@@ -79,44 +90,23 @@ use \Slim\Http\Response as Response;
                 }
             }
 
-            $countersec = $this->get( $keysecond );
-            if( $this->getResultCode() !== Memcached::RES_SUCCESS )
-                $countersec = 0;
-
-            $counter5sec = $this->get( $key5second );
-            if( $this->getResultCode() !== Memcached::RES_SUCCESS )
-                $counter5sec = 0;
-
-            $countermin = $this->get( $keyminute );
-            if( $this->getResultCode() !== Memcached::RES_SUCCESS )
-                $countermin = 0;
-
             // check limits
-            if( $countersec >= $persecond || $counter5sec >= $per5second || $countermin >= $perminute ){
-                $this->delete( $keysecond );
-                $this->delete( $key5second );
-                $this->delete( $keyminute );
+            if( ( is_numeric( $persecond )  && $this->ratecounter( $now, $prefix, 1 )  >= $persecond )  ||
+                ( is_numeric( $per5second ) && $this->ratecounter( $now, $prefix, 5 )  >= $per5second ) ||
+                ( is_numeric( $perminute )  && $this->ratecounter( $now, $prefix, 60 ) >= $perminute ) ){
+
                 $this->set( $keylock, true, $lockfor );
                 $this->set( $keylock . 't', time() + $lockfor, $lockfor );
                 return false;
             }
 
+            $keysecond   = md5( $prefix . date( "YmdHis", $now ) );
+            $countersec  = intval( $this->get( $keysecond ) );
+
             if( $countersec === 0 ){
-                $this->set( $keysecond, 1, 1 + 1 );
+                $this->set( $keysecond, 1, 61 );
             }else{
                 $this->increment( $keysecond );
-            }
-
-            if( $counter5sec === 0 ){
-                $this->set( $key5second, 1, 5 + 1 );
-            }else{
-                $this->increment( $key5second );
-            }
-
-            if( $countermin === 0 ){
-                $this->set( $keyminute, 1, 60 + 1 );
-            }else{
-                $this->increment( $keyminute );
             }
 
             return true;
