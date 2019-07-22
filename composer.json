@@ -4,12 +4,6 @@
     "require": {
 		 
 		 "php": "^7.0",
-		 
-		 "ext-memcached": "*",
-		 "ext-gd": "*",
-		 "ext-bcmath": "*",
-		 "ext-openssl": "*",
-		 "ext-pdo": "*",
 
 		 "slim/slim": "^3.0",
 		 "slim/twig-view": "*",
