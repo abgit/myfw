@@ -3,7 +3,7 @@
 	"description": "a mini php framework",
     "require": {
 		 
-		 "php": "7.1.*",
+		 "php": "^7.0",
 		 
 		 "ext-memcached": "*",
 		 "ext-gd": "*",
