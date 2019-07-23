@@ -78,15 +78,18 @@ use \Slim\Http\Response as Response;
             $now    = time();
             $prefix = $this->rateprefix( $persession, $perip, $perprefix );
 
-            $keylock      = md5( $prefix . 'myfwlock' );
-            $keymono      = md5( $prefix . 'myfwmono' );
+            $keylock = md5( $prefix . 'myfwlock' );
+            $keymono = md5( $prefix . 'myfwmono' );
 
             if( $this->get( $keylock ) === true )
                 return false;
 
             if( $mono ){
-                while( !$this->add( $keymono, 1, intval( ini_get('max_execution_time') ) + 1 ) ){
-                    usleep( 30000 );
+                $expiration = intval( ini_get('max_execution_time') ) + 1;
+                $value      = uniqid( microtime(true ),true );
+                while( !$this->add( $keymono, $value, $expiration ) || $this->get( $keymono ) !== $value ){
+                    usleep( 20000 );
+                    $value = uniqid( microtime(true ),true );
                 }
             }
 
