@@ -17,8 +17,7 @@
 	     "linusu/bitcoin-address-validator": "0.*",
 		 
 		 "christian-riesen/otp": "1.*",
-		 "aferrandini/phpqrcode": "1.*",
-		 
+
 		 "pusher/pusher-php-server": "^3",
 
 		 "aptoma/twig-markdown": "3.*",
