@@ -262,9 +262,9 @@ class myfw{
             return ( $request->isPost() && !empty( $hostname ) && !empty( $referer ) && strpos( strtolower( $referer ), strtolower( $hostname ) ) !== false );
         };
 
-        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->memcached->rateisvalid() ) {
+        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->redis->rateisvalid() ) {
             throw new myexception(myexception::RATELIMIT,
-                'Too much requests. Please wait ' . $container->memcached->ratelocktimeout() . 's and try again.');
+                'Too much requests. Please wait ' . $container->redis->ratelocktimeout() . 's and try again.');
         }
 
         if ( isset( $container->config[ 'app.cidr' ] ) && php_sapi_name() !== 'cli' && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
