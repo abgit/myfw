@@ -1,33 +1,28 @@
 <?php
 
-use \malkusch\lock\mutex\MemcachedMutex;
+use \malkusch\lock\mutex\PHPRedisMutex;
 
-    // dev environment support
-    if( !class_exists( 'Memcached' ) ){
-        include_once __DIR__ . '/mymemcached_.php';
-        class_alias( 'Memcached_', 'Mem' . 'cached' );
-    }
 
-    class mymemcached extends Memcached{
+    class myredis extends Redis{
 
         /** @var mycontainer*/
         private $app;
 
         public function __construct( $c ){
 
-            parent::__construct( APP_NAME );
+            parent::__construct();
 
             $this->app = $c;
 
-            $servers = explode(',', $this->app->config['memcached.servers'] );
+            if( $this->app->config[ 'redis.dsn' ] ){
+                $this->redis_url  = parse_url( $this->app->config[ 'redis.dsn' ] );
 
-            $this->setOptions( $this->app->config[ 'memcached.options' ] );
+                if( isset( $this->redis_url[ 'host' ] ) ){
+                    $this->connect( $this->redis_url[ 'host' ], isset( $this->redis_url[ 'port' ] ) ? $this->redis_url[ 'port' ] : 6379 );
 
-            if( !$this->getServerList() ){
-                foreach( $servers as $s ){
-                    $parts = explode( ':', $s );
-                    if( isset( $parts[0] ) && isset( $parts[1] ) )
-                        $this->addServer( $parts[0], $parts[1] );
+                    if( isset( $this->redis_url[ 'pass' ] ) ){
+                        $this->auth( $this->redis_url[ 'pass' ] );
+                    }
                 }
             }
         }
@@ -35,9 +30,9 @@ use \malkusch\lock\mutex\MemcachedMutex;
         public function getFunction( $key, $timeout, $function ){
 
             $res = $this->get( $key );
-            if( $this->getResultCode() !== Memcached::RES_SUCCESS ){
+            if( $res === false ){
                 $res = $function();
-                $this->set( $key, $res, $timeout );
+                $this->setex( $key, $timeout, $res );
             }
 
             return $res;
@@ -58,8 +53,7 @@ use \malkusch\lock\mutex\MemcachedMutex;
 
             for( $i = 0; $i < $seconds; $i++ ){
                 $keysecond = md5( $prefix . date( "YmdHis", $now - $i ) );
-
-                $counter += intval( $this->get( $keysecond ) );
+                $counter  += intval( $this->get( $keysecond ) );
             }
 
             return $counter;
@@ -81,8 +75,8 @@ use \malkusch\lock\mutex\MemcachedMutex;
                 ( is_numeric( $per5second ) && $this->ratecounter( $now, $prefix, 5 )  >= $per5second ) ||
                 ( is_numeric( $perminute )  && $this->ratecounter( $now, $prefix, 60 ) >= $perminute ) ){
 
-                $this->set( $keylock, true, $lockfor );
-                $this->set( $keylock . 't', time() + $lockfor, $lockfor );
+                $this->setex( $keylock,       $lockfor, true  );
+                $this->setex( $keylock . 't', $lockfor, time() + $lockfor );
                 return false;
             }
 
@@ -90,9 +84,9 @@ use \malkusch\lock\mutex\MemcachedMutex;
             $countersec  = intval( $this->get( $keysecond ) );
 
             if( $countersec === 0 ){
-                $this->set( $keysecond, 1, 61 );
+                $this->setex( $keysecond, 61, 1 );
             }else{
-                $this->increment( $keysecond );
+                $this->incr( $keysecond );
             }
 
             return true;
@@ -105,21 +99,19 @@ use \malkusch\lock\mutex\MemcachedMutex;
 
             $t = $this->get( $keylock . 't' );
 
-            return ( $this->getResultCode() !== Memcached::RES_SUCCESS ) ? 0 : ( $t - time() );
+            return ( $t === false ) ? 0 : ( $t - time() );
         }
 
-        public function mutex( $id ):MemcachedMutex{
-            $mutex = new MemcachedMutex( $id, $this, $this->app->config[ 'memcached.mutextimeout' ] );
-            return $mutex;
+        public function mutex( $id ):PHPRedisMutex{
+            return ( new PHPRedisMutex( [ $this ], $id, $this->app->config[ 'redis.mutextimeout' ] ) );
         }
 
-        public function mutexClient():MemcachedMutex{
-            $mutex = new MemcachedMutex( $this->app->config[ 'memcached.mutexclient' ], $this, $this->app->config[ 'memcached.mutextimeout' ] );
-            return $mutex;
+        public function mutexClient():PHPRedisMutex{
+            return ( new PHPRedisMutex( [ $this ], $this->app->config[ 'redis.mutexclient' ], $this->app->config[ 'redis.mutextimeout' ] ) );
         }
 
-        public function mutexSession():MemcachedMutex{
-            $mutex = new MemcachedMutex( session_id(), $this, $this->app->config[ 'memcached.mutextimeout' ] );
-            return $mutex;
+        public function mutexSession():PHPRedisMutex{
+            return ( new PHPRedisMutex( [ $this ], session_id(), $this->app->config[ 'redis.mutextimeout' ] ) );
         }
+
     }

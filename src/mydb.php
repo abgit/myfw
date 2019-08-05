@@ -9,6 +9,10 @@
         /** @var PDO */
         private $pdo = null;
         private $pdo_url = null;
+        private $pdo_host = null;
+        private $pdo_port = null;
+        private $pdo_dbname = null;
+        private $pdo_dsn = null;
         private $pdo_options = array();
 
         /** @var PDOStatement */
@@ -24,20 +28,41 @@
 
         public function __construct( $container ){
 
-            $this->app     = $container;
-            $this->pdo_url = parse_url( $this->app->config[ 'db.dsn' ] );
+            $this->app         = $container;
+            $this->pdo_url     = parse_url( $this->app->config[ 'db.dsn' ] );
+            $this->pdo_host    = $this->pdo_url[ 'host' ];
+            $this->pdo_port    = $this->pdo_url[ 'port' ];
+            $this->pdo_dbname  = substr( $this->pdo_url[ 'path' ], 1 );
+            $this->pdo_options = ( isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) ) ? $this->app[ 'db.options' ] : array();
 
-            if( isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) )
-                $this->pdo_options = $this->app[ 'db.options' ];
+            $this->pdo_scheme  = '';
+            if( isset( $this->pdo_url['scheme'] ) ){
+                switch( $this->pdo_url['scheme'] ){
+                    case 'postgres':
+                    case 'pgsql': $this->pdo_scheme = 'pgsql'; break;
+                    case 'mysql': $this->pdo_scheme = 'mysql'; break;
+                }
+            }
+
+            $this->pdo_query = '';
+            if( isset( $this->pdo_url['query'] ) ){
+                $this->pdo_query = str_replace( '&', ';', $this->pdo_url['query'] );
+            }
+
+            $this->pdo_dsn = sprintf( '%s:host=%s;dbname=%s;port=%s%s', $this->pdo_scheme, $this->pdo_host, $this->pdo_dbname, $this->pdo_port, empty( $this->pdo_query ) ? '' : ';' . $this->pdo_query );
         }
 
         public function & pdo(){
             if( is_null( $this->pdo ) )
-                $this->pdo = new PDO( sprintf( '%s:host=%s;dbname=%s;port=%s', $this->pdo_url['scheme'], $this->pdo_url[ 'host' ], substr( $this->pdo_url[ 'path' ], 1 ), $this->pdo_url[ 'port' ] ), $this->pdo_url[ 'user' ], $this->pdo_url[ 'pass' ], $this->pdo_options );
+                $this->pdo = new PDO( $this->pdo_dsn, $this->pdo_url[ 'user' ], $this->pdo_url[ 'pass' ], $this->pdo_options );
 
             return $this->pdo;
         }
-        
+
+        public function getDSN(){
+            return $this->pdo_dsn;
+        }
+
         public function & msg( $msgs = null, $headers = null ){
 
             $errcode = $this->errorCode();
@@ -134,7 +159,7 @@
                 }
             }
 
-            switch( $this->pdo_url[ 'scheme' ] ){
+            switch( $this->pdo_scheme ){
 
                 case 'pgsql': $this->stmt = $this->pdo()->prepare( 'select * from ' . $procedure_name . '(' . implode( ',', array_keys( $elements ) ) . ')' );
                               break;

@@ -8,6 +8,7 @@
  * @property myajax $ajax
  * @property mybugsnag $bugsnag
  * @property mymemcached $memcached
+ * @property myredis $redis
  * @property myurlfor $urlfor
  * @property myfilters $filters
  * @property myrules $rules

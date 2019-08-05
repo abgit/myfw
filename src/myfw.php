@@ -36,6 +36,9 @@ class myfw{
         $container['memcached'] = function ($c) {
             return new mymemcached($c);
         };
+        $container['redis'] = function ($c) {
+            return new myredis($c);
+        };
         $container['i18n'] = function () {
             return new myi18n();
         };
@@ -290,12 +293,8 @@ class myfw{
 
         // check debug mode
         if( isset( $container->config[ 'app.debug' ] ) && $container->config[ 'app.debug' ] === true ) {
-            $response = $response->withAddedHeader('X-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
-            $response = $response->withAddedHeader('X-myfw-db', $container->db->getDebugsCounter() );
-        }
-
-        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true ) {
-            $container->memcached->ratemonodelete();
+            $response = $response->withAddedHeader('x-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
+            $response = $response->withAddedHeader('x-myfw-d', $container->db->getDebugsCounter() );
         }
 
         return $container->isajax ? $response->withJson( $container->ajax->obj() ) : $response;

@@ -19,10 +19,6 @@ class myexception extends Exception {
 
     public static function response( $code, $message, ?Response $response, $container ){
 
-        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true ) {
-            $container->memcached->ratemonodelete();
-        }
-
         if( is_null( $response ) )
             $response = new \Slim\Http\Response();
 
@@ -30,8 +26,8 @@ class myexception extends Exception {
 
         // check debug mode
         if( isset( $container->config[ 'app.debug' ] ) && $container->config[ 'app.debug' ] === true ) {
-            $response = $response->withAddedHeader('X-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
-            $response = $response->withAddedHeader('X-myfw-db', $container->db->getDebugsCounter() );
+            $response = $response->withAddedHeader('x-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
+            $response = $response->withAddedHeader('x-myfw-d', $container->db->getDebugsCounter() );
         }
 
         switch( $code ){
