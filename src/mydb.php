@@ -25,6 +25,7 @@
 
         private $cache_enable     = false;
         private $cache_expiration;
+        private $cache_prefix;
 
         public function __construct( $container ){
 
@@ -144,7 +145,7 @@
                                             break;
                         case 'json' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : null;
-                                            if( empty( $column_value ) || !is_string( $column_value ) || !is_array( json_decode( $column_value, true ) ) || json_last_error() != 0 ){
+                                            if( empty( $column_value ) || !$this->app->rules->isJsonString( $column_value ) ){
                                                 $column_value = json_encode( $column_value );
                                             }
                                             break;
@@ -201,10 +202,19 @@
             return sprintf("%d in %.3f (%s)", $this->debugs_counter, $this->debugs_sum, implode( "+", $this->debugs ) );
         }
 
-        public function & cache( $expiration = null ){
+        public function & cache( $expiration = null, $prefix = '' ){
             $this->cache_enable     = true;
-            $this->cache_expiration = is_null( $expiration ) ? time() + 300 : $expiration;
+            $this->cache_expiration = is_null( $expiration ) ? 3600 : $expiration;
+            $this->cache_prefix     = $prefix;
             return $this;
+        }
+
+        public function & cacheSession( $expiration = null ){
+            return $this->cache( $expiration, 'dbcachesession' . session_id() );
+        }
+
+        public function & cacheClient( $expiration = null ){
+            return $this->cache( $expiration, 'dbcacheclient' . $this->app->config[ 'db.cacheclient' ] );
         }
 
         // return NULL if cache disable; TRUE if cache enable and found, FALSE if cache enable and missing
@@ -222,15 +232,15 @@
             $args = array_merge( $args, $this->app->config[ 'db.cachereplaceargs' ] );
 
             $hash       = md5( $procedure . json_encode($args) );
-            $key_result = 'dbcache-res-' . $hash;
-            $key_return = 'dbcache-ret-' . $hash;
+            $key_result = $this->cache_prefix . 'dbcache-res-' . $hash;
+            $key_return = $this->cache_prefix . 'dbcache-ret-' . $hash;
 
             // get from cache
-            $cache = $this->app->memcached->getMulti( array( $key_result, $key_return ) );
+            list( $result, $return ) = $this->app->redis->mGet( array( $key_result, $key_return ) );
 
-            if( $this->app->memcached->getResultCode() === \Memcached::RES_SUCCESS && isset( $cache[ $key_result ] ) && isset( $cache[ $key_return ] ) ){
-                $result = $cache[ $key_result ];
-                $return = $cache[ $key_return ];
+            if( $result !== false && $return !== false ){
+                $result = json_decode( $result );
+                $return = json_decode( $return );
 
                 $debug_time = (float)microtime(true) - $debug_start;
                 $this->debugs_counter ++;
@@ -248,10 +258,13 @@
             $args = array_merge( $args, $this->app->config[ 'db.cachereplaceargs' ] );
 
             $hash       = md5( $procedure . json_encode($args) );
-            $key_result = 'dbcache-res-' . $hash;
-            $key_return = 'dbcache-ret-' . $hash;
+            $key_result = $this->cache_prefix . 'dbcache-res-' . $hash;
+            $key_return = $this->cache_prefix . 'dbcache-ret-' . $hash;
 
-            return $this->app->memcached->setMulti( array( $key_result => $result, $key_return => $return ), $this->cache_expiration );
+            $res_result = $this->app->redis->setex( json_encode( $key_result ), $this->cache_expiration, $result );
+            $res_return = $this->app->redis->setex( json_encode( $key_return ), $this->cache_expiration, $return );
+
+            return $res_result === true && $res_return === true;
         }
 
         public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){

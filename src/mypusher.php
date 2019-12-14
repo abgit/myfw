@@ -27,7 +27,7 @@ use \Slim\Http\Response as Response;
             if( isset( $this->pusherObj ) )
                 return false;
 
-            $urloriginal = $this->app->config[ 'pusher.driver' ] === 'heroku' ? getenv( 'PUSHER_URL' ) : $this->app->config[ 'pusher.url' ];
+            $urloriginal = $this->app->config[ 'pusher.url' ];
 
             $url = parse_url( $urloriginal );
 
@@ -53,9 +53,12 @@ use \Slim\Http\Response as Response;
 
         public function checkEndpoint( Request $request, Response $response ){
             $this->init();
-            $channel = $this->app->config[ 'pusher.channel' ];
 
-            if( isset( $_POST['channel_name'] ) && is_string( $_POST['channel_name'] ) && $_POST['channel_name'] === $channel )
+            if( isset( $_POST['channel_name'] ) && is_string( $_POST['channel_name'] ) &&
+                isset( $_POST['socket_id'] ) && is_string( $_POST['socket_id'] ) &&
+                isset( $this->app->config[ 'pusher.privatechannels' ] ) &&
+                is_array( $this->app->config[ 'pusher.privatechannels' ] ) &&
+                in_array( $_POST['channel_name'], $this->app->config[ 'pusher.privatechannels' ] ) )
                 return $response->write( $this->pusherObj->socket_auth($_POST['channel_name'], $_POST['socket_id']) );
 
             return $response->withStatus(403)->write( 'Forbidden' );

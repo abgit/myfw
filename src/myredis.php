@@ -7,6 +7,9 @@ use \malkusch\lock\mutex\PHPRedisMutex;
 
         /** @var mycontainer*/
         private $app;
+        private $mq = array();
+        private $mqlater = array();
+        private $later = null;
 
         public function __construct( $c ){
 
@@ -112,6 +115,190 @@ use \malkusch\lock\mutex\PHPRedisMutex;
 
         public function mutexSession():PHPRedisMutex{
             return ( new PHPRedisMutex( [ $this ], session_id(), $this->app->config[ 'redis.mutextimeout' ] ) );
+        }
+
+        public function listReset( $list ){
+            return $this->mqReset( $list, false );
+        }
+
+        public function listPush( string $list, string $msg, $timeout = null ){
+
+            $hash = md5( $list . $msg );
+
+            if( is_null( $timeout ) )
+                $this->set( $hash, $msg );
+            else
+                $this->setex( $hash, $timeout, $msg );
+
+            return $this->lPush( $list, json_encode( array( 'h' => $hash ) ) );
+        }
+
+        // returns: true - message processed; false - could not process message; null - empty list
+        public function listPop( $list, $function ){
+
+            // check if this process should pause (resetting working)
+            while( $this->exists( $list . 'sleep' ) ){
+                sleep( 1 );
+            }
+
+            while( $value = $this->rpoplpush( $list, $list . 'processed' ) ) {
+
+                $message = json_decode( $value, true );
+
+                //if( isset( $message['h'] ) ){
+
+                    $hash = $message['h'];
+                    $msg  = $this->get( $hash );
+
+                    // if message is not expired
+                    if( is_string( $msg ) ){
+
+                        $result = $function( $msg );
+
+                        // delete from mqprocessed if processed sucessfuly
+                        if( $result === true ){
+                            $this->lRem( $list . 'processed', $value );
+                            $this->del( $hash );
+                            return true;
+                        }
+
+                        return false;
+
+                    }elseif( $msg === false ){
+                        $this->lRem( $list . 'processed', $value );
+                    }
+                //}
+            }
+
+            return null;
+        }
+
+
+        public function mqReset( $queue = 'mq', $wait = 21 ){
+
+            // pause all consumers with a maximum time of 60
+            if( $wait )
+                $this->setex( $queue . 'sleep', 60, 'sleep' );
+
+            // check if mqprocessed queue has elements
+            if( $this->lLen( $queue . 'processed' ) ) {
+
+                // wait some seconds, so that all consumers have stopped
+                if( $wait )
+                    sleep( $wait );
+
+                // move elements to mq list
+                while ($this->rpoplpush( $queue . 'processed', $queue ) ){
+                }
+            }
+
+            if( $wait )
+                $this->del( $queue . 'sleep' );
+        }
+
+        public function mqRegister( $queue, $function ){
+
+            $this->mq[ 'mq' . $queue ] = $function;
+        }
+
+        public function mqPush( string $queue, string $msg, $ttl = null ){
+
+            $hash = md5( 'mq' . $queue . $msg . intval( $ttl ) . uniqid() );
+
+            if( is_null( $ttl ) )
+                $this->set( $hash, $msg );
+            else
+                $this->setex( $hash, $ttl, $msg );
+
+            return $this->lPush( 'mq', json_encode( array( 'q' => 'mq' . $queue, 'h' => $hash ) ) );
+        }
+
+        private function & later():\Islambey\RSMQ\RSMQ{
+            if( is_null( $this->later ) ) {
+                $this->later = new \Islambey\RSMQ\RSMQ($this);
+
+                if( !in_array( 'mqlater', $this->later->listQueues() ) )
+                    $this->later->createQueue( 'mqlater' );
+            }
+            return $this->later;
+        }
+
+        public function mqPushLater( string $queue, string $msg, int $delay, $ttl = null ){
+
+            $hash = md5( 'mq' . $queue . $msg . intval( $delay ) . intval( $ttl ) . uniqid() );
+
+            if( is_null( $ttl ) )
+                $this->set( $hash, $msg );
+            else
+                $this->setex( $hash, $delay + $ttl, $msg );
+
+            return $this->later()->sendMessage( 'mqlater', json_encode( array( 'q' => 'mq' . $queue, 'h' => $hash ) ), [ 'delay' => $delay ] );
+        }
+
+        public function mqProcess(){
+            if( !empty( $this->mq ) ){
+                while( true ) {
+
+                    // check if this process should pause
+                    while( $this->exists( 'mqsleep' ) ){
+                        sleep( 1 );
+                    }
+
+                    // add all delayed messages available to mq. msg hash already added
+                    while( ( $msg = $this->later()->popMessage( 'mqlater' ) ) && isset( $msg['message'] ) ){
+                        $this->lPush( 'mq', $msg['message'] );
+                    }
+
+                    // process delayed message
+/*                    $msg = $this->later()->receiveMessage( 'mqlater' );
+
+                    if( isset( $msg['message'] ) && isset( $msg['id'] ) && $this->lPush( 'mq', $msg['message'] ) ) {
+                        //$hash = $this->processMessage($msg['message']);
+                        //$this->lPush( 'mq', $msg['message'] );
+
+                        //if( is_string( $hash ) && !empty( $hash ) ) {
+                        $this->later()->deleteMessage( 'mqlater', $msg['id'] );
+                        //    $this->del( $hash );
+                        //}elseif( is_null( $hash ) ){
+                        //    $this->later()->deleteMessage( 'mqlater', $msg['id'] );
+                        //}
+                    }*/
+
+                    // process real-time message
+                    $value = $this->brpoplpush( 'mq', 'mqprocessed', 10 );
+                    $hash  = $this->processMessage( $value );
+
+                    if( is_string( $hash ) && !empty( $hash ) ) {
+                        $this->lRem( 'mqprocessed', $value );
+                        $this->del( $hash );
+                    }elseif( is_null( $hash ) ){
+                        $this->lRem( 'mqprocessed', $value );
+                    }
+
+                }
+            }
+        }
+
+        private function processMessage( $value ){
+
+            $message = json_decode( $value, true );
+
+            if( isset( $message['q'] ) && isset( $message['h'] ) ){
+
+                $queue = $message['q'];
+                $hash  = $message['h'];
+                $msg   = $this->get( $hash );
+
+                // if message not found (expired)
+                if( !is_string( $msg ) )
+                    return null;
+
+                // if message exists (not expired) and returns successfuly
+                if( is_string( $msg ) && $this->mq[$queue]($msg) === true )
+                    return $hash;
+            }
+
+            return false;
         }
 
     }

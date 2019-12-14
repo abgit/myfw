@@ -19,12 +19,42 @@ class mysocial{
 
         $json = file_get_contents( 'https://www.instagram.com/' . $username . '/?__a=1' );
         $json = json_decode( $json, true );
+//d( $json );
+        if( !isset( $json[ 'graphql' ][ 'user' ] ) )
+            return false;
 
-        if( isset( $json[ 'user' ][ 'id' ] ) )
-            return array( 'followers' => $json[ 'user' ][ 'followed_by' ][ 'count' ],
-                          'posts'     => $json[ 'user' ][ 'media' ][ 'count' ] );
+        $followers = $json[ 'graphql' ][ 'user' ][ 'edge_followed_by' ][ 'count' ];
 
-        return false;
+        $likes        = 0;
+        $comments     = 0;
+        $interactions = 0;
+        $engage       = array();
+        $posts        = $json[ 'graphql' ][ 'user' ][ 'edge_owner_to_timeline_media' ][ 'edges' ];
+        $videostotal  = count( $posts );
+
+        foreach( $posts as $post ){
+            $likes        += $post[ 'node' ][ 'edge_liked_by' ][ 'count' ];
+            $comments     += $post[ 'node' ][ 'edge_media_to_comment' ][ 'count' ];
+            $interactions += $post[ 'node' ][ 'edge_liked_by' ][ 'count' ] + $post[ 'node' ][ 'edge_media_to_comment' ][ 'count' ];
+            $engage[]      = $interactions / $followers;
+        }
+
+        $return = array( 'title'           => $json[ 'graphql' ][ 'user' ][ 'full_name' ],
+                         'description'     => empty( $json[ 'graphql' ][ 'user' ][ 'biography' ] ) ? null : $json[ 'graphql' ][ 'user' ][ 'biography' ],
+                         'username'        => $json[ 'graphql' ][ 'user' ][ 'username' ],
+                         'isprivate'       => $json[ 'graphql' ][ 'user' ][ 'is_private' ],
+                         'isverified'      => $json[ 'graphql' ][ 'user' ][ 'is_verified' ],
+                         'thumb'           => $json[ 'graphql' ][ 'user' ][ 'profile_pic_url_hd' ],
+                         'followers'       => $followers,
+                         'posts'           => $json[ 'graphql' ][ 'user' ][ 'edge_owner_to_timeline_media' ][ 'count' ],
+                         'categories'      => $json[ 'graphql' ][ 'user' ][ 'business_category_name' ],
+                         'avglatest'       => $videostotal,
+                         'avglikes'        => intval( $likes / $videostotal ),
+                         'avgcomments'     => intval( $comments / $videostotal ),
+                         'avginteractions' => intval( $interactions / $videostotal ),
+                         'avgengage'       => floatval( bcdiv( array_sum( $engage ) * 100 / $videostotal, 1, 3 ) ) );
+
+        return $return;
     }
 
     public function facebook( $url ){
@@ -92,62 +122,88 @@ class mysocial{
         return $res;
     }
 
-
-    public function youtube( $channel_id ){
-
-        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id='.$channel_id.'&fields=items(id%2Csnippet(description%2Ctitle)%2Cstatistics(commentCount%2CsubscriberCount%2CvideoCount%2CviewCount))&key=' . $this->app->config[ 'youtube.key' ] );
+    public function youtubeid( $channel_name ){
+        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=id&forUsername='.$channel_name.'&key=' . $this->app->config[ 'youtube.key' ] );
         $res = json_decode($res, true);
 
-        if( isset( $res['items'][0]['statistics'] ) )
-            return array( 'viewcount'       => $res['items'][0]['statistics']['viewCount'],
-                          'commentcount'    => $res['items'][0]['statistics']['commentCount'],
-                          'subscribercount' => $res['items'][0]['statistics']['subscriberCount'],
-                          'videocount'      => $res['items'][0]['statistics']['videoCount'] );
-
-        return isset( $res['items'][0]['statistics'] ) ? $res['items'][0]['statistics'] : false;
+        return isset( $item['id'] ) ? $item['id'] : null;
     }
 
-    public function youtubeVideos( $channel_id, $total ){
+    public function youtubeChannels( $channel_id, $total = 12 ){
 
-       $nextPageToken = '';
-       $res           = array();
+        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,topicDetails&id='.$channel_id.'&key=' . $this->app->config[ 'youtube.key' ] );
+        $res = json_decode($res, true);
 
-        while(1){
-            $json = file_get_contents( 'https://www.googleapis.com/youtube/v3/search?' . ( empty( $nextPageToken ) ? '' : 'pageToken=' . $nextPageToken . '&' ) . 'order=date&part=snippet&channelId='. $channel_id . '&maxResults=25&key=' . $this->app->config[ 'youtube.key' ] );
-            $json = json_decode( $json, true );
+        $return = array();
 
-            if( !isset( $json[ 'items' ] ) )
-                return $res;                
+        if( isset( $res['items'] ) )
+            foreach ($res['items'] as $item ) {
 
-            foreach( $json[ 'items' ] as $item ){
+            $chid        = $item[ 'id' ];
+            $playlistid  = 'UU' . substr( $chid , 2);
+            $subscribers = empty($item['statistics']['subscriberCount']) ? 0 : intval($item['statistics']['subscriberCount']);
 
-                $jsonvideo = file_get_contents('https://www.googleapis.com/youtube/v3/videos?part=statistics&id='. $item[ 'id' ]['videoId'] . '&key=' . $this->app->config[ 'youtube.key' ] );
-                $jsonvideo = json_decode($jsonvideo, true);
+            // get categories
+            $categories = array();
 
-                if( !isset( $jsonvideo[ 'items' ] ) )
-                    return $res;                
+            if (isset($item['topicDetails']['topicIds']))
+                foreach (array_unique($item['topicDetails']['topicIds']) as $cat)
+                    if (isset($this->app->list->youtubecategories[$cat]))
+                        $categories[] = $this->app->list->youtubecategories[$cat];
 
-                $res[] = array( 'id'          => $item[ 'id' ][ 'videoId' ],
-                                'title'       => $item[ 'snippet' ][ 'title' ],
-                                'description' => $item[ 'snippet' ][ 'description' ],
-                                'date'        => strtotime( $item[ 'snippet' ][ 'publishedAt' ] ),
-                                'videoviews'  => isset( $jsonvideo[ 'items' ][0]['statistics']['viewCount'] )    ? intval( $jsonvideo[ 'items' ][0]['statistics']['viewCount'] )    : null,
-                                'likes'       => isset( $jsonvideo[ 'items' ][0]['statistics']['likeCount'] )    ? intval( $jsonvideo[ 'items' ][0]['statistics']['likeCount'] )    : null,
-                                'comments'    => isset( $jsonvideo[ 'items' ][0]['statistics']['commentCount'] ) ? intval( $jsonvideo[ 'items' ][0]['statistics']['commentCount'] ) : null );
-
-                if( $total < 2 )
-                    return $res;
-
-                $total--;
-            }
-
-            if( !isset( $json[ 'nextPageToken' ] ) )
-                return $res;                
-
-            $nextPageToken = $json[ 'nextPageToken' ];
+            $return[ $chid ] = array(
+                'title' => $item['snippet']['title'],
+                'description' => $item['snippet']['description'],
+                'playlistid'  => $playlistid,
+                'username' => isset($item['snippet']['customUrl']) ? $item['snippet']['customUrl'] : null,
+                'countrycode' => isset($item['snippet']['country']) ? $item['snippet']['country'] : null,
+                'countryname' => isset($item['snippet']['country']) && isset($this->app->list->countries[$item['snippet']['country']]) ? $this->app->list->countries[$item['snippet']['country']] : null,
+                'thumb' => $item['snippet']['thumbnails']['high']['url'],
+                'views'           => empty( $item['statistics']['viewCount'] )       ? null : intval( $item['statistics']['viewCount'] ),
+                'comments'        => empty( $item['statistics']['commentCount'] )    ? null : intval( $item['statistics']['commentCount'] ),
+                'subscribers' => $subscribers,
+                'videos'          => empty( $item['statistics']['videoCount'] )      ? null : intval( $item['statistics']['videoCount'] ),
+                'categories' => implode(' ', $categories),
+  //              'avglatest' => $videostotal,
+  //              'avgviews' => $videostotal == 0 ? 0 : intval($views / $videostotal),
+  //              'avglikes' => $videostotal == 0 ? 0 : intval($likes / $videostotal),
+  //              'avgcomments' => $videostotal == 0 ? 0 : intval($comments / $videostotal),
+  //              'avginteractions' => $videostotal == 0 ? 0 : intval($interactions / $videostotal),
+  //              'avgengage' => $videostotal == 0 ? 0 : floatval(bcdiv(array_sum($engage) * 100 / $videostotal, 1, 3))
+                );
         }
 
-        return $res;
+        //d( $return );
+        return $return;
+    }
+
+
+    public function youtubePlaylist( $playlistid, $maxResults = 12 ){
+
+        $json = file_get_contents('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=' . $playlistid . '&maxResults=' . $maxResults . '&key=' . $this->app->config['youtube.key']);
+        $json = json_decode($json, true);
+
+        $videoids = array();
+
+        foreach ($json['items'] as $item)
+            if (isset($item['snippet']['resourceId']['videoId']))
+                $videoids[] = $item['snippet']['resourceId']['videoId'];
+
+        return $videoids;
+    }
+
+    public function youtubeVideos( $videoid ){
+
+        $json = file_get_contents('https://www.googleapis.com/youtube/v3/videos?part=statistics&id=' . $videoid . '&key=' . $this->app->config['youtube.key']);
+        $json = json_decode($json, true);
+
+        $return = array();
+
+        foreach ($json['items'] as $item)
+            if (isset($item['statistics']))
+                $return[ $item['id'] ] = $item['statistics'];
+
+        return $return;
     }
 
 

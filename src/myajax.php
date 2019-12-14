@@ -34,6 +34,11 @@ class myajax{
         return $this->msg( $msg, empty( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Errors found' : 'Error found' ) : $header, array( 'theme' => 'growl-error' ) + $args );
     }
 
+    public function & alert( $message ){
+        $this->out[ 'al' ][] = array( 'm' => $message );
+        return $this;
+    }
+
     public function & addFormCsrf( $element, $csrf ){
         $this->out[ 'cs' ][] = array( 'e' => $element, 'v' => $csrf );
         return $this;

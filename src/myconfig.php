@@ -80,7 +80,7 @@ class myconfig implements arrayaccess{
             $prefix  = $vars[ 1 ];
         }
 
-        switch( $setting{0} ){
+        switch( $setting[0]){
             case '@': /** @noinspection PhpUnusedLocalVariableInspection */
                 list( $all, $variable, $sufix ) = $this->configparse( $setting );
                       $var = $this->getenvconfigvar( $variable );

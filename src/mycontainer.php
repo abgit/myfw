@@ -48,5 +48,6 @@
  * @property boolean $isajax
  * @property boolean $isreferer
  * @property string $ipaddress
+ * @property string $host
  */
 class mycontainer extends \Slim\Container {}

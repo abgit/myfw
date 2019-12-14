@@ -106,8 +106,8 @@ class myform{
     }
 
     public function & addHidden( $name ){
-        $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
-        $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+        $htmlname = ( $name[0] == '@' ? substr( $name, 1 ) : $this->formname . $name );
+        $name     = ( $name[0] == '@' ? substr( $name, 1 ) : $name );
         $this->elements[ $name ] = array( 'type' => 'hidden', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => '', 'rules' => array(), 'filters' => array(), 'options' => array() );	
         return $this;
     }
@@ -173,8 +173,8 @@ class myform{
 
 
     public function & addStaticImage( $name, $label, $help = '', $width = '', $height = '', $align = '', $showvalue = true ){
-        $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
-        $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+        $htmlname = ( $name[0] == '@' ? substr( $name, 1 ) : $this->formname . $name );
+        $name     = ( $name[0] == '@' ? substr( $name, 1 ) : $name );
         $this->elements[ $name ] = array( 'type' => 'staticimage', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'width' => $width, 'height' => $height, 'rules' => array(), 'filters' => array(), 'options' => array(), 'align' => $align, 'help' => $help, 'showvalue' => $showvalue );
         return $this;
     }
@@ -406,8 +406,8 @@ class myform{
 
         $rules[ 'selectvalid' ] = array( $label . ' is not valid', $options );
 
-        $htmlname = ( $name{0} == '@' ? substr( $name, 1 ) : $this->formname . $name );
-        $name     = ( $name{0} == '@' ? substr( $name, 1 ) : $name );
+        $htmlname = ( $name[0] == '@' ? substr( $name, 1 ) : $this->formname . $name );
+        $name     = ( $name[0] == '@' ? substr( $name, 1 ) : $name );
 
         $this->elements[ $name ] = array( 'type' => 'select', 'valuetype' => 'simple', 'name' => $htmlname, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options, 'help' => $help );
 

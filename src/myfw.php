@@ -13,9 +13,8 @@ class myfw{
         /** @var mycontainer $container */
         $container = $this->container = $app->getContainer();
 
-        $container['ipaddress'] = function () {
-            return $_SERVER['REMOTE_ADDR'];
-        };
+        $container['ipaddress'] = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : null;
+        $container['host']      = isset( $_SERVER['HTTP_HOST'] )   ? $_SERVER['HTTP_HOST']   : null;
 
         // services
         $container['config'] = function ($c) {
@@ -130,20 +129,21 @@ class myfw{
             return new myform($c);
         });
 
+        if( php_sapi_name() != "cli" ) {
+            $app->add(new \Slim\Middleware\Session([
+                'name'        => 'mysession',
+                'autorefresh' => true,
+                'lifetime'    => '20 minutes'
+            ]));
 
-        $app->add(new \Slim\Middleware\Session([
-            'name'        => 'mysession',
-            'autorefresh' => true,
-            'lifetime'    => '20 minutes'
-        ]));
+            $container['session'] = function () {
+                ( new mysession( [ 'name'        => 'mysession',
+                                   'autorefresh' => true,
+                                   'lifetime'    => '20 minutes' ] ) )->start();
 
-        $container['session'] = function () {
-            ( new mysession( [ 'name'        => 'mysession',
-                               'autorefresh' => true,
-                               'lifetime'    => '20 minutes' ] ) )->start();
-
-            return new \SlimSession\Helper;
-        };
+                return new \SlimSession\Helper;
+            };
+        }
 
 
         $container['confirm'] = function ($c) {
@@ -242,7 +242,6 @@ class myfw{
             return hash_hmac( 'sha256', $c['filestack.policy'], $c->config[ 'filestack.secret' ] );
         };
 
-        $app->post( '/pusher/auth', 'mypusher:checkEndpoint' );
     }
 
     /** @throws myexception */
@@ -262,12 +261,12 @@ class myfw{
             return ( $request->isPost() && !empty( $hostname ) && !empty( $referer ) && strpos( strtolower( $referer ), strtolower( $hostname ) ) !== false );
         };
 
-        if ( isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->redis->rateisvalid() ) {
+        if ( php_sapi_name() !== 'cli' && isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->redis->rateisvalid() ) {
             throw new myexception(myexception::RATELIMIT,
                 'Too much requests. Please wait ' . $container->redis->ratelocktimeout() . 's and try again.');
         }
 
-        if ( isset( $container->config[ 'app.cidr' ] ) && php_sapi_name() !== 'cli' && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
+        if ( php_sapi_name() !== 'cli' && isset( $container->config[ 'app.cidr' ] ) && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
             throw new myexception(myexception::FORBIDDEN,
                 'IP ' . $_SERVER['REMOTE_ADDR'] . ' not in APP cidr whitelist.' );
         }

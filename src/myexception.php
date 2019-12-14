@@ -12,6 +12,7 @@ class myexception extends Exception {
     const STOP         = 106;
     const REDIRECTOK   = 107;
     const FORBIDDEN    = 108;
+    const LOGOUT       = 109;
 
     public function __construct( $code, $message = '' ) {
         parent::__construct( $message, $code);
@@ -41,6 +42,7 @@ class myexception extends Exception {
                     return $response->withRedirect( $message );
                 }
                 break;
+
 
             case myexception::ERROR:
 
@@ -92,6 +94,20 @@ class myexception extends Exception {
                                     ->write( $message );
                 }
                 break;
+
+            case myexception::LOGOUT:
+                if( $container->ismobile ) {
+                    return $response->withJson($container->ajax->alert('Forbidden')
+                        ->obj());
+                }elseif( $container->isajax ) {
+                    return $response->withJson( $container->ajax->redirect( $message, '', 1000, $code == myexception::REDIRECTOK )
+                        ->obj() );
+                }else {
+                    return $response->withRedirect( $message );
+                }
+
+                break;
+
         }
 
         return false;

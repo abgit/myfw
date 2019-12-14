@@ -10,7 +10,7 @@
         }
 
         public function islogged(){
-            return isset( $this->app->session['myclient'][ 'uuid'] );
+            return isset( $this->app->session['myclient'][ 'uuid' ] );
         }
 
         public function getAll(){
@@ -55,11 +55,7 @@
         }
 
         public function offsetGet( $setting ) {
-
-            if( isset( $this->app->session['myclient'][ $setting ] ) )
-                return $this->app->session['myclient'][ $setting ];
-
-            return null;
+            return $this->offsetExists( $setting ) ? $this->app->session['myclient'][ $setting ] : null;
         }
 
         public function offsetSet( $offset, $value ) {
@@ -72,7 +68,7 @@
         }
 
         public function offsetExists( $offset ) {
-            return isset($this->app->session['myclient'][ $offset ] );
+            return is_string( $offset ) && !empty( $offset ) && isset( $_SESSION ) && isset( $this->app->session['myclient'] ) && isset($this->app->session['myclient'][ $offset ] );
         }
 
         public function offsetUnset( $offset ) {
