@@ -1,5 +1,6 @@
 <?php
 
+
 // TODO: port variables to social.* syntax
 class mysocial{
 
@@ -10,18 +11,24 @@ class mysocial{
         $this->app = $c;
     }
 
-    public function instagram( $url ){
+    public function instagram( $url ): array {
 
         $username = $this->app->filters->usernameinstagram( $url );
 
-        if( !$username )
-           return false;
+        if( !$username ) {
+            return array();
+        }
 
-        $json = file_get_contents( 'https://www.instagram.com/' . $username . '/?__a=1' );
-        $json = json_decode( $json, true );
-//d( $json );
-        if( !isset( $json[ 'graphql' ][ 'user' ] ) )
-            return false;
+        $req = Requests::get( 'https://www.instagram.com/' . $username . '/?__a=1' );
+        if( !$req->success ){
+            return array();
+        }
+
+        $json = json_decode($req->body, true, 512, JSON_THROW_ON_ERROR);
+
+        if( !isset( $json[ 'graphql' ][ 'user' ] ) ) {
+            return array();
+        }
 
         $followers = $json[ 'graphql' ][ 'user' ][ 'edge_followed_by' ][ 'count' ];
 
@@ -33,28 +40,25 @@ class mysocial{
         $videostotal  = count( $posts );
 
         foreach( $posts as $post ){
-            $likes        += $post[ 'node' ][ 'edge_liked_by' ][ 'count' ];
-            $comments     += $post[ 'node' ][ 'edge_media_to_comment' ][ 'count' ];
-            $interactions += $post[ 'node' ][ 'edge_liked_by' ][ 'count' ] + $post[ 'node' ][ 'edge_media_to_comment' ][ 'count' ];
-            $engage[]      = $interactions / $followers;
+            $likes        += (int)$post[ 'node' ][ 'edge_liked_by' ][ 'count' ];
+            $comments     += (int)$post[ 'node' ][ 'edge_media_to_comment' ][ 'count' ];
+            $interactions += (int)$post[ 'node' ][ 'edge_liked_by' ][ 'count' ] + (int)$post[ 'node' ][ 'edge_media_to_comment' ][ 'count' ];
         }
 
-        $return = array( 'title'           => $json[ 'graphql' ][ 'user' ][ 'full_name' ],
-                         'description'     => empty( $json[ 'graphql' ][ 'user' ][ 'biography' ] ) ? null : $json[ 'graphql' ][ 'user' ][ 'biography' ],
-                         'username'        => $json[ 'graphql' ][ 'user' ][ 'username' ],
-                         'isprivate'       => $json[ 'graphql' ][ 'user' ][ 'is_private' ],
-                         'isverified'      => $json[ 'graphql' ][ 'user' ][ 'is_verified' ],
-                         'thumb'           => $json[ 'graphql' ][ 'user' ][ 'profile_pic_url_hd' ],
-                         'followers'       => $followers,
-                         'posts'           => $json[ 'graphql' ][ 'user' ][ 'edge_owner_to_timeline_media' ][ 'count' ],
-                         'categories'      => $json[ 'graphql' ][ 'user' ][ 'business_category_name' ],
-                         'avglatest'       => $videostotal,
-                         'avglikes'        => intval( $likes / $videostotal ),
-                         'avgcomments'     => intval( $comments / $videostotal ),
-                         'avginteractions' => intval( $interactions / $videostotal ),
-                         'avgengage'       => floatval( bcdiv( array_sum( $engage ) * 100 / $videostotal, 1, 3 ) ) );
-
-        return $return;
+        return array( 'title'           => $json[ 'graphql' ][ 'user' ][ 'full_name' ],
+                      'description'     => empty( $json[ 'graphql' ][ 'user' ][ 'biography' ] ) ? null : $json[ 'graphql' ][ 'user' ][ 'biography' ],
+                      'username'        => $json[ 'graphql' ][ 'user' ][ 'username' ],
+                      'isprivate'       => $json[ 'graphql' ][ 'user' ][ 'is_private' ],
+                      'isverified'      => $json[ 'graphql' ][ 'user' ][ 'is_verified' ],
+                      'thumb'           => $json[ 'graphql' ][ 'user' ][ 'profile_pic_url_hd' ],
+                      'followers'       => $followers,
+                      'postscounter'    => $json[ 'graphql' ][ 'user' ][ 'edge_owner_to_timeline_media' ][ 'count' ],
+                      'categories'      => $json[ 'graphql' ][ 'user' ][ 'business_category_name' ],
+                      'avglatest'       => $videostotal,
+                      'avglikes'        => $videostotal > 0 ? (int)($likes / $videostotal) : 0,
+                      'avgcomments'     => $videostotal > 0 ? (int)($comments / $videostotal) : 0,
+                      'avginteractions' => $videostotal > 0 ? (int)($interactions / $videostotal) : 0,
+                      'posts'           => $posts );
     }
 
     public function facebook( $url ){
@@ -129,9 +133,9 @@ class mysocial{
         return isset( $item['id'] ) ? $item['id'] : null;
     }
 
-    public function youtubeChannels( $channel_id, $total = 12 ){
+    public function youtubeChannels( $channel_id ){
 
-        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,topicDetails&id='.$channel_id.'&key=' . $this->app->config[ 'youtube.key' ] );
+        $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id='.$channel_id.'&key=' . $this->app->config[ 'youtube.key' ] );
         $res = json_decode($res, true);
 
         $return = array();

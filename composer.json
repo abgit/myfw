@@ -15,8 +15,6 @@
          "mailgun/mailgun-php": "2.*",
 		 
 	     "linusu/bitcoin-address-validator": "0.*",
-		 
-		 "christian-riesen/otp": "1.*",
 
 		 "pusher/pusher-php-server": "^3",
 
@@ -28,6 +26,9 @@
 		 "ezyang/htmlpurifier": "4.*",
 
 		 "nexmo/client": "1.*"
+	},
+	"require-dev": {
+		"roave/security-advisories": "dev-master"
 	},
 	"autoload": {
          "psr-0": {

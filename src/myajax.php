@@ -2,11 +2,11 @@
 
 class myajax{
 
-    protected $out = array();
+    protected array $out = array();
 
     public function & msg( $msg, $header = null, $args = array() ){
 
-        if( !is_null( $header ) ){
+        if($header !== null){
             $args[ 'header' ] = $header;
         }
 
@@ -115,7 +115,7 @@ class myajax{
     }
 
     public function & confirm( $url, $msg, $title, $description, $help, $mode, $requirepin, $pinLabel, $pinHelp ){
-        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 'd' => $description, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => intval( $requirepin ), 'l' => $pinLabel, 'p' => $pinHelp );
+        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 'd' => $description, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => (int)$requirepin, 'l' => $pinLabel, 'p' => $pinHelp );
         return $this;
     }
 
@@ -253,6 +253,16 @@ class myajax{
         return $this;
     }
 
+    public function & hCaptchaReset(){
+        $this->out[ 're' ] = 1;
+        return $this;
+    }
+
+    public function & gCaptchaReset(){
+        $this->out[ 'gc' ] = 1;
+        return $this;
+    }
+
     public function & hideTableRow( $el, $table ){
         $this->out[ 'hr' ][] = array( 'e' => $el, 't' => $table );
         return $this;
@@ -272,6 +282,10 @@ class myajax{
         $this->out[ 'di' ][] = array( 'e' => $el, 'b' => $bool );
         return $this;
     }
+    public function & displayType( $el, $type ){
+        $this->out[ 'dt' ][] = array( 'e' => $el, 't' => $type );
+        return $this;
+    }
 
     public function & fadeOut( $el, $duration = 400 ){
         $this->out[ 'fo' ][] = array( 'e' => $el, 'd' => $duration );
@@ -288,8 +302,9 @@ class myajax{
         return $this;
     }
 
-    public function filter( $s, $escape = false ){
-        return trim( preg_replace( "@( )*[\r\n\t]+( )*@", " ", $escape === false ? $s : htmlspecialchars( $s ) ) );
+    public function filter( $s, $escape = false ): string
+    {
+        return trim( preg_replace( "@( )*[\r\n\t]+( )*@", ' ', !$escape ? $s : htmlspecialchars( $s, ENT_COMPAT | ENT_HTML401 ) ) );
     }
 
     public function & timeout( $action, $ms, $mode = 0 ){
@@ -336,8 +351,12 @@ class myajax{
         return $this->out;
     }
 
+    public function setObj( array $obj ){
+        $this->out = $obj;
+    }
+
     public function __toString(){
-        return json_encode( $this->obj() );
+        return (string)json_encode($this->obj(), JSON_THROW_ON_ERROR, 512);
     }
 
 }

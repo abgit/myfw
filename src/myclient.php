@@ -17,39 +17,6 @@
             return isset( $this->app->session['myclient'] ) && is_array( $this->app->session['myclient'] ) ? $this->app->session['myclient'] : array();
         }
 
-        public function ipaddress(){
-
-            if (isset($_SERVER)) {
-                if (isset($_SERVER["HTTP_X_FORWARDED_FOR"]))
-                    return $_SERVER["HTTP_X_FORWARDED_FOR"];
-
-                if (isset($_SERVER["HTTP_CLIENT_IP"]))
-                    return $_SERVER["HTTP_CLIENT_IP"];
-
-                if (isset($_SERVER["REMOTE_ADDR"]))
-                    return $_SERVER["REMOTE_ADDR"];
-
-            }elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-                return getenv('HTTP_X_FORWARDED_FOR');
-
-            }elseif (getenv('HTTP_CLIENT_IP')){
-                return getenv('HTTP_CLIENT_IP');
-
-            }elseif (getenv('REMOTE_ADDR')) {
-                return getenv('REMOTE_ADDR');
-            }
-
-            return null;
-        }
-
-        public function countryCode(){
-            return function_exists('geoip_country_code_by_name') ? geoip_country_code_by_name( $this->ipaddress() ) : null;
-        }
-
-        public function countryName(){
-            return function_exists('geoip_country_name_by_name') ? geoip_country_name_by_name( $this->ipaddress() ) : null;
-        }
-
         public function useragent(){
             return $_SERVER['HTTP_USER_AGENT'];
         }

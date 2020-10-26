@@ -5,18 +5,19 @@ class myi18n{
     /** @var mycontainer*/
     private $app;
 
-    private $lang    = 'en_US';
-    private $session = false;
-    private $codeset = 'UTF-8';
-    private $domain  = 'myfw';
-    private $path;
+    private string $lang = 'en_US';
+    private bool $session = false;
+    private string $codeset = 'UTF-8';
+    private string $domain = 'myfw';
+    private string $path;
 
-    public function __contruct( $c ){
+    public function __construct( $c ){
         $this->app = $c;
     }
 
     // session: read from session if exists
-    public function & setLang( $lang, $session = false, $updatesession = false ){
+    public function & setLang( $lang, $session = false, $updatesession = false ): myi18n
+    {
         $this->lang = $session ? $this->app->session->get( 'i18n.session', $lang ) : $lang;
 
         if( $updatesession ){
@@ -26,25 +27,29 @@ class myi18n{
         return $this;
     }
 
-    public function & setPath( $path ){
+    public function & setPath( $path ): myi18n
+    {
         $this->path = $path;
         $this->updatebind();
         return $this;
     }
 
-    public function & setCodeset( $codeset ){
+    public function & setCodeset( $codeset ): myi18n
+    {
         $this->codeset = $codeset;
         $this->updatebind();
         return $this;
     }
 
-    public function & setDomain( $domain ){
+    public function & setDomain( $domain ): myi18n
+    {
         $this->domain = $domain;
         $this->updatebind();
         return $this;
     }
 
-    private function & updatebind(){
+    private function & updatebind(): myi18n
+    {
         putenv( 'LC_ALL=' . $this->lang );
         setlocale( LC_ALL, $this->lang );
         bindtextdomain( $this->domain, $this->path );
@@ -58,7 +63,7 @@ class myi18n{
         // singular/plural
         if( is_string( $p ) && is_numeric( $i ) ){
 
-            if( intval( $i ) === 1 ){
+            if( (int)$i === 1 ){
                 $str = gettext( $s );
                 $arr = is_null( $o1 ) ? array("") : ( is_array( $o1 ) ? $o1 : array( $o1 ) );
             }else{
@@ -74,6 +79,6 @@ class myi18n{
 
         array_unshift( $arr, $str );
 
-        return call_user_func_array( 'sprintf', $arr );
+        return sprintf(...$arr);
     }     
 }

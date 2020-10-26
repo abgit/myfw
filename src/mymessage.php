@@ -15,7 +15,7 @@ class mymessage{
     private $customsubheader;
     private $video;
     private $offset;
-    private $reltitle;
+    private ?string $reltitle;
     private $relmessagekey;
     private $messagevars = array();
     private $messageprefix;
@@ -23,6 +23,7 @@ class mymessage{
     private $values = array();
     private $tip = false;
     private $depends = '';
+    private $onSetValues = null;
 
     public function __construct( $c ){
         $this->app = $c;
@@ -67,7 +68,12 @@ class mymessage{
         $this->elements[] = array( 'type' => 'title' , 'text' => $title );
         return $this;
     }
-    
+
+    public function & addTitleRelative( $key ){
+        $this->elements[] = array( 'type' => 'titlerelative' , 'key' => $key );
+        return $this;
+    }
+
     public function & ajaxUpdateTitle( $title ){
         $this->app->ajax->text( '#msg' . $this->name . 't', $this->app->ajax->filter( $title ) );
         return $this;
@@ -78,14 +84,19 @@ class mymessage{
         return $this;
     }
 
+    public function & addMessageRelative( $key ){
+        $this->elements[] = array( 'type' => 'messagerelative', 'key' => $key );
+        return $this;
+    }
+
     public function & setMessageAddon( $prefix, $sufix = '' ){
         $this->messageprefix = $prefix;
         $this->messagesufix  = $sufix;
         return $this;
     }
 
-    public function & addMessageTemplate( $message ){
-        $this->elements[] = array( 'type' => 'messagetemplate', 'message' => $message );
+    public function & addMessageTemplate( $message, $paragraph = true ){
+        $this->elements[] = array( 'type' => 'messagetemplate', 'message' => $message, 'p' => $paragraph );
         return $this;
     }
 
@@ -94,8 +105,18 @@ class mymessage{
         return $this;
     }
 
-    public function & addCustom( $name, $obj ){
-        $this->elements[] = array( 'type' => 'custom' , 'obj' => $obj, 'name' => $name );
+    public function & addCustom( $name, $obj, $htmlbox = true ){
+        $this->elements[ $name ] = array( 'type' => 'custom' , 'obj' => $obj, 'name' => $name, 'htmlbox' => $htmlbox );
+        return $this;
+    }
+
+    public function & addImage( $key, $keyA ){
+        $this->elements[] = array( 'type' => 'image', 'key' => $key, 'keyA' => $keyA );
+        return $this;
+    }
+
+    public function & addImageList( $list ){
+        $this->elements[] = array( 'type' => 'imagelist', 'list' => $list );
         return $this;
     }
 
@@ -104,15 +125,6 @@ class mymessage{
         return $this;
     }
 
-    public function & addTitleRelative( $title ){
-        $this->reltitle = $title;
-        return $this;
-    }
-
-    public function & addMessageRelative( $messagekey ){
-        $this->relmessagekey = $messagekey;
-        return $this;
-    }
 
     public function & setTip(){
 
@@ -136,20 +148,30 @@ class mymessage{
         return $response;
     }
 
-    public function & setValues( $values ){
+    public function & setOnSetValues( $fn ):mymessage{
+        $this->onSetValues = $fn;
+        return $this;
+    }
+
+    public function & setValues( $values ): mymessage{
+
+        if( is_callable( $this->onSetValues ) ) {
+            $values = call_user_func($this->onSetValues, $values);
+        }
 
         $val = '';
 
         if( is_string( $values ) )
             $val = json_decode( $values, true );
 
+        if( isset( $this->reltitle, $values[ $this->reltitle ] ) )
+            $this->addTitle( $values[ $this->reltitle ] );
+
+
         if( json_last_error() !== JSON_ERROR_NONE ){
             $this->addMessage( $values );
 
         }else{
-
-            if( isset( $val[ $this->reltitle ] ) )
-                $this->addTitle( $this->reltitle );
 
             if( isset( $val[ $this->relmessagekey ] ) )
                 $this->addMessage( $val[ $this->relmessagekey ] );
@@ -188,8 +210,8 @@ class mymessage{
         return $this;
     }
 
-    public function & addButton( $label, $icon, $urlobj, $class = '', $color = false, $colorbackground = false ){
-        $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'urlobj' => $urlobj, 'class' => $class, 'color' => $color, 'colorbackground' => $colorbackground );
+    public function & addButton( $label, $icon, $urlobj, $class = '', $color = false, $colorbackground = false, $htmlid = '' ){
+        $this->elements[] = array( 'type' => 'button', 'label' => $label, 'icon' => $icon, 'urlobj' => $urlobj, 'class' => $class, 'color' => $color, 'colorbackground' => $colorbackground, 'htmlid' => $htmlid );
         return $this;
     }
 

@@ -10,7 +10,8 @@
             $this->app = $c;
         }
 
-        public function action( $action, $options = array() ){
+        public function action( $action, $options = array() ): ?string
+        {
             try {
                 return $this->app->router->pathFor($action, $options);
             }catch (Exception $e){
@@ -18,34 +19,47 @@
             }
         }
 
-        public function ajax( $action, $options = array(), $msg = false ){
+        public function ajax( $action, $options = array(), $msg = false ): string
+        {
             return "myfwsubmit('" . $this->action( $action, $options ) . "'" . ( is_string( $msg ) ? ( ",'" . $msg . "'" ) : '' ) . ")";
         }
 
-        public function ajaxObj( $action, $options = array(), $msg = false ){
+        public function ajaxObj( $action, $options = array(), $msg = false ): array
+        {
             return array( 'obj' => 'urlajax',
                           'url' => $this->action( $action, $options ),
                           'msg' => $msg );
         }
 
-        public function obj( $action, $options = array(), $target = '' ){
+        public function obj( $action, $options = array(), $target = '' ): array
+        {
             return array( 'obj'    => 'url',
                           'url'    => $this->action( $action, $options ),
                           'target' => $target );
         }
 
-        public function external( $url, $target = '' ){
+        public function external( $url, $target = '' ): array
+        {
             return array( 'obj'    => 'url',
                           'url'    => $url,
                           'target' => $target );
         }
 
-        public function redir( $action, $options = array() ){
+        public function href( $key, $target = '_blank' ): array
+        {
+            return array( 'obj'    => 'url',
+                          'urlkey' => $key,
+                          'target' => $target );
+        }
+
+        public function redir( $action, $options = array() ): array
+        {
             return array( 'obj'    => 'redir',
                           'url'    => $this->action( $action, $options ) );
         }
 
-        public function multiple( $urls, $code, $keys, $default ){
+        public function multiple( $urls, $code, $keys, $default ): array
+        {
             return array( 'obj'     => 'urls',
                           'urls'    => $urls,
                           'code'    => $code,
@@ -53,17 +67,19 @@
                           'default' => $default );
         }
 
-        public function ajaxForm( $formname, $action, $submitbutton = '', $msg = 'Loading ...', $delay = 0 ){
+        public function ajaxForm( $formname, $action, $submitbutton = '', $msg = 'Loading ...', $delay = 0 ): array
+        {
             return array( 'obj'          => 'urlsubmit',
                           'formname'     => $formname,
                           'submitbutton' => $formname . $submitbutton,
                           'msg'          => $msg,
                           'action'       => $action,
-                          'delay'        => intval( $delay ) );
+                          'delay'        => (int)$delay);
         }
 
 
-        public function urlobj( $val, $valuearray = array(), $tags = array() ){
+        public function urlobj( $val, $valuearray = array(), $tags = array() ): string
+        {
 
             if( is_array( $val ) && isset( $val[ 'obj' ] ) ){
                 switch( $val[ 'obj' ] ){
@@ -77,11 +93,14 @@
             return '';
         }
 
-        public function _urlobj( $val, $valuearray = array(), $tags = array() ){
+        public function _urlobj( $val, $valuearray = array(), $tags = array() ): string
+        {
             if( is_array( $val ) && isset( $val[ 'obj' ] ) ){
 
                 if( isset( $val[ 'url' ] ) ){
                     $url = ( !empty( $valuearray ) && !empty( $tags ) ) ? $this->app->filters->replaceurl( $val[ 'url' ], $valuearray, $tags ) : $val[ 'url' ];
+                }elseif( isset( $val[ 'urlkey' ] ) ) {
+                    $url = $valuearray[ $val[ 'urlkey' ] ] ?? null;
                 }else{
                     $url = null;
                 }
@@ -96,7 +115,8 @@
             return '';
         }
 
-        public function _urlobjmultiple( $url, $values ){
+        public function _urlobjmultiple( $url, $values ): string
+        {
 
             if( is_array( $url ) ){
                 $keys               = $url[ 'keys' ];
@@ -106,13 +126,15 @@
 
                 if( isset( $values[ $urlmultiplekey ] ) ){
                     foreach( $url as $i => $urlobj ){
-                        if( strval( $i ) === strval( $values[ $urlmultiplekey ] ) ){
+                        if( (string)$i === (string)$values[$urlmultiplekey]){
                             return $this->_urlobj( $urlobj, $values, $keys );
                         }
                     }
                 }
 
-                return is_string( $urlmultipledefault ) ? $this->_urlobj( $urlmultipledefault, $values, $keys ) : '';
+                if( is_string( $urlmultipledefault ) ) {
+                    return $this->_urlobj($urlmultipledefault, $values, $keys);
+                }
             }
             return '';
         }

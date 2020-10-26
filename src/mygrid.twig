@@ -1,15 +1,24 @@
 
 {% if allitems %}
 
-    {% if title %}
-        <h6 class="heading"><i{% if title.icon %} class="{{ title.icon }}"{% endif %}></i> {{ title.label }}{{ title.labelkey }}</h6>
-    {% endif %}
 
     {% if buttons is not empty %}
-    <div class="row">
+    <div class="row grid-buttons">
         <div class="col-md-12 text-right">
+
+            {% if title %}
+                <div class="grid-title">
+                    <h3>{% if title.icon %}<i class="{{ title.icon }}"></i>{% endif %}
+                        {{ title.label }}{{ title.labelkey }}
+                        <small>{{ title.description }}</small>
+                    </h3>
+                </div>
+            {% endif %}
+
+
+
         {% for button in buttons %}
-            <a style="margin-left:3px;" type="button" class="btn btn-{{button.class}}" onclick="{{ button.onclick }}"><i class="{{ button.icon }}"></i> {{ button.label }}</a>
+            <a id="{{ button.id }}" style="margin-left:3px;" type="button" class="btn btn-{{button.class}}" {{ button.onclick|urlobj }}><i class="{{ button.icon }}"></i> {{ button.label }}</a>
         {% endfor %}
         </div>
     </div>
@@ -18,15 +27,19 @@
     {{ menuhtml|raw }}
 
     <div style="overflow-y:visible">
-				                <div role="grid">
+				                <div role="grid" id="{{ name }}div">
                                     <table id="{{ name }}table" class="table table-bordered dataTable" style="width:100%;max-width:100%;">
-				                    <thead>
+
+                                        {% if showheaders %}
+                                    <thead>
 				                        <tr role="row">
                                 		{% for col in labels %}
                                             <th role="columnheader" class="text-center{%if col.class %} {{col.class}}{% endif %}{%if orderby and orderby == col.key %} {{ orderbya == 1 ? 'sorting_asc' : 'sorting_desc' }}{% endif %}"{%if col.width %} width="{{col.width}}"{% endif %}>{{col.label}}</th>
                                         {% endfor %}
                                         </tr>
 				                    </thead>
+                                        {% endif %}
+
 				                <tbody id="{{ name }}">
 {% endif %}
 
@@ -37,9 +50,11 @@
                                 		{% for val in values %}
                                         <tr{% if val[ key ] %} id="{{ name }}{{ val[ key ] }}"{% endif %}{% if rowclass and val[ rowclassdepends ] %} class="{{ rowclass }}"{% endif %}>
 
+                                            {% set loop_1 = loop.index %}
+
                                     		{% for col in labels %}
                                             
-				                            <td{% if col.align or col.class %} class="{{ col.class }}{{ col.align ? ' text-' ~ col.align }}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}{%if col.onclick %} onclick="{{ col.onclick|replaceurl( val, tags ) }}" style="cursor:pointer"{% endif %}>
+				                            <td id="{{ name }}_{{ loop_1 }}_{{ loop.index }}" {% if col.align or col.class %} class="{{ col.class }}{{ col.align ? ' text-' ~ col.align }}"{% endif %}{% if cols[ col.key ][0].type == 'ago' %} nowrap="nowrap"{% endif %}{%if col.urlobj %} {{ col.urlobj|urlobj( val, tags ) }} style="cursor:pointer"{% endif %}{%if col.width %} width="{{col.width}}"{% endif %}>
                                                 {% for td in cols[ col.key ] %}
 
                                                     {% set value = val[ td.kval ] %}
@@ -75,16 +90,24 @@
             				                            	<span{% if td.class %} class="{{ td.class.key ? val[ td.class.key ]|replace( td.class.list ) : td.class.list }}"{% endif %} style="display:block;font-size:11px;margin-top:-2px;">{{ addonpre|raw }}{{ value|nl2space|t(60) }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'progress' %}
-                                                            <div class="progress">
+                                                            <div class="progress" {% if td.big == false %}style="height:6px"{% endif %}>
                                                                 {% set prog_val = value|number_format(0) %}
                                                                 
                                                                 {% set class = value|intervalmin( td.class )|default( 'info' ) %}
                                                                 
                                                                 {% if prog_val > 20 %}
-                                                                    <div class="progress-bar progress-bar-{{ class }}" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;margin-right:4px">{{ prog_val }}%</div>
+                                                                    <div class="progress-bar progress-bar-{{ class }}" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;margin-right:4px">
+                                                                        {% if td.big %}
+                                                                          {{ prog_val }}%
+                                                                        {% endif %}
+                                                                    </div>
                                                                 {% else %}
+
                                                                     <div class="progress-bar progress-bar-{{ class }}" role="progressbar" aria-valuenow="{{ prog_val }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ prog_val }}%;margin-right:4px"></div>
-                                                                    <span style="font-size:11px;vertical-align:-2px;">{{ prog_val }}%</span>
+                                                                    {% if td.big %}
+                                                                        <span style="font-size:11px;vertical-align:-2px;">{{ prog_val }}%</span>
+                                                                    {% endif %}
+
                                                                 {% endif %}
                                                             </div>
 
@@ -108,7 +131,7 @@
                                                             <span {% if class %}class="label label-mini label-{{ class }}"{% endif %}>{{ td.replaceval ? value|replaceonly( td.replaceval ) : value|t(20) }}{{ td.sufix|label( value ) }}</span>
 
                                                         {% elseif td.type == 'url' %}
-            				                            	<a class="grid-url" {{ td.urlobj|urlobj( val, tags ) }} style="{% if td.bold %}font-weight:600;{% endif %}">{{ value|t( td.truncate|default( 40 ) ) }}</a>
+            				                            	<a class="grid-url" {{ td.urlobj|urlobj( val, tags ) }}>{{ value|t( td.truncate|default( 40 ) ) }}</a>
 
                                                         {% elseif td.type == 'br' %}
                                                             <br />
@@ -132,16 +155,20 @@
                                                         {% elseif td.type == 'fixed' %}
                                                             {% set fixedfilldefault = true %}
                                                             
-                                                            {% for option in td.options if ( option.value is defined and option.value is same as(value)  ) %}
-                                                                <span{% if option.type %} class="label label-{{ option.type }}"{% endif %}>{{ option.label ? option.label : value }}</span>
-                                                                {% set fixedfilldefault = false %}
+                                                            {% for option in td.options %}
+                                                                {% if ( option.value is defined and option.value is same as(value)  ) %}
+                                                                    <span class="{{ option.type }}">{{ option.label ? option.label : value }}</span>
+                                                                    {% set fixedfilldefault = false %}
+                                                                {% endif %}
                                                             {% endfor %}
 
                                                             {% set break = 0 %}
-                                                            {% for option in td.options if ( break == 0 and option.range is defined and option.range >= value ) %}
-                                                                <span{% if option.type %} class="label label-{{ option.type }}"{% endif %}>{{ option.label ? option.label : value }}</span>
-                                                                {% set fixedfilldefault = false %}
-                                                                {% set break = 1 %}
+                                                            {% for option in td.options %}
+                                                                {% if ( break == 0 and option.range is defined and option.range >= value ) %}
+                                                                    <span class="{{ option.type }}">{{ option.label ? option.label : value }}</span>
+                                                                    {% set fixedfilldefault = false %}
+                                                                    {% set break = 1 %}
+                                                                {% endif %}
                                                             {% endfor %}
 
                                                             {% if fixedfilldefault and td.default is not empty %}
@@ -151,17 +178,21 @@
                                                         {% elseif td.type == 'menu' %}
                                                             {% if not td.depends or ( td.depends and val[ td.depends ] ) %}
     					                                    <div class="btn-group">
-                                                                {% for option in td.buttons if ( option.showdepends is not defined or val[ option.showdepends ] ) %}
-                                                                <a type="button" class="btn btn-{{ option.class|default( 'primary' ) }} btn-xs" {% if option.urlobj and not optiondisabled %} {{ option.urlobj|urlobj( val, tags ) }}"{% endif %}>{{ option.label }}</a>
-    		                                                    {% endfor %}    						                                    
+                                                                {% for option in td.buttons %}
+                                                                    {% if ( option.showdepends is not defined or val[ option.showdepends ] ) %}
+                                                                        <a type="button" class="btn btn-{{ option.class|default( 'primary' ) }} btn-xs" {% if option.urlobj and not optiondisabled %} {{ option.urlobj|urlobj( val, tags ) }}{% endif %}>{{ option.label }}</a>
+    		                                                        {% endif %}
+                                                                {% endfor %}
 
                                                                 {% if td.options is not empty %}
-                                                                    <button data-toggle="dropdown" class="btn btn-icon btn-primary dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon|default( 'icon-cog4' ) }}"></i></button>
+                                                                    <button data-toggle="dropdown" class="btn btn-icon btn-default dropdown-toggle" type="button"><i style="font-size:12px" class="{{ td.icon|default( 'icon-cog4' ) }}"></i></button>
         													        <ul class="dropdown-menu icons-right dropdown-menu-right mygridmenu">
-                                                                    {% for option in td.options if (option.depends is not defined or val[ option.depends ] ) %}
-                                                                        {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
-                														<li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a {{ not optiondisabled ? option.urlobj|urlobj( val, tags ) }}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
-        		                                                    {% endfor %}
+                                                                    {% for option in td.options %}
+                                                                        {% if (option.depends is not defined or val[ option.depends ] ) %}
+                                                                            {% set optiondisabled = ( option.showdepends is defined and val[ option.showdepends ] is defined and not val[ option.showdepends ] ) %}
+                														    <li{{ optiondisabled ? ' class="disabled"' }} id="{{ val[ key ] }}m{{ loop.index0 }}"><a {{ not optiondisabled ? option.urlobj|urlobj( val, tags ) }}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
+        		                                                        {% endif %}
+                                                                    {% endfor %}
                     		    									</ul>
                                                                 {% endif %}                                                                
     	    				                                </div>
@@ -184,17 +215,17 @@
                                 </table>
                        </div>
 
-                            {% if ( more or buttons is not empty ) %}
+                            {% if buttonsbottom or ( more is not empty ) %}
                               <div style="margin:8px 0px 5px 0px;text-align:right">
 
-                                {% if values|length > 4 %}
-                                    {% for button in buttons %}
-                                        <a style="margin-left:3px;margin-top:3px" type="button" class="btn btn-{{button.class}}" onclick="{{ button.onclick }}"><i class="{{ button.icon }}"></i> {{ button.label }}</a>
+                                {% if values|length %}
+                                    {% for button in buttonsbottom %}
+                                        <a id="{{ button.id }}" style="margin-left:3px;margin-top:3px" type="button" class="btn btn-{{button.class}}" {{ button.onclick|urlobj }}><i class="{{ button.icon }}"></i> {{ button.label }}</a>
                                     {% endfor %}
                                 {% endif %}
 
                                 {% if more and moreshow %}
-                                    <button id="{{ name }}more" style="margin-left:3px;margin-top:3px" onclick="{{ more.onclick }}" class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
+                                    <button id="{{ name }}more" style="margin-left:3px;margin-top:3px" {{ more.onclick|urlobj }} class="btn btn-default" type="button"><i class="icon-arrow-down11"></i> {{ more.label }}</button>
                                 {% endif %}
                               </div>
                             {% endif %}

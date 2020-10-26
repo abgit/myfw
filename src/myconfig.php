@@ -9,7 +9,7 @@ class myconfig implements arrayaccess{
     /** @var mycontainer*/
     private $app;
 
-    private $elements = array();
+    private array $elements = array();
 
     public function __construct( $c ){
         $this->app = $c;
@@ -18,19 +18,23 @@ class myconfig implements arrayaccess{
     
     public function set( $key, $value ){
 
-        if( is_array( $key ) )
-            array_merge( $this->elements, $key );
-        else
-            $this->elements[ $key ] = $value;
+        if( is_array( $key ) ) {
+            array_merge($this->elements, $key);
+        }
+        else {
+            $this->elements[$key] = $value;
+        }
     }
 
 
     public function get( $name ){
-        if( !isset( $this->elements[$name] ) )
+        if( !isset( $this->elements[$name] ) ) {
             return null;
+        }
 
-        if( !is_string( $this->elements[$name] ) )
-            return is_callable( $this->elements[$name] ) ? $this->elements[$name]() : $this->elements[$name];
+        if( !is_string( $this->elements[$name] ) ) {
+            return is_callable($this->elements[$name]) ? $this->elements[$name]() : $this->elements[$name];
+        }
 
 
         return $this->parse( $this->elements[$name] );
@@ -39,8 +43,9 @@ class myconfig implements arrayaccess{
 
     public function offsetGet( $setting ) {
 
-        if( isset( $this->app[ $setting ] ) )
-            return $this->parse( $this->app[ $setting ] );
+        if( isset( $this->app[ $setting ] ) ) {
+            return $this->parse($this->app[$setting]);
+        }
 
         return null;
     }
@@ -51,7 +56,7 @@ class myconfig implements arrayaccess{
     }
 
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset):bool {
         return isset( $this->app[ $offset ] );
     }
 

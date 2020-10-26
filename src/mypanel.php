@@ -9,7 +9,7 @@ class mypanel{
     private $key;
     private $keyhtml;
     private $title;
-    private $emptymsg   = 'No elements to display';
+    private $emptymsg   = 'No campaigns to display today';
     private $values     = array();
     private $elements   = array();
     private $more       = false;
@@ -41,8 +41,8 @@ class mypanel{
         return $this;
     }
 
-    public function & setTitle( $label, $icon = 'icon-stack' ){
-        $this->title = array( 'label' => $label, 'icon' => $icon );
+    public function & setTitle( $label, $icon = '', $description = '' ){
+        $this->title = array( 'label' => $label, 'icon' => $icon, 'description' => $description );
         return $this;
     }
 
@@ -67,7 +67,7 @@ class mypanel{
         $this->elements[ 'thumb' ] = array( 'key' => $key, 'static' => $static, 'size' => $size, 'urlobj' => $urlobj, 'classkey' => $classkey, 'default' => $default );
         return $this;
     }
-    
+
     public function & setCDN( $cdn ){
         $this->cdn = $cdn;
         return $this;
@@ -168,6 +168,11 @@ class mypanel{
         return $this;
     }
 
+    public function & addStatusThumb( $key ){
+        $this->elements[ 'status' ][ $key ] = array( 'key' => $key, 'type' => 4 );
+        return $this;
+    }
+
     public function & setStatusInfoFilter( $key, $filter ){
         $this->elements[ 'status' ][ $key ][ 'filter' ] = $filter;
         return $this;
@@ -233,8 +238,8 @@ class mypanel{
         return $this;
     }
 
-    public function & addToolbarButton( $label, $urlobj = '', $icon = 'icon-cog4', $color = '', $class = '' ){
-        $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'color' => $color, 'class' => $class );
+    public function & addToolbarButton( $label, $urlobj = '', $icon = 'icon-cog4', $color = '', $class = '', $htmlid = '' ){
+        $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'color' => $color, 'class' => $class, 'htmlid' => $htmlid );
         return $this;
     }
 
@@ -401,6 +406,7 @@ class mypanel{
                                                                             'keyhtml'    => $this->keyhtml,
                                                                             'emptymsg'   => $this->emptymsg,
                                                                             'cdn'        => $this->cdn,
+                                                                            'title'      => $this->title,
                                                                             'more'       => $this->more,
                                                                             'offset'     => $this->offset + $this->perpage,
                                                                             'perpage'    => $this->perpage,

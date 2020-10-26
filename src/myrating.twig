@@ -1,0 +1,27 @@
+{% if showdiv %}
+	<ul class="pagination" id="{{ name }}pagid">
+{% endif %}
+
+
+		{%     if value == 0   %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#f4f6f9','icon-star4','icon-star4','icon-star4','icon-star4','icon-star4' %}
+		{% elseif value == 0.5 %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#F00',   'icon-star5','icon-star4','icon-star4','icon-star4','icon-star4' %}
+		{% elseif value == 1   %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#F00',   'icon-star6','icon-star4','icon-star4','icon-star4','icon-star4' %}
+		{% elseif value == 1.5 %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#f26609','icon-star6','icon-star5','icon-star4','icon-star4','icon-star4' %}
+		{% elseif value == 2   %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#f26609','icon-star6','icon-star6','icon-star4','icon-star4','icon-star4' %}
+		{% elseif value == 2.5 %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#EEB70A','icon-star6','icon-star6','icon-star5','icon-star4','icon-star4' %}
+		{% elseif value == 3   %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#EEB70A','icon-star6','icon-star6','icon-star6','icon-star4','icon-star4' %}
+		{% elseif value == 3.5 %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#b8c64b','icon-star6','icon-star6','icon-star6','icon-star5','icon-star4' %}
+		{% elseif value == 4   %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#b8c64b','icon-star6','icon-star6','icon-star6','icon-star6','icon-star4' %}
+		{% elseif value == 4.5 %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#43a143','icon-star6','icon-star6','icon-star6','icon-star6','icon-star5' %}
+		{% elseif value == 5   %}{%  set color,star_1,star_2,star_3,star_4,star_5 = '#43a143','icon-star6','icon-star6','icon-star6','icon-star6','icon-star6' %}{% endif %}
+
+		<li>{% if action %}<a {{ action|urlobj }}>{% endif %}<i class="{{ star_1 }}" style="color:{{ color }}"></i>{% if action %}</a>{% endif %}{% if labels is not empty %}<p>{% if labels.1.label %}{{ labels.1.label }}{% else %}&nbsp;{% endif %}</p>{% endif %}</li>
+		<li>{% if action %}<a {{ action|urlobj }}>{% endif %}<i class="{{ star_2 }}" style="color:{{ color }}"></i>{% if action %}</a>{% endif %}{% if labels is not empty %}<p>{% if labels.2.label %}{{ labels.2.label }}{% else %}&nbsp;{% endif %}</p>{% endif %}</li>
+		<li>{% if action %}<a {{ action|urlobj }}>{% endif %}<i class="{{ star_3 }}" style="color:{{ color }}"></i>{% if action %}</a>{% endif %}{% if labels is not empty %}<p>{% if labels.3.label %}{{ labels.3.label }}{% else %}&nbsp;{% endif %}</p>{% endif %}</li>
+		<li>{% if action %}<a {{ action|urlobj }}>{% endif %}<i class="{{ star_4 }}" style="color:{{ color }}"></i>{% if action %}</a>{% endif %}{% if labels is not empty %}<p>{% if labels.4.label %}{{ labels.4.label }}{% else %}&nbsp;{% endif %}</p>{% endif %}</li>
+		<li>{% if action %}<a {{ action|urlobj }}>{% endif %}<i class="{{ star_5 }}" style="color:{{ color }}"></i>{% if action %}</a>{% endif %}{% if labels is not empty %}<p>{% if labels.5.label %}{{ labels.5.label }}{% else %}&nbsp;{% endif %}</p>{% endif %}</li>
+
+
+{% if showdiv %}
+	</ul>
+{% endif %}

@@ -1,192 +1,201 @@
 <?php
 
-use \Slim\Http\Request as Request;
-use \Slim\Http\Response as Response;
+use \Slim\App;
+use \Slim\Http\Request;
+use \Slim\Http\Response;
+
+use \Slim\Middleware\Session;
+use \Slim\Views\Twig;
+use \SlimSession\Helper;
+
+use \Twig\Environment;
+use \Twig\Loader\LoaderInterface;
+use \Twig\TwigFilter;
+use \Twig\TwigFunction;
+use \Twig\Extension\StringLoaderExtension;
 
 class myfw{
 
     /** @var mycontainer */
     private $container;
 
-    public function __construct( \Slim\App $app ){
+    public function __construct( App $app ){
 
         /** @var mycontainer $container */
         $container = $this->container = $app->getContainer();
 
-        $container['ipaddress'] = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : null;
-        $container['host']      = isset( $_SERVER['HTTP_HOST'] )   ? $_SERVER['HTTP_HOST']   : null;
-
         // services
-        $container['config'] = function ($c) {
+        $container['config'] = static function ($c) {
             return new myconfig($c);
         };
-        $container['ajax'] = function () {
+        $container['ajax'] = static function () {
             return new myajax();
         };
-        $container['auth0'] = function ($c) {
+        $container['auth0'] = static function ($c) {
             return new myauth0($c);
         };
-        $container['db'] = function ($c) {
+        $container['db'] = static function ($c) {
             return new mydb($c);
         };
-        $container['bugsnag'] = function ($c) {
+        $container['bugsnag'] = static function ($c) {
             return new mybugsnag($c);
         };
-        $container['memcached'] = function ($c) {
+        $container['memcached'] = static function ($c) {
             return new mymemcached($c);
         };
-        $container['redis'] = function ($c) {
+        $container['redis'] = static function ($c) {
             return new myredis($c);
         };
-        $container['i18n'] = function () {
-            return new myi18n();
+        $container['i18n'] = static function ($c) {
+            return new myi18n($c);
         };
-        $container['urlfor'] = function ($c) {
+        $container['urlfor'] = static function ($c) {
             return new myurlfor($c);
         };
-        $container['filters'] = function ($c) {
+        $container['filters'] = static function ($c) {
             return new myfilters($c);
         };
-        $container['rules'] = function ($c) {
+        $container['rules'] = static function ($c) {
             return new myrules($c);
         };
-        $container['blockchain'] = function ($c) {
+        $container['blockchain'] = static function ($c) {
             return new myblockchain($c);
         };
-        $container['bitaps'] = function ($c) {
-            return new mybitaps($c);
-        };
-        $container['list'] = function ($c) {
+        $container['list'] = static function ($c) {
             return new mylist($c);
         };
-        $container['pusher'] = function ($c) {
-            return new mypusher($c);
-        };
-        $container['breadcrumb'] = function ($c) {
+        $container['breadcrumb'] = static function ($c) {
             return new mybreadcrumb($c);
         };
-        $container['mailgun'] = function ($c) {
+        $container['mailgun'] = static function ($c) {
             return new mymailgun($c);
         };
-        $container['notify'] = function ($c) {
+        $container['notify'] = static function ($c) {
             return new mynotify($c);
         };
-        $container['nexmo'] = function ($c) {
+        $container['nexmo'] = static function ($c) {
             return new mynexmo($c);
         };
-        $container['social'] = function ($c) {
+        $container['social'] = static function ($c) {
             return new mysocial($c);
         };
-        $container['otp'] = function ($c) {
-            return new myotp($c);
-        };
-        $container['client'] = function ($c) {
+        $container['client'] = static function ($c) {
             return new myclient($c);
         };
-        $container['cidr'] = function ($c) {
+        $container['cidr'] = static function ($c) {
             return new mycidr($c);
         };
 
 
         // objects
-        $container['calendar'] = $container->factory(function ($c) {
+        $container['pusher'] = $container->factory(static function ($c) {
+            return new mypusher($c);
+        });
+
+        $container['calendar'] = $container->factory(static function ($c) {
             return new mycalendar($c);
         });
-        $container['videosgrid'] = $container->factory(function ($c) {
-            return new myvideosgrid($c);
+        $container['media'] = $container->factory(static function ($c) {
+            return new mymedia($c);
         });
-        $container['infopage'] = $container->factory(function ($c) {
+        $container['rating'] = $container->factory(static function ($c) {
+            return new myrating($c);
+        });
+        $container['progress'] = $container->factory(static function ($c) {
+            return new myprogress($c);
+        });
+        $container['infopage'] = $container->factory(static function ($c) {
             return new myinfopage($c);
         });
-        $container['chat'] = $container->factory(function ($c) {
+        $container['chat'] = $container->factory(static function ($c) {
             return new mychat($c);
         });
-        $container['clipboard'] = $container->factory(function ($c) {
+        $container['clipboard'] = $container->factory(static function ($c) {
             return new myclipboard($c);
         });
-        $container['grid'] = $container->factory(function ($c) {
+        $container['grid'] = $container->factory(static function ($c) {
             return new mygrid($c);
         });
-        $container['menu'] = $container->factory(function ($c) {
+        $container['menu'] = $container->factory(static function ($c) {
             return new mymenu($c);
         });
-        $container['menuside'] = $container->factory(function ($c) {
+        $container['menuside'] = $container->factory(static function ($c) {
             return new mymenuside($c);
         });
-        $container['message'] = $container->factory(function ($c) {
+        $container['message'] = $container->factory(static function ($c) {
             return new mymessage($c);
         });
-        $container['navbar'] = $container->factory(function ($c) {
+        $container['navbar'] = $container->factory(static function ($c) {
             return new mynavbar($c);
         });
-        $container['panel'] = $container->factory(function ($c) {
+        $container['panel'] = $container->factory(static function ($c) {
             return new mypanel($c);
         });
-        $container['stats'] = $container->factory(function ($c) {
+        $container['stats'] = $container->factory(static function ($c) {
             return new mystats($c);
         });
-        $container['form'] = $container->factory(function ($c) {
+        $container['form'] = $container->factory(static function ($c) {
             return new myform($c);
         });
 
-        if( php_sapi_name() != "cli" ) {
-            $app->add(new \Slim\Middleware\Session([
+        if( PHP_SAPI !== 'cli') {
+            $app->add(new Session([
                 'name'        => 'mysession',
                 'autorefresh' => true,
                 'lifetime'    => '20 minutes'
             ]));
 
-            $container['session'] = function () {
+            $container['session'] = static function () {
                 ( new mysession( [ 'name'        => 'mysession',
                                    'autorefresh' => true,
                                    'lifetime'    => '20 minutes' ] ) )->start();
 
-                return new \SlimSession\Helper;
+                return new Helper;
             };
         }
 
 
-        $container['confirm'] = function ($c) {
+        $container['confirm'] = static function ($c) {
             return new myconfirm($c);
         };
 
-        $container->extend('view', function ( $view, $container ) {
+        $container->extend('view', static function ($view, $container ) {
 
-            /** @var \Slim\Views\Twig $view */
+            /** @var Twig $view */
             if (!is_a($view, '\Slim\Views\Twig')) {
                 return $view;
             }
 
-            /** @var Twig_Environment $env */
+            /** @var Environment $env */
             $env = $view->getEnvironment();
 
-            $env->addFunction(new Twig_Function('_',
-                function ($s, $v = array("")) {
+            $env->addFunction(new TwigFunction('_',
+                static function ($s, $v = array('')) {
                     if (!is_array($v)) {
                         $v = array($v);
                     }
                     array_unshift($v, gettext($s));
-                    return call_user_func_array('sprintf', $v);
+                    return sprintf(...$v);
                 }));
 
-            $env->addFunction(new Twig_Function('d', 'var_export'));
+            $env->addFunction(new TwigFunction('d', 'var_export'));
 
-            $env->addFunction(new Twig_Function('c', function ($value) use ($container) {
+            $env->addFunction(new TwigFunction('c', static function ($value) use ($container) {
                 return $container->config[$value];
             }, array('is_safe' => array('html'))));
 
 
-            $env->addFilter(new Twig_Filter('cdn', array($container->filters, 'cdn')
+            $env->addFilter(new TwigFilter('cdn', array($container->filters, 'cdn')
                 , array('is_safe' => array('html'))));
 
-            $env->addFilter(new Twig_Filter('htmlpurifier', array($container->filters, 'htmlpurifier')
+            $env->addFilter(new TwigFilter('htmlpurifier', array($container->filters, 'htmlpurifier')
                 , array('is_safe' => array('html'))));
 
-            $env->addFilter(new Twig_Filter('urlobj', array($container->urlfor, 'urlobj')
+            $env->addFilter(new TwigFilter('urlobj', array($container->urlfor, 'urlobj')
                 , array('is_safe' => array('html'))));
 
-            $env->addFilter(new Twig_Filter('*',
-                function ($f) use ($container) {
+            $env->addFilter(new TwigFilter('*',
+                static function ($f) use ($container) {
                     if (is_callable(array($container->filters, $f))) {
                         $args = func_get_args();
                         array_shift($args);
@@ -205,10 +214,10 @@ class myfw{
                                     };
                             }));
             */
-            $env->addExtension(new Twig_Extension_StringLoader());
+            $env->addExtension(new StringLoaderExtension());
             $env->addExtension(new Aptoma\Twig\Extension\MarkdownExtension(new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine()));
 
-            /** @var Twig_Loader_Filesystem $loader */
+            /** @var LoaderInterface $loader */
             $loader = $env->getLoader();
             $loader->addPath(__DIR__, 'my');
 
@@ -234,13 +243,8 @@ class myfw{
         $app->post( '/myfw/markdown', 'myform:processMarkdown' )
             ->setName( 'myfwmarkdown' );
 
-        $container['filestack.policy'] = function ($c) {
-            return base64_encode('{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}' );
-        };
-
-        $container['filestack.signature'] = function ($c) {
-            return hash_hmac( 'sha256', $c['filestack.policy'], $c->config[ 'filestack.secret' ] );
-        };
+        $container['filestack.policy'] = static fn() => base64_encode('{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}' );
+        $container['filestack.signature'] = static fn($c) => hash_hmac( 'sha256', $c['filestack.policy'], $c->config[ 'filestack.secret' ] );
 
     }
 
@@ -249,24 +253,24 @@ class myfw{
 
         $container = $this->container;
 
-        $container['isajax'] = function () use ($request) {
+        $container['isajax'] = static function () use ($request) {
             return ($request->getHeaderLine('X-Requested-With') === 'XMLHttpRequest');
         };
 
-        $container['isreferer'] = function () use ($container, $request) {
+        $container['isreferer'] = static function () use ($container, $request) {
 
             $hostname = $container->config['app.hostname'];
             $referer  = $request->getHeaderLine('Referer');
 
-            return ( $request->isPost() && !empty( $hostname ) && !empty( $referer ) && strpos( strtolower( $referer ), strtolower( $hostname ) ) !== false );
+            return ( $request->isPost() && !empty( $hostname ) && !empty( $referer ) && stripos($referer, $hostname) !== false );
         };
 
-        if ( php_sapi_name() !== 'cli' && isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->redis->rateisvalid() ) {
+        if ( PHP_SAPI !== 'cli' && isset( $container->config[ 'app.ratelimit' ] ) && $container->config[ 'app.ratelimit' ] === true && !$container->redis->rateisvalid() ) {
             throw new myexception(myexception::RATELIMIT,
                 'Too much requests. Please wait ' . $container->redis->ratelocktimeout() . 's and try again.');
         }
 
-        if ( php_sapi_name() !== 'cli' && isset( $container->config[ 'app.cidr' ] ) && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
+        if ( PHP_SAPI !== 'cli' && !empty( $container->config[ 'app.cidr' ] ) && !$container->cidr->match( $_SERVER['REMOTE_ADDR'], $container->config[ 'app.cidr' ] ) ) {
             throw new myexception(myexception::FORBIDDEN,
                 'IP ' . $_SERVER['REMOTE_ADDR'] . ' not in APP cidr whitelist.' );
         }
@@ -287,13 +291,15 @@ class myfw{
         /** @var Response $response */
         $response = $next($request, $response);
 
-        if( !$container->pusher->empty() )
-            $container->pusher->sendall();
+        //if( !$container->pusher->empty() ) {
+        //    $container->pusher->sendall();
+        //}
 
         // check debug mode
         if( isset( $container->config[ 'app.debug' ] ) && $container->config[ 'app.debug' ] === true ) {
-            $response = $response->withAddedHeader('x-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
-            $response = $response->withAddedHeader('x-myfw-d', $container->db->getDebugsCounter() );
+            $myresponse = $response->withAddedHeader('x-myfw-page', sprintf("%.3f", defined('APP_START' ) ? (float)microtime(true) - APP_START : 0 ) );
+            $myresponse = $myresponse->withAddedHeader('x-myfw-d', $container->db->getDebugsCounter() );
+            return $container->isajax ? $myresponse->withJson( $container->ajax->obj() ) : $myresponse;
         }
 
         return $container->isajax ? $response->withJson( $container->ajax->obj() ) : $response;

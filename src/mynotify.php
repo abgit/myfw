@@ -63,12 +63,10 @@ class mynotify{
         return $this;
     }
 
-    public function & setValues( $values, $counter ){
+    public function & setValues( array $values, int $counter = null ):mynotify {
 
-        if( !is_array( $values ) )
-            $this->values = json_decode( $values, true );
-
-       $this->counter = $counter;
+        $this->values  = $values;
+        $this->counter = $counter;
 
         return $this;
     }
@@ -144,25 +142,25 @@ class mynotify{
         return $this->render();
     }
 
-    private function render( $values = null ){
-        return $this->app->view->fetch( '@my/mynotify.twig', array( 'values'          => is_null( $values ) ? $this->values : $values,
-                                                                             'name'            => $this->name,
-                                                                             'keys'            => $this->keys,
-                                                                             'title'           => $this->title,
-                                                                             'icon'            => $this->icon,
-                                                                             'buttonright'     => $this->buttonright,
-                                                                             'buttonleft'      => $this->buttonleft,
-                                                                             'itemtitle'       => $this->itemtitle,
-                                                                             'itemlabel'       => $this->itemlabel,
-                                                                             'itemthumb'       => $this->itemthumb,
-                                                                             'itemdescription' => $this->itemdescription,
-                                                                             'itemaction'      => $this->itemaction,
-                                                                             'itemmore'        => $this->itemmore,
-                                                                             'counter'         => $this->counter,
-                                                                             'emptymsg'        => $this->emptymsg,
-                                                                             'unreadkey'       => $this->unreadkey,
-                                                                             'onshow'          => $this->onshow,
-                                                                             'allitems'        => $this->allitems ) );
+    private function render(){
+        return $this->app->view->fetch( '@my/mynotify.twig', array( 'values'          => $this->values,
+                                                                    'name'            => $this->name,
+                                                                    'keys'            => $this->keys,
+                                                                    'title'           => $this->title,
+                                                                    'icon'            => $this->icon,
+                                                                    'buttonright'     => $this->buttonright,
+                                                                    'buttonleft'      => $this->buttonleft,
+                                                                    'itemtitle'       => $this->itemtitle,
+                                                                    'itemlabel'       => $this->itemlabel,
+                                                                    'itemthumb'       => $this->itemthumb,
+                                                                    'itemdescription' => $this->itemdescription,
+                                                                    'itemaction'      => $this->itemaction,
+                                                                    'itemmore'        => $this->itemmore,
+                                                                    'counter'         => $this->counter,
+                                                                    'emptymsg'        => $this->emptymsg,
+                                                                    'unreadkey'       => $this->unreadkey,
+                                                                    'onshow'          => $this->onshow,
+                                                                    'allitems'        => $this->allitems ) );
 
     }
 }

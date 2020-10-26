@@ -291,11 +291,12 @@ class myfilters{
 
     public function replaceonly( $string, $array ){
         
-        if( empty( $array ) )
+        if( empty( $array ) ) {
             $array = array();
+        }
 
         foreach( $array as $k => $v ){
-            if( strval( $string ) === strval( $k ) ){
+            if( (string)$string === (string)$k){
                 return $v;
             }
         }

@@ -1,0 +1,29 @@
+
+
+{% if showdiv %}
+<div class="myfwprogress" id="{{ name }}div">
+{% endif %}
+
+	{% for step in elements %}
+		<div style="width:{{ step.width }}%;float:left">
+
+			{% if showtitle %}
+			<label>{% if step.title %}{{ step.title }}{% else %}&nbsp;{% endif %}</label>
+			{% endif %}
+
+			{% if showheader %}
+			<div class="myfwprogressheader">{% if step.header %}{{ step.header }}{% else %}&nbsp;{% endif %}</div>
+			{% endif %}
+
+			<div class="progress progress-striped myfwprogressbar {{ step.active }}" style="height: {{ height }}px">
+				<div role="progressbar" class="progress-bar {{ step.class }}" style="width: {{ step.percentage }}%;">
+				</div>
+			</div>
+			<span class="help-block">{% if step.active %}<b>{% endif %}{{ step.help }}{% if step.active %}</b>{% endif %}</span>
+		</div>
+	{% endfor %}
+
+
+{% if showdiv %}
+</div>
+{% endif %}

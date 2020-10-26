@@ -17,30 +17,34 @@ class myblockchain{
     }
 
 
-    public function exchangebtc(){
+    public function exchangebtc(): array
+    {
         $json = $this->load( 'ticker' );
 
-        if( isset( $json[ 'USD' ][ 'buy' ] ) )
-            return array( 'USD' => $json[ 'USD' ][ 'buy' ],
-                          'GBP' => $json[ 'GBP' ][ 'buy' ],
-                          'EUR' => $json[ 'EUR' ][ 'buy' ],
-                          'CNY' => $json[ 'CNY' ][ 'buy' ],
-                          'JPY' => $json[ 'JPY' ][ 'buy' ] );
+        if( isset( $json[ 'USD' ][ 'buy' ] ) ) {
+            return array(
+                'USD' => $json['USD']['buy'],
+                'GBP' => $json['GBP']['buy'],
+                'EUR' => $json['EUR']['buy'],
+                'CNY' => $json['CNY']['buy'],
+                'JPY' => $json['JPY']['buy']);
+        }
 
         return array();
     }
 
 
-    public function coinbasebtc(){
-        $json = json_decode( file_get_contents( 'http://api.coindesk.com/v1/bpi/currentprice.json' ), true );
+    public function coinbasebtc(): array
+    {
+        $json = json_decode(file_get_contents('http://api.coindesk.com/v1/bpi/currentprice.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        if( isset( $json[ 'bpi' ][ 'USD' ][ 'rate_float' ] ) && isset( $json[ 'bpi' ][ 'GBP' ][ 'rate_float' ] ) && isset( $json[ 'bpi' ][ 'EUR' ][ 'rate_float' ] ) ){
+        if(isset($json['bpi']['USD']['rate_float'], $json['bpi']['GBP']['rate_float'], $json['bpi']['EUR']['rate_float'])){
 
-            $jsoncny = json_decode( file_get_contents( 'http://api.coindesk.com/v1/bpi/currentprice/CNY.json' ), true );
+            $jsoncny = json_decode(file_get_contents('http://api.coindesk.com/v1/bpi/currentprice/CNY.json'), true, 512, JSON_THROW_ON_ERROR);
 
             if( isset( $jsoncny[ 'bpi' ][ 'CNY' ][ 'rate_float' ] ) ){
 
-                $jsonjpy = json_decode( file_get_contents( 'http://api.coindesk.com/v1/bpi/currentprice/JPY.json' ), true );
+                $jsonjpy = json_decode(file_get_contents('http://api.coindesk.com/v1/bpi/currentprice/JPY.json'), true, 512, JSON_THROW_ON_ERROR);
 
                 if( isset( $jsonjpy[ 'bpi' ][ 'JPY' ][ 'rate_float' ] ) ){
                     return array( 'USD' => $json[ 'bpi' ][ 'USD' ][ 'rate_float' ],
@@ -58,15 +62,16 @@ class myblockchain{
 
     public function frombtc( $currency, $value, $addsymbol = false, $decimals = 2 ){
 
-        if( is_null( $this->exchange ) )
-            $this->exchange = $this->load( 'ticker' );
+        if($this->exchange === null) {
+            $this->exchange = $this->load('ticker');
+        }
     
-        return isset( $this->exchange[ $currency ][ 'last' ] ) ? ( $addsymbol ? ( $this->exchange[ $currency ][ 'symbol' ] . ' ' ) : '' ) . ( number_format( floatval( $this->exchange[ $currency ][ 'last' ] ) * floatval( $value ), $decimals ) ) : false;
+        return isset( $this->exchange[ $currency ][ 'last' ] ) ? ( $addsymbol ? ( $this->exchange[ $currency ][ 'symbol' ] . ' ' ) : '' ) . ( number_format( (float)$this->exchange[$currency]['last'] * (float)$value, $decimals ) ) : false;
     }
 
 
     public function receive( $address = null, $callback = null ){
-        return $this->load( 'api/receive', array( 'method' => 'create', 'address' => is_null( $address ) ? $this->app->config[ 'bitcoin.acc' ] : $address, 'callback' => is_null( $callback ) ? ( 'http://' . $this->app->config[ 'app.hostname' ] . $this->app->urlfor->action( $this->app->config[ 'bitcoin.callback' ] ) ) : $callback ) );
+        return $this->load( 'api/receive', array( 'method' => 'create', 'address' => $address ?? $this->app->config['bitcoin.acc'], 'callback' => $callback ?? ('http://' . $this->app->config['app.hostname'] . $this->app->urlfor->action($this->app->config['bitcoin.callback']))) );
     }
     
 
@@ -76,16 +81,21 @@ class myblockchain{
 
         $json = $this->load( 'address/' . $address, array( 'format' => 'json' ) );
     
-        if( $unique == false )
+        if(!$unique) {
             return $json;
+        }
 
         $addresses = array();
 
-        foreach( $json['txs'] as $transaction )
-            if( isset( $transaction[ 'inputs' ] ) )
-                foreach( $transaction[ 'inputs' ] as $input )
-                    if( isset( $input[ 'prev_out' ][ 'addr' ] ) && $input[ 'prev_out' ][ 'addr' ] != $address )
-                        $addresses[] = $input[ 'prev_out' ][ 'addr' ];
+        foreach( $json['txs'] as $transaction ) {
+            if (isset($transaction['inputs'])) {
+                foreach ($transaction['inputs'] as $input) {
+                    if (isset($input['prev_out']['addr']) && $input['prev_out']['addr'] != $address) {
+                        $addresses[] = $input['prev_out']['addr'];
+                    }
+                }
+            }
+        }
 
         return array_reverse( array_unique( $addresses ) );
     }
@@ -114,14 +124,18 @@ class myblockchain{
                          'to'              => $to,
                          'amount'          => $amount );
 
-        if( $from )
-            $params[ 'from' ] = $from;
-        if( $second_password )
-            $params[ 'second_password' ] = $second_password;
-        if( $fee )
-            $params[ 'fee' ] = $fee;
-        if( $note )
-            $params[ 'note' ] = $note;
+        if( $from ) {
+            $params['from'] = $from;
+        }
+        if( $second_password ) {
+            $params['second_password'] = $second_password;
+        }
+        if( $fee ) {
+            $params['fee'] = $fee;
+        }
+        if( $note ) {
+            $params['note'] = $note;
+        }
 
         return $this->load( 'merchant/' . ( empty( $guid ) ? $this->app->config[ 'bitcoin.guid' ] : $guid ) . '/payment', $params );
     }
@@ -132,14 +146,18 @@ class myblockchain{
         $params = array( 'password'   => $password,
                          'recipients' => $recipients );
 
-        if( $from )
-            $params[ 'from' ] = $from;
-        if( $second_password )
-            $params[ 'second_password' ] = $second_password;
-        if( $fee )
-            $params[ 'fee' ] = $fee;
-        if( $note )
-            $params[ 'note' ] = $note;
+        if( $from ) {
+            $params['from'] = $from;
+        }
+        if( $second_password ) {
+            $params['second_password'] = $second_password;
+        }
+        if( $fee ) {
+            $params['fee'] = $fee;
+        }
+        if( $note ) {
+            $params['note'] = $note;
+        }
 
         return $this->load( 'merchant/' . $guid . '/sendmany', $params );
     }
@@ -149,19 +167,23 @@ class myblockchain{
 
         $opts = array();
     
-        foreach( $options as $k => $v )
-            if( !empty( $v ) )
-                $opts[] = $k . '=' . urlencode( $v );
+        foreach( $options as $k => $v ) {
+            if (!empty($v)) {
+                $opts[] = $k . '=' . urlencode($v);
+            }
+        }
 
         $url = 'https://blockchain.info/' . $uri . '?' . implode( '&', $opts );
 
-        if( $returnUrl )
+        if( $returnUrl ) {
             return $url;
+        }
 
-        if( ( $response = file_get_contents( $url ) ) === false )
+        if( ( $response = file_get_contents( $url ) ) === false ) {
             return false;
+        }
 
-        return $returnString ? $response : json_decode( $response, true );
+        return $returnString ? $response : json_decode($response, true, 512, JSON_THROW_ON_ERROR);
     }
 
 }

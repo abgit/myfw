@@ -1,7 +1,7 @@
 <?php
 
-use \Slim\Http\Request as Request;
-use \Slim\Http\Response as Response;
+use \Slim\Http\Request;
+use \Slim\Http\Response;
 
 class myform{
 
@@ -91,17 +91,25 @@ class myform{
         return $this;
     }
 
-    public function & addText( $name, $label = '', $help = '', $bitcoin = false ){
-        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'bitcoin' => $bitcoin );
+    public function & addText( $name, $label = '', $help = '' ){
+        $this->elements[ $name ] = array( 'type' => 'text', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
         return $this;
     }
 
-    public function & addBitcoin( $name, $label = '', $help = '', $currencies = array(), $onchange = '', $decimal = 8 ){
-        $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $currencies, 'onchange' => $onchange, 'decimal' => $decimal );
+    public function & setNumeric( $name ):myform{
+        if( isset( $this->elements[ $name ] ) ){
+            $this->elements[ $name ][ 'numeric' ] = true;
+        }
+        return $this;
+    }
+
+    public function & addBitcoin( $name, $label = '', $help = '', $onchange = '', $decimal = 8 ){
+
+        $this->elements[ $name ] = array( 'type' => 'bitcoin', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help, 'currencies' => $this->app->formbitcoin, 'onchange' => $onchange, 'decimal' => $decimal );
         $this->addFilter( $name, 'satoshi' );
 
-        if( is_string( $currencies ) && !empty( $currencies ) )
-            $this->elements[ $currencies ] = array();
+//        if( is_string( $currencies ) && !empty( $currencies ) )
+//            $this->elements[ $currencies ] = array();
         return $this;
     }
 
@@ -160,6 +168,29 @@ class myform{
         $this->elements[ $name ] = array( 'type' => 'froalahtml', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array() );
         return $this;
     }
+
+    public function & addHCaptcha(){
+        $this->elements[ 'hcaptcha' ] = array( 'type' => 'hcaptcha', 'valuetype' => 'simple', 'rules' => array(), 'filters' => array(), 'options' => array() );
+
+        // validate captcha
+        $this->addRule( function(){
+
+            if( !isset( $_POST['h-captcha-response'] ) || empty($_POST['h-captcha-response']) )
+                return 'Captcha invalid';
+
+            // always refresh captcha, otherwise server-side call will be duplicated
+            $this->app->ajax->hCaptchaReset();
+
+            $req = Requests::post( "https://hcaptcha.com/siteverify", array(), array( 'secret' => $this->app->config[ 'hcaptcha.secret' ], 'response' => $_POST['h-captcha-response'], 'remoteip' => $this->app->ipaddress ) );
+            if( $req->success && isset( $req->body ) && json_decode( $req->body, false, 512, JSON_THROW_ON_ERROR )->success )
+                return true;
+
+            return 'Captcha not valid';
+        });
+
+        return $this;
+    }
+
 
     public function & addPassword( $name, $label, $help = '' ){
         $this->elements[ $name ] = array( 'type' => 'password', 'valuetype' => 'simple', 'name' => $name, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => array(), 'help' => $help );
@@ -230,17 +261,22 @@ class myform{
         return $this;
     }
 
+    public function & addLink( $name, $label, $urlobj, $help = '' ): myform{
+        $this->elements[ $name ] = array( 'type' => 'link', 'name' => $name, 'label' => $label, 'urlobj' => $urlobj, 'help' => $help );
+        return $this;
+    }
+
     public function & addStaticMessage( $message = '', $title = '', $icon = '', $date = '' ){
         $this->elements[ 'smm' . $this->counter++ ] = array( 'type' => 'staticmessage', 'message' => $message, 'title' => $title, 'icon' => $icon, 'date' => $date, 'rules' => array(), 'filters' => array() );
         return $this;
     }    
 
-    public function & addCustom( $name, $obj ){
-        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array() );
+    public function & addCustom( $name, $obj, $label = '' ){
+        $this->elements[ $name ] = array( 'type' => 'custom', 'obj' => $obj, 'rules' => array(), 'filters' => array(), 'label' => $label );
         return $this;
     }
 
-    public function & getCustom( $name){
+    public function getCustom( $name){
         return isset( $this->elements[ $name ][ 'obj' ] ) ? $this->elements[ $name ][ 'obj' ] : null;
     }
 
@@ -284,7 +320,7 @@ class myform{
 
     public function & addCameraTagPhoto( $name, $label = 'Photo', $appid = null, $help = '' ){
         
-        if( is_null( $appid ) )
+        if($appid === null)
             $appid = $this->app->config[ 'cameratag.appid' ];
 
         $expiration = time() + 1800;
@@ -430,23 +466,81 @@ class myform{
     }
 
 
-    public function processUploadcareThumb( Request $request, Response $response, $args ){
+    public function processUploadcareThumb( Request $request, Response $response, array $args ): bool{
     
         if( isset( $_POST[ 'img' ] ) && is_string( $_POST[ 'img' ] ) ){
 
             // store cropped version and get new uuid
             try {
                 $api = new Uploadcare\Api($this->app->config['uploadcare.key'], $this->app->config['uploadcare.secret']);
-                $file = $api->createLocalCopy( $_POST[ 'img' ] );
-                $uuid = $file->getUuid();
-                $url  = $file->getUrl();
+
+                // dont store by default (can be a movie)
+                $file = $api->getFile( $_POST[ 'img' ] );
+
+                // if image, display <img url<> and <hidden id>
+                if( isset( $file->data['is_image'] ) && $file->data['is_image'] ){
+
+                    // new image saved with crop changes applied
+                    $file = $api->createLocalCopy( $_POST[ 'img' ], true );
+                    $uuid = $file->getUuid();
+                    $url  = $file->getUrl();
+
+                    $this->app->ajax->html( '#uploadcared' . $args[ 'fsid' ], '<img class="uploadcareimage" src="' . $url . '" width="150" height="200">' );
+                    $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
+                    $this->app->ajax->displayType(  '#uploadcarerem' . $args[ 'fsid' ], 'inline-block' );
+
+                // if is a video
+                }elseif( isset( $file->data[ 'mime_type' ] ) && strpos( $file->data[ 'mime_type' ], 'video/' ) === 0 ){
+
+                    $uuid    = $file->getUuid();
+                    $success = true;
+
+                    // only convert if video is not an .mp4
+                    //if( $file->data[ 'mime_type' ] !== 'video/mp4' ) {
+                        $convert = $api->request('POST', '/convert/video/', array( "paths" => [$uuid . "/video/-/format/mp4/-/cut/0.0/60.0/"], "store" => "1" ) );
+
+                        // if convertion problems
+                        if(!isset($convert->result[0]->token, $convert->result[0]->uuid)){
+                            $this->app->ajax->msgError( 'Cannot convert file' );
+                            return false;
+                        }
+
+                        $uuid = $convert->result[0]->uuid;
+                        $done = false;
+                        while (!$done) {
+                            sleep(1);
+                            $req     = $api->request('GET', '/convert/video/status/' . $convert->result[0]->token . '/');
+                            $done    = ( $req->status === 'finished' || $req->status === 'failed' || $req->status === 'canceled' );
+                            $success = $req->status === 'finished';
+                        }
+                    //}else{
+                    //    $file->store();
+                    //}
+
+                    if( $success ) {
+                        $content = '<video controls class="uploadcarevideo"><source src="https://ucarecdn.com/' . $uuid . '/video.mp4" type="video/mp4" /></video>';
+
+                        $this->app->ajax->html('#uploadcared' . $args['fsid'], $content );
+                        $this->app->ajax->val( '#uploadcareh' . $args['fsid'], '.' . $uuid );
+                        $this->app->ajax->displayType(  '#uploadcarerem' . $args[ 'fsid' ], 'inline-block' );
+                        return true;
+
+                    }
+
+                    $this->app->ajax->msgError( 'Invalid input file', 'Cannot process' );
+                    return false;
+
+                }else{
+                    $this->app->ajax->msgError( 'Invalid file type' );
+                    return false;
+                }
+
             } catch (Exception $e) {
+                $this->app->ajax->msgError( 'Invalid file' );
+                return false;
             }
 
-            $this->app->ajax->attr( '#uploadcarei' . $args[ 'fsid' ], 'src', $url );
-            $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
-        }
-        elseif( isset( $_POST[ 'fro' ] ) && is_string( $_POST[ 'fro' ] ) ){
+        }elseif( isset( $_POST[ 'fro' ] ) && is_string( $_POST[ 'fro' ] ) ){
 
             // store cropped version and get new uuid
             try {
@@ -458,9 +552,9 @@ class myform{
             }
 
             $this->app->ajax->froalaProcess( '#' . $args[ 'fsid' ], $url );
-//            $this->app->ajax->val(  '#uploadcareh' . $args[ 'fsid' ], $uuid  );
         }
 
+        return false;
     }
 
 
@@ -477,23 +571,26 @@ class myform{
 
             if( isset( $_POST[ $this->formname . $name ] ) && is_string( $_POST[ $this->formname . $name ] ) ){
 
-                if( empty( $_POST[ $this->formname . $name ] ) )
+                if( empty( $_POST[ $this->formname . $name ] ) ) {
                     return true;
+                }
 
-                    try {
-                        $api = new Uploadcare\Api($this->app->config['uploadcare.key'], $this->app->config['uploadcare.secret']);
-                        $file = $api->getFile($_POST[$this->formname . $name])->getUuid();
+                try {
 
-                        if (!empty($file)) {
-                            return true;
-                        }
+                    $uuid = strpos( $_POST[$this->formname . $name], '.' ) === 0 ? substr( $_POST[$this->formname . $name], 1 ) : $_POST[$this->formname . $name];
 
-                    } catch (Exception $e) {
+                    $api = new Uploadcare\Api($this->app->config['uploadcare.key'], $this->app->config['uploadcare.secret']);
+                    $file = $api->getFile( $uuid )->getUuid();
+
+                    if (!empty($file)) {
+                        return true;
                     }
 
+                } catch (Exception $e) {
+                }
             }
 
-            return 'Invalid media uploadcare';
+            return 'Invalid media';
         });
 
         return $this;
@@ -678,6 +775,68 @@ class myform{
         return $this;
     }
 
+    public function & addAjaxGCaptcha( $label, $name, $css = 'btn-success', $position = '', $options = array() ){
+
+        $this->elements[ $name ] = array( 'type' => 'ajaxgcaptcha', 'valuetype' => 'simple', 'isbutton' => true, 'name' => $name, 'position' => $position, 'css' => $css, 'label' => $label, 'rules' => array(), 'filters' => array(), 'options' => $options );
+        $this->applyCsrf();
+
+        // validate captcha
+        $this->addRule( function() use ($name){
+
+            if( !isset( $_POST['g-recaptcha-response'] ) || empty( $_POST['g-recaptcha-response' ] ) || !is_string( $_POST['g-recaptcha-response' ] ) || strlen( $_POST['g-recaptcha-response' ] ) > 1000 ) {
+                return 'Captcha not present';
+            }
+
+            $req = Requests::post( "https://www.google.com/recaptcha/api/siteverify", array(), array( 'secret' => $this->app->config[ 'gcaptcha.secretkey' ], 'response' => $_POST['g-recaptcha-response'], 'remoteip' => $this->app->ipaddress ) );
+
+            // validate post
+            if( !isset( $req->success, $req->body ) || $req->success !== true ) {
+                return 'Captcha not valid';
+            }
+
+            $res = json_decode( $req->body, false, 512, JSON_THROW_ON_ERROR );
+
+            // validate success
+            if( !isset( $res->success ) || $res->success !== true ) {
+                return 'Captcha not valid verification';
+            }
+
+            // validate score
+            if( !isset( $res->score ) || $res->score < 0.5 ) {
+                return 'Captcha not valid score';
+            }
+
+            // validate hostname
+            if( !isset( $res->hostname ) ) {
+                return 'Captcha not valid hostname';
+            }
+
+            // validate host
+            $hostvalid = false;
+            foreach( $this->app->config['gcaptcha.hostname'] as $host ){
+                if( stripos( strrev( $res->hostname ), strrev( $host ) ) === 0 ) {
+                    $hostvalid = true;
+                    break;
+                }
+            }
+
+            if( !$hostvalid ) {
+                return 'Captcha not valid host';
+            }
+
+            // validate action
+            if( !isset( $res->action ) || $res->action !== $this->getName() ) {
+                return 'Captcha not valid action.';
+            }
+
+            return true;
+        });
+
+        return $this;
+    }
+
+
+
     public function & setProperty( $name, $property, $value ){
         if( isset( $this->elements[ $name ] ) )
             $this->elements[ $name ][ $property ] = $value;
@@ -717,7 +876,7 @@ class myform{
                     return true;
                 }else{
                     $this->csrfreset();
-                    return 'csrf protection';
+                    return 'Try again';
                 }
             });
 
@@ -764,7 +923,7 @@ class myform{
     public function isSubmitted( $button = '' ){
 
         foreach( $this->elements as $n => $el ){
-            if( isset( $el[ 'type' ] ) && ( $el[ 'type' ] == 'submit' || $el[ 'type' ] == 'ajax' ) && isset( $_POST[ $this->formname . $n ] ) && ( empty( $button ) || $n == $button ) )
+            if( isset( $el[ 'type' ] ) && ( $el[ 'type' ] == 'submit' || $el[ 'type' ] == 'ajax' || $el[ 'type' ] == 'ajaxgcaptcha' ) && isset( $_POST[ $this->formname . $n ] ) && ( empty( $button ) || $n == $button ) )
                 return true;
         }
         return false;
@@ -846,6 +1005,11 @@ class myform{
             }
 
             foreach( $this->elements as $n => $el ){
+
+                if( isset( $el[ 'obj' ] ) && method_exists( $el[ 'obj' ], 'setvalues' ) ) {
+                    $el['obj']->setValues($values);
+                }
+
                 if( isset( $values[ $n ] ) ){
                     if( isset( $el[ 'obj' ] ) && method_exists( $el[ 'obj' ], 'setvalues' ) ){
                         $el[ 'obj' ]->setValues( $values[ $n ] );
@@ -958,8 +1122,8 @@ class myform{
                 }
             }
 
-            if( $counter == 0 ){
-                $res = call_user_func( $rulecallback );
+            if( $counter === 0 ){
+                $res = $rulecallback();
                 if( $res !== true ){
                     if( isset( $rinfo[0] ) ){
                         $this->errors[ $rinfo[0] ] = is_string( $res ) ? $res : '';

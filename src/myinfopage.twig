@@ -20,16 +20,19 @@
                                     </div>
 							    {% endif %}						    
 
-						    	<div class="caption text-center">
+						    	<div class=" text-center">
 						    		{% if profile.head.key %}<h6>{{ values[ profile.head.key ] }}</h6>{% endif %}
 
-						    		<h6>{{ profile.desc.keytitle ? values[ profile.desc.keytitle ] }}<small>
-                                    
-                                    {% if values[ profile.descimg.key ] %}
-                                        <img width="{{ profile.descimg.width|default(30) }}" height="{{ profile.descimg.height|default(30) }}" style="display:inline;max-width:{{ profile.descimg.width|default(30) }}px;max-height:{{ profile.descimg.height|default(30) }}px;" src="{{ profile.descimg.cdn }}{{ values[ profile.descimg.key ] }}{{ profile.descimg.sufix }}">&nbsp;
+						    		{% if profile.desc.keytitle or profile.descimg.key or profile.desc.keysubtitle %}
+                                    <h6>{{ profile.desc.keytitle ? values[ profile.desc.keytitle ] }}
+                                        <small>
+                                        {% if values[ profile.descimg.key ] %}
+                                            <img width="{{ profile.descimg.width|default(30) }}" height="{{ profile.descimg.height|default(30) }}" style="display:inline;max-width:{{ profile.descimg.width|default(30) }}px;max-height:{{ profile.descimg.height|default(30) }}px;" src="{{ profile.descimg.cdn }}{{ values[ profile.descimg.key ] }}{{ profile.descimg.sufix }}">&nbsp;
+                                        {% endif %}
+                                        {{ values[ profile.desc.keysubtitle ] }}
+                                        </small>
+                                    </h6>
                                     {% endif %}
-                                    
-                                    {{ values[ profile.desc.keysubtitle ] }}</small></h6>
 
                                     {% if profile.text %}
                                         <h6><small>{{ profile.text.prefix|raw }}<span id="profiletk{{ profile.text.key }}">{{ values[ profile.text.key ]|default( profile.text.default ) }}</span>{{ ( profile.text.sufixsingular and values[ profile.text.key ] == 1 ) ? profile.text.sufixsingular : profile.text.sufix|raw }}</small></h6>
@@ -45,7 +48,13 @@
 
 						    		{% if profile.string.key %}<h6>{{ values[ profile.string.key ] }}</h6>{% endif %}
 
-						    	</div>
+                                    {% if profile.custom %}
+                                            {% for custom in profile.custom %}
+                                                {{ custom.obj|raw }}
+                                            {% endfor %}
+                                    {% endif %}
+
+                                </div>
 					    	</div>
                             
                                     {% if profile.menu %}
@@ -130,19 +139,29 @@
                 <div class="well">
                     <dl>
                         {% set isempty = true %}
-                        {% for opt in el.options if values[ opt.key ] is not empty %}
+                        {% for opt in el.options  %}
+
+                            {% if values[ opt.key ] is not empty %}
                             <dt class="{{ opt.class|default('text-info') }}">{{ opt.label }}</dt>
                             <dd>
                             {% if opt.replace %}
-                                {% for optvals in values[ opt.key ]|split(';') if optvals is not empty %}
+                                {% for optvals in values[ opt.key ]|split(';')  %}
+                                      {% if optvals is not empty %}
+
                                         {% if not loop.first %}, {% endif %}
                                         {{ optvals|replace( opt.replace ) }}
+
+                                      {% endif %}
+
                                 {% endfor %}
                             {% else %}
                                 {{ values[ opt.key ] }}
                             {% endif %}
                             </dd>
                             {% set isempty = false %}
+                            {%  endif %}
+
+
                         {% endfor %}
 
                         {% if isempty %}

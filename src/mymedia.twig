@@ -1,0 +1,88 @@
+
+
+{% if showdiv %}
+<div class="{% if ismultiple %}row{% endif %}" id="{{ name }}div">
+{% endif %}
+
+	{% if values %}
+	{% for value in values %}
+	<div class="{% if ismultiple %}col-lg-3 col-md-6 col-sm-6{% endif %}">
+		<div class="block">
+
+			<div class="breadcrumb-line mymediabread">
+				<ul class="breadcrumb">
+					<div class="{{ elements.info.class }} mymediainfo">{{ value[ elements.info.key ] }}</div>
+
+					{% for option in elements.fixed.options %}
+						{% if ( option.value is defined and option.value is same as( value[ elements.fixed.kval ] )  ) %}
+							<span class="{{ option.type }}">{{ option.label ? option.label : value[ elements.fixed.kval ] }}</span>
+						{% endif %}
+					{% endfor %}
+				</ul>
+
+
+				<ul class="breadcrumb-buttons">
+
+					<li class="dropdown mymediadrop">
+						<a class="dropdown-toggle mymediamenu" data-toggle="dropdown"> <i id="mymediaicon" class="icon-cog4"></i> </a>
+						<ul class="dropdown-menu dropdown-menu-right icons-right">
+
+
+							{% for option in elements.menu.options %}
+								{% if (option.depends is not defined or value[ option.depends ] ) %}
+									{% set optiondisabled = ( option.showdepends is defined and ( ( value[ option.showdepends ] is defined and not value[ option.showdepends ] ) or ( value[ option.showdepends ] is not defined ) ) ) %}
+									<li{{ optiondisabled ? ' class="disabled"' }}><a {{ not optiondisabled ? option.urlobj|urlobj( value, tags ) }}>{% if option.icon %}<i class="{{ option.icon }}"></i> {% endif %}{{ option.label }}</a></li>
+								{% endif %}
+							{% endfor %}
+
+
+						</ul>
+					</li>
+
+				</ul>
+			</div>
+
+
+			<div class="thumbnail thumbnail-boxed">
+				<div>
+					{% if elements.thumb and value[ elements.thumb.key ] %}
+						<img class="uploadcareimage" src="{{ value[ elements.thumb.key ] }}" alt=""/>
+					{% elseif elements.video and value[ elements.video.key ] %}
+						<video controls class="uploadcarevideo"><source src="{{ value[ elements.video.key ] }}" type="video/mp4" /></video>
+					{% endif %}
+				</div>
+				<div class="caption">
+
+					<a {{ elements.title.urlobj|urlobj( value, tags ) }} class="caption-title">{{ value[ elements.title.keytitle ] }}</a>
+					{{ value[ elements.description.key ]|nl2br }}
+
+					{% if elements.small %}
+					<hr/>
+					<small>{{ elements.small.prefix }}{{ value[ elements.small.key ] }}{{ elements.smallfixed.prefix }}
+						{% for option in elements.smallfixed.options %}
+							{% if ( option.value is defined and option.value is same as(value[ elements.smallfixed.key ])  ) %}
+								{{ option.label ? option.label : value }}
+							{% endif %}
+						{% endfor %}
+					</small>
+					{% endif %}
+
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+
+	{% endfor %}
+	{% elseif emptymsg %}
+		<div style="margin: 0px 20%" class="callout callout-info fade in">
+			<h5 >Info</h5>
+			<p >{{ emptymsg }}</p>
+		</div>
+	{% endif %}
+
+
+	{% if showdiv %}
+</div>
+{% endif %}

@@ -112,6 +112,10 @@ class myinfopage{
         $this->profile[ 'icons' ][] = array( 'icon' => $icon, 'href' => $href, 'hrefkey' => $hrefkey, 'hrefsufix' => $hrefsufix );
         return $this;
     }
+    public function & addProfileCustom( $name, $obj ){
+        $this->profile[ 'custom' ][] = array( 'name' => $name, 'obj' => $obj );
+        return $this;
+    }
 
     public function & setKey( $key, $keyhtml ){
         $this->keys[]     = $key;

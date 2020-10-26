@@ -3,40 +3,34 @@
 
     class mydb{
 
-        /** @var abcontainer */
+        /** @var mycontainer */
         private $app;
 
-        /** @var PDO */
-        private $pdo = null;
-        private $pdo_url = null;
-        private $pdo_host = null;
-        private $pdo_port = null;
-        private $pdo_dbname = null;
-        private $pdo_dsn = null;
-        private $pdo_options = array();
+        private PDO $pdo;
+        private array $pdo_url;
+        private string $pdo_dsn;
+        private array $pdo_options;
+        private string $pdo_scheme;
 
         /** @var PDOStatement */
-        private $stmt = null;
+        private ?PDOStatement $stmt;
 
-        private $debugs = array();
+        private array $debugs = array();
 
-        private $debugs_sum       = 0;
-        private $debugs_counter   = 0;
+        private float $debugs_sum = 0;
+        private int $debugs_counter = 0;
 
-        private $cache_enable     = false;
-        private $cache_expiration;
-        private $cache_prefix;
+        private bool $cache_enable = false;
+        private int $cache_expiration;
+        private string $cache_prefix;
 
         public function __construct( $container ){
 
             $this->app         = $container;
             $this->pdo_url     = parse_url( $this->app->config[ 'db.dsn' ] );
-            $this->pdo_host    = $this->pdo_url[ 'host' ];
-            $this->pdo_port    = $this->pdo_url[ 'port' ];
-            $this->pdo_dbname  = substr( $this->pdo_url[ 'path' ], 1 );
             $this->pdo_options = ( isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) ) ? $this->app[ 'db.options' ] : array();
-
             $this->pdo_scheme  = '';
+
             if( isset( $this->pdo_url['scheme'] ) ){
                 switch( $this->pdo_url['scheme'] ){
                     case 'postgres':
@@ -45,33 +39,37 @@
                 }
             }
 
-            $this->pdo_query = '';
+            $pdo_query = '';
             if( isset( $this->pdo_url['query'] ) ){
-                $this->pdo_query = str_replace( '&', ';', $this->pdo_url['query'] );
+                $pdo_query = str_replace( '&', ';', $this->pdo_url['query'] );
             }
 
-            $this->pdo_dsn = sprintf( '%s:host=%s;dbname=%s;port=%s%s', $this->pdo_scheme, $this->pdo_host, $this->pdo_dbname, $this->pdo_port, empty( $this->pdo_query ) ? '' : ';' . $this->pdo_query );
+            $this->pdo_dsn = sprintf( '%s:host=%s;dbname=%s;port=%s%s', $this->pdo_scheme, $this->pdo_url[ 'host' ], substr( $this->pdo_url[ 'path' ], 1 ), $this->pdo_url[ 'port' ], empty( $pdo_query ) ? '' : ';' . $pdo_query );
         }
 
-        public function & pdo(){
-            if( is_null( $this->pdo ) )
-                $this->pdo = new PDO( $this->pdo_dsn, $this->pdo_url[ 'user' ], $this->pdo_url[ 'pass' ], $this->pdo_options );
+        public function & pdo(): PDO
+        {
+            if( !isset( $this->pdo )) {
+                $this->pdo = new PDO($this->pdo_dsn, $this->pdo_url['user'], $this->pdo_url['pass'], $this->pdo_options);
+            }
 
             return $this->pdo;
         }
 
-        public function getDSN(){
+        public function getDSN(): string
+        {
             return $this->pdo_dsn;
         }
 
-        public function & msg( $msgs = null, $headers = null ){
-
+        public function & msg( $message = null, $fallback = null ): mydb
+        {
             $errcode = $this->errorCode();
 
-            $message = ( is_array( $msgs )    && isset( $msgs[ $errcode ] )    ) ? $msgs[ $errcode ]    : ( is_string( $msgs ) ? $msgs : $errcode );
-            $header  = ( is_array( $headers ) && isset( $headers[ $errcode ] ) ) ? $headers[ $errcode ] : ( is_string( $headers ) ? $headers : null );
+            if( is_array( $message ) ) {
+                $message = $message[$errcode] ?? $fallback;
+            }
 
-            $this->app->ajax->msgError( $message, $header );
+            $this->app->ajax->msgError( $message, 'Error found' );
 
             return $this;
         }
@@ -79,14 +77,15 @@
         private function & query( $procedure, $values = array() ){
 
             // add custom global values
-            if( isset( $this->app[ 'db.queryargs' ] ) && is_array( $this->app[ 'db.queryargs' ] ) )
-                $values = $this->app[ 'db.queryargs' ] + $values;
+            if( isset( $this->app[ 'db.queryargs' ] ) && is_array( $this->app[ 'db.queryargs' ] ) ) {
+                $values = $this->app['db.queryargs'] + $values;
+            }
 
             // debug time start
             $debug_start = microtime( true );
 
             // split procedure
-            preg_match( '/([a-zA-Z0-9]+)\(([a-zA-Z0-9\,|_]*)\)/', $procedure, $s );
+            preg_match( '/([a-zA-Z0-9_]+)\(([a-zA-Z0-9\,|_]*)\)/', $procedure, $s );
 
             $procedure_name = $s[1];
             $procedure_args = $s[2];
@@ -107,25 +106,25 @@
                                             $column_value = null;
                                             break;
                         case 'int' :        $column_type  = PDO::PARAM_INT;
-                                            $column_value = isset( $args[2] ) ? intval( $args[2] ) : ( ( isset( $values[ $column_name ] ) && ( is_numeric( $values[ $column_name ] ) || is_bool( $values[ $column_name ] ) ) ) ? intval( $values[ $column_name ] ) : null );
+                                            $column_value = isset( $args[2] ) ? (int)$args[2] : ( ( isset( $values[ $column_name ] ) && ( is_numeric( $values[ $column_name ] ) || is_bool( $values[ $column_name ] ) ) ) ? intval( $values[ $column_name ] ) : null );
                                             break;
                         case 'bool' :       $column_type  = PDO::PARAM_BOOL;
                                             $column_value = isset( $values[ $column_name] ) ? !empty( $values[ $column_name ] ) : ( isset( $args[2] ) ? ( $args[2] === 'true' ? true : ( $args[2] === 'false' ? false : null ) ) : null );
                                             break;
                         case 'datetime' :   $column_type  = PDO::PARAM_STR;
-                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d H:i:s", strtotime( $values[ $column_name ] ) ) : null;
+                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date('Y-m-d H:i:s', strtotime( $values[ $column_name ] ) ) : null;
                                             break;
                         case 'date' :       $column_type  = PDO::PARAM_STR;
-                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date("Y-m-d 00:00:00", strtotime( $values[ $column_name ] ) ) : null;
+                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date('Y-m-d 00:00:00', strtotime( $values[ $column_name ] ) ) : null;
                                             break;
                         case 'bigint' :     $column_type  = PDO::PARAM_STR;
-                                            $column_value = ( isset( $values[ $column_name ] ) && preg_match('/^[0-9]+$/', strval($values[ $column_name ] ) ) ) ? $values[ $column_name ]: null;
+                                            $column_value = ( isset( $values[ $column_name ] ) && preg_match('/^[0-9]+$/', (string)$values[$column_name]) ) ? $values[ $column_name ]: null;
                                             break;
                         case 'text' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 65535 ) : null;
                                             break;
                         case 'tag' :        $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? substr( preg_replace( "/[^A-Za-z0-9]/", '', $values[ $column_name ] ), 0, 100 ) : null;
+                                            $column_value = isset( $values[ $column_name ] ) ? substr( preg_replace( '/[^A-Za-z0-9]/', '', $values[ $column_name ] ), 0, 100 ) : null;
                                             break;
                         case 'btcaddr' :    $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) && preg_match( "/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/", $values[ $column_name ] ) ? $values[ $column_name ] : null;
@@ -138,21 +137,21 @@
                                             break;
                         case 'numeric' :
                         case 'double' :     $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? floatval( str_replace( ',', '.', $values[ $column_name] ) ) : 0;
+                                            $column_value = isset( $values[ $column_name ] ) ? (float)str_replace(',', '.', $values[$column_name]) : 0;
                                             break;
                         case 'uuid' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 40 ) : null;
                                             break;
                         case 'json' :       $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? $values[ $column_name ] : null;
+                                            $column_value = $values[$column_name] ?? null;
                                             if( empty( $column_value ) || !$this->app->rules->isJsonString( $column_value ) ){
-                                                $column_value = json_encode( $column_value );
+                                                $column_value = json_encode($column_value, JSON_THROW_ON_ERROR, 512);
                                             }
                                             break;
                         case 'str' :
                         case 'varchar' :
                         default :           $column_type  = PDO::PARAM_STR;
-                                            $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) ) ? substr( $values[ $column_name ], 0, ( isset( $args[2] ) ? $args[2] : 0 ) ) : null;
+                                            $column_value = ( isset( $values[ $column_name ] ) && $values[$column_name] !== '') ? substr( $values[ $column_name ], 0, $args[2] ?? 0 ) : null;
                     }
 
                     // add elements
@@ -170,8 +169,9 @@
             }
 
             // bind
-            foreach( $elements as $col => $sett )
-                $this->stmt->bindValue( $col, $sett[0], $sett[1] );
+            foreach( $elements as $col => $sett ) {
+                $this->stmt->bindValue($col, $sett[0], $sett[1]);
+            }
 
             $this->stmt->execute();
 
@@ -183,45 +183,47 @@
                 $this->debugs_counter ++;
                 $debug_time = (float)microtime(true) - $debug_start;
                 $this->debugs_sum += $debug_time;
-                $this->debugs[] = sprintf("%s|%.3f%s", $procedure_name, $debug_time, $error ? '|E' . $this->errorCode() : ''  );
+                $this->debugs[] = sprintf('%s|%.3f%s', $procedure_name, $debug_time, $error ? '|E' . $this->errorCode() : ''  );
             }
 
             // check error warning
-            if( $error ){
-
-                if( isset( $this->app[ 'db.onerror' ] ) ) {
-                    $this->app['db.onerror']( $this->errorCode(), $this->errorInfo(), $procedure, $values );
-                }
-
+            if($error && isset($this->app['db.onerror'])) {
+                $this->app['db.onerror']( $this->errorCode(), $this->errorInfo(), $procedure, $values );
             }
 
             return $this->stmt;
         }
 
-        public function getDebugsCounter(){
-            return sprintf("%d in %.3f (%s)", $this->debugs_counter, $this->debugs_sum, implode( "+", $this->debugs ) );
+        public function getDebugsCounter(): string
+        {
+            return sprintf('%d in %.3f (%s)', $this->debugs_counter, $this->debugs_sum, implode( '+', $this->debugs ) );
         }
 
-        public function & cache( $expiration = null, $prefix = '' ){
+        public function & cache( $expiration = null, $prefix = '' ): mydb
+        {
             $this->cache_enable     = true;
-            $this->cache_expiration = is_null( $expiration ) ? 3600 : $expiration;
+            $this->cache_expiration = $expiration ?? 3600;
             $this->cache_prefix     = $prefix;
             return $this;
         }
 
-        public function & cacheSession( $expiration = null ){
+        public function & cacheSession( $expiration = null ): mydb
+        {
             return $this->cache( $expiration, 'dbcachesession' . session_id() );
         }
 
-        public function & cacheClient( $expiration = null ){
+        public function & cacheClient( $expiration = null ): mydb
+        {
             return $this->cache( $expiration, 'dbcacheclient' . $this->app->config[ 'db.cacheclient' ] );
         }
 
         // return NULL if cache disable; TRUE if cache enable and found, FALSE if cache enable and missing
-        private function onCache( &$result, &$return, $procedure, $args ){
+        private function onCache( &$result, &$return, $procedure, $args ): ?bool
+        {
 
-            if( $this->cache_enable !== true )
+            if( $this->cache_enable !== true ) {
                 return null;
+            }
 
             $this->cache_enable = false;
 
@@ -231,103 +233,126 @@
             // replace args
             $args = array_merge( $args, $this->app->config[ 'db.cachereplaceargs' ] );
 
-            $hash       = md5( $procedure . json_encode($args) );
+            $hash       = md5( $procedure . json_encode($args, JSON_THROW_ON_ERROR, 512));
             $key_result = $this->cache_prefix . 'dbcache-res-' . $hash;
             $key_return = $this->cache_prefix . 'dbcache-ret-' . $hash;
 
             // get from cache
-            list( $result, $return ) = $this->app->redis->mGet( array( $key_result, $key_return ) );
+            [$result, $return] = $this->app->redis->mGet(array($key_result, $key_return));
 
             if( $result !== false && $return !== false ){
-                $result = json_decode( $result );
-                $return = json_decode( $return );
+                $result = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+                $return = json_decode($return, true, 512, JSON_THROW_ON_ERROR);
 
                 $debug_time = (float)microtime(true) - $debug_start;
                 $this->debugs_counter ++;
                 $this->debugs_sum += $debug_time;
-                $this->debugs[] = sprintf("%s|%.3f|C", strstr( $procedure, '(', true), $debug_time );
+                $this->debugs[] = sprintf('%s|%.3f|C', strstr( $procedure, '(', true), $debug_time );
                 return true;
             }
 
             return false;
         }
 
-        private function addCache( $result, $return, $procedure, $args ){
-
+        private function addCache( $result, $return, $procedure, $args ): bool
+        {
             // replace args
             $args = array_merge( $args, $this->app->config[ 'db.cachereplaceargs' ] );
 
-            $hash       = md5( $procedure . json_encode($args) );
+            $hash       = md5( $procedure . json_encode($args, JSON_THROW_ON_ERROR, 512));
             $key_result = $this->cache_prefix . 'dbcache-res-' . $hash;
             $key_return = $this->cache_prefix . 'dbcache-ret-' . $hash;
 
-            $res_result = $this->app->redis->setex( json_encode( $key_result ), $this->cache_expiration, $result );
-            $res_return = $this->app->redis->setex( json_encode( $key_return ), $this->cache_expiration, $return );
+            $res_result = $this->app->redis->setex( json_encode($key_result, JSON_THROW_ON_ERROR, 512), $this->cache_expiration, $result );
+            $res_return = $this->app->redis->setex( json_encode($key_return, JSON_THROW_ON_ERROR, 512), $this->cache_expiration, $return );
 
             return $res_result === true && $res_return === true;
         }
 
-        public function findAll( & $result, $procedure, $args = array(), $returnobject = false ){
-
+        public function findAll( &$result, $procedure, $args = array(), $returnobject = false ): bool
+        {
             // get cache
             $oncache = $this->onCache($result, $return, $procedure, $args );
 
             // if cache is enable and exists
-            if( $oncache === true )
+            if( $oncache === true ) {
                 return $return;
+            }
 
             $result = $this->query( $procedure, $args )->fetchAll( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
             $return = ( count( $result ) > 0 );
 
             // save cache if oncache is false (enable but missing)
-            if( $oncache === false )
-                $this->addCache( $result, $return, $procedure, $args );
+            if( $oncache === false ) {
+                $this->addCache($result, $return, $procedure, $args);
+            }
 
             return $return;
         }
 
 
-        public function findOne( & $result, string $procedure, array $args = array(), bool $returnobject = false ){
+        public function findAllFunction( $function, $procedure, $args = array(), $returnobject = false ): bool
+        {
+            // no cache
+            $haselements = false;
 
+            $stmt = $this->query( $procedure, $args );
+            while ($row = $stmt->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject )) {
+                $function( $row );
+                $haselements = true;
+            }
+
+            return $haselements;
+        }
+
+
+        public function findOne( & $result, string $procedure, array $args = array(), bool $returnobject = false ): bool
+        {
             // get cache
             $oncache = $this->onCache($result, $return, $procedure, $args );
 
             // if cannot get cache (disable or enable_but_not_found)
-            if( $oncache === true )
+            if( $oncache === true ) {
                 return $return;
+            }
 
             $result = $this->query( $procedure, $args )->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject );
             $return = ( ! empty( $result ) );
 
             // save cache if oncache is false (enable but missing)
-            if( $oncache === false )
-                $this->addCache( $result, $return, $procedure, $args );
+            if( $oncache === false ) {
+                $this->addCache($result, $return, $procedure, $args);
+            }
 
             return $return;
         }
 
 
-        public function findResult( & $result, $procedure, $args = array() ){
+        public function findResult( & $result, $procedure, $args = array() ): bool
+        {
 
             // get cache
             $oncache = $this->onCache($result, $return, $procedure, $args );
 
             // if cannot get cache (disable or enable_but_not_found)
-            if( $oncache === true )
+            if( $oncache === true ) {
                 return $return;
+            }
 
             $result = $this->query( $procedure, $args )->fetchAll();
-            $return = ( !is_array( $result ) || count($result) != 1 ) ? false : ( intval( reset( $result[0] ) ) > 0 );
+            $return = ( !is_array( $result ) || count($result) !== 1 ) ? false : ( (int)reset($result[0]) > 0 );
 
             // save cache if oncache is false (enable but missing)
-            if( $oncache === false )
-                $this->addCache( $result, $return, $procedure, $args );
+            if( $oncache === false ) {
+                $this->addCache($result, $return, $procedure, $args);
+            }
 
             return $return;
         }
 
 
-        public function findAllReturn( $procedure, $args = array(), $returnobject = false ){
+        public function findAllReturn( string $procedure, array $args = array(), bool $returnobject = false ): array
+        {
             return $this->findAll( $result, $procedure, $args, $returnobject ) ? $result : array();
         }
 
@@ -337,7 +362,8 @@
         }
 
 
-        public function findValue( & $result, $procedure, $args = array(), $returnobject = false ){
+        public function findValue( & $result, $procedure, $args = array(), $returnobject = false ): bool
+        {
             if( !$this->findOne( $oneresult, $procedure, $args, $returnobject ) || empty( $oneresult ) )
                 return false;
 
@@ -353,9 +379,10 @@
         }
 
 
-        public function errorCode(){
+        public function errorCode(): int
+        {
 
-            if( !is_null( $this->stmt ) ) {
+            if($this->stmt !== null) {
 
                 $errcode = $this->stmt->errorCode();
 
@@ -364,10 +391,10 @@
 
                     $arr = $this->stmt->errorInfo();
                     if (isset($arr[2]) && is_string($arr[2]) && strlen($arr[2]) > 8) {
-                        return intval(substr($arr[2], 8));
+                        return (int)substr($arr[2], 8);
                     }
                 }else{
-                    return intval($errcode);
+                    return (int)$errcode;
                 }
             }
 
@@ -375,12 +402,13 @@
         }
 
 
-        public function errorInfo(){
+        public function errorInfo():string{
 
-            if( !is_null( $this->stmt ) ) {
+            if($this->stmt !== null) {
                 $arr = $this->stmt->errorInfo();
-                if( isset( $arr[2] ) )
+                if( isset( $arr[2] ) ) {
                     return $arr[2];
+                }
             }
 
             return 'unknown error';

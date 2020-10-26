@@ -1,5 +1,9 @@
 <?php
 
+use Slim\Container;
+use Slim\Views\Twig;
+use SlimSession\Helper;
+
 /**
  * services:
  * @property myconfig $config
@@ -17,7 +21,6 @@
  * @property mylist $list
  * @property myotp $otp
  * @property mypusher $pusher
- * @property mybitaps $bitaps
  * @property myconfirm $confirm
  * @property mymailgun $mailgun
  * @property mybreadcrumb $breadcrumb
@@ -25,12 +28,12 @@
  * @property mynexmo $nexmo
  * @property mysocial $social
  * @property mycidr $cidr
- * @property \SlimSession\Helper $session
- * @property \Slim\Views\Twig $view
+ * @property Helper $session
+ * @property Twig $view
  *
  * objects:
  * @property mycalendar $calendar
- * @property myvideosgrid $videosgrid
+ * @property mymedia $media
  * @property myinfopage $infopage
  * @property mychat $chat
  * @property myclipboard $clipboard
@@ -43,6 +46,8 @@
  * @property mystats $stats
  * @property myform $form
  * @property myclient $client
+ * @property myprogress $progress
+ * @property myrating $rating
  *
  * properties:
  * @property boolean $isajax
@@ -50,4 +55,4 @@
  * @property string $ipaddress
  * @property string $host
  */
-class mycontainer extends \Slim\Container {}
+class mycontainer extends Container {}

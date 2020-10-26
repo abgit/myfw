@@ -2,7 +2,8 @@
 
 class myobject{
 
-    public function & setValues($values){
+    public function & setValues($values)
+    {
         return $this;
     }
 }

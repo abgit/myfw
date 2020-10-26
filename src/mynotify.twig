@@ -39,7 +39,7 @@
 
                         {% set title = val[ itemtitle.key ] %}
                         {% if itemtitle.replace %}
-                            {% set title = val[ itemtitle.key ]|replace( itemtitle.replace ) %}
+                            {% set title = val[ itemtitle.key ]|replaceonly( itemtitle.replace ) %}
                         {% endif %}
 
                         <strong style="padding-right:0px;">{{title|t(30) }} {% if itemlabel and val[ itemlabel.key ] %}<span style="float:right"><span class="label label-info">{{ itemlabel.prefix ? itemlabel.prefix|raw }}{{ val[ itemlabel.key ]|t(8) }}{{ itemlabel.sufix ? itemlabel.sufix|raw }}</span></span>{% endif %}</strong><span>{{val[ itemdescription.key ]|t(35) }}</span>

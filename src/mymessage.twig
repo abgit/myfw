@@ -48,16 +48,46 @@
     {% for el in elements %}
 
         {% if el.type == 'title' %}
-            <h5 id="msg{{ name }}t">{{ el.text }}</h5>        
+            <h5 id="msg{{ name }}t">{{ el.text }}</h5>
 
-        {% elseif el.type == 'custom' %}
-        <div class="well myfwstatsmsg">{{ el.obj|raw }}</div>
+        {% elseif el.type == 'titlerelative' %}
+            <h5 id="msg{{ name }}t">{{ values[ el.key ] }}</h5>
+
+       {% elseif el.type == 'custom' %}
+
+        {% if el.htmlbox %}
+            <div class="well myfwstatsmsg" id="{{ el.name }}">{{ el.obj|raw }}</div>
+        {% else %}
+            {{ el.obj|raw }}
+        {% endif %}
+
+        {% elseif el.type == 'image' %}
+        <a href='{{ values[ el.keyA ] }}'>
+           <img src='{{ values[ el.key ] }}' alt=''>
+        </a>
+
+        {% elseif el.type == 'imagelist' %}
+            <div class="row" >
+                {% for img in el.list %}
+
+                <div style="float: left; padding: 15px;">
+                    <a href='{{ values[ img.a ] }}'><img src='{{ values[ img.key ] }}' alt='' style="width:100%"></a>
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
 
         {% elseif el.type == 'message' %}
             <p id="msg{{ name }}m">{% if el.thumb %}<img src="{{ el.thumb }}" /> &nbsp;&nbsp;{% endif %}{{ messageprefix }}{{ el.text }}{{ messagesufix }}</p>
 
+        {% elseif el.type == 'messagerelative' %}
+            <p id="msg{{ name }}m">{{ values[ el.key ] }}</p>
+
         {% elseif el.type == 'messagetemplate' %}
-            <p id="msg{{ name }}t">{{ messageprefix }}{{ include( template_from_string( el.message ) ) }}{{ messagesufix }}</p>
+            {% if el.p %}<p>{% endif %}{{ messageprefix }}{{ include( template_from_string( el.message ) ) }}{{ messagesufix }}{% if el.p %}</p>{% endif %}
 
         {% elseif el.type == 'small' %}
             <small style="color:#999">{{ el.text }}</small>
@@ -66,7 +96,7 @@
             <br>
 
         {% elseif el.type == 'button' %}
-            <a style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}" {{ el.urlobj|urlobj }}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
+            <a id="{{  el.htmlid }}" style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}" {{ el.urlobj|urlobj }}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
 
         {% elseif el.type == 'labelslist' %}
         {% if el.header %}<p class="myfwlabellisthead">{{ el.header|raw }}{% endif %}

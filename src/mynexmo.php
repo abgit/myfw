@@ -1,39 +1,46 @@
 <?php
 
+use Nexmo\Client;
+use Nexmo\Client\Credentials\Basic;
 
-    class mynexmo{
+class mynexmo{
 
         /** @var mycontainer */
         private $app;
 
         /** @var Nexmo\Client  */
-        private $client;
+        private Client $client;
 
         public function __construct( $c ){
             $this->app = $c;
-            $this->client = new Nexmo\Client( new Nexmo\Client\Credentials\Basic( $this->app->config[ 'sms.nexmokey' ], $this->app->config[ 'sms.nexmosecret' ] ) );
+            $this->client = new Client( new Basic( $this->app->config[ 'nexmo.key' ], $this->app->config[ 'nexmo.secret' ] ) );
         }
 
 
-        public function verifyCheck( $token, $pin ){
-
+        public function verifyCheck( $token, $pin ): bool
+        {
             try{
-                return intval( $this->client->verify()->check( $token, $pin )->getStatus() ) === 0;
+                return (int)$this->client->verify()->check($token, $pin)->getStatus() === 0;
             } catch( Nexmo\Client\Exception\Request $e ){
                 return false;
             }
         }
 
 
-        public function verifyStart( $mobile ){
+        public function verifyStart( $mobile ): ?string{
 
-            $options = array( 'number' => $mobile, 'code_length' => 4, 'lg' => 'en-us' );
+            $options = array(
+                'number'      => $mobile,
+                'code_length' => 4,
+                'lg'          => 'en-us',
+                'brand'       => $this->app->config[ 'nexmo.brand' ],
+                'sender_id'   => $this->app->config[ 'nexmo.sender_id' ]
+            );
 
-            if( isset( $this->app->config[ 'nexmo.from' ] ) ) {
-                $options['brand']     = $this->app->config[ 'nexmo.from' ];
-                $options['sender_id'] = $this->app->config[ 'nexmo.from' ];
+            try {
+                return $this->client->verify()->start($options)->getRequestId();
+            }catch(Exception $exception){
+                return '';
             }
-
-            return $this->client->verify()->start( $options );
         }
     }

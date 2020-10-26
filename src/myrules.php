@@ -152,7 +152,7 @@ class myrules{
     }
 
     public function maxvalue( $value, $opts, $formelement = null ) {
-        return ( intval( $value ) <= intval( $opts ) );
+        return ( (float)$value <= (float)$opts);
     }
 
     public function instagramBio( $value, $bio ){
@@ -184,7 +184,7 @@ class myrules{
     }
 
     public function minvalue( $value, $opts, $formelement = null ) {
-        return ( intval( $value ) >= intval( $opts ) );
+        return ( (float)$value >= (float)$opts);
     }
 
     public function isdate( $value ){

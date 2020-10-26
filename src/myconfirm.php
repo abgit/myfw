@@ -17,12 +17,12 @@ class myconfirm{
 
         $obj = $this->app->session->get( $args[ 'h' ], false );
 
-        if( isset( $obj[ 'url' ] ) && isset( $obj[ 'xconfirm' ] ) && isset( $obj[ 'pin' ] ) && isset( $obj[ 'validateSecret' ] ) ){
+        if( isset( $obj[ 'url' ] ) && isset( $obj[ 'xconfirm' ] ) && isset( $obj[ 'pin' ] ) ){
 
             if( $obj[ 'pin' ] === true ){
 
-                if ( !isset( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ], null, $obj[ 'validateSecret' ] ) )
-                    throw new myexception( myexception::ERROR, 'Two-factor token invalid' );
+                if ( !isset( $args[ 'twotoken' ] ) || !isset( $this->app[ 'confirm.onvalidation'] ) || !$this->app[ 'confirm.onvalidation']( $args[ 'twotoken' ] ) )
+                    throw new myexception( myexception::ERROR, 'Invalid pin' );
             }
 
             $this->app->ajax->confirmSubmit( $obj[ 'url' ], $obj[ 'xconfirm' ] );
@@ -30,21 +30,25 @@ class myconfirm{
         }
 
         $this->app->ajax->confirmDialogClose();
-//        throw new myexception( myexception::NOTFOUND );
     }
 
     /** @throws myexception */
-    public function checkToken( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null ){
-        return $this->check( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore, false );
+    public function checkToken( $msg = null, $help = null, $title = null ){
+        return $this->check( $msg, $help, $title, '', 1, true, true );
     }
 
     /** @throws myexception */
-    public function checkTokenOrSecret( $msg = null, $help = null, $title = null, $confirmByDefault = false, $customBefore = null){
-        return $this->check( $msg, $help, $title, '', 1, true, $confirmByDefault, $customBefore, true );
+    public function checkTokenIfConfigurared( $msg = null, $help = null, $title = null){
+        return $this->check( $msg, $help, $title, '', 1, true, false );
     }
 
     /** @throws myexception */
-    public function check( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $confirmByDefault = false, $customBefore = null, $validateSecret = false ){
+    public function checkConfirm( $msg = null, $help = null, $title = null, $description = '' ){
+        return $this->check( $msg, $help, $title, $description, 1, false, true );
+    }
+
+    /** @throws myexception */
+    private function check( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $required = true ){
 
         if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';
         if( empty( $help ) )  $help  = '';
@@ -66,7 +70,7 @@ class myconfirm{
             $this->app->ajax->confirmDialogClose();
             return true;
         }
-
+/*
         $call = true;
 
         if( !is_null( $customBefore ) && is_callable( $customBefore ) ){
@@ -88,20 +92,30 @@ class myconfirm{
             $this->app->ajax->confirmDialogClose();
             return true;
         }
-
-        $title    = '';
+*/
+        //$title    = '';
         $pinlabel = '';
         $pinhelp  = '';
 
-        if( $twofactor == true ){
-            $title    = 'Two-factor authentication';
-            $pinlabel = $validateSecret == false ? 'Pin' : 'Pin or Secret';
-            $pinhelp  = $validateSecret == false ? 'Fill your 6-digit pin' : 'Fill your 6-digit pin or Secret';
+        // if check is only executed if configured
+        if( !$required && $this->app[ 'confirm.isrequired' ] === false ){
+            return true;
         }
 
-        $xconfirm = md5( $hash . rand( 1, 1000000 ) );
+        if( $twofactor === true ){
 
-        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $twofactor, 'postvars' => $_POST, 'validateSecret' => $validateSecret ) );
+            if( isset( $this->app[ 'confirm.oncheck' ] ) ) {
+                $this->app['confirm.oncheck']();
+            }
+
+            $title    = 'Two-factor authentication';
+            $pinlabel = 'Pin';
+            $pinhelp  = 'Fill your 6-digit pin';
+        }
+
+        $xconfirm = md5( $hash . random_int( 1, 1000000 ) );
+
+        $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $twofactor, 'postvars' => $_POST ) );
         $this->app->session->set( $xconfirm, $hash );
 
         $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $twofactor, $pinlabel, $pinhelp );

@@ -1,12 +1,25 @@
 
 {% if allitems %}
+
+
+
     {% if elements.tmenu %}
-        <div class="row" style="margin-bottom:20px;">
+        <div class="row myfwpaneltool">
         <div class="col-md-12 text-right">
+
+            {% if title %}
+                <div class="grid-title">
+                    <h3>{% if title.icon %}<i class="{{ title.icon }}"></i>{% endif %}
+                        {{ title.label }}{{ title.labelkey }}
+                        <small>{{ title.description }}</small>
+                    </h3>
+                </div>
+            {% endif %}
+
                                                 {% for menu in elements.tmenu %}
 
                                                     {% if menu.type == 0 %}
-                                                        <a style="margin-left:2px;margin-top:6px" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %} {{ menu.urlobj|urlobj }}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
+                                                        <a id="{{  menu.htmlid }}" style="margin-left:2px;" class="btn {{ menu.class ? menu.class : 'btn-default'}}" {% if menu.color %} style="color:{{menu.color}}"{% endif %} {{ menu.urlobj|urlobj }}><i class="{{ menu.icon }}"></i> {{ menu.label }}</a>
 
                                                     {% elseif menu.type == 3 %}
                                                         {% for i in 1..menu.it %}<br />{% endfor %}
@@ -37,25 +50,29 @@
         </div></div>
     {% endif %}
 
+
+
     <div class="row" id="{{name}}">
 {% endif %}
+
+
 
     {% if values %}
         {% for value in values %}
 						  <div class="col-md-{{ size }}{%if sizeoffset %} col-md-offset-{{sizeoffset}}{% endif %}" id="{{ name }}{{ value[ key ] }}">
                                 <div class="block task task-low" style="margin-bottom:30px{% if elements.back %};background-size:100% 100%;background-image:url({{ cdn }}{{ value[ elements.back.key ] }}){% endif %}">
                                   <div style="margin:0px" class="row">
-									<div class="with-padding"{% if action %} onclick="{{ action|replaceurl( value, tags ) }}" style="margin: 0px;cursor:pointer;min-height:150px"{% else %} style="min-height:150px"{% endif %}>
+									<div class="with-padding" {{ action|urlobj( value, tags ) }} style="margin:0px;{% if action %}cursor:pointer;{% endif %}min-height:150px">
 
                                         {% if elements.thumb.static or value[ elements.thumb.key ] or elements.thumb.default %}
 
-    										<div class="col-sm-{{ elements.thumb.size }}" style="text-align: center;">
+    										<div class="col-sm-{{ elements.thumb.size }}" style="padding:0px;text-align:center;">
                                                 
                                                 {% if elements.thumb.urlobj %}
                                                     <a {{ elements.thumb.urlobj|urlobj( value, tags ) }}>
                                                 {% endif %}
 
-                                                <img class="pt{{ value[ elements.thumb.classkey ] }}" style="margin-top:10px;margin-left:-10px" src="{% if elements.thumb.static %}{{ cdn }}{{ elements.thumb.key|raw }}{% else %}{{ cdn }}{{ value[ elements.thumb.key ]|default( elements.thumb.default ) }}{% endif %}">
+                                                <img class="pt{{ value[ elements.thumb.classkey ] }} panelthumb" src="{% if elements.thumb.static %}{{ cdn }}{{ elements.thumb.key|raw }}{% else %}{{ cdn }}{{ value[ elements.thumb.key ]|default( elements.thumb.default ) }}{% endif %}">
 
                                                 {% if elements.thumb.urlobj %}
                                                     </a>
@@ -221,6 +238,8 @@
 
                                                         {% endif %}
 
+                                                    {% elseif status.type == 4 %}
+                                                        <img src="{{ value[ status.key ] }}" class="panelthumbmini">
 
                                                     {% endif %}
 
