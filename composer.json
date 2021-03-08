@@ -12,7 +12,6 @@
 		 "bryanjhv/slim-session": "~3.0",
 
 		 "defuse/php-encryption": "2.*",
-         "mailgun/mailgun-php": "2.*",
 		 
 	     "linusu/bitcoin-address-validator": "0.*",
 
