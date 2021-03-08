@@ -9,17 +9,30 @@ class mymedia{
     private array $elements = array();
     private array $values = array();
     private $onInit;
-    private $onRefresh;
+    public  $onInitValues;
+    public  $onRefresh;
+    public  $onRefreshValues;
     private string $key;
     private string $keyhtml;
     private array $keys = array();
     private array $keyshtml = array();
     private bool $showdiv = true;
-    private string $emptymsg = '';
+    private array $emptymsg = array();
     private bool $ismultiple = true;
 
     public function __construct( $c ){
         $this->app = $c;
+    }
+
+    public function & init(): mymedia
+    {
+        if( is_callable( $this->onInit ) ) {
+            call_user_func($this->onInit);
+        }
+        if( is_callable( $this->onInitValues ) ) {
+            $this->setValues( call_user_func( $this->onInitValues ) );
+        }
+        return $this;
     }
 
     public function & setOnInit( $fn ):mymedia{
@@ -27,8 +40,29 @@ class mymedia{
         return $this;
     }
 
+    public function & setOnInitValues( $fn ):mymedia{
+        $this->onInitValues = $fn;
+        return $this;
+    }
+
+    public function & refresh(): mymedia
+    {
+        if( is_callable( $this->onRefresh ) ) {
+            call_user_func($this->onRefresh);
+        }
+        if( is_callable( $this->onRefreshValues ) ) {
+            $this->ajaxRefresh( call_user_func($this->onRefreshValues) );
+        }
+        return $this;
+    }
+
     public function & setOnRefresh( $fn ):mymedia{
         $this->onRefresh = $fn;
+        return $this;
+    }
+
+    public function & setOnRefreshValues( $fn ):mymedia{
+        $this->onRefreshValues = $fn;
         return $this;
     }
 
@@ -52,18 +86,6 @@ class mymedia{
         return $this;
     }
 
-    public function init( $args = null ): mymedia
-    {
-        call_user_func( $this->onInit, $args );
-        return $this;
-    }
-
-    public function refresh( $args = null ): mymedia
-    {
-        call_user_func( $this->onRefresh, $args );
-        return $this;
-    }
-
     public function & setName( string $name ): mymedia{
         $this->name = $name;
         return $this;
@@ -75,19 +97,29 @@ class mymedia{
         return $this;
     }
 
-    public function & setThumb( $key ): mymedia{
-        $this->elements[ 'thumb' ] = array( 'key' => $key );
+    public function & setThumb( $key, $class = 'mediaimg' ): mymedia{
+        $this->elements[ 'thumb' ] = array( 'key' => $key, 'class' => $class );
         return $this;
     }
 
-    public function & setVideo( $key ): mymedia{
-        $this->elements[ 'video' ] = array( 'key' => $key );
+    public function & setVideo( $key, $class = 'mediavideo' ): mymedia{
+        $this->elements[ 'video' ] = array( 'key' => $key, 'class' => $class );
         return $this;
     }
 
-    public function & setDescription( $key ): mymedia
+    public function & setButton( $key, $urlobj, $label ): mymedia{
+        $this->elements[ 'button' ] = array( 'key' => $key, 'urlobj' => $urlobj, 'label' => $label );
+        return $this;
+    }
+
+    public function & setRating( $key, $obj ): mymedia{
+        $this->elements[ 'rating' ] = array( 'key' => $key, 'obj' => $obj );
+        return $this;
+    }
+
+    public function & setDescription( $key, $mini = true ): mymedia
     {
-        $this->elements[ 'description' ] = array( 'key' => $key );
+        $this->elements[ 'description' ] = array( 'key' => $key, 'mini' => $mini );
         return $this;
     }
 
@@ -138,8 +170,8 @@ class mymedia{
         return $this;
     }
 
-    public function & setEmptyMessage( $emptymsg ): mymedia{
-        $this->emptymsg = $emptymsg;
+    public function & setEmptyMessage( $message, $class = 'callout-info', $title = '' ): mymedia{
+        $this->emptymsg = array( 'message' => $message, 'class' => $class, 'title' => $title );
         return $this;
     }
 

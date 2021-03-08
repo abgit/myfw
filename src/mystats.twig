@@ -5,7 +5,7 @@
 					<a data-target="#header-statistics" data-toggle="collapse" class="btn btn-primary btn-icon collapsed"><i class="icon-stats"></i></a>
 				</div>
                 <div class="header-statistics">
-					<div id="header-statistics" class="collapse" style="height: 0px;">
+					<div id="header-statistics" class="collapse">
 						<div class="well">
 {% endif %}                        
                         
@@ -22,6 +22,7 @@
                         {% set type = (stat.classreplacekey ? values[ stat.classreplacekey ] : value)|replaceonly( stat.classreplace )|default( stat.classreplacedefault )|default( 'default' ) %}
                     {% endif %}
 
+    {%  if stat.element == 'standard' %}
     <li{% if stat.class %} class="{{ stat.class }}"{% endif %}>
         <div class="statistics-info">
             {% if stat.icon %}<a class="bg-{{ type }}"><i class="{{stat.icon}}"></i></a>{% endif %}
@@ -50,7 +51,9 @@
                     {% set infopos = stat.addonpos|replace({' ': '&nbsp;'}) %}
                     {% if infopos %}<span class="infopos">{{ infopos|raw }}</span>{% endif %}
             </strong>
+
             {% endif %}
+
         </div>
         {% if stat.percentagetype %}
             {% set pervalue = ( stat.percentagekey ? values[ stat.percentagekey ] : stat.percentage )|default(0) %}
@@ -62,6 +65,38 @@
         {% endif %}
         <span>{{ stat.addonlabelpre|raw }}<span id="st{{ stat.key}}lpre">{{ stat.addonlabelprekey ? values[ stat.addonlabelprekey ]|default( stat.addonlabelprekeydefault )|raw }}</span>{{ stat.label|raw|label( values[ stat.addonlabelprekey ] ) }}<span id="st{{ stat.key}}lpos">{{ stat.addonlabelposkey ? values[ stat.addonlabelposkey ]|default( stat.addonlabelposkeydefault )|raw }}</span>{{ stat.addonlabelpos|raw }}</span>
     </li>
+
+    {% elseif stat.element == 'label' %}
+
+    <li>
+        <div class="statistics-info">
+
+            {% set class = stat.defaultclass %}
+            {% set label = stat.defaultlabel %}
+            {% for option in stat.options %}
+                {% if option.value is same as(value) %}
+                    {% set class = option.stats %}
+                    {% set label = option.label %}
+                {% endif %}
+
+            {% endfor %}
+
+            <strong>
+                <span id="st{{ stat.key }}" class="label label-stats {{ class }}">{{ label }}</span>
+            </strong>
+
+        </div>
+            <div class="progress progress-micro">
+                <div id="stp{{ stat.key }}" style="width:0%;" role="progressbar" class="progress-bar progress-bar-info">
+                    <span class="sr-only"></span>
+                </div>
+            </div>
+
+        <span>{{ stat.label }}</span>
+    </li>
+
+    {% endif %}
+
 {% endfor %}
 </ul>
 

@@ -14,6 +14,15 @@ use \Twig\TwigFilter;
 use \Twig\TwigFunction;
 use \Twig\Extension\StringLoaderExtension;
 
+// global time constants
+define( 'SEC_SECOND',       1 );
+define( 'SEC_MINUTE',      60 );
+define( 'SEC_HOUR',      3600 );
+define( 'SEC_DAY',      86400 );
+define( 'SEC_WEEK',    604800 );
+define( 'SEC_MONTH',  2592000 );
+
+
 class myfw{
 
     /** @var mycontainer */
@@ -142,13 +151,15 @@ class myfw{
             $app->add(new Session([
                 'name'        => 'mysession',
                 'autorefresh' => true,
-                'lifetime'    => '20 minutes'
+                'secure'      => true,
+                'lifetime'    => '60 minutes'
             ]));
 
             $container['session'] = static function () {
                 ( new mysession( [ 'name'        => 'mysession',
                                    'autorefresh' => true,
-                                   'lifetime'    => '20 minutes' ] ) )->start();
+                                   'secure'      => true,
+                                   'lifetime'    => '60 minutes' ] ) )->start();
 
                 return new Helper;
             };
@@ -185,14 +196,21 @@ class myfw{
             }, array('is_safe' => array('html'))));
 
 
-            $env->addFilter(new TwigFilter('cdn', array($container->filters, 'cdn')
-                , array('is_safe' => array('html'))));
+//            $env->addFilter(new TwigFilter('cdn', array($container->filters, 'cdn')
+//                , array('is_safe' => array('html'))));
 
             $env->addFilter(new TwigFilter('htmlpurifier', array($container->filters, 'htmlpurifier')
                 , array('is_safe' => array('html'))));
 
             $env->addFilter(new TwigFilter('urlobj', array($container->urlfor, 'urlobj')
                 , array('is_safe' => array('html'))));
+
+
+            $env->addFilter(new TwigFilter('autolink',
+                static function ($f){
+                    return preg_replace("/http[s]?:\/\/[a-zA-Z0-9.\-\/?#=&]+/", "<a href=\"$0\" target=\"_blank\">$0</a>", $f);
+                }, array( 'pre_escape'=>'html', 'is_safe' => array('html'))));
+
 
             $env->addFilter(new TwigFilter('*',
                 static function ($f) use ($container) {
@@ -204,18 +222,9 @@ class myfw{
                     return '';
                 }
             ));
-            /*
-                            $view->addFunction( new Twig_SimpleFunction( 'urlFor',
-                                function( $action, $params = array() ){
-                                    try{
-                                        return $this->urlFor( $action, is_array( $params ) ? $params : array( $params ) );
-                                    }catch( RuntimeException $e ){
-                                        return '';
-                                    };
-                            }));
-            */
+
             $env->addExtension(new StringLoaderExtension());
-            $env->addExtension(new Aptoma\Twig\Extension\MarkdownExtension(new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine()));
+//            $env->addExtension(new Aptoma\Twig\Extension\MarkdownExtension(new Aptoma\Twig\Extension\MarkdownEngine\MichelfMarkdownEngine()));
 
             /** @var LoaderInterface $loader */
             $loader = $env->getLoader();
@@ -224,9 +233,6 @@ class myfw{
             return $view;
         });
 
-//        $app->get( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:[0-9]{6}}]', 'myconfirm:processRequest' )
-//            ->setName( 'myfwconfirm' );
-
         $app->post( '/verify/{h:cf[a-f0-9]{32}}[/{twotoken:.*}]', 'myconfirm:processRequest' )
             ->setName( 'myfwconfirm' );
 
@@ -234,17 +240,17 @@ class myfw{
         $app->post( '/myfw/tip/{tip:tip[a-zA-Z0-9]{1,20}}', 'mymessage:processTip' )
             ->setName( 'myfwtip' );
 
-        $app->post( '/myfw/filestack/{fsid:[a-zA-Z0-9]{1,20}}', 'myform:processFilestackThumb' )
-            ->setName( 'myfwfilestack' );
+//        $app->post( '/myfw/filestack/{fsid:[a-zA-Z0-9]{1,20}}', 'myform:processFilestackThumb' )
+//            ->setName( 'myfwfilestack' );
 
         $app->post( '/myfw/uploadcare/{fsid:.*}', 'myform:processUploadcareThumb' )
             ->setName( 'myfwuploadcare' );
 
-        $app->post( '/myfw/markdown', 'myform:processMarkdown' )
-            ->setName( 'myfwmarkdown' );
+//        $app->post( '/myfw/markdown', 'myform:processMarkdown' )
+//            ->setName( 'myfwmarkdown' );
 
-        $container['filestack.policy'] = static fn() => base64_encode('{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}' );
-        $container['filestack.signature'] = static fn($c) => hash_hmac( 'sha256', $c['filestack.policy'], $c->config[ 'filestack.secret' ] );
+//        $container['filestack.policy'] = static fn() => base64_encode('{"expiry":' . strtotime( 'first day of next month midnight' ) . ',"call":["pick","store"]}' );
+//        $container['filestack.signature'] = static fn($c) => hash_hmac( 'sha256', $c['filestack.policy'], $c->config[ 'filestack.secret' ] );
 
     }
 
@@ -312,3 +318,54 @@ class myfw{
         die(var_export($x));
     }
 
+    function in_arrayi( string $needle, array $haystack ): array{
+        return in_array(strtolower($needle), array_map('strtolower', $haystack));
+    }
+
+    function array_avg( array $array ): array{
+        $num = count( $array );
+
+        $array = array_filter( $array, function($v){ return is_string($v) || is_numeric($v); } );
+
+        $res = array_count_values($array);
+
+        foreach ($res as $k => $val) {
+            $res[$k] = array( 'value' => $k, 'count' => $val, 'percentage' => round($val / $num * 100, 2) );
+        }
+
+        return $res;
+
+    }
+
+    function array_avg_desc( array $array ):array{
+        $array = array_values( array_avg( $array ) );
+
+        array_multisort(array_column($array, 'percentage'), SORT_DESC, $array);
+
+        return $array;
+    }
+
+    function array_avg_min( array $array, float $min ): array{
+        $res = array();
+
+        foreach( array_avg( $array ) as $k => $val ){
+            if( $val[ 'percentage' ] >= $min ){
+                $res[] = $val[ 'value' ];
+            }
+        }
+
+        return $res;
+    }
+
+    function array_one( array $array ):array{
+
+        $res = array();
+        foreach ( $array as $el ){
+            if( is_array( $el ) ){
+                $res = array_merge( $res, array_one( $el ) );
+            }else{
+                $res[] = $el;
+            }
+        }
+        return $res;
+    }

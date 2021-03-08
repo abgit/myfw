@@ -2,7 +2,7 @@
 {% if allitems %}
 
 
-    {% if buttons is not empty %}
+    {% if buttons is not empty or title.label %}
     <div class="row grid-buttons">
         <div class="col-md-12 text-right">
 
@@ -18,7 +18,7 @@
 
 
         {% for button in buttons %}
-            <a id="{{ button.id }}" style="margin-left:3px;" type="button" class="btn btn-{{button.class}}" {{ button.onclick|urlobj }}><i class="{{ button.icon }}"></i> {{ button.label }}</a>
+            <a id="{{ button.id }}" type="button" class="btn btn-{{button.class}} btn-grid" {{ button.onclick|urlobj }}><i class="{{ button.icon }}"></i> {{ button.label }}</a>
         {% endfor %}
         </div>
     </div>
@@ -126,6 +126,9 @@
                                                         {% elseif td.type == 'image' %}
                                                             <img height="{{ td.height }}" width="{{ td.width }}" src="{{ td.cdn }}{{ value }}{{ td.sufix }}">
 
+                                                        {% elseif td.type == 'rating' %}
+                                                             {{ td.obj.setvalue( value )|raw }}
+
                                                         {% elseif td.type == 'label' %}
                                                             {% set class = ( td.classreplacekey ? val[ td.classreplacekey ] : value )|replaceonly( td.classreplace )|default( td.classreplacedefault ) %}
                                                             <span {% if class %}class="label label-mini label-{{ class }}"{% endif %}>{{ td.replaceval ? value|replaceonly( td.replaceval ) : value|t(20) }}{{ td.sufix|label( value ) }}</span>
@@ -144,7 +147,7 @@
             				                            	<span class="hidden-xs" style="color:#999999;display:block;font-size:11px;margin:0px 0px 0px 20px;">{{ ( td.keycustomdate ? val[ td.keycustomdate ] : value )|date( td.dateonly ? "Y-m-d" : "Y-m-d H:i:s" ) }}</span>
 
                                                         {% elseif td.type == 'description' %}
-            				                            	<span class="hidden-xs" style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|t( td.truncate|default( 36 ) )|nl2space }}{{ addonpos|raw }}</span>
+            				                            	<span style="color:#999999;display:{{ td.inline ? 'inline' : 'block' }};font-size:11px;margin:0px;">{{ addonpre|raw }}{{ value|t( td.truncate|default( 36 ) )|nl2space }}{{ addonpos|raw }}</span>
 
                                                         {% elseif td.type == 'info' %}
 

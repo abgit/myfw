@@ -129,11 +129,64 @@ class mysocial{
     public function youtubeid( $channel_name ){
         $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=id&forUsername='.$channel_name.'&key=' . $this->app->config[ 'youtube.key' ] );
         $res = json_decode($res, true);
-
         return isset( $item['id'] ) ? $item['id'] : null;
     }
 
-    public function youtubeChannels( $channel_id ){
+
+    private function rateLimitYoutube(){
+
+        // rate limit check: 1 per second
+        while (!$this->app->redis->rateisvalid(1, 1, 60, null, 2, false, false, 'domyoutube')) {
+            sleep(2);
+        }
+    }
+
+    public function youtubeinfo( $url ): ?string{
+        $dom = new PHPHtmlParser\Dom;
+
+        $this->rateLimitYoutube();
+
+        $url = trim( $url );
+        if( stripos( $url, 'https://www.youtube.com/' ) === 0 || stripos( $url, 'https://youtube.com/' ) === 0 ) {
+            $meta = $dom->loadFromUrl($url);
+        }else{
+
+            // check if is a channel
+            if( $url[0] === 'U' && $url[1] === 'C' && strlen( $url ) > 15 ) {
+                return $url;
+            }
+
+            // try by username or by custom url
+            $meta = $dom->loadFromUrl( 'https://www.youtube.com/c/' . $url );
+
+            if( is_null( $meta ) ){
+                $this->rateLimitYoutube();
+                $meta = $dom->loadFromUrl( 'https://www.youtube.com/' . $url );
+            }
+        }
+
+        return $meta === null ? null : $dom->find( "meta[itemprop=channelId]" )[0]->getTag()->getAttribute('content')['value'];
+    }
+
+    public function youtubeChannels( string $channel ){
+/*
+        $channel_id = trim( $channel );
+
+        if( $channel_id[0] !== 'U' || $channel_id[1] !== 'C'){
+            $channel_id = $this->youtubeid( $channel_id ) ?? '';
+
+            if( empty( $channel_id ) ) {
+                $res = file_get_contents('https://www.googleapis.com/youtube/v3/search?part=id&type=channel&q=' . trim( $channel ) . '&key=' . $this->app->config['youtube.key']);
+                $res = json_decode($res, true);
+
+                $channel_id = $res[ 'items' ][0]['id']['channelId'] ?? '';
+            }
+        }
+*/
+        $channel_id = $this->youtubeinfo( $channel );
+
+        if( $channel_id === null )
+            return array();
 
         $res = file_get_contents('https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id='.$channel_id.'&key=' . $this->app->config[ 'youtube.key' ] );
         $res = json_decode($res, true);
@@ -155,19 +208,20 @@ class mysocial{
                     if (isset($this->app->list->youtubecategories[$cat]))
                         $categories[] = $this->app->list->youtubecategories[$cat];
 
-            $return[ $chid ] = array(
-                'title' => $item['snippet']['title'],
+            $return[] = array(
+                'id'          => $chid,
+                'title'       => $item['snippet']['title'],
                 'description' => $item['snippet']['description'],
                 'playlistid'  => $playlistid,
-                'username' => isset($item['snippet']['customUrl']) ? $item['snippet']['customUrl'] : null,
-                'countrycode' => isset($item['snippet']['country']) ? $item['snippet']['country'] : null,
-                'countryname' => isset($item['snippet']['country']) && isset($this->app->list->countries[$item['snippet']['country']]) ? $this->app->list->countries[$item['snippet']['country']] : null,
-                'thumb' => $item['snippet']['thumbnails']['high']['url'],
-                'views'           => empty( $item['statistics']['viewCount'] )       ? null : intval( $item['statistics']['viewCount'] ),
-                'comments'        => empty( $item['statistics']['commentCount'] )    ? null : intval( $item['statistics']['commentCount'] ),
+                'username'    => $item['snippet']['customUrl'] ?? null,
+                'countrycode' => $item['snippet']['country'] ?? null,
+                'countryname' => isset($item['snippet']['country'], $this->app->list->countries[$item['snippet']['country']]) ? $this->app->list->countries[$item['snippet']['country']] : null,
+                'thumb'       => $item['snippet']['thumbnails']['high']['url'],
+                'views'       => empty( $item['statistics']['viewCount'] )       ? null : (int)$item['statistics']['viewCount'],
+                'comments'    => empty( $item['statistics']['commentCount'] )    ? null : (int)$item['statistics']['commentCount'],
                 'subscribers' => $subscribers,
-                'videos'          => empty( $item['statistics']['videoCount'] )      ? null : intval( $item['statistics']['videoCount'] ),
-                'categories' => implode(' ', $categories),
+                'videos'      => empty( $item['statistics']['videoCount'] )      ? null : (int)$item['statistics']['videoCount'],
+                'categories'  => implode(' ', $categories),
   //              'avglatest' => $videostotal,
   //              'avgviews' => $videostotal == 0 ? 0 : intval($views / $videostotal),
   //              'avglikes' => $videostotal == 0 ? 0 : intval($likes / $videostotal),

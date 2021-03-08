@@ -22,7 +22,6 @@ use SlimSession\Helper;
  * @property myotp $otp
  * @property mypusher $pusher
  * @property myconfirm $confirm
- * @property mymailgun $mailgun
  * @property mybreadcrumb $breadcrumb
  * @property mynotify $notify
  * @property mynexmo $nexmo

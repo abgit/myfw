@@ -13,6 +13,7 @@ class myexception extends Exception {
     const REDIRECTOK   = 107;
     const FORBIDDEN    = 108;
     const LOGOUT       = 109;
+    const LOGIN        = 110;
 
     public function __construct( $code, $message = '' ) {
         parent::__construct( $message, $code);
@@ -43,6 +44,15 @@ class myexception extends Exception {
                 }
                 break;
 
+            case myexception::LOGIN:
+
+                if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->redirect( $message, 'Welcome.', 2000, true )
+                        ->obj() );
+                }else {
+                    return $response->withRedirect( $message );
+                }
+                break;
 
             case myexception::ERROR:
 
@@ -96,11 +106,11 @@ class myexception extends Exception {
                 break;
 
             case myexception::LOGOUT:
-                if( $container->ismobile ) {
+/*                if( $container->ismobile ) {
                     return $response->withJson($container->ajax->alert('Forbidden')
                         ->obj());
-                }elseif( $container->isajax ) {
-                    return $response->withJson( $container->ajax->redirect( $message, '', 1000, $code == myexception::REDIRECTOK )
+                }else*/if( $container->isajax ) {
+                    return $response->withJson( $container->ajax->redirect( $message, 'Session expired. Please login again.', 3000, $code == myexception::REDIRECTOK )
                         ->obj() );
                 }else {
                     return $response->withRedirect( $message );

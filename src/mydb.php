@@ -28,7 +28,7 @@
 
             $this->app         = $container;
             $this->pdo_url     = parse_url( $this->app->config[ 'db.dsn' ] );
-            $this->pdo_options = ( isset( $this->app[ 'db.options' ] ) && is_array( $this->app[ 'db.options' ] ) ) ? $this->app[ 'db.options' ] : array();
+            $this->pdo_options = $this->app[ 'db.options' ] ?? array();
             $this->pdo_scheme  = '';
 
             if( isset( $this->pdo_url['scheme'] ) ){
@@ -49,9 +49,9 @@
 
         public function & pdo(): PDO
         {
-            if( !isset( $this->pdo )) {
+            //if( !isset( $this->pdo )) {
                 $this->pdo = new PDO($this->pdo_dsn, $this->pdo_url['user'], $this->pdo_url['pass'], $this->pdo_options);
-            }
+            //}
 
             return $this->pdo;
         }
@@ -69,7 +69,7 @@
                 $message = $message[$errcode] ?? $fallback;
             }
 
-            $this->app->ajax->msgError( $message, 'Error found' );
+            $this->app->ajax->msgError( $message, 'Problem found' );
 
             return $this;
         }
@@ -85,7 +85,7 @@
             $debug_start = microtime( true );
 
             // split procedure
-            preg_match( '/([a-zA-Z0-9_]+)\(([a-zA-Z0-9\,|_]*)\)/', $procedure, $s );
+            preg_match( '/([a-zA-Z0-9_]+)\(([a-zA-Z0-9\,|_-]*)\)/', $procedure, $s );
 
             $procedure_name = $s[1];
             $procedure_args = $s[2];
@@ -108,8 +108,11 @@
                         case 'int' :        $column_type  = PDO::PARAM_INT;
                                             $column_value = isset( $args[2] ) ? (int)$args[2] : ( ( isset( $values[ $column_name ] ) && ( is_numeric( $values[ $column_name ] ) || is_bool( $values[ $column_name ] ) ) ) ? intval( $values[ $column_name ] ) : null );
                                             break;
+                        case 'intlist' :    $column_type  = PDO::PARAM_STR;
+                                            $column_value = isset( $values[ $column_name ] ) && is_array( $values[ $column_name ] ) ? implode( ';', array_filter( $values[ $column_name ], 'intval' ) ) : null;
+                                            break;
                         case 'bool' :       $column_type  = PDO::PARAM_BOOL;
-                                            $column_value = isset( $values[ $column_name] ) ? !empty( $values[ $column_name ] ) : ( isset( $args[2] ) ? ( $args[2] === 'true' ? true : ( $args[2] === 'false' ? false : null ) ) : null );
+                                            $column_value = isset( $values[ $column_name ] ) ? !empty( $values[ $column_name ] ) : ( isset( $args[2] ) ? ( $args[2] === 'true' ? true : ( $args[2] === 'false' ? false : null ) ) : null );
                                             break;
                         case 'datetime' :   $column_type  = PDO::PARAM_STR;
                                             $column_value = ( isset( $values[ $column_name ] ) && strlen( $values[ $column_name ] ) > 5 ) ? date('Y-m-d H:i:s', strtotime( $values[ $column_name ] ) ) : null;
@@ -124,7 +127,7 @@
                                             $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 65535 ) : null;
                                             break;
                         case 'tag' :        $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name ] ) ? substr( preg_replace( '/[^A-Za-z0-9]/', '', $values[ $column_name ] ), 0, 100 ) : null;
+                                            $column_value = isset( $values[ $column_name ] ) ? substr( $values[ $column_name ], 0, 36 ) : null;
                                             break;
                         case 'btcaddr' :    $column_type  = PDO::PARAM_STR;
                                             $column_value = isset( $values[ $column_name ] ) && preg_match( "/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/", $values[ $column_name ] ) ? $values[ $column_name ] : null;
@@ -140,7 +143,7 @@
                                             $column_value = isset( $values[ $column_name ] ) ? (float)str_replace(',', '.', $values[$column_name]) : 0;
                                             break;
                         case 'uuid' :       $column_type  = PDO::PARAM_STR;
-                                            $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 40 ) : null;
+                                            $column_value = isset( $values[ $column_name] ) ? substr( $values[ $column_name ], 0, 36 ) : null;
                                             break;
                         case 'json' :       $column_type  = PDO::PARAM_STR;
                                             $column_value = $values[$column_name] ?? null;
@@ -291,18 +294,16 @@
         }
 
 
-        public function findAllFunction( $function, $procedure, $args = array(), $returnobject = false ): bool
-        {
-            // no cache
-            $haselements = false;
+        public function findAllFunction( callable $function, string $procedure, $args = array(), $returnobject = false ): array{
+            $elements = array();
 
             $stmt = $this->query( $procedure, $args );
-            while ($row = $stmt->fetch( is_bool($returnobject) ? ( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) : $returnobject )) {
+            while ($row = $stmt->fetch( $returnobject ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC ) ){
                 $function( $row );
-                $haselements = true;
+                $elements[] = $row;
             }
 
-            return $haselements;
+            return $elements;
         }
 
 
@@ -364,13 +365,14 @@
 
         public function findValue( & $result, $procedure, $args = array(), $returnobject = false ): bool
         {
-            if( !$this->findOne( $oneresult, $procedure, $args, $returnobject ) || empty( $oneresult ) )
+
+            if( !$this->findOne( $oneresult, $procedure, $args, $returnobject ) || empty( $oneresult ) ) {
                 return false;
+            }
 
-            foreach( $oneresult as $result )
-                break;
+            $result = array_shift($oneresult);
 
-            return ( count( $oneresult ) > 0 );
+            return true;
         }
 
 

@@ -56,16 +56,14 @@ class myprogress{
         return $this;
     }
 
-    public function & setKey( string $key, string $keyhtml ): myprogress
-    {
+    public function & setKey( string $key, string $keyhtml ): myprogress{
         $this->key     = $key;
         $this->keyhtml = $keyhtml;
         $this->addKey( $key, $keyhtml );
         return $this;
     }
 
-    public function & addKey( string $key, string $keyhtml ): myprogress
-    {
+    public function & addKey( string $key, string $keyhtml ): myprogress{
         $this->keys[]     = $key;
         $this->keyshtml[] = $keyhtml;
         return $this;
@@ -87,8 +85,7 @@ class myprogress{
         return (int)$unit === 1 && !is_null( $this->titleFormatSingular )? $this->titleFormatSingular : $this->titleFormatPlural;
     }
 
-    public function init( $args = null ): myprogress
-    {
+    public function init( $args = null ): myprogress{
         call_user_func( $this->onInit, $args );
         return $this;
     }
@@ -98,10 +95,9 @@ class myprogress{
         return $this;
     }
 
-    public function & addStep( $name, $units, $help, $header = null ): myprogress
-    {
+    public function & addStep( string $name, int $units, string $help = '', string $header = '' ): myprogress{
 
-        if( !is_null( $header ) ){
+        if( !empty( $header ) ){
             $this->showHeader = true;
         }
 
@@ -148,14 +144,6 @@ class myprogress{
                 $this->elements[ $name ][ 'title' ]      = sprintf( $this->getTitleFormat($unitsleft), $unitsleft );
                 $this->elements[ $name ][ 'type' ]       = 1;
 
-            }elseif( $this->value === $this->elements[ $name ][ 'start' ] - 1 ){
-                $this->elements[ $name ][ 'percentage' ] = 4;
-                $this->elements[ $name ][ 'class' ]      = $this->getClassActive();
-                $this->elements[ $name ][ 'active' ]     = $this->getActive();
-                $this->elements[ $name ][ 'unitsleft' ]  = $this->elements[ $name ][ 'units' ];
-                $this->elements[ $name ][ 'title' ]      = sprintf( $this->getTitleFormat($this->elements[ $name ][ 'units' ]), $this->elements[ $name ][ 'units' ] );
-                $this->elements[ $name ][ 'type' ]       = 2;
-
             }elseif( $this->value < $this->elements[ $name ][ 'start' ] ){
                 $this->elements[ $name ][ 'percentage' ] = 0;
                 $this->elements[ $name ][ 'class' ]      = '';
@@ -175,12 +163,11 @@ class myprogress{
             }elseif( $this->value == $this->elements[ $name ][ 'end' ] ) {
                 $this->elements[ $name ][ 'percentage' ] = 100;
                 $this->elements[ $name ][ 'class' ]      = $this->getClassDone();
-                $this->elements[ $name ][ 'active' ]     = '';
+                $this->elements[ $name ][ 'active' ]     = $this->getActive();
                 $this->elements[ $name ][ 'unitsleft' ]  = 0;
                 $this->elements[ $name ][ 'title' ]      = '';
                 $this->elements[ $name ][ 'type' ]       = 4;
             }
-
         }
 
         // add width correction to last element so that total width is always 100%
@@ -189,15 +176,14 @@ class myprogress{
         return $this->elements;
     }
 
-    public function & setValue( $value ): myprogress
-    {
-        $max = 0;
-        foreach( $this->elements as $el ){
-            $max += $el[ 'units' ];
-        }
-
-        $this->value = abs( $value ) > $max ? abs( $max ) : abs( $value );
+    public function & setValue( $value ): myprogress{
+        $this->value = abs( $value );
         $this->on    = $value >= 0;
+        return $this;
+    }
+
+    public function & setOn( bool $on ): myprogress{
+        $this->on = $on;
         return $this;
     }
 

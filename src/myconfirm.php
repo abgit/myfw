@@ -29,30 +29,31 @@ class myconfirm{
             return;
         }
 
-        $this->app->ajax->confirmDialogClose();
+        //$this->app->ajax->confirmDialogClose();
     }
 
     /** @throws myexception */
     public function checkToken( $msg = null, $help = null, $title = null ){
-        return $this->check( $msg, $help, $title, '', 1, true, true );
+        return $this->check( $msg, $help, $title, '', '', 1, true, true );
     }
 
     /** @throws myexception */
     public function checkTokenIfConfigurared( $msg = null, $help = null, $title = null){
-        return $this->check( $msg, $help, $title, '', 1, true, false );
+        return $this->check( $msg, $help, $title, '', '', 1, true, false );
     }
 
     /** @throws myexception */
-    public function checkConfirm( $msg = null, $help = null, $title = null, $description = '' ){
-        return $this->check( $msg, $help, $title, $description, 1, false, true );
+    public function checkConfirm( $msg = null, $help = null, $title = null, $description = '', $raw = '', $size = 2 ){
+        return $this->check( $msg, $help, $title, $description, $raw, 1, false, true, $size );
     }
 
     /** @throws myexception */
-    private function check( $msg = null, $help = null, $title = null, $description = '', $mode = 1, $twofactor = false, $required = true ){
+    private function check( $msg = null, $help = null, $title = null, $description = '', $raw = '', $mode = 1, $twofactor = false, $required = true, $size = 2){
 
-        if( empty( $msg ) )   $msg   = 'Do you confirm your action ?';
-        if( empty( $help ) )  $help  = '';
-        if( empty( $title ) ) $title = 'Confirmation';
+        $msg   = empty( $msg )   ? 'Do you confirm your action ?' : htmlspecialchars( $msg );
+        $help  = empty( $help )  ? ''                             : htmlspecialchars( $help );
+        $title = empty( $title ) ? 'Confirmation'                 : htmlspecialchars( $title );
+        $description = htmlspecialchars( $description ) . ( empty( $raw ) ? '' : '<br><br>' . $this->app->ajax->filter( $raw ) );
 
         $postvars = ( isset( $_POST ) ? $_POST : array() );
         foreach( $postvars as $k => $val )
@@ -67,7 +68,7 @@ class myconfirm{
 
         if( isset( $current_hash[ 'xconfirm' ] ) && $current_hash[ 'xconfirm' ] === $this->app->request->getHeaderLine('X-Confirm') ){
             $this->app->session->delete( $hash );
-            $this->app->ajax->confirmDialogClose();
+            $this->app->ajax->confirmDialogClose( $current_hash[ 'xconfirm' ] );
             return true;
         }
 /*
@@ -118,7 +119,7 @@ class myconfirm{
         $this->app->session->set( $hash, array( 'url' => $actual_link, 'xconfirm' => $xconfirm, 'pin' => $twofactor, 'postvars' => $_POST ) );
         $this->app->session->set( $xconfirm, $hash );
 
-        $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $twofactor, $pinlabel, $pinhelp );
+        $this->app->ajax->confirm( $this->app->urlfor->action( 'myfwconfirm', array( 'h' => $hash ) ), $msg, $title, $description, $help, $mode, $twofactor, $pinlabel, $pinhelp, $size, $xconfirm );
 
         throw new myexception( myexception::STOP );
     }

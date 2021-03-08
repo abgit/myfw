@@ -65,12 +65,17 @@ class mymessage{
     }
 
     public function & addTitle( $title ){
-        $this->elements[] = array( 'type' => 'title' , 'text' => $title );
+        $this->elements[] = array( 'type' => 'title', 'text' => $title );
         return $this;
     }
 
-    public function & addTitleRelative( $key ){
-        $this->elements[] = array( 'type' => 'titlerelative' , 'key' => $key );
+    public function & addSeparator(){
+        $this->elements[] = array( 'type' => 'separator' );
+        return $this;
+    }
+
+    public function & addHelp( $message ){
+        $this->elements[] = array( 'type' => 'help', 'message' => $message );
         return $this;
     }
 

@@ -20,7 +20,7 @@
 	{% else %}
         <div class="callout callout-danger fade in">
 				<button data-dismiss="alert" class="close" type="button">×</button>
-				<h5>Some errors found</h5>
+				<h5>Problems found</h5>
 				<p><ul><li>{{ errors|join('</li><li>')|raw }}</li></ul></p>
         </div>
     {% endif %}
@@ -30,9 +30,10 @@
 
 	{% if renderaction %}
 		<form action="{{ action }}" method="post" name="{{ name }}" id="{{ name }}" role="form"{% if target %} target="{{ target }}"{% endif %}>
-	{% endif %}
+	    <div class="modal-elements">
+    {% endif %}
 
-	{% if ismodal %}
+	{% if ismodal and false %}
             <div id="{{ modal.id }}" class="{{ isajax ? 'modal' }}" tabindex="-1" role="dialog"{{ modal.static ? ' data-keyboard="false" data-backdrop="static"'}}>
 				<div class="modal-dialog{{ modal.class ? ' ' ~ modal.class }}" style="{% if isajax %}{% if modal.width %}max-width:{{modal.width}}px{% endif %}{% else %}max-width:100%;width:{{modal.width|default( 1120 )}}px;margin:0px{% endif %}">
 					<div class="modal-content">
@@ -315,20 +316,12 @@
 
                     <p class="form-control-static" id="{{name ~ el.name}}">{{ value|htmlpurifier }}</p>
 
-                    {% elseif el.type == 'link' %}
-
-                        <a {{ el.urlobj|urlobj }} id="{{name ~ el.name}}">{{ el.label }}</a>
-                        {% if el.help %}<p><span id="help{{name ~ el.name}}" class="help-static help-block">{{el.help|nl2br}}</span></p>{% endif %}
 
                     {% elseif el.type == 'button' %}
 
                 {% if el.label %}<label>{{ el.label }}{{el.rules.required ? ' <span>(required)</span>'}}</label>{% endif %}
                     <div>
-                        {% if el.onclick %}
-                            <button type="button" class="btn btn-default" onClick="{{el.onclick|raw}}">{{ el.labelbutton }}</button>
-                        {% else %}
-                            <a class="btn btn-default" href="{{el.href|raw}}" target="_blank">{% if el.icon %}<i class="icon-{{ el.icon }}"></i>{% endif %}{{ el.labelbutton }}</a>
-                        {% endif %}
+                        <button type="button" class="btn btn-{{ el.class }}" {{el.urlobj|urlobj}}>{% if el.icon %}<i class="icon-{{ el.icon }}"></i>{% endif %}{{ el.labelbutton }}</button>
                     </div>
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
 
@@ -448,10 +441,10 @@
 
 
                             <button onClick='uploadcare.openDialog(null, {{ el.pickeroptions|raw }} ).done(function(file) {
-                                    myfwloadon("Uploading . . .", "info" );
+                                    myfwloadon("Uploading ...  Please wait.", "info" );
                                     file.done(function(fileInfo) {
                                     myfwloadoff();
-                                    myfwsubmit("{{ el.processing }}","Processing ...",{img:fileInfo.cdnUrl},false,"info",1000);
+                                    myfwsubmit("{{ el.processing }}","Processing ... Please wait.",{img:fileInfo.cdnUrl},false,"info",1000);
                                     });
                                     });' class="btn btn-default" type="button"><i class="icon-image2"></i>Upload image or video</button> <button id="uploadcarerem{{ name ~ el.name }}" onClick="$('#uploadcared{{ name ~ el.name }}').html('');$('#uploadcareh{{ name ~ el.name }}').val('');$('#uploadcarerem{{ name ~ el.name }}').css('display','none');" class="btn btn-default btn-icon" type="button" style="display: none"><i class="icon-remove3"></i></button>
                             </div>
@@ -497,6 +490,11 @@
                     <div>unknown</div>
                 {% endif %}
                 {% if el.help %}<span class="help-block">{{el.help|nl2br}}</span>{% endif %}
+
+
+                {% elseif el.type == 'link' %}
+                    <a class="formlink" {{ el.urlobj|urlobj }} id="{{name ~ el.name}}">{{ el.label }}</a>
+                {% if el.help %}<p class="formlinkhelp"><span id="help{{name ~ el.name}}" class="help-static help-block">{{el.help|nl2br}}</span></p>{% endif %}
 
                     {% elseif el.type == 'transloadit' %}
 
@@ -573,7 +571,7 @@
 	{% endif %}
             
         {% if footer %}
-            <div style="text-align:right">
+            <div style="">
         {% endif %}
             
             {% for el in elements %}
@@ -588,7 +586,7 @@
 
                         <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
 
-                        <input style="margin:3px 0px 200px 0px;" {{el.disabled ? 'disabled="disabled" '}}type="submit" id="{{name ~ el.name}}ajax" class="btn {{el.css}}" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
+                        <input style="margin:3px 0px 50px 0px; width: 100%;cursor: pointer;" {{el.disabled ? 'disabled="disabled" '}}type="submit" id="{{name ~ el.name}}ajax" class="btn {{el.css}}" value="{{el.label}}"{%for k,v in el.options.html%} {{k}}={{v|json_encode|raw}}{%endfor%}>
 
                         <script type="text/javascript">
                             $('#{{name}}').submit(function(event) {
@@ -608,6 +606,19 @@
                     {% endif %}
                 {% endif %}
             {% endfor %}
+
+    {% if bottom %}
+    <hr>
+    {% endif %}
+
+    {% for el in bottom %}
+        {% if el.type == 'link' %}
+            <a class="formlink" {{ el.urlobj|urlobj }} id="{{name ~ el.name}}">{{ el.label }}</a>
+            {% if el.help %}<p class="formlinkhelp"><a class="help-static help-block" {{ el.urlobj|urlobj }}>{{el.help|nl2br}}</a></p>{% endif %}
+        {% endif %}
+    {% endfor %}
+
+
             <input type="hidden" name="{{csrfname}}" id="{{csrfname}}" value="{{csrf}}"/>
 
         {% if footer %}
@@ -619,6 +630,8 @@
                             {% if closeb %}
                                 <button data-dismiss="modal" class="btn btn-{{closeset.class|default('default')}}" style="margin-left:5px;margin-top:3px;">{{closeset.label|default('Close')}}</button>
                             {% endif %}
+    {% endif %}
+    {% if ismodal and false %}
 						</div>
                     </div>                            
                 </div>
@@ -627,6 +640,7 @@
 
 
 	{% if renderaction %}
+        </div>
 		</form>
 	{% endif %}
 

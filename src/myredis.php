@@ -11,12 +11,15 @@ use Ahc\Cron\Expression;
         private array $mq   = array();
         private array $cron = array();
         private RSMQ $later;
+        private float $process_start;
 
         public function __construct( $c ){
 
             parent::__construct();
 
             $this->app = $c;
+
+            $this->processStartNow();
 
             if( $this->app->config[ 'redis.dsn' ] ){
 
@@ -33,15 +36,76 @@ use Ahc\Cron\Expression;
             }
         }
 
-        public function getFunction( $key, $timeout, $function ):string{
+        public function processStartNow(){
+            $this->process_start = microtime( true );
+        }
 
-            $res = $this->get( $key );
-            if( $res === false ){
+        public function processStart():float{
+            return $this->process_start;
+        }
+
+        public function getFunction( string $key, int $timeout, callable $function, bool $useCache = true ): ?string{
+
+            if( $useCache ) {
+                $res = $this->get($key);
+                if ($res === false) {
+                    $res = $function();
+
+                    if( !is_null($res) && $timeout > 0 ) {
+                        $this->setex($key, $timeout, $res);
+                    }
+                }
+            }else{
                 $res = $function();
-                $this->setex( $key, $timeout, $res );
+
+                if( !is_null($res) && $timeout > 0 ){
+                    $this->setex($key, $timeout, $res);
+                }
             }
 
             return $res;
+        }
+
+        // returns the next index, round robin
+        public function getRoundRobin( string $name, int $indexes ):int{
+
+            $value = $this->get( 'roundrobin' . $name );
+
+            if( $value === false || (int) $value >= $indexes || (int) $value < 0 ){
+                $value = 0;
+                $this->set( 'roundrobin' . $name, 0 );
+            }
+
+            $this->incr( 'roundrobin' . $name );
+            return (int) $value;
+        }
+
+
+        public function timeSchedule( int $now, int $step = 1, string $prefix = '' ):int{
+
+            $seconds = 0;
+            while( true ) {
+                if( $now % $step === 0 && $this->setnx( 'cronschedule' . $prefix . $now, '' ) ){
+                    $this->expire( 'cronschedule' . $prefix . $now, 86400 * 60 ); // 60 days
+                    return $now;
+                }
+                $now++;
+                $seconds++;
+
+                // protect infinite loop
+                if( $seconds > 86400 * 60 ){
+                    throw new Exception( 'no schedule slot available' );
+                }
+            }
+        }
+
+        public function timeScheduleNow( int $now, int $step = 1, string $prefix = '' ):int{
+            $time = time();
+            if( $now < $time ){
+                $now = $time;
+            }
+
+            return $this->timeSchedule( $now, $step, $prefix ) - $time;
         }
 
         private function rateprefix( $persession, $perip, $perprefix ): string{
@@ -123,6 +187,37 @@ use Ahc\Cron\Expression;
             $t = $this->get( $keylock . 't' );
 
             return ( $t === false ) ? 0 : ( (int)$t - time() );
+        }
+
+
+        public function requestGet( int $timeout, bool $useCache, string $url, array $headers = array(), array $parameters = array() ): object{
+
+            $res = $this->getFunction( md5( 'requestGet|' . json_encode( array( $url, $headers, $parameters ) ) ), $timeout,
+                   function() use ( $url, $headers, $parameters ){
+
+                try {
+                    $r = \Unirest\Request::get($url, $headers, $parameters);
+                    return $r->code >= 200 && $r->code < 300 && !empty($r->raw_body) ? $r->raw_body : null;
+                }catch (Exception $exception){
+                    return null;
+                }
+
+                   }, $useCache );
+
+            return (object) array( 'body' => json_decode( $res ) );
+        }
+
+        public function requestPost( int $timeout, bool $useCache, string $url, array $headers, $parameters ): object{
+
+            $res = $this->getFunction( md5( 'requestPost|' . json_encode( array( $url, $headers, $parameters ) ) ), $timeout,
+                function() use ( $url, $headers, $parameters ){
+
+                    $r = \Unirest\Request::post( $url, $headers, $parameters );
+                    return $r->code >= 200 && $r->code < 300 && !empty($r->raw_body) ? $r->raw_body : null;
+
+                }, $useCache );
+
+            return (object) array( 'body' => json_decode( $res ) );
         }
 
         public function mutex( $id ):PHPRedisMutex{
@@ -293,6 +388,8 @@ use Ahc\Cron\Expression;
             if( !empty( $this->mq ) ){
                 while( true ) {
 
+                    $this->processStartNow();
+
                     // check if this process should pause
                     while( $this->exists( 'mqsleep' ) ){
                         sleep( 1 );
@@ -316,7 +413,7 @@ use Ahc\Cron\Expression;
                     }
 
                     // process real-time message
-                    $value = $this->brpoplpush( 'mq', 'mqprocessed', 10 );
+                    $value = $this->brpoplpush( 'mq', 'mqprocessed', 5 );
 
                     // check if message is valid (note: if timeout passed, result is false)
                     if( !empty($value) && ( $message = json_decode($value, true, 512, JSON_THROW_ON_ERROR) ) && isset($message['q'], $message['h'])) {

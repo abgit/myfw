@@ -8,8 +8,8 @@ class mygrid{
     private string $name;
     private string $key = '';
     private string $keyhtml = '';
-    private array $cols;
-    private array $labels;
+    private array $cols   = array();
+    private array $labels = array();
     private array $more   = array();
     private array $values = array();
     private array $title = array();
@@ -33,8 +33,10 @@ class mygrid{
     private bool $showheaders = true;
 
     public  $onInit;
+    public  $onInitValues;
     public  $onMore;
     public  $onRefresh;
+    public  $onRefreshValues;
 
     public function __construct( $c ){
         $this->app  = $c;
@@ -213,6 +215,15 @@ class mygrid{
             $this->labels[ $key ] = array( 'key' => $key, 'label' => $label );
         }
         $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'progress', 'class' => $class, 'big' => $big );
+        return $this;
+    }
+
+    public function & addRating( $key, $kval, $label = '', $align = '' ): mygrid{
+
+        if( !isset( $this->labels[ $key ] ) ){
+            $this->labels[ $key ] = array( 'key' => $key, 'label' => $label, 'align' => $align );
+        }
+        $this->cols[ $key ][] = array( 'key' => $key, 'kval' => $kval, 'type' => 'rating', 'obj' => $this->app->rating->setName( $key ) );
         return $this;
     }
 
@@ -650,12 +661,22 @@ class mygrid{
 
     public function init(): mygrid
     {
-        call_user_func($this->onInit);
+        if( is_callable( $this->onInit ) ) {
+            call_user_func($this->onInit);
+        }
+        if( is_callable( $this->onInitValues ) ) {
+            $this->setValues( call_user_func( $this->onInitValues ) );
+        }
         return $this;
     }
 
     public function & setOnInit( $fn ):mygrid{
         $this->onInit = $fn;
+        return $this;
+    }
+
+    public function & setOnInitValues( $fn ):mygrid{
+        $this->onInitValues = $fn;
         return $this;
     }
 
@@ -672,12 +693,22 @@ class mygrid{
 
     public function refresh(): mygrid
     {
-        call_user_func($this->onRefresh);
+        if( is_callable( $this->onRefresh ) ) {
+            call_user_func($this->onRefresh);
+        }
+        if( is_callable( $this->onRefreshValues ) ) {
+            $this->ajaxRefresh( call_user_func($this->onRefreshValues) );
+        }
         return $this;
     }
 
     public function & setOnRefresh( $fn ):mygrid{
         $this->onRefresh = $fn;
+        return $this;
+    }
+
+    public function & setOnRefreshValues( $fn ):mygrid{
+        $this->onRefreshValues = $fn;
         return $this;
     }
 

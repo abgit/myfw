@@ -7,6 +7,7 @@ class myform{
 
     private $formname;
     private $elements;
+    private $bottom;
     private $counter;
     private $valuesdefault;
     private $errors;
@@ -76,8 +77,8 @@ class myform{
         return $this->formname;
     }
 
-    public function & setModal( $title = '', $class = 'modal-lg', $icon = '', $static = true, $width = '', $closebutton = true, $pagewidth = 1210 ){
-        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'class' => $class, 'icon' => $icon, 'static' => $static, 'width' => $width, 'closebutton' => $closebutton, 'pagewidth' => $pagewidth );
+    public function & setModal( string $title = '', int $size = 2, bool $closebutton = true ){
+        $this->modal = array( 'id' => 'mod' . $this->formname, 'title' => $title, 'size' => $size, 'closebutton' => $closebutton );
         return $this;
     }
 
@@ -266,6 +267,11 @@ class myform{
         return $this;
     }
 
+    public function & addLinkBottom( $name, $label, $urlobj, $help = '' ): myform{
+        $this->bottom[ $name ] = array( 'type' => 'link', 'name' => $name, 'label' => $label, 'urlobj' => $urlobj, 'help' => $help );
+        return $this;
+    }
+
     public function & addStaticMessage( $message = '', $title = '', $icon = '', $date = '' ){
         $this->elements[ 'smm' . $this->counter++ ] = array( 'type' => 'staticmessage', 'message' => $message, 'title' => $title, 'icon' => $icon, 'date' => $date, 'rules' => array(), 'filters' => array() );
         return $this;
@@ -436,7 +442,7 @@ class myform{
         return $options;
     }
 
-    public function & addSelect( $name, $label, $options = array(), $optionsFilter = null, $help = '' ){
+    public function & addSelect( string $name, string $label, array $options = array(), $optionsFilter = null, $help = '' ){
         if( !is_null( $optionsFilter ) )
             $options = $this->filterOptions( $options, $optionsFilter );
 
@@ -736,9 +742,9 @@ class myform{
         return $rand;
     }
 
-    public function & addButton( $name, $label = null, $labelbutton = null, $onclick = '', $href = '', $icon = '' ){
+    public function & addButton( $name, $label = null, $labelbutton = null, $urlobj = '', $icon = '', $class = '' ){
 
-        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'onclick' => $onclick, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'href' => $href, 'icon' => $icon );
+        $this->elements[ $name ] = array( 'type' => 'button', 'name' => $name, 'urlobj' => $urlobj, 'label' => $label, 'labelbutton' => $labelbutton,  'rules' => array(), 'filters' => array(), 'icon' => $icon, 'class' => $class );
         return $this;
     }
 
@@ -981,8 +987,12 @@ class myform{
         if( ! isset( $this->modal['id'] ) )
             $this->setModal();
 
-        $this->app->ajax->showForm( $this->formname, $this->app->ajax->filter( $this->__toString() ), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag );
+        $this->app->ajax->showForm( $this->formname, $this->getRAW(), $this->modal['id'], $transloadit, $chatscroll, $pusherchannel, $cameratag, $this->modal['title'] ?? null, $this->modal['id'] ?? null, $this->modal['size'] ?? null, $this->modal['closebutton'] ?? null );
         return $this;
+    }
+
+    public function getRAW():string{
+        return $this->app->ajax->filter( $this->__toString() );
     }
 
     public function & setValues( $values ){
@@ -1240,6 +1250,7 @@ class myform{
                         'action'        => $this->action,
                         'target'        => $this->target,
                         'elements'      => $this->elements,
+                        'bottom'        => $this->bottom,
                         'renderaction'  => $this->renderaction,
                         'rendersubmit'  => $this->rendersubmit,
                         'csrfname'      => $this->csrfname,

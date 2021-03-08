@@ -31,7 +31,7 @@ class myajax{
     }
 
     public function & msgError( $msg, $header = null, $args = array() ){
-        return $this->msg( $msg, empty( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Errors found' : 'Error found' ) : $header, array( 'theme' => 'growl-error' ) + $args );
+        return $this->msg( $msg, empty( $header ) ? ( ( is_array( $msg ) && count( $msg ) > 1 ) ? 'Problems found' : 'Problem found' ) : $header, array( 'theme' => 'growl-error' ) + $args );
     }
 
     public function & alert( $message ){
@@ -49,8 +49,8 @@ class myajax{
         return $this;
     }
     
-    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0, $webcameratag = array() ){
-        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $transloadit, 'c' => $chatscroll, 'p' => $pusher, 'w' => empty( $webcameratag ) ? false : $webcameratag );
+    public function & showForm( $formname, $html, $modal, $transloadit = 0, $chatscroll = 0, $pusher = 0, $webcameratag = array(), $title = null, $id = null, $size = 2, $closebutton = true ){
+        $this->out[ 'fs' ] = array( 'f' => $formname, 'h' => $html, 's' => $modal, 't' => $title, 'i' => $id, 'c' => $chatscroll, 'p' => $pusher, 'w' => empty( $webcameratag ) ? false : $webcameratag, 'x' => $this->dialogSize( $size ), 'b' => $closebutton );
         return $this;
     }
     
@@ -114,13 +114,21 @@ class myajax{
         return $this;
     }
 
-    public function & confirm( $url, $msg, $title, $description, $help, $mode, $requirepin, $pinLabel, $pinHelp ){
-        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 'd' => $description, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => (int)$requirepin, 'l' => $pinLabel, 'p' => $pinHelp );
+    private function dialogSize( int $size ):string{
+        switch( $size ){
+            case 1: return 'size-small';
+            case 3: return 'size-wide';
+        }
+        return 'size-normal';
+    }
+
+    public function & confirm( $url, $msg, $title, $description, $help, $mode, $requirepin, $pinLabel, $pinHelp, $size, $id ){
+        $this->out[ 'co' ] = array( 'u' => $url, 'm' => $msg, 'd' => $description, 't' => $title, 'h' => $help, 'o' => $mode, 'f' => (int)$requirepin, 'l' => $pinLabel, 'p' => $pinHelp, 's' => $this->dialogSize( $size ), 'i' => $id );
         return $this;
     }
 
-    public function & confirmDialogClose(){
-        $this->out[ 'cd' ] = array();
+    public function & confirmDialogClose( $id ){
+        $this->out[ 'cd' ] = array( 'i' => $id );
         return $this;
     }
 
@@ -128,6 +136,7 @@ class myajax{
         $this->out[ 'xx' ] = array( 'u' => $url, 'h' => $confimheader );
         return $this;
     }
+
 
     public function & redirect( $url, $message = '', $ms = 1000, $success = false ){
 

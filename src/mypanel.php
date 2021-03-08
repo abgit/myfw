@@ -5,110 +5,114 @@ class mypanel{
     /** @var mycontainer*/
     private $app;
 
-    private $name;
-    private $key;
-    private $keyhtml;
-    private $title;
-    private $emptymsg   = 'No campaigns to display today';
-    private $values     = array();
-    private $elements   = array();
-    private $more       = false;
-    private $perpage    = 10;
-    private $offset     = 0;
-    private $size       = 6;
-    private $sizeoffset = 0;
-    private $action     = false;
-    private $cdn        = false;
+    private ?string $name    = null;
+    private array $keys      = array();
+    private array $keyshtml  = array();
+    private array $title     = array();
+    private array $emptymsg  = array();
+    private array $values    = array();
+    private array $elements  = array();
+    private bool $more       = false;
+    private int $perpage     = 10;
+    private int $offset      = 0;
+    private int $size        = 6;
+    private int $sizeoffset  = 0;
+    private ?array $action   = null;
+    private ?string $cdn     = null;
 
     public function __construct( $c ){
         $this->app = $c;
     }
 
-    public function & setName( $name ){
+    public function & setName( string $name ): mypanel{
         $this->name = $name;
         return $this;
     }
     
-    public function & setKey( $key, $keyhtml = 'KEY' ){
-        $this->key     = $key;
-        $this->keyhtml = $keyhtml;
+    public function & addKey( string $key, string $keyhtml ): mypanel{
+        $this->keys[]     = $key;
+        $this->keyshtml[] = $keyhtml;
         return $this;
     }
 
-    public function & setSize( $size, $sizeoffset = 0 ){
+    public function & setSize( int $size, int $sizeoffset = 0 ): mypanel{
         $this->size       = $size;
         $this->sizeoffset = $sizeoffset;
         return $this;
     }
 
-    public function & setTitle( $label, $icon = '', $description = '' ){
+    public function & setTitle( string $label, string $icon = '', string $description = '' ):mypanel{
         $this->title = array( 'label' => $label, 'icon' => $icon, 'description' => $description );
         return $this;
     }
 
-    public function & setAction( $onclick ){
+    public function & setAction( array $onclick ):mypanel{
         $this->action = $onclick;
         return $this;
     }
 
-    public function & setEmptyMessage( $emptymsg ){
-        $this->emptymsg = $emptymsg;
+    public function & setEmptyMessage( string $message, $class = 'callout-info', $title = '' ):mypanel{
+        $this->emptymsg = array( 'message' => $message, 'class' => $class, 'title' => $title );
         return $this;
     }
 
-    public function & setValues( $values ){
-        if( is_array( $values ) )
-            $this->values = $values;
+    public function & setValues( array $values ):mypanel{
+        $this->values = $values;
 
         return $this;
     }
 
-    public function & addThumb( $key, $static = false, $size = 3, $urlobj = '', $classkey = '', $default = '' ){
-        $this->elements[ 'thumb' ] = array( 'key' => $key, 'static' => $static, 'size' => $size, 'urlobj' => $urlobj, 'classkey' => $classkey, 'default' => $default );
+    public function & addThumb( string $key, $static = false, $size = 3, ?array $urlobj = null, $classkey = '', $default = '', $ratingkey = '' ):mypanel{
+        $this->elements[ 'thumb' ] = array( 'key' => $key, 'static' => $static, 'size' => $size, 'urlobj' => $urlobj, 'classkey' => $classkey, 'default' => $default, 'ratingkey' => $ratingkey, 'ratingobj' => $this->app->rating->setName( $key ) );
         return $this;
     }
 
-    public function & setCDN( $cdn ){
+    public function & setCDN( string $cdn ):mypanel{
         $this->cdn = $cdn;
         return $this;
     }
 
-    public function & addTitle( $key, $static = false, $urlobj = null, $maxsize = '' ){
+    public function & addTitle( string $key, $static = false, ?array $urlobj = null, $maxsize = '' ):mypanel{
         $this->elements[ 'title' ] = array( 'key' => $key, 'static' => $static, 'urlobj' => $urlobj, 'maxsize' => $maxsize );
         return $this;
     }
 
-    public function & addReference( $key ){
+    public function & addReference( string $key ):mypanel{
         $this->elements[ 'reference' ] = array( 'key' => $key );
         return $this;
     }
 
-    public function & addDescription( $key, $static = false, $onclick = '', $maxsize = '' ){
+    public function & addDescription( string $key, $static = false, $onclick = '', $maxsize = '' ):mypanel{
         $this->elements[ 'description' ] = array( 'key' => $key, 'static' => $static, 'onclick' => $onclick, 'maxsize' => $maxsize );
         return $this;
     }
 
-    public function & addBackground( $key ){
+    public function & addBackground( string $key ):mypanel{
         $this->elements[ 'back' ] = array( 'key' => $key );
         return $this;
     }
 
-    public function & addInfo( $key, $prefix = '', $sufix = '', $iclass = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $depends = false ){
+    public function & addInfo( string $key, $prefix = '', $sufix = '', $iclass = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $depends = false ):mypanel{
         $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 0, 'prefix' => $prefix, 'sufix' => $sufix, 'iclass' => $iclass, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix, 'depends' => $depends );
         return $this;
     }
 
-    public function & addProgress( $key ){
-        $this->elements[ 'progress' ] = array( 'key' => $key );
+    public function & addInfoLabel( string $key, string $label, string $iclass ):mypanel{
+        $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 2, 'iclass' => $iclass, 'label' => $label );
         return $this;
     }
 
-    public function & ajaxUpdateProgress( $key, $value ){
+    public function & addProgress( string $key, ?string $class = 'success' ):mypanel{
+        $this->elements[ 'progress' ] = array( 'key' => $key, 'class' => $class );
+        return $this;
+    }
+
+    public function & ajaxUpdateProgress( string $key, $value ):mypanel{
         $this->app->ajax->css( '#ppb' . $key, 'width', $value . '%' );
         return $this;
     }
 
-    public function & ajaxUpdateStatus( $key, $statuskey, $value ){
+    public function & ajaxUpdateStatus( $key, $statuskey, $value ):mypanel{
 
         if( isset( $this->elements[ 'status' ] ) )
             foreach( $this->elements[ 'status' ] as $el )
@@ -118,7 +122,7 @@ class mypanel{
         return $this;
     }
 
-    public function & ajaxUpdateInfo( $panelkey, $infokey, $value, $extravalue = '' ){
+    public function & ajaxUpdateInfo( $panelkey, $infokey, $value, $extravalue = '' ):mypanel{
         
         // get prefix and extrasufix
         if( isset( $this->elements[ 'info' ][ $infokey ] ) )
@@ -129,71 +133,71 @@ class mypanel{
         return $this;
     }
 
-    public function & ajaxHideInfo( $panelkey, $infokey ){
+    public function & ajaxHideInfo( string $panelkey, string $infokey ):mypanel{
         
         $this->app->ajax->html( '#pic' . $infokey . $panelkey, '' )
                         ->switchClass( '#pi' . $infokey . $panelkey, 'hide', 'hide' );
         return $this;
     }
 
-    public function & ajaxMenuLabel( $panelkey, $value ){
+    public function & ajaxMenuLabel( string $panelkey, string $value ):mypanel{
         
         $this->app->ajax->html( '#pms' . $panelkey, $value );
 
         return $this;
     }
 
-    public function & addInfoThumb( $key, $size = null, $onclick = '' ){
+    public function & addInfoThumb( string $key, $size = null, $onclick = '' ):mypanel{
         $this->elements[ 'info' ][ $key ] = array( 'key' => $key, 'type' => 1, 'size' => $size, 'onclick' => $onclick );
         return $this;
     }
 
-    public function & setInfoFilter( $key, $filter ){
+    public function & setInfoFilter( string $key, string $filter ):mypanel{
         $this->elements[ 'info' ][ $key ][ 'filter' ] = $filter;
         return $this;
     }
 
-    public function & addStatus( $key, $prefix = '', $sufix = '' ){
+    public function & addStatus( string $key, string $prefix = '', string $sufix = '' ):mypanel{
         $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 1, 'prefix' => $prefix, 'sufix' => $sufix );
         return $this;
     }
 
-    public function & addStatusIcon( $key, $icons, $depends = false, $keyclass = '' ){
+    public function & addStatusIcon( string $key, $icons, $depends = false, $keyclass = '' ):mypanel{
         $this->elements[ 'status' ][] = array( 'key' => $key, 'type' => 2, 'icons' => $icons, 'icon' => is_string( $icons ) ? $icons : false, 'depends' => $depends, 'keyclass' => $keyclass );
         return $this;
     }
 
-    public function & addStatusInfo( $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $classreplacekey = '' ){
+    public function & addStatusInfo( string $key, $prefix = '', $sufix = '', $class = '', $defaultvalue = '', $defaultprefix = '', $defaultsufix = '', $defaultclass = '', $extrakey = false, $extrasufix = '', $classreplacekey = '' ):mypanel{
         $this->elements[ 'status' ][ $key ] = array( 'key' => $key, 'type' => 3, 'prefix' => $prefix, 'sufix' => $sufix, 'class' => $class, 'defaultvalue' => $defaultvalue, 'defaultprefix' => $defaultprefix, 'defaultsufix' => $defaultsufix, 'defaultclass' => $defaultclass, 'extrakey' => $extrakey, 'extrasufix' => $extrasufix, 'classreplacekey' => $classreplacekey );
         return $this;
     }
 
-    public function & addStatusThumb( $key ){
+    public function & addStatusThumb( string $key ):mypanel{
         $this->elements[ 'status' ][ $key ] = array( 'key' => $key, 'type' => 4 );
         return $this;
     }
 
-    public function & setStatusInfoFilter( $key, $filter ){
+    public function & setStatusInfoFilter( string $key, string $filter ):mypanel{
         $this->elements[ 'status' ][ $key ][ 'filter' ] = $filter;
         return $this;
     }
 
-    public function & ajaxStatusIconShow( $key, $id, $operation = true ){
+    public function & ajaxStatusIconShow( string $key, string $id, bool $operation = true ):mypanel{
         $this->app->ajax->css( '#pani' . $id . $key, 'display', $operation ? 'inline' : 'none' );
         return $this;
     }
 
-    public function & ajaxStatusIconShowClass( $classname, $operation = true ){
+    public function & ajaxStatusIconShowClass( $classname, $operation = true ):mypanel{
         $this->app->ajax->css( '.panicon' . $classname, 'display', $operation ? 'inline' : 'none' );
         return $this;
     }
 
-    public function & ajaxThumbChange( $src, $class ){
+    public function & ajaxThumbChange( $src, $class ):mypanel{
         $this->app->ajax->attr( '.pt' . $class, 'src', ( is_string( $src ) && strlen( $src ) ) ? $src : ( isset( $this->elements[ 'thumb' ][ 'default' ] ) ? $this->elements[ 'thumb' ][ 'default' ] : '' ) );
         return $this;
     }
 
-    public function & ajaxMenuShow( $index, $id, $operation = true ){
+    public function & ajaxMenuShow( $index, $id, $operation = true ):mypanel{
 
         if( isset( $this->elements[ 'menu' ] ) ){
             foreach( $this->elements[ 'menu' ] as $menu ){
@@ -211,44 +215,44 @@ class mypanel{
         return $this;
     }
 
-    public function & ajaxMenuShowClass( $index, $class, $operation = true ){
+    public function & ajaxMenuShowClass( $index, $class, $operation = true ):mypanel{
         $this->app->ajax->css( '.panmc' . $index . $class, 'display', $operation ? 'block' : 'none' );
         return $this;
     }
 
-    public function & addStatusSeparator( $sep = '|' ){
+    public function & addStatusSeparator( $sep = '|' ):mypanel{
         $this->elements[ 'status' ][] = array( 'type' => 0, 'sep' => $sep );
         return $this;
     }
 
-    public function & addButton( $label, $urlobj, $icon = 'icon-cog4', $color = '', $id = '', $depends = false, $dependsLabelPrefix = '', $dependsLabelSufix = '', $dependsValueKey = '', $showdepends = '' ){
-        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'color' => $color, 'id' => $id, 'depends' => $depends, 'dependsLabelPrefix' => $dependsLabelPrefix, 'dependsLabelSufix' => $dependsLabelSufix, 'dependsValueKey' => $dependsValueKey, 'showdepends' => $showdepends );
+    public function & addButton( $label, $urlobj, $icon = 'icon-cog4', $id = '', $dependsLabelPrefix = null, $dependsLabelSufix = null, $dependsValueKey = null, $showdepends = '' ):mypanel{
+        $this->elements[ 'menu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'id' => $id, 'dependsLabelPrefix' => $dependsLabelPrefix, 'dependsLabelSufix' => $dependsLabelSufix, 'dependsValueKey' => $dependsValueKey, 'showdepends' => $showdepends );
         return $this;
     }
 
-    public function & addMenu( $options, $icon = 'icon-cog4', $label = '' ){
+    public function & addMenu( $options, $icon = 'icon-cog4', $label = '' ):mypanel{
         $this->elements[ 'menu' ][] = array( 'type' => 1, 'icon' => $icon, 'options' => $options, 'label' => $label );
         return $this;
     }
 
-    public function & setMenuItemDisabled( $menuindex, $subindex, $depends ){
+    public function & setMenuItemDisabled( $menuindex, $subindex, $depends ):mypanel{
 
         if( isset( $this->elements[ 'menu' ][ $menuindex ][ 'options' ][ $subindex ] ) )
             $this->elements[ 'menu' ][ $menuindex ][ 'options' ][ $subindex ] += array( 'disabled' => true, 'disableddepends' => $depends );
         return $this;
     }
 
-    public function & addToolbarButton( $label, $urlobj = '', $icon = 'icon-cog4', $color = '', $class = '', $htmlid = '' ){
+    public function & addToolbarButton( $label, $urlobj = '', $icon = 'icon-cog4', $color = '', $class = '', $htmlid = '' ):mypanel{
         $this->elements[ 'tmenu' ][] = array( 'type' => 0, 'icon' => $icon, 'urlobj' => $urlobj, 'label' => $label, 'color' => $color, 'class' => $class, 'htmlid' => $htmlid );
         return $this;
     }
 
-    public function & addToolbarMenu( $options, $icon = 'icon-cog4', $label = '' ){
+    public function & addToolbarMenu( $options, $icon = 'icon-cog4', $label = '' ):mypanel{
         $this->elements[ 'tmenu' ][] = array( 'type' => 1, 'icon' => $icon, 'options' => $options, 'label' => $label );
         return $this;
     }
 
-    public function & addToolbarMenuSelect( $id, $options, $icon = 'icon-cog4', $label = null ){
+    public function & addToolbarMenuSelect( $id, $options, $icon = 'icon-cog4', $label = null ):mypanel{
 
         if( is_null( $label ) ){
             $label = 'menu';
@@ -267,12 +271,12 @@ class mypanel{
         return $this;
     }
 
-    public function & addToolbarSeparator( $iterations = 1 ){
+    public function & addToolbarSeparator( $iterations = 1 ):mypanel{
         $this->elements[ 'tmenu' ][] = array( 'type' => 3, 'it' => $iterations );
         return $this;
     }
 
-    public function & ajaxToolbarMenuSelected( $ctxmenuid, $index ){
+    public function & ajaxToolbarMenuSelected( $ctxmenuid, $index ):mypanel{
 
         if( isset( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] ) ){
             foreach( $this->elements[ 'tmenu' ][ $ctxmenuid ][ 'options' ] as $i => $arr ){
@@ -303,7 +307,7 @@ class mypanel{
         return $this;
     }
 */
-    public function & setMore( $onclick, $perpage = 10, $offset = 0, $label = 'more' ){
+    public function & setMore( $onclick, $perpage = 10, $offset = 0, $label = 'more' ):mypanel{
         
         // reset counter
 //        $this->app->session()->set( 'p' . $this->name . 'perpage', $perpage );
@@ -340,13 +344,13 @@ class mypanel{
         return $this->offset;
     }
     
-    public function & resetOffset(){
+    public function & resetOffset():mypanel{
         $this->offset = 0;
 //        $this->app->session()->set( 'p' . $this->name . 'offset', 0 );
         return $this;
     }
 
-    public function & addAjaxValues( $values, $append = true ){
+    public function & addAjaxValues( $values, $append = true ):mypanel{
 
         if( !is_array( $values ) )
             return $this;
@@ -363,12 +367,12 @@ class mypanel{
         return $this;
     }
 
-    public function & ajaxRemove( $tag ){
+    public function & ajaxRemove( $tag ):mypanel{
         $this->app->ajax->hide( '#' . $this->name . $tag );
         return $this;
     }
 
-    public function & updateAjaxValues( $values ){
+    public function & updateAjaxValues( $values ):mypanel{
 
         if( !is_array( $values ) )
             return $this;
@@ -388,32 +392,34 @@ class mypanel{
     }
 
 
-    public function show( $htmlid ){
+    public function & show( string $htmlid ):mypanel{
         $this->app->ajax->html( $htmlid, $this->render() );
+        return $this;
     }
 
 
-    public function __toString(){
+    public function __toString():string{
         return $this->render();
     }
 
 
-    private function render( $values = null ){
-        return $this->app->view->fetch( '@my/mypanel.twig', array( 'values'     => is_null( $values ) ? $this->values : $values,
-                                                                            'elements'   => $this->elements,
-                                                                            'name'       => $this->name,
-                                                                            'key'        => $this->key,
-                                                                            'keyhtml'    => $this->keyhtml,
-                                                                            'emptymsg'   => $this->emptymsg,
-                                                                            'cdn'        => $this->cdn,
-                                                                            'title'      => $this->title,
-                                                                            'more'       => $this->more,
-                                                                            'offset'     => $this->offset + $this->perpage,
-                                                                            'perpage'    => $this->perpage,
-                                                                            'size'       => $this->size,
-                                                                            'sizeoffset' => $this->sizeoffset,
-                                                                            'allitems'   => is_null( $values ),
-                                                                            'action'     => $this->action,
-                                                                            'tags'       => array( array( $this->key ), array( $this->keyhtml ) ) ) );
+    private function render( $values = null ):string{
+
+        return $this->app->view->fetch( '@my/mypanel.twig',
+            array(
+                'values'     => $values ?? $this->values,
+                'elements'   => $this->elements,
+                'name'       => $this->name,
+                'emptymsg'   => $this->emptymsg,
+                'cdn'        => $this->cdn,
+                'title'      => $this->title,
+                'more'       => $this->more,
+                'offset'     => $this->offset + $this->perpage,
+                'perpage'    => $this->perpage,
+                'size'       => $this->size,
+                'sizeoffset' => $this->sizeoffset,
+                'allitems'   => is_null( $values ),
+                'action'     => $this->action,
+                'tags'       => array( $this->keys, $this->keyshtml ) ) );
     }
 }

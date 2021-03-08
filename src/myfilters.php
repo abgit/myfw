@@ -25,6 +25,15 @@ class myfilters{
         return nl2br( $string );
     }
 
+    public function plural( $value, $singular, $plural ){
+        return (float) $value === 1.0 ? $singular : $plural;
+    }
+
+    public function firstname( $value ){
+        $res = explode(' ', ucfirst( trim( $value ) ) );
+        return $res[0] ?? $value;
+    }
+
     public function nozero( $string ){
         return empty( $string ) ? '' : $string;
     }
@@ -247,7 +256,7 @@ class myfilters{
     }
 
     public function replaceurl( $val, $valuearray, $tags ){
-        return str_replace( isset( $tags[1] ) ? $tags[1] : array(), array_map( function($n) use ( $valuearray ){ return isset( $valuearray[ $n ] ) ? $valuearray[ $n ] : ''; }, isset( $tags[0] ) ? $tags[0] : array() ), $val );
+        return str_replace( $tags[1] ?? array(), array_map( function($n) use ( $valuearray ){ return $valuearray[ $n ] ?? ''; }, $tags[0] ?? array() ), $val );
     }
 
 

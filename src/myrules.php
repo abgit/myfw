@@ -155,6 +155,20 @@ class myrules{
         return ( (float)$value <= (float)$opts);
     }
 
+    public function instagramusername( $value ):bool{
+        return preg_match('/^([A-Za-z0-9._](?:(?:[A-Za-z0-9._]|(?:\.(?!\.))){2,28}(?:[A-Za-z0-9._]))?)$/', $value ) === 1 ||
+               preg_match('/^@([A-Za-z0-9._](?:(?:[A-Za-z0-9._]|(?:\.(?!\.))){2,28}(?:[A-Za-z0-9._]))?)$/', $value ) === 1 ||
+               preg_match('/^https?:\/\/(www.)?instagram.com\/([A-Za-z0-9._](?:(?:[A-Za-z0-9._]|(?:\.(?!\.))){2,28}(?:[A-Za-z0-9._]))?)$/', $value ) === 1;
+    }
+
+    public function youtubeusername( $value ):bool{
+        return preg_match('/^(UC([A-Za-z0-9._]){18,38})$/', $value ) === 1 ||
+               preg_match('/^([A-Za-z0-9._]){1,28})$/', $value ) === 1 ||
+               preg_match('/^https?:\/\/(www.)?youtube.com\/channel\/UC([A-Za-z0-9._]){18,38}$/', $value ) === 1;
+               preg_match('/^https?:\/\/(www.)?youtube.com\/c\/([A-Za-z0-9._]){1,28}$/', $value ) === 1;
+               preg_match('/^https?:\/\/(www.)?youtube.com\/([A-Za-z0-9._]){1,38}$/', $value ) === 1;
+    }
+
     public function instagramBio( $value, $bio ){
         $username = $this->app->filters->usernameinstagram( $value );
 

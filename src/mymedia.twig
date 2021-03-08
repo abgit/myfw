@@ -21,6 +21,7 @@
 				</ul>
 
 
+				{% if elements.menu %}
 				<ul class="breadcrumb-buttons">
 
 					<li class="dropdown mymediadrop">
@@ -38,33 +39,53 @@
 
 						</ul>
 					</li>
-
 				</ul>
+				{% endif %}
+
+
+
 			</div>
 
 
 			<div class="thumbnail thumbnail-boxed">
 				<div>
 					{% if elements.thumb and value[ elements.thumb.key ] %}
-						<img class="uploadcareimage" src="{{ value[ elements.thumb.key ] }}" alt=""/>
+						<img class="{{ elements.thumb.class }}" src="{{ value[ elements.thumb.key ] }}"/>
 					{% elseif elements.video and value[ elements.video.key ] %}
-						<video controls class="uploadcarevideo"><source src="{{ value[ elements.video.key ] }}" type="video/mp4" /></video>
+						<video controls class="{{ elements.video.class }}"><source src="{{ value[ elements.video.key ] }}" type="video/mp4" /></video>
 					{% endif %}
 				</div>
 				<div class="caption">
 
 					<a {{ elements.title.urlobj|urlobj( value, tags ) }} class="caption-title">{{ value[ elements.title.keytitle ] }}</a>
-					{{ value[ elements.description.key ]|nl2br }}
+
+					{% if elements.description.mini %}
+						{{ value[ elements.description.key ]|t( 25 ) }}
+					{% else %}
+						{{ value[ elements.description.key ]|t( 10000 )|nl2br }}
+					{%  endif %}
+
+					{%  if elements.button %}
+						<a type="button" {{ elements.button.urlobj|urlobj( value, tags ) }} class="btn btn-default" style="width:100%;margin-top:20px">{{ elements.button.label }}</a>
+					{%  endif %}
 
 					{% if elements.small %}
 					<hr/>
-					<small>{{ elements.small.prefix }}{{ value[ elements.small.key ] }}{{ elements.smallfixed.prefix }}
+					<small>{{ elements.small.prefix }}{{ value[ elements.small.key ]|t(30) }}
+						{{ elements.smallfixed.prefix|raw }}
 						{% for option in elements.smallfixed.options %}
 							{% if ( option.value is defined and option.value is same as(value[ elements.smallfixed.key ])  ) %}
 								{{ option.label ? option.label : value }}
 							{% endif %}
 						{% endfor %}
+						&nbsp;
 					</small>
+					{% endif %}
+
+					{% if elements.rating %}
+						<div style="display:block">
+							{{ elements.rating.obj.setvalue( value[ elements.rating.key ] ).setOtherValues( value )|raw }}
+						</div>
 					{% endif %}
 
 				</div>
@@ -76,9 +97,9 @@
 
 	{% endfor %}
 	{% elseif emptymsg %}
-		<div style="margin: 0px 20%" class="callout callout-info fade in">
-			<h5 >Info</h5>
-			<p >{{ emptymsg }}</p>
+		<div style="margin: 0px 20%" class="callout {{ emptymsg.class }} fade in">
+			{% if emptymsg.title %}<h5>{{ emptymsg.title }}</h5>{% endif %}
+			{% if emptymsg.message %}<p>{{ emptymsg.message }}</p>{% endif %}
 		</div>
 	{% endif %}
 

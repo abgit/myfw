@@ -66,7 +66,12 @@
            <img src='{{ values[ el.key ] }}' alt=''>
         </a>
 
-        {% elseif el.type == 'imagelist' %}
+       {% elseif el.type == 'separator' %}
+       <br/>
+       {% elseif el.type == 'help' %}
+       <span class="help-block">{{ el.message }}</span>
+
+       {% elseif el.type == 'imagelist' %}
             <div class="row" >
                 {% for img in el.list %}
 
@@ -96,7 +101,7 @@
             <br>
 
         {% elseif el.type == 'button' %}
-            <a id="{{  el.htmlid }}" style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}" {{ el.urlobj|urlobj }}><i class="{{ el.icon }}"></i> {{ el.label }}</a>
+            <a {% if el.htmlid %}id="{{ el.htmlid }}" {% endif %}style="margin:5px 3px 0px 0px{% if el.colorbackground %};background-color:{{el.colorbackground}}{%endif%}{% if el.color %};color:{{el.color}}{%endif%}" type="button" class="btn btn-{{ el.class|default( classname ) }}" {{ el.urlobj|urlobj }}>{% if el.icon %}<i class="{{ el.icon }}"></i> {% endif %}{{ el.label }}</a>
 
         {% elseif el.type == 'labelslist' %}
         {% if el.header %}<p class="myfwlabellisthead">{{ el.header|raw }}{% endif %}
