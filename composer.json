@@ -15,16 +15,12 @@
 		 
 	     "linusu/bitcoin-address-validator": "0.*",
 
-		 "pusher/pusher-php-server": "^3",
-
 		 "aptoma/twig-markdown": "3.*",
 		 "michelf/php-markdown": "1.*",
 		 "league/html-to-markdown": "4.*",
 		 
-		 "uploadcare/uploadcare-php": ">=v2.0,<3.0",
-		 "ezyang/htmlpurifier": "4.*",
-
-		 "nexmo/client": "1.*"
+		 "ezyang/htmlpurifier": "4.*"
+		 
 	},
 	"require-dev": {
 		"roave/security-advisories": "dev-master"
